@@ -1,1 +1,16 @@
-                            
+body {
+    position: relative;
+    font-family: "Inter";
+    background-color: #D1EAFF;;
+}
+
+.estilo-navegacao {
+    position: absolute;
+    width: 266px;
+    height: 100vh;
+    left: -2px;
+    top: 0px;
+    background-color: #4F6C8C;
+    border-radius: 6px;
+}
+
