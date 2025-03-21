@@ -13,4 +13,18 @@ body {
     background-color: #4F6C8C;
     border-radius: 6px;
 }
+a{
+    padding: 5px;
+    color: rgb(255, 255, 255);
+}
+.side-bar{
+    text-align: center;
+    position: absolute;
+    width: 234px;
+    height: 158px;
+    left: 12px;
+    top: 358px;   
+}
+
+
 
