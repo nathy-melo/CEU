@@ -1,7 +1,22 @@
 body {
-    position: relative;
     font-family: "Inter", sans-serif;
     background-color: #D1EAFF;
+}
+
+h5 {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 132%;
+    text-align: center;
+    letter-spacing: -0.01em;
+    color: #D1EAFF;
+}
+
+.container-layout {
+    display: flex;
+    height: 100vh;
 }
 
 .estilo-navegacao {
@@ -16,6 +31,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
+    flex-shrink: 0;
 }
 
 .avatar {
@@ -27,19 +43,14 @@ body {
 }
 
 .side-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
     width: 100%;
     text-align: center;
-}
-
-h5 {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 132%;
-    text-align: center;
-    letter-spacing: -0.01em;
-    color: #D1EAFF;
+    margin-bottom: 110%;
 }
 
 .side-bar-item {
@@ -73,28 +84,11 @@ h5 {
     z-index: -1;
 }
 
-.mt-auto {
-    margin-top: auto;
-    padding-bottom: 20px;
-}
-
-.side-bar-highlight {
-    position: absolute;
-    width: 234px;
-    height: 43px;
-    left: 14px;
-    top: 299px;
-    background: #A2C7FF;
-    opacity: 0.3;
-    border-radius: 20px;
-}
-
 .sidebar-footer {
     width: 100%;
     text-align: center;
     position: absolute;
     bottom: 20px;
-    padding-bottom: 0;
 }
 
 .ceu-logo {
@@ -125,4 +119,153 @@ h5 {
     line-height: 132%;
     text-align: center;
     letter-spacing: -0.02em;
+}
+
+.conteudo-principal {
+    flex-grow: 1;
+    position: relative;
+    padding-top: 50px;
+}
+
+.event-search-container {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    position: absolute;
+    top: 10%;
+    left: 55%;
+    transform: translateX(-50%);
+}
+
+.search-bar {
+    position: relative;
+    width: 350px;
+    background: #FFFFFF;
+    border-radius: 6px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Istok Web';
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 132%;
+    text-align: center;
+    letter-spacing: -0.02em;
+    color: #000000;
+}
+
+.search-icon {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 70px;
+    height: 70px;
+}
+
+.filter-button {
+    position: relative;
+}
+
+.filter-button .btn {
+    padding-right: 40px;
+    font-size: 20px;
+    border-radius: 6px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
+    font-family: 'Istok Web';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 132%;
+    letter-spacing: -0.02em;
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+.filter-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+}
+
+.eventos-container {
+    font-family: "Inter";
+    text-align: center;
+    margin-top: 120px;
+    width: calc(100% - 220px);
+    margin-left: 220px;
+}
+
+.eventos-title {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 120%;
+    text-align: center;
+    letter-spacing: -0.01em;
+    background-color: #4F6C8C;
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 10px;
+    color: #FFFFFF;
+    text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.eventos-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.eventos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 20px;
+    justify-content: center;
+    width: calc(100% - 220px);
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.event-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    min-height: 120px;
+}
+
+.event-card h5 {
+    font-size: 16px;
+    color: #000000;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    line-height: 132%;
+    letter-spacing: -0.02em;
+    text-align: left;
+}
+
+.event-card p {
+    font-size: 14px;
+    color: #000000;
+    margin: 5px 0;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+    letter-spacing: -0.01em;
 }
