@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Istok+Web:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alice&family=Istok+Web:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="ceu.css">
+
+    <title>Início Controle de Eventos Unificado</title>
+
+</head>
+
+<body>
+
+    <div class="container-layout">
+
+        <!-- Barra Lateral -->
+        <div class="estilo-navegacao text-white p-3 d-flex flex-column">
+            <div class="text-center">
+                <img src="elisa.svg" alt="Elisa" class="avatar">
+                <h5 class="mt-2">Elisa</h5>
+            </div>
+
+            <div class="side-bar mt-4">
+                <a class="side-bar-item active">Início</a>
+                <a class="side-bar-item">Meus Eventos</a>
+                <a class="side-bar-item">Certificados</a>
+                <a class="side-bar-item">Configurações</a>
+            </div>
+
+            <div class="sidebar-footer text-center">
+                <img src="CEU 1.png" alt="Logo CEU" class="ceu-logo">
+                <p class="duvidas">Dúvidas ou<br>Sugestões?<br>
+                    <a href="#" class="fale-conosco">Fale conosco</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="conteudo-principal">
+            <div class="event-search-container">
+                <!-- Barra de Pesquisa -->
+                <div class="search-bar">
+                    <input type="text" class="form-control" placeholder="Procurar eventos...">
+                    <img src="lupa.svg" alt="Ícone de lupa" class="search-icon">
+                </div>
+
+                <!-- Botão Filtrar -->
+                <div class="filter-button">
+                    <button class="btn">Filtrar</button>
+                    <img src="filtro.svg" alt="Ícone de filtro" class="filter-icon">
+                </div>
+            </div>
+
+            <div class="eventos-container">
+
+                <h2 class="eventos-title">Eventos acontecendo</h2>
+
+                <div class="eventos-wrapper">
+
+                    <div class="eventos-grid">
+
+                        <div class="event-card">
+                            <h5>Roda de Capoeira</h5>
+                            <p>Em andamento</p>
+                            <p>Data: 07/03/25</p>
+                            <p>Certificado: Sim</p>
+                        </div>
+
+                        <div class="event-card">
+                            <h5>Oficina de Crochê</h5>
+                            <p>Em andamento</p>
+                            <p>Data: 17/03/25</p>
+                            <p>Certificado: Sim</p>
+                        </div>
+
+                        <div class="event-card">
+                            <h5>Oficina de Forró</h5>
+                            <p>Em andamento</p>
+                            <p>Data: 20/03/25</p>
+                            <p>Certificado: Não</p>
+                        </div>
+
+                        <div class="event-card">
+                            <h5>Cinema Comentado</h5>
+                            <p>Em andamento</p>
+                            <p>Data: 15/02/25</p>
+                            <p>Certificado: Não</p>
+                        </div>
+
+                        <div class="event-card">
+                            <h5>Palestra</h5>
+                            <p>Em andamento</p>
+                            <p>Data: 20/02/25</p>
+                            <p>Certificado: Sim</p>
+                        </div>
+
+                        <div class="event-card">
+                            <h5>Oficina de Peteca</h5>
+                            <p>Em andamento</p>
+                            <p>Data: 30/02/25</p>
+                            <p>Certificado: Sim</p>
+                        </div>
+                    
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    
+    </div> 
+
+</body>
+
+</html>
