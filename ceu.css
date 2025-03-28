@@ -1,16 +1,128 @@
 body {
     position: relative;
-    font-family: "Inter";
-    background-color: #D1EAFF;;
+    font-family: "Inter", sans-serif;
+    background-color: #D1EAFF;
 }
 
 .estilo-navegacao {
     position: absolute;
-    width: 266px;
+    width: 200px;
     height: 100vh;
-    left: -2px;
-    top: 0px;
+    left: 0;
+    top: 0;
     background-color: #4F6C8C;
     border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
 }
 
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #D1EAFF;
+    display: block;
+}
+
+.side-bar {
+    width: 100%;
+    text-align: center;
+}
+
+h5 {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 132%;
+    text-align: center;
+    letter-spacing: -0.01em;
+    color: #D1EAFF;
+}
+
+.side-bar-item {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    z-index: 1;
+    font-weight: bold;
+}
+
+.side-bar-item.active {
+    position: relative;
+    font-weight: bold;
+}
+
+.side-bar-item.active::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #A1C7FF;
+    opacity: 0.3;
+    border-radius: 20px;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+
+.mt-auto {
+    margin-top: auto;
+    padding-bottom: 20px;
+}
+
+.side-bar-highlight {
+    position: absolute;
+    width: 234px;
+    height: 43px;
+    left: 14px;
+    top: 299px;
+    background: #A2C7FF;
+    opacity: 0.3;
+    border-radius: 20px;
+}
+
+.sidebar-footer {
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
+    padding-bottom: 0;
+}
+
+.ceu-logo {
+    width: 164px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.duvidas {
+    font-family: "Istok Web", sans-serif;
+    font-size: 20px;
+    color: white;
+    margin-top: 0;
+    font-weight: bold;
+    font-weight: 700;
+    line-height: 108%;
+    text-align: center;
+    letter-spacing: -0.02em;
+}
+
+.fale-conosco {
+    font-family: "Alice", serif;
+    color: white;
+    text-decoration-line: underline;
+    font-weight: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 132%;
+    text-align: center;
+    letter-spacing: -0.02em;
+}
