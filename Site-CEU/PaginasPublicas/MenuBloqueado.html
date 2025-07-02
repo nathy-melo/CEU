@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Lateral Bloqueado</title>
+  <link rel="stylesheet" href="../styleGlobal.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: var(--fundo);
+      font-family: sans-serif;
+    }
+
+    .Menu {
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: clamp(200px, 15%, 300px);
+      background-color: var(--caixas);
+      box-shadow: 5px 0 30px black;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .Menu.expanded {
+      transform: translateX(0);
+    }
+
+    .conteudo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .perfil {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+      margin-top: 20px;
+    }
+
+    .perfil button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .perfil img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: var(--botao);
+    }
+
+    .perfil span {
+      color: white;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+      max-width: 90%;
+      font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    button {
+      color: white;
+      font-size: 1.2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button.ativo {
+      background-color: var(--botao);
+      border-radius: 30px;
+      box-shadow: 0 0 0 5px var(--botao);
+    }
+
+    .rodape {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 10px;
+      background-color: var(--caixas);
+      z-index: 0;
+    }
+
+    .rodape img {
+      width: 150px;
+      display: block;
+    }
+
+    .rodape div {
+      color: white;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      white-space: nowrap;
+    }
+
+    .rodape p {
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .menu-toggle {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 25px);
+      transform: translate(-50%, -50%);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 1000;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    /* Estado inicial da seta (>) */
+    .menu-toggle::before {
+      content: "➤";
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    /* Estado da seta quando o menu está expandido (<) */
+    .Menu.expanded .menu-toggle::before {
+      transform: rotate(180deg);
+    }
+
+    .conteudo-principal {
+      flex: 1;
+      transition: margin-left 0.3s ease;
+      margin-left: 0;
+    }
+
+    .Menu.expanded + .conteudo-principal {
+      margin-left: clamp(200px, 15%, 300px);
+    }
+
+    /* Novos estilos para a caixa preta e itens */
+    .menu-items-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .caixa-preta {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: calc(3 * (1.2rem + 5px) + 2 * 20px);
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      z-index: 2;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cadeado-img {
+      max-width: 70%;
+      max-height: 70%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+      pointer-events: none;
+      /* impede clique na imagem, só na caixa-preta */
+    }
+
+    .menu-items {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .menu-item {
+      color: white;
+      font-size: 1.2rem;
+      width: 100%;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="Menu expanded">
+    <div class="conteudo">
+      <div class="perfil">
+        <button class="botao-perfil" onclick="carregarPagina('login')">
+          <img src="../Imagens/FotodePerfil.webp" alt="Foto de perfil">
+          <span>Perfil</span>
+        </button>
+      </div>
+      <button class="botao-inicio" onclick="carregarPagina('inicio')">Início</button>
+      <div class="menu-items-container">
+
+        <div class="caixa-preta">
+          <img src="../Imagens/Cadeado.png" alt="Cadeado" class="cadeado-img" />
+        </div>
+        <div class="menu-items">
+          <div class="menu-item">Meus eventos</div>
+          <div class="menu-item">Certificados</div>
+          <div class="menu-item">Configurações</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="botao-faleConosco rodape" onclick="carregarPagina('faleConosco')">
+      <img src="../Imagens/CEU-Vetor.png" alt="Logo CEU">
+      <div>Dúvidas ou Sugestões?</div>
+      <p>Fale Conosco</p>
+    </button>
+  </div>
+
+  <script src="MenuBloqueado.js"></script>
+</body>
+
+</html>
