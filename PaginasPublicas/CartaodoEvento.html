@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartão do Evento</title>
+</head>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #d1eaff;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1.2rem;
+  }
+
+  .secao-detalhes-evento {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .cartao-evento {
+    background-color: #4f6c8c;
+    border-radius: 1.875rem;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.6);
+    padding: 1.875rem;
+    width: 100%;
+    max-width: 51.5625rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .corpo-cartao {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.875rem 0.975rem;
+    align-items: start;
+  }
+
+  .grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .grupo-campo label {
+    font-weight: 700;
+    font-size: 1.35rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .caixa-valor {
+    background-color: #ffffff;
+    border-radius: 1.875rem;
+    color: #000000;
+    padding: 0.45rem 0.9rem;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    min-height: 2.025rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .campo-nome {
+    grid-column: 1 / 3;
+  }
+
+  .campo-local {
+    grid-column: 3 / 5;
+  }
+
+  .campo-descricao {
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+  }
+
+  .caixa-descricao {
+    min-height: 15.45rem;
+  }
+
+  .campo-publico {
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
+  }
+
+  .campo-categoria {
+    grid-column: 4 / 5;
+    grid-row: 3 / 4;
+  }
+
+  .rodape-cartao {
+    grid-column: 3 / 5;
+    grid-row: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    margin-top: 0;
+    justify-content: flex-end;
+    height: 100%;
+    align-self: stretch;
+  }
+
+  .texto-login {
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .botao-voltar {
+    background-color: #6598d2;
+    border-radius: 0.225rem;
+    color: #ffffff;
+    padding: 0.6rem 3rem;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.125rem;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+
+<body>
+  <div id="main-content">
+    <main id="secao-detalhes-evento" class="secao-detalhes-evento">
+      <div class="cartao-evento">
+        <div class="corpo-cartao">
+          <div class="grupo-campo campo-nome">
+            <label for="event-name">Nome:</label>
+            <div id="event-name" class="caixa-valor">Evento X</div>
+          </div>
+          <div class="grupo-campo campo-local">
+            <label for="event-local">Local:</label>
+            <div id="event-local" class="caixa-valor">Auditório</div>
+          </div>
+          <div class="grupo-campo campo-data-inicio">
+            <label for="start-date">Data de início:</label>
+            <div id="start-date" class="caixa-valor">07/03/25</div>
+          </div>
+          <div class="grupo-campo campo-data-fim">
+            <label for="end-date">Data de fim:</label>
+            <div id="end-date" class="caixa-valor">07/03/25</div>
+          </div>
+          <div class="grupo-campo campo-hora-inicio">
+            <label for="start-time">Horário início:</label>
+            <div id="start-time" class="caixa-valor">13:00</div>
+          </div>
+          <div class="grupo-campo campo-hora-fim">
+            <label for="end-time">Horário fim:</label>
+            <div id="end-time" class="caixa-valor">14:00</div>
+          </div>
+          <div class="grupo-campo campo-descricao">
+            <label for="description">Descrição:</label>
+            <div id="description" class="caixa-valor caixa-descricao">Descrição</div>
+          </div>
+          <div class="grupo-campo campo-publico">
+            <label for="audience">Público alvo:</label>
+            <div id="audience" class="caixa-valor">Estudantes</div>
+          </div>
+          <div class="grupo-campo campo-categoria">
+            <label for="category">Categoria:</label>
+            <div id="category" class="caixa-valor">Oficina</div>
+          </div>
+          <div class="rodape-cartao">
+            <p class="texto-login">Acesse uma conta para se inscrever</p>
+            <button onclick="carregarPagina('inicio')" class="botao-voltar">Voltar</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+
+</html>

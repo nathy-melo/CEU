@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitar Código</title>
+</head>
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #d1eaff;
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 0.875em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* CSS da seção:solicitar-codigo */
+  #solicitar-codigo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container-formulario {
+    background-color: #4f6c8c;
+    border-radius: 2.1875em;
+    padding: 1.75em 2.1875em;
+    max-width: 34.65em;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.53125em;
+    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
+  }
+
+  .cabecalho-formulario {
+    text-align: center;
+    text-shadow: 0 0.175em 0.875em rgba(0, 0, 0, 0.6);
+  }
+
+  .titulo-formulario {
+    font-size: 2.93125rem;
+    line-height: 1.1;
+    letter-spacing: -0.0581em;
+    margin: 0;
+  }
+
+  .subtitulo-formulario {
+    font-size: 1.05rem;
+    line-height: 1.32;
+    letter-spacing: -0.021em;
+    margin: 0.4375em 0 0;
+  }
+
+  .corpo-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 1.3125em;
+  }
+
+  .entrada-formulario,
+  .area-texto-formulario {
+    background-color: #ffffff;
+    border-radius: 2.1875em;
+    border: none;
+    padding: 0.4375em 1.09375em;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: #4f6c8c;
+    width: 100%;
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .entrada-formulario::placeholder,
+  .area-texto-formulario::placeholder {
+    color: #4f6c8c;
+    opacity: 0.8;
+  }
+
+  .entrada-formulario {
+    height: 2.5em;
+  }
+
+  .area-texto-formulario {
+    height: 5.8625em;
+    padding-top: 0.65625em;
+    resize: vertical;
+  }
+
+  .linha-formulario {
+    display: flex;
+    gap: 0.9625em;
+  }
+
+  .grupo-termos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.65625em;
+    margin-top: -0.21875em;
+  }
+
+  .rotulo-termos {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.021em;
+    color: #ffffff;
+    text-shadow: 0 0.175em 0.875em rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    cursor: pointer;
+  }
+
+  .link-termos {
+    color: #6598d2;
+    text-decoration: underline;
+  }
+
+  .acoes-formulario {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.875em;
+    margin-top: 0.4375em;
+  }
+
+  .botao {
+    background-color: #6598d2;
+    border-radius: 0.2625em;
+    border: none;
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-grow: 0;
+    flex-basis: 7em;
+    text-align: center;
+    min-height: 2em;
+  }
+
+  .botao-voltar {
+      background-color: #6598d2;
+      border-radius: 0.2625em;
+      border: none;
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-grow: 0;
+      flex-basis: 7em;
+      text-align: center;
+      flex-basis: 2em;
+      min-height: 2em;
+      padding: 0.5em;
+    }
+
+  .botao-toggle-termos {
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 1.056em;
+    height: 1.056em;
+    cursor: pointer;
+    padding: 0;
+  }
+  .botao-toggle-termos.selected {
+    box-shadow: 0 0 0 2.5px #6598d2;
+  }
+  .botao-toggle-termos.selected::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0.22em;
+    left: 0.22em;
+    width: 0.6em;
+    height: 0.6em;
+    background: #6598d2;
+    border-radius: 50%;
+  }
+  .botao-toggle-termos {
+    position: relative;
+  }
+  /* Toggle switch custom */
+  .switch-toggle {
+    position: relative;
+    display: inline-block;
+    width: 2em;
+    height: 1.2em;
+    margin-left: 0.5em;
+    vertical-align: middle;
+  }
+  .switch-toggle input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    z-index: 2;
+    cursor: pointer;
+  }
+  .slider-toggle {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .2s;
+    border-radius: 1em;
+  }
+  .slider-toggle:before {
+    position: absolute;
+    content: "";
+    height: 0.9em;
+    width: 0.9em;
+    left: 0.15em;
+    bottom: 0.15em;
+    background-color: #6598d2;
+    transition: .2s;
+    border-radius: 50%;
+  }
+  .switch-toggle input:checked + .slider-toggle {
+    background-color: #6598d2;
+  }
+  .switch-toggle input:checked + .slider-toggle:before {
+    transform: translateX(0.8em);
+    background: #fff;
+  }
+</style>
+
+<body>
+  <div id="main-content">
+    <section id="solicitar-codigo">
+      <div class="container-formulario">
+        <header class="cabecalho-formulario">
+          <h1 class="titulo-formulario">Solicitar Código</h1>
+          <p class="subtitulo-formulario">Receba por e-mail</p>
+        </header>
+        <form class="corpo-formulario">
+          <input type="text" class="entrada-formulario" placeholder="Nome" required>
+          <input type="email" class="entrada-formulario" placeholder="E-mail" required
+            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Digite um e-mail válido">
+          <div class="linha-formulario">
+            <input type="text" class="entrada-formulario" placeholder="CPF" required
+              pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00"
+              id="cpf" maxlength="14">
+            <input type="text" class="entrada-formulario" placeholder="Data de Nascimento" required
+              pattern="\d{2}/\d{2}/\d{4}" title="Digite a data no formato dd/mm/aaaa" id="data-nascimento">
+          </div>
+          <textarea class="area-texto-formulario" placeholder="Mensagem" required></textarea>
+          <div class="grupo-termos">
+            <label class="rotulo-termos">
+              Concordo com os <a onclick="carregarPagina('termos')" class="link-termos">Termos de Condições</a>
+              <span class="switch-toggle">
+                <input type="checkbox" id="aceite-termos" required>
+                <span class="slider-toggle"></span>
+              </span>
+            </label>
+          </div>
+          <div class="acoes-formulario">
+            <button type="button" class="botao" onclick="carregarPagina('cadastroO')" >Voltar</button>
+            <button type="submit" class="botao" id="btnEnviar">Enviar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</body>
+
+</html>
