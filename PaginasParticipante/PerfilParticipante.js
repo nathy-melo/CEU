@@ -67,7 +67,7 @@ function mostrarModalExcluirConta() {
     btnConfirmar.onclick = function() {
         // Aqui você pode colocar a lógica real de exclusão de conta
         alert('Conta excluída!');
-        window.location.href = '/Site-CEU/PaginasPublicas/PrimeiraPagina.html';
+        window.location.href = '../PaginasPublicas/PrimeiraPagina.html';
     };
 
     botoesWrapper.appendChild(btnCancelar);
