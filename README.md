@@ -1,3 +1,12 @@
+A fazer:
+- Tabela de banco de dados para participante e organizador
+- Link entre páginas
+- Dar funcionalidade a páginas de cadastro e edição de eventos com js (dar uma atenção para a página de organizador)
+- Fazer conecção entre BD e front com php
+- Criar o manual de uso
+
+
+
 # Como criar uma nova página para funcionar com o menu expansível
 
 Siga os passos abaixo para garantir que sua nova página funcione corretamente com o menu expansível/retraível e o layout sincronizado:
