@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir Senha Participante</title>
+</head>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+    }
+
+    body {
+        background-color: #d1eaff;
+        font-family: 'Inter', sans-serif;
+        display: grid;
+        place-items: center;
+        padding: 1.2rem; 
+    }
+
+    .cartao-redefinir {
+        background-color: #4f6c8c;
+        border-radius: 0.225rem; 
+        padding: 1.2rem; 
+        width: 40em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .texto-instrucao {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.2rem; 
+        line-height: 1.32;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-shadow: 0px 0.15rem 0.75rem rgba(0, 0, 0, 0.6); 
+        margin-top: 0;
+        margin-bottom: 1.5rem; 
+
+    }
+
+    .grupo-botoes {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.75rem; 
+    }
+
+    .botao {
+        background-color: #6598d2;
+        border-radius: 0.225rem; 
+        border: none;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem; 
+        line-height: 1; 
+        padding: 0.6rem 0.9rem; 
+        cursor: pointer;
+        white-space: nowrap;
+    }
+</style>
+<body>
+    <div id="main-content">
+        <div class="cartao-redefinir">
+            <p class="texto-instrucao">
+                Clique no botão abaixo para receber o link de mudança de senha que será enviado para o e-mail cadastrado
+            </p>
+            <div class="grupo-botoes">
+                <button class="botao">Voltar</button>
+                <button class="botao">Redefinir senha</button>
+            </div>
+        </div>
+    </div> 
+</body>
+</html>
