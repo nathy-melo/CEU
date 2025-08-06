@@ -6,14 +6,28 @@
   --fundo: #D1EAFF;
   --cinza-escuro: #333333;
   --cinza-medio: #888888;
+  --azul-escuro: #0a1449;
   --sombra-padrao: rgba(0, 0, 0, 0.6);
   --sombra-forte: rgba(0, 0, 0, 0.8);
   --sombra-leve: rgba(0, 0, 0, 0.5);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--fundo);
+  color: var(--branco);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

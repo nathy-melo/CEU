@@ -7,22 +7,6 @@
   <title>Menu Lateral</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--fundo);
-      color: var(--branco);
-      display: flex;
-      min-height: 100vh;
-      width: 100%;
-    }
-
     .Menu {
       position: fixed;
       z-index: 1000;
@@ -31,7 +15,7 @@
       height: 100vh;
       width: clamp(200px, 15%, 300px);
       background-color: var(--caixas);
-      box-shadow: 5px 0 30px black;
+      box-shadow: 5px 0 30px var(--preto);
       transform: translateX(-100%);
       transition: transform 0.3s ease;
     }

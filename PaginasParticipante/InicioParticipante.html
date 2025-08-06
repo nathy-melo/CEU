@@ -2,30 +2,16 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eventos Acontecendo</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
     body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: var(--fundo);
-        color: var(--branco);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 1.2rem;
+        align-items: flex-start;
+        padding-top: 1rem;
     }
-
 
     .barra-pesquisa-container {
         max-width: clamp(310px, 86%, 1150px);
@@ -57,10 +43,10 @@
         border-radius: clamp(16px, 3vw, 26px);
         padding: 0 clamp(10px, 2vw, 15px);
         font-size: clamp(12px, 1.5vw, 16px);
-        color: #000000;
+        color: var(--preto);
         box-sizing: border-box;
         border: 2px solid #e0e0e0;
-        box-shadow: 0px 5px 21px 0px rgba(0, 0, 0, 0.6);
+        box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
         font-weight: bold;
         outline: none;
     }
@@ -78,7 +64,7 @@
         width: clamp(30px, 5vw, 77px);
         height: clamp(30px, 5vw, 77px);
         background-color: transparent;
-        box-shadow: 0px 5px 21px 0px rgba(0, 0, 0, 0.6);
+        box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
         border-radius: 50%;
         border: none;
         padding: 0;
@@ -92,7 +78,7 @@
     .icone-pesquisa {
         width: 100%;
         height: 100%;
-        background-color: var(--caixas);
+        background-color: var(--azul-escuro);
         border-radius: 50%;
         display: flex;
         justify-content: center;
@@ -158,7 +144,7 @@
         font-size: 1.9rem;
         font-weight: 700;
         color: var(--branco);
-        text-shadow: 0px 4px 20px var(--sombra-padrao);
+        text-shadow: 0px 4px 10px var(--preto);
     }
 
     .container {
@@ -191,7 +177,7 @@
         font-size: 1.2rem;
         font-weight: bold;
         margin-bottom: 11px;
-        color: var(--caixas);
+        color: var(--azul-escuro);
     }
 
     .EventoInfo {

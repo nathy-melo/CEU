@@ -18,7 +18,8 @@ $paginasPermitidas = [
     'perfil' => 'PerfilParticipante.html',
     'certificados' => 'CerticadosParticipante.html',
     'faleconosco' => 'FaleConoscoParticipante.html',
-    'configuracoes' => 'ConfiguracoesParticipante.html'
+    'configuracoes' => 'ConfiguracoesParticipante.html',
+    'termos' => 'TermosDeCondicoesP.html'
     // Adicione novas páginas conforme necessário - não se esqueça de as adicionar no menu (JS) também!
 ];
 

@@ -2,28 +2,12 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfil</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
-
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: var(--fundo);
-        color: var(--branco);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 0;
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
     .container-perfil {
         width: 30rem;
         max-width: 100%;
@@ -143,37 +127,37 @@
 
 <body>
     <div id="main-content">
-            <div class="container-perfil">
-                <div class="cartao-dados">
-                    <h1 class="titulo-cartao">Seus Dados</h1>
-                    <form>
-                        <div class="grupo-formulario">
-                            <label for="name">Nome:</label>
-                            <div id="name" class="controle-formulario">Elisa de Souza Lima</div>
-                        </div>
-                        <div class="grupo-formulario">
-                            <label for="email">E-mail:</label>
-                            <div id="email" class="controle-formulario">elisa.lima@exemplo.com</div>
-                        </div>
-                        <div class="grupo-formulario">
-                            <label for="phone">Telefone:</label>
-                            <div id="phone" class="controle-formulario">(00) 91234-5678</div>
-                        </div>
-                        <div class="grupo-formulario">
-                            <label for="cpf">CPF:</label>
-                            <div id="cpf" class="controle-formulario">123.456.789.-00</div>
-                        </div>
-                        <div class="acoes-formulario">
-                            <button type="button" class="botao botao-editar">Editar</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="barra-acoes">
-                    <button type="button" class="botao botao-excluir" id="btn-excluir-conta">Excluir Conta</button>
-                    <button type="button" class="botao botao-sair"
-                        onclick="window.location.href='../PaginasPublicas/ContainerPublico.php'">Sair</button>
-                </div>
+        <div class="container-perfil">
+            <div class="cartao-dados">
+                <h1 class="titulo-cartao">Seus Dados</h1>
+                <form>
+                    <div class="grupo-formulario">
+                        <label for="name">Nome:</label>
+                        <div id="name" class="controle-formulario">Elisa de Souza Lima</div>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="email">E-mail:</label>
+                        <div id="email" class="controle-formulario">elisa.lima@exemplo.com</div>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="phone">Telefone:</label>
+                        <div id="phone" class="controle-formulario">(00) 91234-5678</div>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="cpf">CPF:</label>
+                        <div id="cpf" class="controle-formulario">123.456.789.-00</div>
+                    </div>
+                    <div class="acoes-formulario">
+                        <button type="button" class="botao botao-editar">Editar</button>
+                    </div>
+                </form>
             </div>
+            <div class="barra-acoes">
+                <button type="button" class="botao botao-excluir" id="btn-excluir-conta">Excluir Conta</button>
+                <button type="button" class="botao botao-sair"
+                    onclick="window.location.href='../PaginasPublicas/ContainerPublico.php'">Sair</button>
+            </div>
+        </div>
     </div>
     <script src="PerfilParticipante.js"></script>
 </body>

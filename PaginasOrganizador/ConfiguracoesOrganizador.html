@@ -5,25 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: var(--fundo);
-        color: var(--branco);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 1rem;
-    }
-
     .conteiner-configuracoes {
         display: flex;
         flex-direction: column;
@@ -39,7 +23,7 @@
         align-items: center;
         gap: 1.25rem;
         text-decoration: none;
-        color: #0a1449;
+        color: var(--azul-escuro);
         cursor: pointer;
     }
 
@@ -71,7 +55,7 @@
         line-height: 1.32;
         letter-spacing: -0.0225rem;
         text-align: center;
-        color: var(--caixas);
+        color: var(--azul-escuro);
         padding: 0.25rem;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -111,8 +95,7 @@
             </div>
             <div class="item-configuracao" data-link="#terms" onclick="carregarPagina('termos')">
                 <div class="icone-configuracao">
-                    <img src="../Imagens/Escudo.svg" alt="Terms and Conditions Icon"
-                        class="imagem-icone-configuracao">
+                    <img src="../Imagens/Escudo.svg" alt="Terms and Conditions Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Termos de Condições</span>
             </div>
@@ -130,16 +113,6 @@
             </div>
         </div>
     </div>
-    <script>
-        document.querySelectorAll('.item-configuracao').forEach(item => {
-            item.addEventListener('click', () => {
-                const link = item.getAttribute('data-link');
-                if (link) {
-                    window.location.href = link;
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>

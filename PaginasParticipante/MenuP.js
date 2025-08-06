@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       inicio: ['inicio', 'evento'],
       meusEventos: ['meusEventos', 'eventoInscrito'],
       certificados: ['certificados'],
-      configuracoes: ['configuracoes'],
+      configuracoes: ['configuracoes', 'termos'],
       faleConosco: ['faleconosco']
     };
 

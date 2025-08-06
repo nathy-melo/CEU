@@ -5,26 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: var(--fundo);
-        color: var(--branco);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 1rem;
-    }
-
     .conteiner-configuracoes {
         display: flex;
         flex-direction: column;
@@ -40,7 +23,8 @@
         align-items: center;
         gap: 1.25rem;
         text-decoration: none;
-        color: #0a1449;
+        color: var(--azul-escuro);
+        cursor: pointer;
     }
 
     .icone-configuracao {
@@ -71,63 +55,62 @@
         line-height: 1.32;
         letter-spacing: -0.0225rem;
         text-align: center;
-        color: var(--caixas);
+        color: var(--azul-escuro);
         padding: 0.25rem;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .item-configuracao:hover .botao-configuracao {
         transform: translateY(-0.125rem);
-        box-shadow: 0px 3px 12.5px 0px rgba(0, 0, 0, 0.5);
+        box-shadow: 0px 3px 12.5px 0px var(--sombra-padrao);
     }
 </style>
 
 <body>
     <div id="main-content">
         <div class="conteiner-configuracoes">
-            <a href="#change-password" class="item-configuracao">
+            <div class="item-configuracao">
                 <div class="icone-configuracao">
                     <img src="../Imagens/Cadeado2.svg" alt="Cadeado" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Mudar Senha</span>
-            </a>
-            <a href="#recovery-email" class="item-configuracao">
+            </div>
+            <div class="item-configuracao" data-link="#recovery-email">
                 <div class="icone-configuracao">
                     <img src="../Imagens/Arroba.svg" alt="Recovery Email Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">E-mail de Recuperação</span>
-            </a>
-            <a href="#site-theme" class="item-configuracao">
+            </div>
+            <div class="item-configuracao" data-link="#site-theme">
                 <div class="icone-configuracao">
                     <img src="../Imagens/Lampada.svg" alt="Site Theme Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Tema do Site</span>
-            </a>
-            <a href="#faq" class="item-configuracao">
+            </div>
+            <div class="item-configuracao" data-link="#faq">
                 <div class="icone-configuracao">
                     <img src="../Imagens/Interrogacao.svg" alt="FAQ Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Dúvidas Frequentes</span>
-            </a>
-            <a href="#terms" class="item-configuracao">
+            </div>
+            <div class="item-configuracao" data-link="#terms" onclick="carregarPagina('termos')">
                 <div class="icone-configuracao">
-                    <img src="../Imagens/Escudo.svg" alt="Terms and Conditions Icon"
-                        class="imagem-icone-configuracao">
+                    <img src="../Imagens/Escudo.svg" alt="Terms and Conditions Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Termos de Condições</span>
-            </a>
-            <a href="#manual" class="item-configuracao">
+            </div>
+            <div class="item-configuracao" data-link="#manual">
                 <div class="icone-configuracao">
                     <img src="../Imagens/Jornal.svg" alt="User Manual Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Manual de Uso</span>
-            </a>
-            <a href="#about-us" class="item-configuracao">
+            </div>
+            <div class="item-configuracao" data-link="#about-us">
                 <div class="icone-configuracao">
                     <img src="../Imagens/Pessoas.svg" alt="About Us Icon" class="imagem-icone-configuracao">
                 </div>
                 <span class="botao-configuracao">Sobre nós</span>
-            </a>
+            </div>
         </div>
     </div>
 </body>
