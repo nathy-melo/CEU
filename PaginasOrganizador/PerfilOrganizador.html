@@ -7,21 +7,12 @@
     <title>Perfil</title>
 </head>
 <style>
-    :root {
-        --background-color: #d1eaff;
-        --card-background: #4f6c8c;
-        --text-light: #ffffff;
-        --input-background: #ffffff;
-        --button-edit-bg: #6598d2;
-        --button-delete-bg: #7a0909;
-        --button-logout-bg: #253542;
-        --text-dark: #333333;
-    }
 
     body {
         margin: 0;
         font-family: 'Inter', sans-serif;
-        background-color: var(--background-color);
+        background-color: var(--fundo);
+        color: var(--branco);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -42,20 +33,20 @@
     }
 
     .cartao-dados {
-        background-color: var(--card-background);
+        background-color: var(--caixas);
         border-radius: 0.5rem;
         padding: 1.25rem 1.25rem 1.5rem 1.25rem;
-        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+        box-shadow: 0 0.25rem 1rem var(--sombra-padrao);
     }
 
     .titulo-cartao {
-        color: var(--text-light);
+        color: var(--branco);
         font-weight: 700;
         font-size: 2.25rem;
         line-height: 1.1;
         text-align: center;
         letter-spacing: 0;
-        text-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.6);
+        text-shadow: 0 0.125rem 0.5rem var(--sombra-padrao);
         margin-top: 0;
         margin-bottom: 1.25rem;
     }
@@ -70,7 +61,7 @@
 
     label {
         display: block;
-        color: var(--text-light);
+        color: var(--branco);
         font-weight: 700;
         font-size: 1rem;
         margin-bottom: 0.25rem;
@@ -78,11 +69,11 @@
     }
 
     .controle-formulario {
-        background-color: var(--input-background);
+        background-color: var(--branco);
         border-radius: 0.1875rem;
         padding: 0.25rem 0.5rem;
         font-size: 1rem;
-        color: var(--text-dark);
+        color: var(--cinza-escuro);
         width: 100%;
         line-height: 1.5;
         border: none;
@@ -103,7 +94,7 @@
     .botao {
         border: none;
         border-radius: 0.3125rem;
-        color: var(--text-light);
+        color: var(--branco);
         font-family: 'Inter', sans-serif;
         font-weight: 700;
         font-size: 1.125rem;
@@ -112,12 +103,27 @@
         text-align: center;
         transition: opacity 0.2s ease;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+        background-color: var(--botao);
     }
 
     .botao-editar {
-        background-color: var(--button-edit-bg);
+        background-color: var(--botao);
         width: 7.5rem;
         float: right;
+    }
+
+    .botao-excluir {
+        background-color: #7a0909;
+        width: 10rem;
+        font-size: 1.25rem;
+        padding: 0.5rem 0;
+    }
+
+    .botao-sair {
+        background-color: #253542;
+        width: 8.75rem;
+        font-size: 1.25rem;
+        padding: 0.5rem 0;
     }
 
     .barra-acoes {
@@ -125,63 +131,49 @@
         justify-content: space-between;
         gap: 1.25rem;
         margin-top: 0.5rem;
-        background: var(--card-background);
+        background: var(--caixas);
         border-radius: 0.5rem;
-        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+        box-shadow: 0 0.25rem 1rem var(--sombra-padrao);
         padding: 0.75rem 0.75rem 0.75rem 0.75rem;
         width: 30rem;
         max-width: 100%;
         box-sizing: border-box;
     }
-
-    .botao-excluir {
-        background-color: var(--button-delete-bg);
-        width: 10rem;
-        font-size: 1.25rem;
-        padding: 0.5rem 0;
-    }
-
-    .botao-sair {
-        background-color: var(--button-logout-bg);
-        width: 8.75rem;
-        font-size: 1.25rem;
-        padding: 0.5rem 0;
-    }
 </style>
 
 <body>
     <div id="main-content">
-            <div class="container-perfil">
-                <div class="cartao-dados">
-                    <h1 class="titulo-cartao">Seus Dados</h1>
-                    <form>
-                        <div class="grupo-formulario">
-                            <label for="name">Nome:</label>
-                            <div id="name" class="controle-formulario">Aurora do Nascimento</div>
-                        </div>
-                        <div class="grupo-formulario">
-                            <label for="email">E-mail:</label>
-                            <div id="email" class="controle-formulario">aurora.nascimento@exemplo.com</div>
-                        </div>
-                        <div class="grupo-formulario">
-                            <label for="phone">Telefone:</label>
-                            <div id="phone" class="controle-formulario">(00) 91234-5678</div>
-                        </div>
-                        <div class="grupo-formulario">
-                            <label for="cpf">CPF:</label>
-                            <div id="cpf" class="controle-formulario">123.456.789.-00</div>
-                        </div>
-                        <div class="acoes-formulario">
-                            <button type="button" class="botao botao-editar">Editar</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="barra-acoes">
-                    <button type="button" class="botao botao-excluir" id="btn-excluir-conta">Excluir Conta</button>
-                    <button type="button" class="botao botao-sair"
-                        onclick="window.location.href='../PaginasPublicas/ContainerPublico.php'">Sair</button>
-                </div>
+        <div class="container-perfil">
+            <div class="cartao-dados">
+                <h1 class="titulo-cartao">Seus Dados</h1>
+                <form>
+                    <div class="grupo-formulario">
+                        <label for="name">Nome:</label>
+                        <div id="name" class="controle-formulario">Aurora do Nascimento</div>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="email">E-mail:</label>
+                        <div id="email" class="controle-formulario">aurora.nascimento@exemplo.com</div>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="phone">Telefone:</label>
+                        <div id="phone" class="controle-formulario">(00) 91234-5678</div>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="cpf">CPF:</label>
+                        <div id="cpf" class="controle-formulario">123.456.789.-00</div>
+                    </div>
+                    <div class="acoes-formulario">
+                        <button type="button" class="botao botao-editar">Editar</button>
+                    </div>
+                </form>
             </div>
+            <div class="barra-acoes">
+                <button type="button" class="botao botao-excluir" id="btn-excluir-conta">Excluir Conta</button>
+                <button type="button" class="botao botao-sair"
+                    onclick="window.location.href='../PaginasPublicas/ContainerPublico.php'">Sair</button>
+            </div>
+        </div>
     </div>
     <script src="PerfilOrganizador.js"></script>
 </body>

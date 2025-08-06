@@ -4,6 +4,11 @@
   --botao: #6598D2;
   --caixas: #4F6C8C;
   --fundo: #D1EAFF;
+  --cinza-escuro: #333333;
+  --cinza-medio: #888888;
+  --sombra-padrao: rgba(0, 0, 0, 0.6);
+  --sombra-forte: rgba(0, 0, 0, 0.8);
+  --sombra-leve: rgba(0, 0, 0, 0.5);
 }
 
 body {

@@ -16,39 +16,39 @@
   body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background-color: #d1eaff;
-    color: #0a1449;
+    background-color: var(--fundo);
+    color: var(--branco);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 0.7rem;
+    padding: 1.2rem;
   }
 
   /* CSS da seção: certificados */
   .cartao-certificados {
     max-width: 31.5rem;
     width: 100%;
-    background-color: #ffffff;
+    background-color: var(--branco);
     border-radius: 0.525rem;
-    box-shadow: 0px 0.175rem 0.875rem 0px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 0.175rem 0.875rem 0px var(--sombra-padrao);
     overflow: hidden;
     display: flex;
     flex-direction: column;
   }
 
   .cabecalho-cartao {
-    background-color: #4f6c8c;
+    background-color: var(--caixas);
     padding: 0.525rem 1.05rem;
   }
 
   .cabecalho-cartao h1 {
-    color: #ffffff;
+    color: var(--branco);
     font-size: clamp(1.26rem, 2.8vw, 2.1rem);
     font-weight: 700;
     text-align: center;
     margin: 0;
-    text-shadow: 0px 0.175rem 0.875rem rgba(0, 0, 0, 0.6);
+    text-shadow: 0px 0.175rem 0.875rem var(--sombra-padrao);
     letter-spacing: -0.085625rem;
   }
 
@@ -74,9 +74,9 @@
     font-size: clamp(0.7rem, 1.4vw, 1.26rem);
     font-weight: 700;
     margin: 0 0 0 0.8rem;
-    text-shadow: 0px 0.175rem 0.875rem rgba(0, 0, 0, 0.6);
+    text-shadow: 0px 0.175rem 0.875rem var(--sombra-padrao);
     letter-spacing: -0.044375rem;
-    color: #0a1449;
+    color: var(--caixas);
   }
 
   .nome-item {
@@ -97,8 +97,8 @@
 
   .botao {
     display: inline-block;
-    background-color: #4f6c8c;
-    color: #ffffff;
+    background-color: var(--caixas);
+    color: var(--branco);
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: clamp(0.6125rem, 1.05vw, 1.05rem);

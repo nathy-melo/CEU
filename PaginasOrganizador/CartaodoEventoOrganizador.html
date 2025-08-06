@@ -10,8 +10,8 @@
   body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background-color: #d1eaff;
-    color: #ffffff;
+    background-color: var(--fundo);
+    color: var(--branco);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,9 +27,9 @@
   }
 
   .cartao-evento {
-    background-color: #4f6c8c;
+    background-color: var(--caixas);
     border-radius: 1.875rem;
-    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0.15rem 0.75rem 0 var(--sombra-padrao);
     padding: 1.875rem;
     width: 100%;
     max-width: 51.5625rem;
@@ -58,9 +58,9 @@
   }
 
   .caixa-valor {
-    background-color: #ffffff;
+    background-color: var(--branco);
     border-radius: 1.875rem;
-    color: #000000;
+    color: var(--preto);
     padding: 0.45rem 0.9rem;
     text-align: center;
     font-size: 1.05rem;
@@ -69,7 +69,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0.15rem 0.75rem 0 var(--sombra-leve);
   }
 
   .campo-nome {
@@ -122,9 +122,9 @@
 
   .botao-voltar,
   .botao-inscrever {
-    background-color: #6598d2;
+    background-color: var(--botao);
     border-radius: 0.225rem;
-    color: #ffffff;
+    color: var(--branco);
     padding: 0.6rem 2rem;
     text-decoration: none;
     font-weight: 700;

@@ -15,12 +15,13 @@
 
     body {
         margin: 0;
-        padding: 0;
         font-family: 'Inter', sans-serif;
-        background-color: #d1eaff;
+        background-color: var(--fundo);
+        color: var(--branco);
         display: flex;
         justify-content: center;
         align-items: center;
+        min-height: 100vh;
         padding: 1rem;
     }
 
@@ -62,14 +63,15 @@
         justify-content: center;
         width: 17rem;
         height: 2.5rem;
-        background-color: #ffffff;
+        background-color: var(--branco);
         border-radius: 0.375rem;
-        box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.6);
+        box-shadow: 0px 2px 10px 0px var(--sombra-padrao);
         font-weight: 700;
         font-size: 1.125rem;
         line-height: 1.32;
         letter-spacing: -0.0225rem;
         text-align: center;
+        color: var(--caixas);
         padding: 0.25rem;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }

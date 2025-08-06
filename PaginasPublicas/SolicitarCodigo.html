@@ -16,8 +16,7 @@
   body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background-color: #d1eaff;
-    color: #ffffff;
+    background-color: var(--fundo);
     min-height: 100vh;
     padding: 0.875em;
     display: flex;
@@ -33,7 +32,7 @@
   }
 
   .container-formulario {
-    background-color: #4f6c8c;
+    background-color: var(--caixas);
     border-radius: 2.1875em;
     padding: 1.75em 2.1875em;
     max-width: 34.65em;
@@ -46,10 +45,11 @@
 
   .cabecalho-formulario {
     text-align: center;
-    text-shadow: 0 0.175em 0.875em rgba(0, 0, 0, 0.6);
+    text-shadow: 0 0.175em 0.875em var(--sombra-padrao);
   }
 
   .titulo-formulario {
+    color: var(--branco);
     font-size: 2.93125rem;
     line-height: 1.1;
     letter-spacing: -0.0581em;
@@ -71,20 +71,20 @@
 
   .entrada-formulario,
   .area-texto-formulario {
-    background-color: #ffffff;
+    background-color: var(--branco);
     border-radius: 2.1875em;
     border: none;
     padding: 0.4375em 1.09375em;
     font-family: 'Inter', sans-serif;
     font-size: 0.7rem;
-    color: #4f6c8c;
+    color: var(--caixas);
     width: 100%;
     box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.5);
   }
 
   .entrada-formulario::placeholder,
   .area-texto-formulario::placeholder {
-    color: #4f6c8c;
+    color: var(--caixas);
     opacity: 0.8;
   }
 
@@ -112,10 +112,10 @@
   }
 
   .rotulo-termos {
+    color: var(--branco);
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.021em;
-    color: #ffffff;
     text-shadow: 0 0.175em 0.875em rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
@@ -124,7 +124,7 @@
   }
 
   .link-termos {
-    color: #6598d2;
+    color: var(--botao);
     text-decoration: underline;
   }
 
@@ -136,10 +136,10 @@
   }
 
   .botao {
-    background-color: #6598d2;
+    background-color: var(--botao);
     border-radius: 0.2625em;
     border: none;
-    color: #ffffff;
+    color: var(--branco);
     font-size: 1.05rem;
     font-weight: 700;
     cursor: pointer;
@@ -150,10 +150,10 @@
   }
 
   .botao-voltar {
-      background-color: #6598d2;
+      background-color: var(--botao);
       border-radius: 0.2625em;
       border: none;
-      color: #ffffff;
+      color: var(--branco);
       font-size: 1.05rem;
       font-weight: 700;
       cursor: pointer;
@@ -175,7 +175,7 @@
     padding: 0;
   }
   .botao-toggle-termos.selected {
-    box-shadow: 0 0 0 2.5px #6598d2;
+    box-shadow: 0 0 0 2.5px var(--botao);
   }
   .botao-toggle-termos.selected::after {
     content: '';
@@ -185,7 +185,7 @@
     left: 0.22em;
     width: 0.6em;
     height: 0.6em;
-    background: #6598d2;
+    background: var(--botao);
     border-radius: 50%;
   }
   .botao-toggle-termos {
@@ -230,16 +230,16 @@
     width: 0.9em;
     left: 0.15em;
     bottom: 0.15em;
-    background-color: #6598d2;
+    background-color: var(--botao);
     transition: .2s;
     border-radius: 50%;
   }
   .switch-toggle input:checked + .slider-toggle {
-    background-color: #6598d2;
+    background-color: var(--botao);
   }
   .switch-toggle input:checked + .slider-toggle:before {
     transform: translateX(0.8em);
-    background: #fff;
+    background: var(--branco);
   }
 </style>
 

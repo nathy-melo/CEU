@@ -10,7 +10,7 @@
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            background-color: #d1eaff;
+            background-color: var(--fundo);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -27,11 +27,11 @@
         }
 
         .sombra-texto-comum {
-            text-shadow: 0px 0.25em 1.25em rgb(0, 0, 0);
+            text-shadow: 0px 0.25em 1.25em var(--sombra-padrao);
         }
 
         .cartao-login {
-            background-color: #4f6c8c;
+            background-color: var(--caixas);
             border-radius: 2em;
             width: 100%;
             max-width: 600px;
@@ -73,7 +73,7 @@
         }
 
         .input-formulario {
-            background-color: #ffffff;
+            background-color: var(--branco);
             border-radius: 1em;
             width: 100%;
             height: 2.2em;
@@ -100,7 +100,7 @@
 
         .botao-login {
             font-size: 1em;
-            background-color: #6598d2;
+            background-color: var(--botao);
             border-radius: 0.2em;
             color: #ffffff;
             font-family: 'Inter', sans-serif;

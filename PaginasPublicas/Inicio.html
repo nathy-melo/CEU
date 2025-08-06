@@ -14,7 +14,7 @@
         }
 
         body {
-            background-color: #d1eaff;
+            background-color: var(--fundo);
             font-family: "Inter", sans-serif;
             min-height: 100vh;
             width: 100%;
@@ -152,8 +152,8 @@
         .section-title {
             font-size: 1.9rem;
             font-weight: 700;
-            color: #ffffff;
-            text-shadow: 0px 4px 10px rgb(0, 0, 0);
+            color: var(--branco);
+            text-shadow: 0px 4px 10px var(--preto);
         }
 
         .container {
@@ -166,10 +166,10 @@
         }
 
         .CaixaDoEvento {
-            background-color: white;
+            background-color: var(--branco);
             border-radius: 10px;
             padding: 15px;
-            box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.8);
+            box-shadow: 2px 2px 15px var(--sombra-forte);
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -190,7 +190,7 @@
         }
 
         .EventoInfo {
-            color: #333;
+            color: var(--cinza-escuro);
             line-height: 1.6;
             margin-top: auto;
             text-align: left;

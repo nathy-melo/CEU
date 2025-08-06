@@ -15,13 +15,15 @@
     }
 
     body {
-        background-color: #d1eaff;
+        background-color: var(--fundo);
         font-family: "Inter", sans-serif;
         min-height: 100vh;
         width: 100%;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
+        margin: 0;
+        color: var(--branco);
     }
 
 
@@ -167,7 +169,7 @@
     }
 
     .CaixaDoEvento {
-        background-color: white;
+        background-color: var(--branco);
         border-radius: 10px;
         padding: 15px;
         box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.8);
@@ -214,6 +216,123 @@
     .CaixaDoEventoAdicionar:hover {
         background-color: #e6f2ff;
         transform: scale(1.05);
+    }
+
+    .cartao-evento {
+        background-color: var(--caixas);
+        border-radius: 1.875rem;
+        box-shadow: 0 0.15rem 0.75rem 0 var(--sombra-padrao);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 0.5rem;
+        transition: transform 0.3s;
+    }
+
+    .cartao-evento:hover {
+        transform: translateY(-0.1rem);
+    }
+
+    .imagem-evento {
+        width: 100%;
+        height: auto;
+        border-radius: 1.25rem;
+        object-fit: cover;
+    }
+
+    .titulo-evento {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--titulo);
+        margin-bottom: 0.5rem;
+    }
+
+    .descricao-evento {
+        font-size: 1rem;
+        color: var(--texto);
+        line-height: 1.4;
+    }
+
+    .data-hora-local {
+        font-size: 0.875rem;
+        color: var(--texto-secundario);
+        margin-top: 0.5rem;
+    }
+
+    .valor-ingresso {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: var(--valor);
+        margin-top: 0.5rem;
+    }
+
+    .botao-inscrever {
+        background-color: var(--botao);
+        border-radius: 0.225rem;
+        color: var(--branco);
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        border: none;
+        display: inline-block;
+        margin-top: auto;
+    }
+
+    .botao-inscrever:hover {
+        background-color: var(--botao-hover);
+        transform: translateY(-0.1rem);
+    }
+
+    .botao-voltar {
+        background-color: var(--botao);
+        border-radius: 0.225rem;
+        color: var(--branco);
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        border: none;
+        display: inline-block;
+        margin-top: 1rem;
+    }
+
+    .botao-voltar:hover {
+        background-color: var(--botao-hover);
+        transform: translateY(-0.1rem);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 20px 20px;
+        }
+
+        .titulo-evento {
+            font-size: 1.25rem;
+        }
+
+        .descricao-evento {
+            font-size: 0.875rem;
+        }
+
+        .data-hora-local {
+            font-size: 0.75rem;
+        }
+
+        .valor-ingresso {
+            font-size: 1rem;
+        }
+
+        .botao-inscrever,
+        .botao-voltar {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
     }
 </style>
 </head>

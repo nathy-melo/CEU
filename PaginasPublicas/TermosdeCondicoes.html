@@ -19,7 +19,7 @@
     body {
         margin: 0;
         font-family: 'Inter', sans-serif;
-        background-color: #d1eaff;
+        background-color: var(--fundo);
         min-height: 100%;
         display: flex;
         flex-direction: column;
@@ -36,10 +36,10 @@
     }
 
     .cartao-termos {
-        background-color: #4f6c8c;
-        color: #ffffff;
+        background-color: var(--caixas);
+        color: var(--branco);
         border-radius: 0.875rem;
-        box-shadow: 0 0.175rem 0.875rem 0 rgba(0, 0, 0, 0.6);
+        box-shadow: 0 0.175rem 0.875rem 0 var(--sombra-padrao);
         padding: 1.792rem 0.917rem;
         max-width: 59.108rem;
         width: 100%;
@@ -98,8 +98,8 @@
 
     .botao-voltar {
         display: inline-block;
-        background-color: #6598d2;
-        color: #ffffff;
+        background-color: var(--botao);
+        color: var(--branco);
         border-radius: 0.2625rem;
         padding: 0.7875rem 2.317rem;
         text-decoration: none;

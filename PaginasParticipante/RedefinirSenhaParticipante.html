@@ -17,7 +17,7 @@
     }
 
     body {
-        background-color: #d1eaff;
+        background-color: var(--fundo);
         font-family: 'Inter', sans-serif;
         display: grid;
         place-items: center;
@@ -25,7 +25,7 @@
     }
 
     .cartao-redefinir {
-        background-color: #4f6c8c;
+        background-color: var(--caixas);
         border-radius: 0.225rem; 
         padding: 1.2rem; 
         width: 40em;
@@ -35,13 +35,13 @@
     }
 
     .texto-instrucao {
-        color: #ffffff;
+        color: var(--branco);
         font-weight: 700;
         font-size: 1.2rem; 
         line-height: 1.32;
         letter-spacing: -0.02em;
         text-align: center;
-        text-shadow: 0px 0.15rem 0.75rem rgba(0, 0, 0, 0.6); 
+        text-shadow: 0px 0.15rem 0.75rem var(--sombra-padrao); 
         margin-top: 0;
         margin-bottom: 1.5rem; 
 
@@ -55,10 +55,10 @@
     }
 
     .botao {
-        background-color: #6598d2;
+        background-color: var(--botao);
         border-radius: 0.225rem; 
         border: none;
-        color: #ffffff;
+        color: var(--branco);
         font-family: 'Inter', sans-serif;
         font-weight: 700;
         font-size: 1.2rem; 
