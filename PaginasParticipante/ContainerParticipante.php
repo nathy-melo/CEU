@@ -19,7 +19,12 @@ $paginasPermitidas = [
     'certificados' => 'CerticadosParticipante.html',
     'faleconosco' => 'FaleConoscoParticipante.html',
     'configuracoes' => 'ConfiguracoesParticipante.html',
-    'termos' => 'TermosDeCondicoesP.html'
+    'termos' => 'TermosDeCondicoesP.html',
+    'redefinirSenha' => 'RedefinirSenhaParticipante.html',
+    'emailRecuperacao' => 'EmailDeRecuperacaoP.html',
+    'temaDoSite' => 'TemaDoSiteParticipante.html',
+    'manualDeUso' => 'ManualDeUsoParticipante.html',
+    'duvidasFrequentes' => 'DuvidasFrequentesParticipante.html',
     // Adicione novas páginas conforme necessário - não se esqueça de as adicionar no menu (JS) também!
 ];
 
@@ -100,6 +105,7 @@ function carregarPagina(pagina) {
                     'perfil': 'PerfilParticipante.js',
                     'faleconosco': 'FaleConoscoParticipante.js',
                     'meusEventos': 'MeusEventosParticipante.js', // ADICIONADO
+                    'redefinirSenha': 'RedefenirSenhaParticipante.js'
                 }[pagina];
 
                 if (jsFile) {
@@ -109,6 +115,7 @@ function carregarPagina(pagina) {
                         if (pagina === 'inicio' && typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
                         if (pagina === 'perfil' && typeof window.inicializarEventosPerfilParticipante === 'function') window.inicializarEventosPerfilParticipante();
                         if (pagina === 'meusEventos' && typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos(); // ADICIONADO
+                        if (pagina === 'redefinirSenha' && typeof window.inicializarRedefinirSenhaParticipante === 'function') window.inicializarRedefinirSenhaParticipante();
                     };
                     document.getElementById('conteudo-dinamico').appendChild(script);
                 }

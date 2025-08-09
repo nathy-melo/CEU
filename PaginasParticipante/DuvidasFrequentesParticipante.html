@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dúvidas Frequentes</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
+</head>
+<style>
+    .secao-duvidas {
+        flex: 1 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 1.75rem 0.88rem;
+    }
+
+    .cartao-duvidas {
+        background-color: var(--caixas);
+        color: var(--branco);
+        border-radius: 0.875rem;
+        box-shadow: 0 0.175rem 0.875rem 0 var(--sombra-padrao);
+        padding: 1.792rem 0.917rem;
+        max-width: 59.108rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 3rem 0 3rem 0;
+    }
+
+    .titulo-duvidas {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.75rem;
+        line-height: 1.32;
+        letter-spacing: -0.05em;
+        text-align: center;
+        margin: 0 0 1.967rem 0;
+    }
+
+    .conteudo-duvidas {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        line-height: 2;
+        letter-spacing: -0.02em;
+        text-align: left;
+        width: 100%;
+        max-width: 57.316rem;
+    }
+
+    .conteudo-duvidas h2 {
+        font-size: 1.5rem;
+        color: var(--azul-claro);
+    }
+
+    .conteudo-duvidas p {
+        margin: 0 0 1.4em 0;
+        margin-bottom: 2em;
+    }
+
+
+    .conteudo-duvidas>*:last-child {
+        margin-bottom: 0;
+    }
+
+    .container-botao {
+        margin-top: 2.408rem;
+    }
+
+    .botao-voltar {
+        display: inline-block;
+        background-color: var(--botao);
+        color: var(--branco);
+        border-radius: 0.2625rem;
+        padding: 0.7875rem 2.317rem;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1rem;
+        text-align: center;
+    }
+</style>
+
+<body>
+    <div id="main-content">
+            <div class="cartao-duvidas">
+                <h1 class="titulo-duvidas">Dúvidas Frequentes</h1>
+                <div class="conteudo-duvidas">
+                    <h2>Quem pode criar eventos na plataforma?</h2>
+                    <p>Somente usuários aprovados como organizadores podem criar eventos. Para isso, é necessário ter um
+                        código de organizador. Caso não tenha, você pode solicitar um preenchendo seus dados, e se for
+                        aprovado, o código será enviado por e-mail.</p>
+
+                    <h2>Como faço para recuperar minha senha?</h2>
+                    <p>Você pode redefinir sua senha acessando a seção "Configurações" e selecionando "Recuperação de
+                        Senha". Um e-mail será enviado com um link para criar uma nova senha.</p>
+
+                    <h2>Onde encontro meus certificados?</h2>
+                    <p>Se você for um participante, seus certificados aparecerão automaticamente na seção "Certificados"
+                        após o evento. Se for um organizador, encontrará os certificados pendentes e enviados na mesma
+                        seção.</p>
+
+                    <h2>Como posso editar um evento que já criei?</h2>
+                    <p>Acesse a seção "Meus Eventos", clique no evento desejado e utilize as opções de edição
+                        disponíveis para alterar informações como nome, data, descrição e participantes.</p>
+
+                    <h2>O que acontece se eu esquecer de enviar os certificados dos participantes?</h2>
+                    <p>Os certificados pendentes ficarão listados na seção "Certificados", garantindo que você não
+                        esqueça de enviá-los. Além disso, você pode ativar notificações para receber lembretes.</p>
+
+                    <h2>Posso alterar o tema do site?</h2>
+                    <p>Sim! Na seção "Configurações", você pode escolher entre tema claro e escuro para personalizar a
+                        aparência do site conforme sua preferência.</p>
+
+                    <h2>Como entro em contato com o suporte?</h2>
+                    <p>Se sua dúvida não estiver respondida aqui, você pode usar a opção "Fale Conosco" no canto
+                        inferior esquerdo do site para obter ajuda diretamente com a equipe de suporte.</p>
+                </div>
+                <div class="container-botao">
+                    <a href="javascript:history.back()" class="botao-voltar">Voltar</a>
+                </div>
+            </div>
+    </div>
+</body>
+
+</html>

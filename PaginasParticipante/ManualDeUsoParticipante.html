@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Uso</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
+</head>
+<style>
+    .cartao-tema {
+        background-color: var(--caixas);
+        border-radius: 0.438rem;
+        padding: 1.35rem 3.06rem 1.14rem;
+        max-width: 34.65rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0rem 0.175rem 0.875rem 0rem var(--sombra-forte);
+    }
+
+    .cartao-titulo {
+        color: var(--branco);
+        font-weight: 700;
+        font-size: 1.75rem;
+        line-height: 1.32;
+        letter-spacing: -0.035rem;
+        text-align: center;
+        text-shadow: 0rem 0.175rem 0.875rem var(--sombra-forte);
+        margin: 0 0 1.66rem 0;
+    }
+
+    .opcoes-tema {
+        display: flex;
+        justify-content: center;
+        gap: 5.2rem;
+        margin-bottom: 1.75rem;
+        width: 100%;
+    }
+
+    .opcao-tema {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 11.375rem;
+        height: 4.025rem;
+        border-radius: 0.875rem;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+        background-color: var(--azul-claro);
+    }
+
+    .opcao-tema:hover {
+        transform: scale(1.05);
+    }
+
+    .texto-opcao {
+        font-size: 1.575rem;
+        font-weight: 700;
+        color: var(--branco);
+    }
+
+    .botao-voltar {
+        background-color: var(--botao);
+        color: var(--branco);
+        font-size: 1.05rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.438rem;
+        width: 9.1rem;
+        height: 2.84rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .botao-voltar:hover {
+        background-color: #5a90c9;
+    }
+</style>
+
+<body>
+    <div id="main-content">
+        <div class="cartao-tema">
+            <h1 class="cartao-titulo">Manual de Uso</h1>
+            <div class="opcoes-tema">
+                <div class="opcao-tema">
+                    <span class="texto-opcao">Participante</span>
+                </div>
+                <div class="opcao-tema">
+                    <span class="texto-opcao">Organizador</span>
+                </div>
+            </div>
+            <button class="botao-voltar" onclick="history.back()">Voltar</button>
+        </div>
+    </div>
+</body>
+
+</html>
