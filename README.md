@@ -53,5 +53,3 @@ Se quiser adicionar botões no menu para navegar para a nova página, use:
 ```html
 <button onclick="carregarPagina('minhanova')">Minha Nova Página</button>
 ```
-
-Pronto! Seguindo essas instruções, sua nova página funcionará perfeitamente com o menu expansível e o layout responsivo do sistema.
