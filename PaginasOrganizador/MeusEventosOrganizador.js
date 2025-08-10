@@ -52,6 +52,10 @@ function inicializarFiltroEventos() {
             }
         };
     }
+    // Inicializa o filtro lateral quando disponível
+    if (typeof inicializarFiltro === 'function') {
+        inicializarFiltro();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);

@@ -1,5 +1,5 @@
 :root {
-  --branco: #FFFFFF; /* Nomeando a cor */
+  --branco: #FFFFFF;
   --preto: #000000;
   --botao: #6598D2;
   --caixas: #4F6C8C;
@@ -32,3 +32,537 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+
+/* ====== Botões ====== */
+
+.btn, .botao {
+  border: none;
+  cursor: pointer;
+  border-radius: 1rem !important;
+  box-shadow: 0rem 0.1rem 1rem var(--sombra-leve) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+  will-change: transform !important;
+}
+
+.btn:hover, .botao:hover {
+  transform: translateY(-0.0625rem) scale(1.02) !important;
+  box-shadow: 0rem 0.2rem 0.6rem var(--sombra-leve) !important;
+}
+
+/* ====== Páginas de listagem de eventos ====== */
+.barra-pesquisa-container {
+  max-width: clamp(310px, 86%, 1150px);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px auto;
+}
+
+.barra-pesquisa {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.campo-pesquisa-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: clamp(200px, 39vw, 580px);
+  height: clamp(30px, 4vw, 48px);
+}
+
+.campo-pesquisa {
+  width: 100%;
+  height: 100%;
+  background-color: var(--branco);
+  border-radius: clamp(16px, 3vw, 26px);
+  padding: 0 clamp(10px, 2vw, 15px);
+  font-size: clamp(12px, 1.5vw, 16px);
+  color: var(--preto);
+  box-sizing: border-box;
+  border: 2px solid #e0e0e0;
+  box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
+  font-weight: bold;
+  outline: none;
+}
+
+.campo-pesquisa:focus {
+  border: 2px solid var(--azul-escuro);
+  outline: none;
+}
+
+.botao-pesquisa {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(30px, 5vw, 77px);
+  height: clamp(30px, 5vw, 77px);
+  background-color: transparent;
+  box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.icone-pesquisa {
+  width: 100%;
+  height: 100%;
+  background-color: var(--azul-escuro);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icone-pesquisa img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.botao-filtrar {
+  width: clamp(80px, 10vw, 145px);
+  height: clamp(30px, 4vw, 48px);
+  background-color: var(--branco);
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: clamp(10px, 2vw, 20px);
+  font-size: clamp(12px, 1.5vw, 16px);
+  color: var(--preto);
+  box-sizing: border-box;
+  box-shadow: 0rem 0.1rem 0.5rem var(--sombra-leve);
+  font-weight: bold;
+  outline: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.botao-filtrar img {
+  width: 20%;
+  height: auto;
+  margin-left: 8px;
+}
+
+.section-title-wrapper {
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.div-section-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--caixas);
+  border-radius: 10px;
+  padding: 5px 10px;
+  margin-top: 20px;
+}
+
+.section-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--branco);
+  text-shadow: 0px 4px 10px var(--preto);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 23px;
+  max-width: 1200px;
+  padding: 0 40px 40px;
+  margin: 0 auto;
+}
+
+.CaixaDoEvento {
+  background-color: var(--branco);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 2px 2px 15px var(--sombra-forte);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 180px;
+  position: relative;
+  min-height: 12rem;
+}
+
+.CaixaDoEvento:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.EventoTitulo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 11px;
+  color: var(--azul-escuro);
+}
+
+.EventoInfo {
+  color: var(--cinza-escuro);
+  line-height: 1.6;
+  margin-top: auto;
+  text-align: left;
+}
+
+.CaixaDoEventoAdicionar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--azul-escuro);
+  cursor: pointer;
+  border: 2px dashed var(--azul-escuro);
+  border-radius: 10px;
+  background-color: #f0f8ff;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.CaixaDoEventoAdicionar:hover {
+  background-color: #e6f2ff;
+  transform: scale(1.05);
+}
+
+
+/* ====== Filtro lateral dos eventos ====== */
+.filtro-container {
+  max-width: 380px;
+  width: 90%;
+  height: 100vh;
+  background-color: var(--caixas);
+  padding: 1rem 1.5rem 2rem;
+  color: var(--branco);
+  position: fixed;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in-out;
+  z-index: 1000;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  display: block;
+}
+
+.filtro-container.ativo {
+  transform: translateX(0);
+}
+
+.filtro-container::-webkit-scrollbar {
+  display: none;
+}
+
+.filtro-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body.filtro-ativo {
+  overflow: hidden;
+}
+
+.filtro-titulo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 1rem 0;
+  text-shadow: var(--sombra-padrao);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.filtro-grupo {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.grupo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem 0;
+  padding: 0;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: var(--sombra-padrao);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.titulo-icone {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--branco);
+  background-color: transparent;
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.titulo-icone.ativo {
+  background-color: var(--branco);
+}
+
+.entradas-data {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entrada-data {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.texto-data {
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.3;
+  text-shadow: var(--shadow-md);
+  margin: 0;
+}
+
+.input-data {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: var(--azul-escuro);
+  font-family: inherit;
+}
+
+.divisor {
+  margin: 1.5rem 0;
+}
+
+.divisor-linha {
+  width: 100%;
+  height: 1px;
+  background-color: var(--azul-escuro);
+}
+
+.colunas-checkbox {
+  display: flex;
+  justify-content: space-between;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lista-checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  font-weight: 400;
+  text-shadow: var(--sombra-padrao);
+  cursor: pointer;
+  line-height: 1.3;
+  position: relative;
+}
+
+.item-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.item-checkbox .checkbox-personalizado {
+  height: 12px;
+  width: 12px;
+  background-color: transparent;
+  border: 1px solid var(--branco);
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.item-checkbox input:checked~.checkbox-personalizado {
+  background-color: var(--branco);
+}
+
+/* ====== Estilos dos Menus Laterais ====== */
+
+.Menu {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: clamp(200px, 15%, 300px);
+  background-color: var(--caixas);
+  box-shadow: 5px 0 30px var(--preto);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.Menu.expanded {
+  transform: translateX(0);
+}
+
+.Menu .conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.Menu .perfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  margin-top: 20px;
+}
+
+.Menu .perfil button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.Menu .perfil img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--botao);
+}
+
+.Menu .perfil span {
+  color: var(--branco);
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+  max-width: 90%;
+  font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.Menu button {
+  color: var(--branco);
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(.4,1.5,.5,1), box-shadow 0.35s cubic-bezier(.4,1.5,.5,1), border-radius 0.2s;
+}
+
+.Menu button:hover:not(.menu-toggle) {
+  transform: scale(1.05);
+}
+
+.Menu button.ativo {
+  background-color: var(--botao);
+  border-radius: 30px;
+  box-shadow: 0 0 0 5px var(--botao), 0 0 16px 0 var(--azul-escuro);
+}
+
+.Menu .rodape {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 10px;
+  background-color: var(--caixas);
+  width: fit-content;
+}
+
+.Menu .rodape img {
+  width: 150px;
+  display: block;
+}
+
+.Menu .rodape div {
+  color: var(--branco);
+  font-size: 0.9rem;
+  margin-top: 10px;
+  white-space: nowrap;
+}
+
+.Menu .rodape p {
+  color: var(--branco);
+  font-size: 0.8rem;
+}
+
+.Menu .menu-toggle {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 25px);
+  transform: translate(-50%, -50%);
+  color: var(--branco);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1000;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Estado inicial da seta (>) */
+.Menu .menu-toggle::before {
+  content: "➤";
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+/* Estado da seta quando o menu está expandido (<) */
+.Menu.expanded .menu-toggle::before {
+  transform: rotate(180deg);
+}
+
+.conteudo-principal {
+  flex: 1;
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+}
+
+.Menu.expanded + .conteudo-principal {
+  margin-left: clamp(200px, 15%, 300px);
+}
+

@@ -30,13 +30,17 @@ function mostrarMensagemFaleConosco() {
     mensagem.style.textAlign = 'center';
     var btnVoltar = document.createElement('button');
     btnVoltar.type = 'button';
-    btnVoltar.className = ' botao-voltar';
+    btnVoltar.className = 'botao botao-voltar';
     btnVoltar.textContent = 'Voltar';
     btnVoltar.onclick = function() {
         mainContent.innerHTML = conteudoOriginalFaleConosco;
         conteudoOriginalFaleConosco = null;
         // Limpa o estado de confirmação ao voltar
         sessionStorage.removeItem('faleConoscoEnviado');
+        // Reatribui o evento de submit ao formulário restaurado
+        if (typeof window.inicializarFaleConosco === 'function') {
+            window.inicializarFaleConosco();
+        }
     };
     container.appendChild(titulo);
     container.appendChild(mensagem);
@@ -47,26 +51,50 @@ function mostrarMensagemFaleConosco() {
 }
 
 // Adiciona o controle de exibição da mensagem ao carregar a página
-window.addEventListener('DOMContentLoaded', function() {
-    // Adiciona evento ao botão Enviar do formulário
+function inicializarFaleConosco() {
+    console.log('Inicializando FaleConosco...');
+    
+    // Adiciona evento ao formulário para interceptar o submit
     var form = document.querySelector('.cartao-formulario form');
+    console.log('Formulário encontrado:', form);
+    
     if (form) {
-        var btnEnviar = form.querySelector('button[type="submit"]');
-        if (btnEnviar) {
-            btnEnviar.onclick = function(e) {
-                e.preventDefault();
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                sessionStorage.setItem('faleConoscoEnviado', '1');
-                mostrarMensagemFaleConosco();
-            };
-        }
+        // Remove qualquer listener anterior para evitar duplicação
+        form.onsubmit = null;
+        
+        // Adiciona o evento de submit
+        form.addEventListener('submit', function(e) {
+            console.log('Submit interceptado!');
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            console.log('Formulário válido, mostrando mensagem...');
+            sessionStorage.setItem('faleConoscoEnviado', '1');
+            mostrarMensagemFaleConosco();
+        });
+        
+        console.log('Event listener adicionado ao formulário');
+    } else {
+        console.error('Formulário não encontrado!');
     }
+    
     // Se a flag está setada, mostra a mensagem e limpa a flag
     if (sessionStorage.getItem('faleConoscoEnviado')) {
         sessionStorage.removeItem('faleConoscoEnviado');
         mostrarMensagemFaleConosco();
     }
-});
+}
+
+// Chama a inicialização imediatamente se o DOM já estiver carregado
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarFaleConosco);
+} else {
+    inicializarFaleConosco();
+}
+
+// Exporta a função para uso global
+window.inicializarFaleConosco = inicializarFaleConosco;

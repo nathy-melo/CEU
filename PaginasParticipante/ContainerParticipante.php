@@ -17,14 +17,17 @@ $paginasPermitidas = [
     'meusEventos' => 'MeusEventosParticipante.html',
     'perfil' => 'PerfilParticipante.html',
     'certificados' => 'CerticadosParticipante.html',
-    'faleconosco' => 'FaleConoscoParticipante.html',
     'configuracoes' => 'ConfiguracoesParticipante.html',
-    'termos' => 'TermosDeCondicoesP.html',
-    'redefinirSenha' => 'RedefinirSenhaParticipante.html',
-    'emailRecuperacao' => 'EmailDeRecuperacaoP.html',
-    'temaDoSite' => 'TemaDoSiteParticipante.html',
-    'manualDeUso' => 'ManualDeUsoParticipante.html',
-    'duvidasFrequentes' => 'DuvidasFrequentesParticipante.html',
+
+    // Reaproveita conteúdos globais quando aplicável
+    'termos' => '../PaginasGlobais/TermosDeCondicoes.html',
+    'faleconosco' => '../PaginasGlobais/FaleConosco.html',
+    'redefinirSenha' => '../PaginasGlobais/RedefinirSenhaConta.html',
+    'emailRecuperacao' => '../PaginasGlobais/EmailDeRecuperacao.html',
+    'temaDoSite' => '../PaginasGlobais/TemaDoSite.html',
+    'manualDeUso' => '../PaginasGlobais/ManualDeUso.html',
+    'duvidasFrequentes' => '../PaginasGlobais/DuvidasFrequentes.html',
+    'sobreNos' => '../PaginasGlobais/SobreNos.html',
     // Adicione novas páginas conforme necessário - não se esqueça de as adicionar no menu (JS) também!
 ];
 
@@ -42,6 +45,9 @@ $arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
 </div>
 
 <script>
+// Variável global para guardar o estado do filtro
+window.estadoFiltro = {}
+
 // Variável global para guardar o observer
 let menuContentObserver = null;
 
@@ -78,7 +84,46 @@ function sincronizarMenuComConteudo() {
     menuContentObserver.observe(menu, { attributes: true });
 }
 
+function removerFiltroExistente() {
+    const filtroContainer = document.getElementById('filtro-container');
+    if (filtroContainer) {
+        // Salva o estado antes de remover
+        const form = filtroContainer.querySelector('form') || filtroContainer;
+        const formData = new FormData(form);
+        window.estadoFiltro = {};
+        for (const [key, value] of formData.entries()) {
+            if (!window.estadoFiltro[key]) {
+                window.estadoFiltro[key] = [];
+            }
+            window.estadoFiltro[key].push(value);
+        }
+        filtroContainer.remove();
+    }
+    document.body.classList.remove('filtro-ativo');
+}
+
+function carregarFaleConoscoScript() {
+    // Remove qualquer script antigo de FaleConosco.js
+    const conteudo = document.getElementById('conteudo-dinamico');
+    if (!conteudo) return;
+    const scripts = conteudo.querySelectorAll('script[data-faleconosco]');
+    scripts.forEach(s => s.remove());
+    // Adiciona o novo script
+    var script = document.createElement('script');
+    script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
+    script.setAttribute('data-faleconosco', '1');
+    script.onload = function() {
+        if (typeof window.inicializarFaleConosco === 'function') {
+            window.inicializarFaleConosco();
+        }
+    };
+    conteudo.appendChild(script);
+}
+
 function carregarPagina(pagina) {
+    // 1. Remove o filtro da página anterior ANTES de carregar o novo conteúdo.
+    removerFiltroExistente();
+
     fetch('ContainerParticipante.php?pagina=' + pagina)
         .then(response => response.text())
         .then(html => {
@@ -89,52 +134,55 @@ function carregarPagina(pagina) {
                 document.getElementById('conteudo-dinamico').innerHTML = novoConteudo.innerHTML;
                 sincronizarMenuComConteudo();
 
-                // Ativa o botão correto do menu conforme a página carregada
                 if (typeof window.setMenuAtivoPorPagina === 'function') {
                     window.setMenuAtivoPorPagina(pagina);
                 }
 
-                // Mapeamento manual: associa cada nome de página ao seu respectivo arquivo JS.
-                // Se adicionar uma nova página HTML e quiser que ela carregue um JS específico,
-                // basta adicionar uma nova entrada aqui, usando o mesmo nome da chave usada em $paginasPermitidas do PHP.
-                // Exemplo: 'minhaPagina': 'MinhaPagina.js'
-                const jsFile = {
-                    'inicio': 'InicioParticipante.js',
-                    'evento': 'CartaoEventoParticipante.js',
-                    'eventoInscrito': 'CartaoEventoInscrito.js',
-                    'perfil': 'PerfilParticipante.js',
-                    'faleconosco': 'FaleConoscoParticipante.js',
-                    'meusEventos': 'MeusEventosParticipante.js', // ADICIONADO
-                    'redefinirSenha': 'RedefenirSenhaParticipante.js'
-                }[pagina];
+                // Mapeamento de scripts aprimorado para carregar dependências na ordem correta.
+                const scriptsParaCarregar = {
+                    'inicio': ['../PaginasGlobais/FIltro.js', 'InicioParticipante.js'],
+                    'meusEventos': ['../PaginasGlobais/FIltro.js', 'MeusEventosParticipante.js'],
+                    'evento': ['CartaoDoEventoParticipante.js'],
+                    'eventoInscrito': ['CartaoDoEventoInscrito.js'],
+                    'perfil': ['PerfilParticipante.js'],
+                    'faleconosco': ['../PaginasGlobais/FaleConosco.js'],
+                    'redefinirSenha': ['../PaginasGlobais/RedefinirSenhaConta.js']
+                }[pagina] || [];
 
-                if (jsFile) {
-                    const script = document.createElement('script');
-                    script.src = jsFile;
-                    script.onload = function() {
-                        if (pagina === 'inicio' && typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
-                        if (pagina === 'perfil' && typeof window.inicializarEventosPerfilParticipante === 'function') window.inicializarEventosPerfilParticipante();
-                        if (pagina === 'meusEventos' && typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos(); // ADICIONADO
-                        if (pagina === 'redefinirSenha' && typeof window.inicializarRedefinirSenhaParticipante === 'function') window.inicializarRedefinirSenhaParticipante();
-                    };
-                    document.getElementById('conteudo-dinamico').appendChild(script);
-                }
-
-                // Garante que o botão de inscrição funcione sempre ao entrar na página 'evento'
-                if (pagina === 'evento') {
-                    // Aguarda o DOM do conteudo-dinamico ser atualizado
-                    setTimeout(function() {
-                        var btnInscrever = document.querySelector('.botao-inscrever');
-                        if (btnInscrever) {
-                            btnInscrever.onclick = function() {
-                                if (typeof window.mostrarMensagemInscricaoFeita === 'function') {
-                                    window.mostrarMensagemInscricaoFeita();
-                                }
-                            };
+                // Função para carregar múltiplos scripts em sequência.
+                function carregarScripts(lista, callback) {
+                    let index = 0;
+                    function proximo() {
+                        if (index < lista.length) {
+                            const script = document.createElement('script');
+                            // Adiciona um timestamp para evitar problemas de cache
+                            script.src = lista[index++] + '?t=' + new Date().getTime();
+                            script.onload = proximo;
+                            script.onerror = () => console.error(`Falha ao carregar o script: ${script.src}`);
+                            document.body.appendChild(script).parentNode.removeChild(script);
+                        } else if (callback) {
+                            callback();
                         }
-                    }, 0);
+                    }
+                    proximo();
                 }
-                
+
+                // Carrega os scripts da página e, em seguida, executa as funções de inicialização.
+                carregarScripts(scriptsParaCarregar, () => {
+                    if (pagina === 'inicio' || pagina === 'meusEventos') {
+                        if (typeof inicializarFiltroEventos === 'function') inicializarFiltroEventos();
+                    } else if (pagina === 'perfil') {
+                        if (typeof inicializarEventosPerfilParticipante === 'function') inicializarEventosPerfilParticipante();
+                    } else if (pagina === 'evento') {
+                        if (typeof inicializarEventosCartaoEvento === 'function') inicializarEventosCartaoEvento();
+                    } else if (pagina === 'eventoInscrito') {
+                        if (typeof window.inicializarEventosCartaoDoEventoInscrito === 'function') {
+                            window.inicializarEventosCartaoDoEventoInscrito();
+                        }
+                    } else if (pagina === 'faleconosco') {
+                        carregarFaleConoscoScript();
+                    }
+                });
             }
             window.history.pushState({}, '', '?pagina=' + pagina);
         });
@@ -153,7 +201,13 @@ document.addEventListener("DOMContentLoaded", function() {
         window.setMenuAtivoPorPagina(pagina);
     }
     sincronizarMenuComConteudo();
+
+    // Garante que o FaleConosco.js seja carregado e inicializado ao abrir diretamente a página
+    if (pagina === 'faleconosco') {
+        carregarFaleConoscoScript();
+    }
 });
+
 </script>
 
 <style>

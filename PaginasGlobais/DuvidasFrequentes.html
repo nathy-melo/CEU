@@ -67,10 +67,6 @@
         margin-bottom: 0;
     }
 
-    .container-botao {
-        margin-top: 2.408rem;
-    }
-
     .botao-voltar {
         display: inline-block;
         background-color: var(--botao);
@@ -81,6 +77,8 @@
         font-weight: 700;
         font-size: 1rem;
         text-align: center;
+        margin-top: 2.408rem;
+        border: none;
     }
 </style>
 
@@ -119,9 +117,8 @@
                     <p>Se sua dúvida não estiver respondida aqui, você pode usar a opção "Fale Conosco" no canto
                         inferior esquerdo do site para obter ajuda diretamente com a equipe de suporte.</p>
                 </div>
-                <div class="container-botao">
-                    <a href="javascript:history.back()" class="botao-voltar">Voltar</a>
-                </div>
+                <button class="botao botao-voltar" onclick="history.back()">Voltar
+                </button>
             </div>
     </div>
 </body>

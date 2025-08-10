@@ -3,13 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const toggleButton = document.createElement("button");
     toggleButton.className = "menu-toggle";
     menu.appendChild(toggleButton);
-  
+
     const mainContent = document.querySelector(".conteudo-principal");
   
     // Alterna o estado do menu ao clicar no botão
     toggleButton.addEventListener("click", () => {
       menu.classList.toggle("expanded");
-      mainContent.classList.toggle("shifted");
+mainContent.classList.toggle("shifted");
     });
   
     // Mantém funcionalidade existente para ativar botões
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         inicio: ['inicio', 'evento'],
         meusEventos: ['meusEventos', 'eventoInscrito'],
         certificados: ['certificados'],
-        configuracoes: ['configuracoes', 'termos'],
+        configuracoes: ['configuracoes', 'termos', 'redefinirSenha', 'emailRecuperacao', 'temaDoSite', 'manualDeUso', 'duvidasFrequentes', 'sobreNos'],
         faleConosco: ['faleconosco']
       };
   
@@ -56,5 +56,4 @@ document.addEventListener("DOMContentLoaded", () => {
     // Torna a função global para ser chamada pelo Container.php
     globalThis.setMenuAtivoPorPagina = setMenuAtivoPorPagina;
   });
-  
-  
+

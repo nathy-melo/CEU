@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Nós</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
+</head>
+<style>
+    .secao-duvidas {
+        flex: 1 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 1.75rem 0.88rem;
+    }
+
+    .cartao-duvidas {
+        background-color: var(--caixas);
+        color: var(--branco);
+        border-radius: 0.875rem;
+        box-shadow: 0 0.175rem 0.875rem 0 var(--sombra-padrao);
+        padding: 1.792rem 0.917rem;
+        max-width: 59.108rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 3rem 0 3rem 0;
+    }
+
+    .titulo-duvidas {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.75rem;
+        line-height: 1.32;
+        letter-spacing: -0.05em;
+        text-align: center;
+        margin: 0 0 1rem 0;
+    }
+
+    .conteudo-duvidas {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        line-height: 2;
+        letter-spacing: -0.02em;
+        text-align: left;
+        width: 100%;
+        max-width: 57.316rem;
+    }
+
+    .conteudo-duvidas p {
+        margin: 0 0 1.4em 0;
+        font-weight: 400;
+    }
+
+    .conteudo-duvidas h1 {
+        text-align: center;
+        font-weight: 400;
+    }
+
+
+    .conteudo-duvidas>*:last-child {
+        margin-bottom: 0;
+    }
+
+    .botao-voltar {
+        display: inline-block;
+        background-color: var(--botao);
+        color: var(--branco);
+        border-radius: 0.2625rem;
+        padding: 0.7875rem 2.317rem;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1rem;
+        text-align: center;
+        margin-top: 2.408rem;
+        border: none;
+    }
+</style>
+
+<body>
+    <div id="main-content">
+        <div class="cartao-duvidas">
+            <h1 class="titulo-duvidas">Sobre Nós</h1>
+            <div class="conteudo-duvidas">
+                <h1>Bem vindo ao CEU!</h1>
+                <p>Este site foi criado como parte da disciplina “Projetec” que tem o objetivo de criar um site ou
+                    aplicação que ajude em algum problema que nos afeta. O desenvolvimento do nosso site nasceu da
+                    dificuldade que encontramos em completar e categorizar corretamente nossa carga horária complementar
+                    ao longo do Ensino Médio.
+                    <br><br>
+                    Nós somos um grupo de 8 estudantes (Ana Clara, Caike, Jean, Júlia, Nathally, Pâmela, Roxane e
+                    Victória) do Instituto Federal de Minas Gerais no Campus Sabará e o nosso objetivo é facilitar a
+                    criação e a certificação de eventos com praticidade e qualidade, garantindo que a pré e
+                    pós-realização dos mesmos sejam descomplicadas para todos os envolvidos. Ao longo do processo,
+                    exploramos ferramentas como o “Figma” para garantir que esse espaço fosse acessível e intuitivo.
+                    <br><br>
+                    Esperamos que o site seja útil e facilite a experiência com a realização de eventos. Se tiver
+                    dúvidas ou sugestões, estamos abertos para ouvi-las!
+                </p>
+
+            </div>
+            <button class="botao botao-voltar" onclick="history.back()">Voltar
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -55,7 +55,8 @@
         width: 100%;
         border: none;
         background-color: var(--branco);
-        border-radius: 2rem;
+        color: var(--caixas);
+        border-radius:  2rem;
         padding: 0.3125rem 0.78125rem;
         font-family: 'Inter', sans-serif;
         font-size: 0.8rem;
@@ -86,7 +87,7 @@
 
     .btn {
         border: none;
-        border-radius: 0.1875rem;
+        border-radius: 1rem; /* padronizado */
         padding: 0.5625rem 0;
         width: 4.59375rem;
         font-family: 'Inter', sans-serif;
@@ -94,12 +95,20 @@
         font-weight: 500;
         color: var(--branco);
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0rem 0.1rem 0.5rem var(--sombra-leve); /* padronizado */
+        transition: transform .15s ease, filter .15s ease, background-color .2s ease; /* animação padrão */
+        will-change: transform, filter;
         background-color: var(--botao);
     }
 
     .btn:hover {
-        transform: translateY(-0.0625rem);
+        transform: translateY(-0.125rem) scale(1.02); /* leve deslocamento + aumento */
+        filter: brightness(1.05);
+    }
+
+    .btn:active {
+        transform: translateY(0) scale(0.99);
+        filter: none;
     }
 
     .apenas-leitura {
@@ -113,8 +122,7 @@
         white-space: nowrap;
         border: 0;
     }
-
-    /* Vou deixar isso aqui pois tinha um botão de voltar antes. Vai q precisa */
+    
     .botao-voltar {
         background-color: var(--botao);
         border-radius: 0.2625em;
@@ -138,7 +146,7 @@
             <div class="container-formulario">
                 <h1 class="titulo-formulario">Fale Conosco</h1>
                 <div class="cartao-formulario">
-                    <form action="#" method="GET" onsubmit="event.preventDefault(); mostrarMensagemFaleConosco();">
+                    <form action="#" method="post">
                         <div class="campos-formulario">
                             <label for="nome" class="apenas-leitura">Nome</label>
                             <input type="text" id="nome" name="nome" class="entrada-formulario" placeholder="Nome"
@@ -164,7 +172,7 @@
             </div>
         </section>
     </div>
-    <script src="FaleConoscoOrganizador.js"></script>
+    <script src="FaleConosco.js"></script>
 </body>
 
 </html>

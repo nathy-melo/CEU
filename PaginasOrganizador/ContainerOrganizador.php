@@ -13,13 +13,22 @@
 $paginasPermitidas = [
     'inicio' => 'InicioOrganizador.html',
     'evento' => 'CartaodoEventoOrganizador.html',
-    'eventoInscrito' => 'CartaodoEventoInscrito.html',
+    'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
     'meusEventos' => 'MeusEventosOrganizador.html',
     'perfil' => 'PerfilOrganizador.html',
     'certificados' => 'CertificadosOrganizador.html',
-    'faleconosco' => 'FaleConoscoOrganizador.html',
     'configuracoes' => 'ConfiguracoesOrganizador.html',
-    'termos' => 'TermosDeCondicoesO.html'
+
+
+    // Reaproveita conteúdos globais quando aplicável
+    'termos' => '../PaginasGlobais/TermosDeCondicoes.html',
+    'faleconosco' => '../PaginasGlobais/FaleConosco.html',
+    'redefinirSenha' => '../PaginasGlobais/RedefinirSenhaConta.html',
+    'emailRecuperacao' => '../PaginasGlobais/EmailDeRecuperacao.html',
+    'temaDoSite' => '../PaginasGlobais/TemaDoSite.html',
+    'manualDeUso' => '../PaginasGlobais/ManualDeUso.html',
+    'duvidasFrequentes' => '../PaginasGlobais/DuvidasFrequentes.html',
+    'sobreNos' => '../PaginasGlobais/SobreNos.html',
         // Adicione novas páginas conforme necessário - não se esqueça de as adicionar no menu (JS) também!
 ];
 
@@ -73,7 +82,30 @@ function sincronizarMenuComConteudo() {
     menuContentObserver.observe(menu, { attributes: true });
 }
 
+function carregarFaleConoscoScript() {
+    // Remove qualquer script antigo de FaleConosco.js
+    const conteudo = document.getElementById('conteudo-dinamico');
+    if (!conteudo) return;
+    const scripts = conteudo.querySelectorAll('script[data-faleconosco]');
+    scripts.forEach(s => s.remove());
+    // Adiciona o novo script
+    var script = document.createElement('script');
+    script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
+    script.setAttribute('data-faleconosco', '1');
+    script.onload = function() {
+        if (typeof window.inicializarFaleConosco === 'function') {
+            window.inicializarFaleConosco();
+        }
+    };
+    conteudo.appendChild(script);
+}
+
 function carregarPagina(pagina) {
+    // Remove o filtro lateral (se existir) antes de trocar de página
+    if (typeof window.removerFiltroExistente === 'function') {
+        try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
+    }
+
     fetch('ContainerOrganizador.php?pagina=' + pagina)
         .then(response => response.text())
         .then(html => {
@@ -89,33 +121,47 @@ function carregarPagina(pagina) {
                     window.setMenuAtivoPorPagina(pagina);
                 }
 
-                // Mapeamento manual: associa cada nome de página ao seu respectivo arquivo JS.
-                // Se adicionar uma nova página HTML e quiser que ela carregue um JS específico,
-                // basta adicionar uma nova entrada aqui, usando o mesmo nome da chave usada em $paginasPermitidas do PHP.
-                // Exemplo: 'minhaPagina': 'MinhaPagina.js'
-                const jsFile = {
-                    'inicio': 'InicioOrganizador.js',
-                    'evento': 'CartaoEventoOrganizador.js',
-                    'eventoInscrito': 'CartaoEventoInscrito.js',
-                    'perfil': 'PerfilOrganizador.js',
-                    'faleconosco': 'FaleConoscoOrganizador.js',
-                    'meusEventos': 'MeusEventosOrganizador.js', // ADICIONADO
-                }[pagina];
+                // Carregamento sequencial de scripts por página
+                const scriptsParaCarregar = {
+                    'inicio': ['../PaginasGlobais/FIltro.js', 'InicioOrganizador.js'],
+                    'meusEventos': ['../PaginasGlobais/FIltro.js', 'MeusEventosOrganizador.js'],
+                    'evento': ['CartaoDoEventoOrganizador.js'],
+                    'eventoOrganizador': ['EventoOrganizador.js'],
+                    'perfil': ['PerfilOrganizador.js'],
+                    'faleconosco': ['../PaginasGlobais/FaleConosco.js'],
+                    'redefinirSenha': ['../PaginasGlobais/RedefinirSenhaConta.js']
+                }[pagina] || [];
 
-                if (jsFile) {
-                    const script = document.createElement('script');
-                    script.src = jsFile;
-                    script.onload = function() {
-                        if (pagina === 'inicio' && typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
-                        if (pagina === 'perfil' && typeof window.inicializarEventosPerfilOrganizador === 'function') window.inicializarEventosPerfilOrganizador();
-                        if (pagina === 'meusEventos' && typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos(); // ADICIONADO
-                    };
-                    document.getElementById('conteudo-dinamico').appendChild(script);
+                function carregarScripts(lista, callback) {
+                    let index = 0;
+                    function proximo() {
+                        if (index < lista.length) {
+                            const script = document.createElement('script');
+                            script.src = lista[index++] + '?t=' + new Date().getTime();
+                            script.onload = proximo;
+                            script.onerror = () => console.error('Falha ao carregar o script:', script.src);
+                            document.getElementById('conteudo-dinamico').appendChild(script);
+                        } else if (callback) {
+                            callback();
+                        }
+                    }
+                    proximo();
                 }
+
+                carregarScripts(scriptsParaCarregar, () => {
+                    if (pagina === 'inicio' || pagina === 'meusEventos') {
+                        if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    } else if (pagina === 'perfil') {
+                        if (typeof window.inicializarEventosPerfilOrganizador === 'function') window.inicializarEventosPerfilOrganizador();
+                    } else if (pagina === 'eventoOrganizador') {
+                        if (typeof window.inicializarEventosCartaoDoEventoOrganizador === 'function') window.inicializarEventosCartaoDoEventoOrganizador();
+                    } else if (pagina === 'faleconosco') {
+                        carregarFaleConoscoScript();
+                    }
+                });
 
                 // Garante que o botão de inscrição funcione sempre ao entrar na página 'evento'
                 if (pagina === 'evento') {
-                    // Aguarda o DOM do conteudo-dinamico ser atualizado
                     setTimeout(function() {
                         var btnInscrever = document.querySelector('.botao-inscrever');
                         if (btnInscrever) {
@@ -139,13 +185,15 @@ window.onpopstate = function() {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Detecta a página atual pela URL (?pagina=...)
     const params = new URLSearchParams(window.location.search);
     const pagina = params.get('pagina') || 'inicio';
     if (typeof window.setMenuAtivoPorPagina === 'function') {
         window.setMenuAtivoPorPagina(pagina);
     }
     sincronizarMenuComConteudo();
+    if (pagina === 'faleconosco') {
+        carregarFaleConoscoScript();
+    }
 });
 </script>
 

@@ -12,186 +12,9 @@
         align-items: flex-start;
         padding-top: 1rem;
     }
-
-    .barra-pesquisa-container {
-        max-width: clamp(310px, 86%, 1150px);
-        box-sizing: border-box;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .barra-pesquisa {
-        display: flex;
-        align-items: center;
-        width: 100%;
-    }
-
-    .campo-pesquisa-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-        width: clamp(200px, 39vw, 580px);
-        height: clamp(30px, 4vw, 48px);
-    }
-
-    .campo-pesquisa {
-        width: 100%;
-        height: 100%;
-        background-color: var(--branco);
-        border-radius: clamp(16px, 3vw, 26px);
-        padding: 0 clamp(10px, 2vw, 15px);
-        font-size: clamp(12px, 1.5vw, 16px);
-        color: var(--preto);
-        box-sizing: border-box;
-        border: 2px solid #e0e0e0;
-        box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
-        font-weight: bold;
-        outline: none;
-    }
-
-    .campo-pesquisa:focus {
-        border: 2px solid #0a1449;
-        outline: none;
-    }
-
-    .botao-pesquisa {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: clamp(30px, 5vw, 77px);
-        height: clamp(30px, 5vw, 77px);
-        background-color: transparent;
-        box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
-        border-radius: 50%;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1;
-    }
-
-    .icone-pesquisa {
-        width: 100%;
-        height: 100%;
-        background-color: var(--azul-escuro);
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .icone-pesquisa img {
-        width: 70%;
-        height: 70%;
-        object-fit: contain;
-        filter: brightness(0) invert(1);
-    }
-
-    .botao-filtrar {
-        width: clamp(80px, 10vw, 145px);
-        height: clamp(30px, 4vw, 48px);
-        background-color: var(--branco);
-        border-radius: clamp(11px, 4vw, 21px);
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: clamp(10px, 2vw, 20px);
-        font-size: clamp(12px, 1.5vw, 16px);
-        color: var(--preto);
-        box-sizing: border-box;
-        box-shadow: 0px 5px 21px 0px var(--sombra-padrao);
-        font-weight: bold;
-        outline: none;
-    }
-
-    .botao-filtrar span {
-        font-weight: bold;
-    }
-
-    .botao-filtrar img {
-        width: 20%;
-        height: auto;
-        margin-left: 8px;
-    }
-
-    .section-title-wrapper {
-        width: 100%;
-        padding: 20px 0;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .div-section-title {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--caixas);
-        border-radius: 10px;
-        padding: 5px 5px 5px 5px;
-        margin-top: 20px;
-    }
-
-    .section-title {
-        font-size: 1.9rem;
-        font-weight: 700;
-        color: var(--branco);
-        text-shadow: 0px 4px 10px var(--preto);
-    }
-
-    .container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 23px;
-        max-width: 1200px;
-        padding: 0 40px 40px;
-        margin: 0 auto;
-    }
-
-    .CaixaDoEvento {
-        background-color: var(--branco);
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 2px 2px 15px var(--sombra-forte);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        min-height: 180px;
-        position: relative;
-    }
-
-    .CaixaDoEvento:hover {
-        cursor: pointer;
-        opacity: 0.8;
-    }
-
-    .EventoTitulo {
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin-bottom: 11px;
-        color: var(--azul-escuro);
-    }
-
-    .EventoInfo {
-        color: var(--cinza-escuro);
-        line-height: 1.6;
-        margin-top: auto;
-        text-align: left;
-    }
 </style>
-</head>
-
 <body>
     <div id="main-content">
-        <!-- Conteúdo principal da página -->
         <div class="section-title-wrapper">
             <div class="barra-pesquisa-container">
                 <div class="barra-pesquisa">
@@ -204,7 +27,7 @@
                         </button>
                     </div>
                 </div>
-                <button class="botao-filtrar">
+                <button class="botao botao-filtrar">
                     <span>Filtrar</span>
                     <img src="../Imagens/filtro.png" alt="Filtro">
                 </button>
@@ -215,45 +38,89 @@
         </div>
 
         <div class="container" id="eventos-container">
-            <!-- Caixas de evento -->
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 1</div>
-                <div class="EventoInfo">Em andamento<br>Data: 07/03/25<br>Certificado: Sim</div>
+            <!-- Exemplos com data-* e descrições para testar filtros -->
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="palestra"
+                data-modalidade="presencial" data-localizacao="auditorio" data-duracao="1h_2h" data-data="2025-03-07"
+                data-certificado="extensao">
+                <div class="EventoTitulo">Inovação no Campus</div>
+                <div class="EventoInfo">Categoria: Palestra<br>Data: 07/03/25<br>Certificado: Sim</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 2</div>
-                <div class="EventoInfo">Em andamento<br>Data: 17/01/25<br>Certificado: Sim</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="workshop" data-modalidade="online"
+                data-localizacao="biblioteca" data-duracao="2h_4h" data-data="2025-01-17" data-certificado="ensino">
+                <div class="EventoTitulo">Programação Python</div>
+                <div class="EventoInfo">Categoria: Workshop<br>Data: 17/01/25<br>Certificado: Sim</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 3</div>
-                <div class="EventoInfo">Em andamento<br>Data: 20/01/25<br>Certificado: Não</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="curso" data-modalidade="presencial"
+                data-localizacao="quadra" data-duracao="menos_1h" data-data="2025-01-20" data-certificado="ensino">
+                <div class="EventoTitulo">Curso Rápido de Oratória</div>
+                <div class="EventoInfo">Categoria: Curso<br>Data: 20/01/25<br>Certificado: Não</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 4</div>
-                <div class="EventoInfo">Em andamento<br>Data: 15/02/25<br>Certificado: Não</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="seminario"
+                data-modalidade="hibrido" data-localizacao="sala_x" data-duracao="1h_2h" data-data="2025-02-15"
+                data-certificado="pesquisa">
+                <div class="EventoTitulo">Seminário de Sustentabilidade</div>
+                <div class="EventoInfo">Categoria: Seminário<br>Data: 15/02/25<br>Certificado: Não</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 5</div>
-                <div class="EventoInfo">Em andamento<br>Data: 20/02/25<br>Certificado: Sim</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="conferencia"
+                data-modalidade="presencial" data-localizacao="auditorio" data-duracao="2h_4h" data-data="2025-02-20"
+                data-certificado="pesquisa">
+                <div class="EventoTitulo">Conferência de IA</div>
+                <div class="EventoInfo">Categoria: Conferência<br>Data: 20/02/25<br>Certificado: Sim</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 6</div>
-                <div class="EventoInfo">Em andamento<br>Data: 30/02/25<br>Certificado: Sim</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="forum" data-modalidade="online"
+                data-localizacao="biblioteca" data-duracao="mais_5h" data-data="2025-02-28" data-certificado="extensao">
+                <div class="EventoTitulo">Inclusão Digital</div>
+                <div class="EventoInfo">Categoria: Fórum<br>Data: 28/02/25<br>Certificado: Sim</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 7</div>
-                <div class="EventoInfo">Em andamento<br>Data: 13/06/25<br>Certificado: Sim</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="visita_tecnica"
+                data-modalidade="presencial" data-localizacao="quadra" data-duracao="2h_4h" data-data="2025-06-13"
+                data-certificado="extensao">
+                <div class="EventoTitulo">Visita Técnica ao Laboratório</div>
+                <div class="EventoInfo">Categoria: Visita Técnica<br>Data: 13/06/25<br>Certificado: Sim</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 8</div>
-                <div class="EventoInfo">Em andamento<br>Data: 30/06/25<br>Certificado: Não</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="oficina" data-modalidade="hibrido"
+                data-localizacao="sala_x" data-duracao="1h_2h" data-data="2025-06-30" data-certificado="extensao">
+                <div class="EventoTitulo">Oficina de Design Thinking</div>
+                <div class="EventoInfo">Categoria: Oficina<br>Data: 30/06/25<br>Certificado: Não</div>
             </div>
-            <div class="CaixaDoEvento" onclick="carregarPagina('evento')">
-                <div class="EventoTitulo">Evento 9</div>
-                <div class="EventoInfo">Em andamento<br>Data: 07/07/25<br>Certificado: Sim</div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="congresso"
+                data-modalidade="presencial" data-localizacao="auditorio" data-duracao="mais_5h" data-data="2025-07-07"
+                data-certificado="ensino">
+                <div class="EventoTitulo">Congresso de Educação</div>
+                <div class="EventoInfo">Categoria: Congresso<br>Data: 07/07/25<br>Certificado: Sim</div>
+            </div>
+
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="palestra" data-modalidade="online"
+                data-localizacao="auditorio" data-duracao="1h_2h" data-data="2025-08-10" data-certificado="extensao">
+                <div class="EventoTitulo">Segurança da Informação</div>
+                <div class="EventoInfo">Categoria: Palestra<br>Data: 10/08/25<br>Certificado: Sim</div>
+            </div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="workshop"
+                data-modalidade="presencial" data-localizacao="sala_x" data-duracao="2h_4h" data-data="2025-09-05"
+                data-certificado="ensino">
+                <div class="EventoTitulo">Git e GitHub</div>
+                <div class="EventoInfo">Categoria: Workshop<br>Data: 05/09/25<br>Certificado: Sim</div>
+            </div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="curso" data-modalidade="online"
+                data-localizacao="biblioteca" data-duracao="mais_5h" data-data="2025-10-01" data-certificado="ensino">
+                <div class="EventoTitulo">HTML & CSS do Zero</div>
+                <div class="EventoInfo">Categoria: Curso<br>Data: 01/10/25<br>Certificado: Sim</div>
+            </div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="seminario"
+                data-modalidade="presencial" data-localizacao="quadra" data-duracao="1h_2h" data-data="2025-11-12"
+                data-certificado="extensao">
+                <div class="EventoTitulo">Empreendedorismo</div>
+                <div class="EventoInfo">Categoria: Seminário<br>Data: 12/11/25<br>Certificado: Não</div>
+            </div>
+            <div class="botao CaixaDoEvento" onclick="carregarPagina('evento')" data-tipo="conferencia"
+                data-modalidade="hibrido" data-localizacao="auditorio" data-duracao="2h_4h" data-data="2025-12-03"
+                data-certificado="pesquisa">
+                <div class="EventoTitulo">Conferência de Cloud Computing</div>
+                <div class="EventoInfo">Categoria: Conferência<br>Data: 03/12/25<br>Certificado: Sim</div>
             </div>
         </div>
     </div>
+    <script src="../PaginasGlobais/FIltro.js"></script>
     <script src="InicioParticipante.js"></script>
 </body>
 

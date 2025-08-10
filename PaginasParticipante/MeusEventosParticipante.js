@@ -14,14 +14,18 @@ function inicializarFiltroEventos() {
     semResultadosMsg.style.padding = '30px 0';
 
     function filtrarEventos() {
-        const termo = searchInput.value.trim().toLowerCase();
-        const caixas = eventosContainer.querySelectorAll('.CaixaDoEvento');
+        const termo = (searchInput?.value || '').trim().toLowerCase();
+        const caixas = eventosContainer?.querySelectorAll('.CaixaDoEvento') || [];
         let encontrou = false;
 
         caixas.forEach(caixa => {
-            const titulo = caixa.querySelector('.EventoTitulo').textContent.toLowerCase();
-            const info = caixa.querySelector('.EventoInfo').textContent.toLowerCase();
-            if (termo === '' || titulo.includes(termo) || info.includes(termo)) {
+            const titulo = (caixa.querySelector('.EventoTitulo')?.textContent || '').toLowerCase();
+            const info = (caixa.querySelector('.EventoInfo')?.textContent || '').toLowerCase();
+            const searchOk = (termo === '' || titulo.includes(termo) || info.includes(termo));
+            const filterOk = caixa.dataset.filterOk !== 'false';
+            const mostrar = searchOk && filterOk;
+
+            if (mostrar) {
                 caixa.style.display = '';
                 encontrou = true;
             } else {
@@ -29,12 +33,10 @@ function inicializarFiltroEventos() {
             }
         });
 
-        // Remove mensagem anterior
-        if (eventosContainer.contains(semResultadosMsg)) {
+        if (eventosContainer && eventosContainer.contains(semResultadosMsg)) {
             eventosContainer.removeChild(semResultadosMsg);
         }
-
-        if (!encontrou) {
+        if (!encontrou && eventosContainer) {
             eventosContainer.appendChild(semResultadosMsg);
         }
     }
@@ -52,8 +54,14 @@ function inicializarFiltroEventos() {
             }
         };
     }
+    // Inicializa o filtro lateral quando disponível
+    if (typeof inicializarFiltro === 'function') {
+        inicializarFiltro();
+    }
 }
 
-document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarFiltroEventos();
+});
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML
 window.inicializarFiltroEventos = inicializarFiltroEventos;
