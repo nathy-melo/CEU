@@ -108,8 +108,17 @@
   }
 
   .link-termos {
-    color: var(--botao);
     text-decoration: underline;
+    color: var(--botao);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .link-termos:hover {
+    text-decoration: underline;
+    color: var(--azul-claro);
   }
 
   .acoes-formulario {
@@ -134,20 +143,20 @@
   }
 
   .botao-voltar {
-      background-color: var(--botao);
-      border-radius: 0.2625em;
-      border: none;
-      color: var(--branco);
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      flex-grow: 0;
-      flex-basis: 7em;
-      text-align: center;
-      flex-basis: 2em;
-      min-height: 2em;
-      padding: 0.5em;
-    }
+    background-color: var(--botao);
+    border-radius: 0.2625em;
+    border: none;
+    color: var(--branco);
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-grow: 0;
+    flex-basis: 7em;
+    text-align: center;
+    flex-basis: 2em;
+    min-height: 2em;
+    padding: 0.5em;
+  }
 
   .botao-toggle-termos {
     background: #fff;
@@ -158,9 +167,11 @@
     cursor: pointer;
     padding: 0;
   }
+
   .botao-toggle-termos.selected {
     box-shadow: 0 0 0 2.5px var(--botao);
   }
+
   .botao-toggle-termos.selected::after {
     content: '';
     display: block;
@@ -172,9 +183,11 @@
     background: var(--botao);
     border-radius: 50%;
   }
+
   .botao-toggle-termos {
     position: relative;
   }
+
   /* Toggle switch custom */
   .switch-toggle {
     position: relative;
@@ -184,6 +197,7 @@
     margin-left: 0.5em;
     vertical-align: middle;
   }
+
   .switch-toggle input {
     position: absolute;
     left: 0;
@@ -196,6 +210,7 @@
     z-index: 2;
     cursor: pointer;
   }
+
   .slider-toggle {
     position: absolute;
     cursor: pointer;
@@ -207,6 +222,7 @@
     transition: .2s;
     border-radius: 1em;
   }
+
   .slider-toggle:before {
     position: absolute;
     content: "";
@@ -218,10 +234,12 @@
     transition: .2s;
     border-radius: 50%;
   }
-  .switch-toggle input:checked + .slider-toggle {
+
+  .switch-toggle input:checked+.slider-toggle {
     background-color: var(--botao);
   }
-  .switch-toggle input:checked + .slider-toggle:before {
+
+  .switch-toggle input:checked+.slider-toggle:before {
     transform: translateX(0.8em);
     background: var(--branco);
   }
@@ -236,14 +254,14 @@
           <p class="subtitulo-formulario">Receba por e-mail</p>
         </header>
         <form class="corpo-formulario">
-          <input type="text" class="entrada-formulario" placeholder="Nome" required>
-          <input type="email" class="entrada-formulario" placeholder="E-mail" required
+          <input type="text" class="entrada-formulario" id="nome-completo" placeholder="Nome" required>
+          <input type="email" class="entrada-formulario" id="email" placeholder="E-mail" required
             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Digite um e-mail válido">
           <div class="linha-formulario">
-            <input type="text" class="entrada-formulario" placeholder="CPF" required
-              pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00"
-              id="cpf" maxlength="14">
-            <input type="text" class="entrada-formulario" placeholder="Data de Nascimento" required
+            <input type="text" class="entrada-formulario" id="cpf" placeholder="CPF" required
+              pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00" id="cpf"
+              maxlength="14">
+            <input type="text" class="entrada-formulario" id="data-nascimento" placeholder="Data de Nascimento" required
               pattern="\d{2}/\d{2}/\d{4}" title="Digite a data no formato dd/mm/aaaa" id="data-nascimento">
           </div>
           <textarea class="area-texto-formulario" placeholder="Mensagem" required></textarea>
@@ -257,7 +275,7 @@
             </label>
           </div>
           <div class="acoes-formulario">
-            <button type="button" class="botao" onclick="carregarPagina('cadastroO')" >Voltar</button>
+            <button type="button" class="botao" onclick="carregarPagina('cadastroO')">Voltar</button>
             <button type="submit" class="botao" id="btnEnviar">Enviar</button>
           </div>
         </form>

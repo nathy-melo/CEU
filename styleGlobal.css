@@ -202,7 +202,6 @@ body {
   justify-content: flex-start;
   min-height: 180px;
   position: relative;
-  min-height: 12rem;
 }
 
 .CaixaDoEvento:hover {
@@ -236,6 +235,7 @@ body {
   border-radius: 10px;
   background-color: #f0f8ff;
   transition: background-color 0.3s, transform 0.3s;
+  min-height: 180px;
 }
 
 .CaixaDoEventoAdicionar:hover {

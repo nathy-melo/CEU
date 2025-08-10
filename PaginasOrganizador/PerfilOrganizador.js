@@ -50,6 +50,7 @@ function mostrarModalExcluirConta() {
     btnCancelar.style.fontSize = '1.1rem';
     btnCancelar.style.cursor = 'pointer';
     btnCancelar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
+    btnCancelar.className = 'botao';
     btnCancelar.onclick = function() { window.location.reload(); };
 
     var btnConfirmar = document.createElement('button');
@@ -64,6 +65,7 @@ function mostrarModalExcluirConta() {
     btnConfirmar.style.fontSize = '1.1rem';
     btnConfirmar.style.cursor = 'pointer';
     btnConfirmar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
+    btnConfirmar.className = 'botao';
     btnConfirmar.onclick = function() {
         // Aqui você pode colocar a lógica real de exclusão de conta
         alert('Conta excluída!');

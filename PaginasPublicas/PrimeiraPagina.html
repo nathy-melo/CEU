@@ -7,78 +7,77 @@
   <title>Página Inicial</title>
   <link rel="stylesheet" href="../styleGlobal.css">
   <style>
-    :root {
-      --proporcao-container: 0.7;
-    }
-    
     .container-principal {
       position: relative;
       width: clamp(260px, 70vw, 1000px);
       height: calc(clamp(260px, 70vw, 1000px) * 0.5);
-      max-height: 700px;
       background: var(--caixas);
       border-radius: 1.25rem;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem;
+      box-sizing: border-box;
+      gap: 1rem;
+      display: flex;
+      justify-content: center;
     }
 
     .botao {
-      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       color: var(--branco);
       font-size: clamp(0.9rem, 2.5vw, 1.8rem);
       font-family: 'Istok Web', sans-serif;
       font-weight: 700;
       word-wrap: break-word;
-      top: 77%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(19, 31, 99, 0.3);
+      background: var(--botao);
       border-radius: 1.25rem;
       border: none;
       cursor: pointer;
-      width: 30%;
+      width: 100%;
       min-width: 120px;
-      min-height: 30px;
+      min-height: 40px;
       max-width: 300px;
       max-height: 60px;
-      white-space: nowrap;
       transition: background 0.3s;
-      z-index: 1;
+      padding: 0 1.5rem;
+      white-space: nowrap;
     }
 
-    .botao:hover {
-      background: rgba(19, 31, 99, 0.6);
+    .botao-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      width: 100%;
     }
 
     .texto-principal {
-      position: absolute;
       text-align: center;
       color: var(--branco);
       font-size: clamp(1rem, 3vw, 2.2rem);
       font-weight: 700;
       line-height: 1.2;
-      white-space: nowrap;
       text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
-      top: 65%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
+      width: 100%;
       max-width: 800px;
+      white-space: nowrap;
     }
 
     .imagem {
-      width: 30%;
+      width: 100%;
       max-width: 250px;
       min-width: 100px;
-      position: absolute;
       border-radius: 50%;
-      top: 7%;
-      left: 50%;
-      transform: translateX(-50%);
+      margin: 0 auto;
+      display: block;
     }
 
     .subtexto {
-      position: absolute;
       text-align: center;
       color: var(--branco);
       font-size: clamp(0.8rem, 2vw, 1.6rem);
@@ -87,23 +86,24 @@
       line-height: 1.5;
       word-wrap: break-word;
       text-shadow: 0px 0.25rem 1.25rem rgba(0, 0, 0, 0.60);
-      top: 40%;
-      left: 50%;
-      transform: translateX(-50%);
       width: 90%;
       max-width: 600px;
+      margin: 0 0 3em 0;
+      ;
     }
   </style>
 </head>
 
 <body>
-    <div class="container-principal">
+  <div class="container-principal">
     <img class="imagem" src="../Imagens/CEU-Vetor.png" alt="Logo CEU" />
     <div class="subtexto">Controle de Eventos Unificado</div>
     <div class="texto-principal">Crie e organize eventos de forma rápida e prática</div>
-    <a href="ContainerPublico.php" style="text-decoration: none;">
-      <button class="botao">Comece Agora!</button>
-    </a>
+    <div class="botao-wrapper">
+      <a href="ContainerPublico.php" style="text-decoration: none;">
+        <button class="botao">Comece Agora!</button>
+      </a>
+    </div>
   </div>
 </body>
 

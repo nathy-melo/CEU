@@ -77,10 +77,13 @@
             line-height: 1.32;
             letter-spacing: -0.02em;
             text-align: center;
+            text-decoration: none;
+            transition: transform 0.2s ease;
         }
 
         .link-cadastro:hover {
             text-decoration: underline;
+            transform: translateY(-0.0625rem) scale(1.02);
         }
 
         .formulario-login {
@@ -135,10 +138,13 @@
             line-height: 1.32;
             letter-spacing: -0.02em;
             text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
         .link-esqueci-senha:hover {
             text-decoration: underline;
+            transform: translateY(-0.0625rem) scale(1.02);
         }
 
         .botao-login {
@@ -175,10 +181,9 @@
                 <h1 class="titulo-login sombra-texto-comum">Acesse sua conta</h1>
                 <p class="prompt-cadastro">
                     <span class="texto-cadastro sombra-texto-comum">Não tem uma conta?</span>
-                    <button type="button" class="link-cadastro sombra-texto-comum"
-                        onclick="carregarPagina('cadastroP')">
+                    <a type="button" class="link-cadastro sombra-texto-comum" onclick="carregarPagina('cadastroP')">
                         Clique aqui para criar
-                    </button>
+                    </a>
                 </p>
                 <form class="formulario-login" onsubmit="event.preventDefault();" method="post">
                     <div class="grupo-formulario">
@@ -190,8 +195,8 @@
                             class="input-formulario password-input">
                     </div>
                     <div class="acoes-formulario">
-                        <button onclick="carregarPagina('redefinirSenha')"
-                            class="link-esqueci-senha sombra-texto-comum">Esqueci minha senha </button>
+                        <a onclick="carregarPagina('redefinirSenha')"
+                            class="link-esqueci-senha sombra-texto-comum">Esqueci minha senha </a>
                         <button class="botao botao-login">Entrar</button>
                     </div>
                 </form>

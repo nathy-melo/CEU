@@ -32,7 +32,7 @@ mainContent.classList.toggle("shifted");
       const mapeamentoBotoes = {
         perfil: ['perfil', 'editarPerfil'],
         inicio: ['inicio', 'evento'],
-        meusEventos: ['meusEventos', 'eventoInscrito'],
+        meusEventos: ['meusEventos', 'eventoOrganizado'],
         certificados: ['certificados'],
         configuracoes: ['configuracoes', 'termos', 'redefinirSenha', 'emailRecuperacao', 'temaDoSite', 'manualDeUso', 'duvidasFrequentes', 'sobreNos'],
         faleConosco: ['faleconosco']

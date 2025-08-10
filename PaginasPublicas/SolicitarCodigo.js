@@ -66,7 +66,7 @@
     mensagem.style.textAlign = 'center';
     var btnVoltar = document.createElement('button');
     btnVoltar.type = 'button';
-    btnVoltar.className = ' botao-voltar';
+    btnVoltar.className = 'botao botao-voltar';
     btnVoltar.textContent = 'Voltar';
     btnVoltar.onclick = function() { carregarPagina('login'); };
     container.appendChild(titulo);
