@@ -93,6 +93,23 @@ function carregarFaleConoscoScript() {
     conteudo.appendChild(script);
 }
 
+// Loader de scripts reutilizável (global) para uso tanto no carregamento inicial quanto via AJAX
+function carregarScripts(lista, callback) {
+    let index = 0;
+    function proximo() {
+        if (index < lista.length) {
+            const script = document.createElement('script');
+            script.src = lista[index++] + '?t=' + new Date().getTime();
+            script.onload = proximo;
+            script.onerror = () => console.error('Falha ao carregar o script:', script.src);
+            document.getElementById('conteudo-dinamico').appendChild(script);
+        } else if (callback) {
+            callback();
+        }
+    }
+    proximo();
+}
+
 function carregarPagina(pagina) {
     // Remove o filtro lateral (se existir) antes de trocar de página (versão pública)
     if (typeof window.removerFiltroExistente === 'function') {
@@ -126,40 +143,10 @@ function carregarPagina(pagina) {
                     'menuBloqueado': 'MenuBloqueado.js'
                 }[pagina];
 
-                // Carregamento sequencial (suporta múltiplos scripts quando necessário)
-                function carregarScripts(lista, callback) {
-                    let index = 0;
-                    function proximo() {
-                        if (index < lista.length) {
-                            const script = document.createElement('script');
-                            script.src = lista[index++] + '?t=' + new Date().getTime();
-                            script.onload = proximo;
-                            script.onerror = () => console.error('Falha ao carregar o script:', script.src);
-                            document.getElementById('conteudo-dinamico').appendChild(script);
-                        } else if (callback) {
-                            callback();
-                        }
-                    }
-                    proximo();
-                }
-
-                // Para a página inicial pública, também carregamos o filtro lateral reutilizando o do Participante
+                // Para a página inicial pública, também carregamos o filtro lateral reutilizando o do Globais
                 if (pagina === 'inicio') {
-                    // Garante o CSS do filtro
-                    (function ensureFilterCssLoadedPublico(){
-                        const href = '../PaginasParticipante/FiltroParticipante.css';
-                        const already = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-                            .some(l => (l.getAttribute('href') || '').includes('FiltroParticipante.css'));
-                        if (!already) {
-                            const link = document.createElement('link');
-                            link.rel = 'stylesheet';
-                            link.href = href + '?t=' + new Date().getTime();
-                            document.head.appendChild(link);
-                        }
-                    })();
-
                     const scriptsParaCarregar = [
-                        '../PaginasGlobais/FIltro.js',
+                        '../PaginasGlobais/Filtro.js',
                         'Inicio.js'
                     ];
 
@@ -213,6 +200,16 @@ document.addEventListener("DOMContentLoaded", function() {
     sincronizarMenuComConteudo();
     if (pagina === 'faleConosco') {
         carregarFaleConoscoScript();
+    }
+    // Garantir que, ao recarregar a página inicial (F5), o filtro seja carregado e inicializado
+    if (pagina === 'inicio') {
+        const scriptsParaCarregar = [
+            '../PaginasGlobais/Filtro.js'
+        ];
+        carregarScripts(scriptsParaCarregar, () => {
+            if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+            if (typeof window.inicializarFiltro === 'function') window.inicializarFiltro();
+        });
     }
 });
 </script>

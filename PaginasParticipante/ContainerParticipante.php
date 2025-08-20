@@ -140,8 +140,8 @@ function carregarPagina(pagina) {
 
                 // Mapeamento de scripts aprimorado para carregar dependências na ordem correta.
                 const scriptsParaCarregar = {
-                    'inicio': ['../PaginasGlobais/FIltro.js', 'InicioParticipante.js'],
-                    'meusEventos': ['../PaginasGlobais/FIltro.js', 'MeusEventosParticipante.js'],
+                    'inicio': ['../PaginasGlobais/Filtro.js', 'InicioParticipante.js'],
+                    'meusEventos': ['../PaginasGlobais/Filtro.js', 'MeusEventosParticipante.js'],
                     'evento': ['CartaoDoEventoParticipante.js'],
                     'eventoInscrito': ['CartaoDoEventoInscrito.js'],
                     'perfil': ['PerfilParticipante.js'],
