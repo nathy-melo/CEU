@@ -72,6 +72,11 @@ function inicializarFiltroEventos() {
     filtrarEventos();
 }
 
-document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarFiltroEventos();
+    if (typeof inicializarFiltro === 'function') {
+        inicializarFiltro();
+    }
+});
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML
 window.inicializarFiltroEventos = inicializarFiltroEventos;

@@ -13,6 +13,17 @@
   --sombra-leve: rgba(0, 0, 0, 0.5);
 }
 
+/* Estilos para o conteúdo principal quando o menu está expandido */
+#main-content {
+    transition: margin-left 0.3s;
+    margin-left: 0;
+}
+
+#main-content.shifted {
+    margin-left: 220px;
+}
+/* ============================= */
+
 *,
 *::before,
 *::after {

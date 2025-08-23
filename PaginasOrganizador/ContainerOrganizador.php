@@ -1,171 +1,144 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CEU</title>
+    <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
-</html>
 
-
-<?php
-// Páginas permitidas (adicionar novas aqui!)
-$paginasPermitidas = [
-    'inicio' => 'InicioOrganizador.html',
-    'evento' => 'CartaodoEventoOrganizador.html',
-    'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
-    'meusEventos' => 'MeusEventosOrganizador.html',
-    'perfil' => 'PerfilOrganizador.html',
-    'certificados' => 'CertificadosOrganizador.html',
-    'configuracoes' => 'ConfiguracoesOrganizador.html',
-
-
-    // Reaproveita conteúdos globais quando aplicável
-    'termos' => '../PaginasGlobais/TermosDeCondicoes.html',
-    'faleconosco' => '../PaginasGlobais/FaleConosco.html',
-    'redefinirSenha' => '../PaginasGlobais/RedefinirSenhaConta.html',
-    'emailRecuperacao' => '../PaginasGlobais/EmailDeRecuperacao.html',
-    'temaDoSite' => '../PaginasGlobais/TemaDoSite.html',
-    'manualDeUso' => '../PaginasGlobais/ManualDeUso.html',
-    'duvidasFrequentes' => '../PaginasGlobais/DuvidasFrequentes.html',
-    'sobreNos' => '../PaginasGlobais/SobreNos.html',
-        // Adicione novas páginas conforme necessário - não se esqueça de as adicionar no menu (JS) também!
-];
-
-// Página padrão se não existir
-$pagina = $_GET['pagina'] ?? 'inicio';
-$arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
+<body>
+    <?php
+    // Definição das páginas permitidas e resolução do arquivo a incluir
+    $paginasPermitidas = [
+        'inicio' => 'InicioOrganizador.html',
+        'evento' => 'CartaodoEventoOrganizador.html',
+        'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
+        'meusEventos' => 'MeusEventosOrganizador.html',
+        'perfil' => 'PerfilOrganizador.html',
+        'certificados' => 'CertificadosOrganizador.html',
+        'configuracoes' => 'ConfiguracoesOrganizador.html',
+        // Reaproveita conteúdos globais quando aplicável
+        'termos' => '../PaginasGlobais/TermosDeCondicoes.html',
+        'faleconosco' => '../PaginasGlobais/FaleConosco.html',
+        'redefinirSenha' => '../PaginasGlobais/RedefinirSenhaConta.html',
+        'emailRecuperacao' => '../PaginasGlobais/EmailDeRecuperacao.html',
+        'temaDoSite' => '../PaginasGlobais/TemaDoSite.html',
+        'manualDeUso' => '../PaginasGlobais/ManualDeUso.html',
+        'duvidasFrequentes' => '../PaginasGlobais/DuvidasFrequentes.html',
+        'sobreNos' => '../PaginasGlobais/SobreNos.html',
+    ];
+    $pagina = $_GET['pagina'] ?? 'inicio';
+    $arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
 ?>
 
-<!-- Menu fixo -->
-<?php include 'MenuO.html'; ?>
+    <!-- Menu fixo -->
+    <?php include 'MenuO.html'; ?>
 
-<!-- Conteúdo dinâmico -->
-<div id="conteudo-dinamico">
-    <?php include $arquivo; ?>
-</div>
+    <!-- Conteúdo dinâmico -->
+    <div id="conteudo-dinamico">
+        <?php include $arquivo; ?>
+    </div>
 
-<script>
-// Variável global para guardar o observer
-let menuContentObserver = null;
+    <script>
+        // =========================
+        // Variáveis globais
+        // =========================
+        let menuContentObserver = null; // Observer para sincronizar menu/conteúdo
 
-function sincronizarMenuComConteudo() {
-    const menu = document.querySelector(".Menu");
-    const mainContent = document.getElementById("main-content");
-    if (!menu || !mainContent) return;
-
-    // Remove observer antigo, se existir
-    if (menuContentObserver) {
-        menuContentObserver.disconnect();
-        menuContentObserver = null;
-    }
-
-    // Aplica classe inicial
-    if (menu.classList.contains("expanded")) {
-        mainContent.classList.add("shifted");
-    } else {
-        mainContent.classList.remove("shifted");
-    }
-
-    // Cria novo observer para o mainContent atual
-    menuContentObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'class') {
-                if (menu.classList.contains("expanded")) {
-                    mainContent.classList.add("shifted");
-                } else {
-                    mainContent.classList.remove("shifted");
+        // =========================
+        // Funções utilitárias (helpers)
+        // =========================
+        function carregarScripts(lista, callback) {
+            const alvo = document.getElementById('conteudo-dinamico') || document.body;
+            let index = 0;
+            function proximo() {
+                if (index < lista.length) {
+                    const script = document.createElement('script');
+                    script.src = lista[index++] + '?t=' + new Date().getTime();
+                    script.onload = proximo;
+                    script.onerror = () => console.error('Falha ao carregar o script:', script.src);
+                    alvo.appendChild(script);
+                } else if (callback) {
+                    callback();
                 }
             }
-        });
-    });
-    menuContentObserver.observe(menu, { attributes: true });
-}
-
-function carregarFaleConoscoScript() {
-    // Remove qualquer script antigo de FaleConosco.js
-    const conteudo = document.getElementById('conteudo-dinamico');
-    if (!conteudo) return;
-    const scripts = conteudo.querySelectorAll('script[data-faleconosco]');
-    scripts.forEach(s => s.remove());
-    // Adiciona o novo script
-    var script = document.createElement('script');
-    script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
-    script.setAttribute('data-faleconosco', '1');
-    script.onload = function() {
-        if (typeof window.inicializarFaleConosco === 'function') {
-            window.inicializarFaleConosco();
+            proximo();
         }
-    };
-    conteudo.appendChild(script);
-}
 
-function carregarPagina(pagina) {
-    // Remove o filtro lateral (se existir) antes de trocar de página
-    if (typeof window.removerFiltroExistente === 'function') {
-        try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
-    }
+        function sincronizarMenuComConteudo() {
+            const menu = document.querySelector('.Menu');
+            const mainContent = document.getElementById('main-content');
+            if (!menu || !mainContent) return;
 
-    fetch('ContainerOrganizador.php?pagina=' + pagina)
-        .then(response => response.text())
-        .then(html => {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            const novoConteudo = temp.querySelector('#conteudo-dinamico');
-            if (novoConteudo) {
-                document.getElementById('conteudo-dinamico').innerHTML = novoConteudo.innerHTML;
-                sincronizarMenuComConteudo();
+            if (menuContentObserver) {
+                menuContentObserver.disconnect();
+                menuContentObserver = null;
+            }
 
-                // Ativa o botão correto do menu conforme a página carregada
-                if (typeof window.setMenuAtivoPorPagina === 'function') {
-                    window.setMenuAtivoPorPagina(pagina);
-                }
+            if (menu.classList.contains('expanded')) {
+                mainContent.classList.add('shifted');
+            } else {
+                mainContent.classList.remove('shifted');
+            }
 
-                // Carregamento sequencial de scripts por página
-                const scriptsParaCarregar = {
-                    'inicio': ['../PaginasGlobais/FIltro.js', 'InicioOrganizador.js'],
-                    'meusEventos': ['../PaginasGlobais/FIltro.js', 'MeusEventosOrganizador.js'],
-                    'evento': ['CartaoDoEventoOrganizador.js'],
-                    'eventoOrganizador': ['EventoOrganizador.js'],
-                    'perfil': ['PerfilOrganizador.js'],
-                    'faleconosco': ['../PaginasGlobais/FaleConosco.js'],
-                    'redefinirSenha': ['../PaginasGlobais/RedefinirSenhaConta.js']
-                }[pagina] || [];
-
-                function carregarScripts(lista, callback) {
-                    let index = 0;
-                    function proximo() {
-                        if (index < lista.length) {
-                            const script = document.createElement('script');
-                            script.src = lista[index++] + '?t=' + new Date().getTime();
-                            script.onload = proximo;
-                            script.onerror = () => console.error('Falha ao carregar o script:', script.src);
-                            document.getElementById('conteudo-dinamico').appendChild(script);
-                        } else if (callback) {
-                            callback();
+            menuContentObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class') {
+                        if (menu.classList.contains('expanded')) {
+                            mainContent.classList.add('shifted');
+                        } else {
+                            mainContent.classList.remove('shifted');
                         }
                     }
-                    proximo();
-                }
-
-                carregarScripts(scriptsParaCarregar, () => {
-                    if (pagina === 'inicio' || pagina === 'meusEventos') {
-                        if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
-                    } else if (pagina === 'perfil') {
-                        if (typeof window.inicializarEventosPerfilOrganizador === 'function') window.inicializarEventosPerfilOrganizador();
-                    } else if (pagina === 'eventoOrganizador') {
-                        if (typeof window.inicializarEventosCartaoDoEventoOrganizador === 'function') window.inicializarEventosCartaoDoEventoOrganizador();
-                    } else if (pagina === 'faleconosco') {
-                        carregarFaleConoscoScript();
-                    }
                 });
+            });
+            menuContentObserver.observe(menu, { attributes: true });
+        }
 
-                // Garante que o botão de inscrição funcione sempre ao entrar na página 'evento'
-                if (pagina === 'evento') {
-                    setTimeout(function() {
+        function carregarFaleConoscoScript() {
+            const conteudo = document.getElementById('conteudo-dinamico');
+            if (!conteudo) return;
+            const scripts = conteudo.querySelectorAll('script[data-faleconosco]');
+            scripts.forEach(s => s.remove());
+            const script = document.createElement('script');
+            script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
+            script.setAttribute('data-faleconosco', '1');
+            script.onload = function () {
+                if (typeof window.inicializarFaleConosco === 'function') window.inicializarFaleConosco();
+            };
+            conteudo.appendChild(script);
+        }
+
+        // =========================
+        // Definição das rotas
+        // =========================
+        const rotas = {
+            'inicio': {
+                html: 'InicioOrganizador.html',
+                js: ['../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
+                init: () => {
+                    if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                }
+            },
+            'meusEventos': {
+                html: 'MeusEventosOrganizador.html',
+                js: ['../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
+                init: () => {
+                    if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                }
+            },
+            'evento': {
+                html: 'CartaodoEventoOrganizador.html',
+                js: ['CartaoDoEventoOrganizador.js'],
+                init: () => {
+                    if (typeof window.inicializarEventosCartaoEvento === 'function') window.inicializarEventosCartaoEvento();
+                    // Fallback: garante o botão mesmo sem init explícito
+                    setTimeout(function () {
                         var btnInscrever = document.querySelector('.botao-inscrever');
                         if (btnInscrever) {
-                            btnInscrever.onclick = function() {
+                            btnInscrever.onclick = function () {
                                 if (typeof window.mostrarMensagemInscricaoFeita === 'function') {
                                     window.mostrarMensagemInscricaoFeita();
                                 }
@@ -173,36 +146,129 @@ function carregarPagina(pagina) {
                         }
                     }, 0);
                 }
-                
+            },
+            'eventoOrganizado': {
+                html: 'CartaoDoEventoOrganizando.html',
+                js: [],
+                init: () => { }
+            },
+            'perfil': {
+                html: 'PerfilOrganizador.html',
+                js: ['PerfilOrganizador.js'],
+                init: () => {
+                    if (typeof window.inicializarEventosPerfilOrganizador === 'function') window.inicializarEventosPerfilOrganizador();
+                }
+            },
+            'certificados': {
+                html: 'CertificadosOrganizador.html',
+                js: [],
+                init: () => { }
+            },
+            'configuracoes': {
+                html: 'ConfiguracoesOrganizador.html',
+                js: [],
+                init: () => { }
+            },
+            'faleconosco': {
+                html: '../PaginasGlobais/FaleConosco.html',
+                js: [],
+                init: () => { carregarFaleConoscoScript(); }
+            },
+            'redefinirSenha': {
+                html: '../PaginasGlobais/RedefinirSenhaConta.html',
+                js: ['../PaginasGlobais/RedefinirSenhaConta.js'],
+                init: () => {
+                    if (typeof window.atribuirEventoRedefinirSenha === 'function') window.atribuirEventoRedefinirSenha();
+                }
+            },
+            'termos': {
+                html: '../PaginasGlobais/TermosDeCondicoes.html',
+                js: [],
+                init: () => { }
+            },
+            'emailRecuperacao': {
+                html: '../PaginasGlobais/EmailDeRecuperacao.html',
+                js: [],
+                init: () => { }
+            },
+            'temaDoSite': {
+                html: '../PaginasGlobais/TemaDoSite.html',
+                js: [],
+                init: () => { }
+            },
+            'manualDeUso': {
+                html: '../PaginasGlobais/ManualDeUso.html',
+                js: [],
+                init: () => { }
+            },
+            'duvidasFrequentes': {
+                html: '../PaginasGlobais/DuvidasFrequentes.html',
+                js: [],
+                init: () => { }
+            },
+            'sobreNos': {
+                html: '../PaginasGlobais/SobreNos.html',
+                js: [],
+                init: () => { }
             }
-            window.history.pushState({}, '', '?pagina=' + pagina);
+        };
+        globalThis.rotas = rotas;
+
+        // =========================
+        // Funções de navegação e carregamento
+        // =========================
+        function executarRota(pagina) {
+            const rota = rotas[pagina];
+            if (!rota) return;
+            const scripts = Array.isArray(rota.js) ? rota.js : [];
+            if (scripts.length) {
+                carregarScripts(scripts, () => { if (typeof rota.init === 'function') rota.init(); });
+            } else {
+                if (typeof rota.init === 'function') rota.init();
+            }
+        }
+
+        function carregarPagina(pagina) {
+            if (typeof window.removerFiltroExistente === 'function') {
+                try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
+            }
+            fetch('ContainerOrganizador.php?pagina=' + encodeURIComponent(pagina))
+                .then(response => response.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const novoConteudo = temp.querySelector('#conteudo-dinamico');
+                    if (novoConteudo) {
+                        document.getElementById('conteudo-dinamico').innerHTML = novoConteudo.innerHTML;
+                        sincronizarMenuComConteudo();
+                        if (typeof window.setMenuAtivoPorPagina === 'function') {
+                            window.setMenuAtivoPorPagina(pagina);
+                        }
+                        executarRota(pagina);
+                    }
+                    window.history.pushState({}, '', '?pagina=' + pagina);
+                });
+        }
+
+        // =========================
+        // Eventos de inicialização
+        // =========================
+        window.onpopstate = function () {
+            const params = new URLSearchParams(window.location.search);
+            const pagina = params.get('pagina') || 'inicio';
+            carregarPagina(pagina);
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const params = new URLSearchParams(window.location.search);
+            const pagina = params.get('pagina') || 'inicio';
+            if (typeof window.setMenuAtivoPorPagina === 'function') {
+                window.setMenuAtivoPorPagina(pagina);
+            }
+            sincronizarMenuComConteudo();
+            executarRota(pagina);
         });
-}
-window.onpopstate = function() {
-    const params = new URLSearchParams(window.location.search);
-    const pagina = params.get('pagina') || 'inicio';
-    carregarPagina(pagina);
-};
+    </script>
+</body>
 
-document.addEventListener("DOMContentLoaded", function() {
-    const params = new URLSearchParams(window.location.search);
-    const pagina = params.get('pagina') || 'inicio';
-    if (typeof window.setMenuAtivoPorPagina === 'function') {
-        window.setMenuAtivoPorPagina(pagina);
-    }
-    sincronizarMenuComConteudo();
-    if (pagina === 'faleconosco') {
-        carregarFaleConoscoScript();
-    }
-});
-</script>
-
-<style>
-#main-content {
-    transition: margin-left 0.3s;
-    margin-left: 0;
-}
-#main-content.shifted {
-    margin-left: 220px; /* ajuste conforme a largura do menu expandido */
-}
-</style>
+</html>
