@@ -123,8 +123,8 @@ function carregarPagina(pagina) {
 
                 // Carregamento sequencial de scripts por página
                 const scriptsParaCarregar = {
-                    'inicio': ['../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
-                    'meusEventos': ['../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
+                    'inicio': ['../PaginasGlobais/FIltro.js', 'InicioOrganizador.js'],
+                    'meusEventos': ['../PaginasGlobais/FIltro.js', 'MeusEventosOrganizador.js'],
                     'evento': ['CartaoDoEventoOrganizador.js'],
                     'eventoOrganizador': ['EventoOrganizador.js'],
                     'perfil': ['PerfilOrganizador.js'],

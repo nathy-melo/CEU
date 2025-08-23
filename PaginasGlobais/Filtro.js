@@ -1,103 +1,6 @@
-// Moderniza o Filtro.js para funcionar de forma robusta em todos os containers (Público/Participante/Organizador)
-// - API unificada via window.CEUFiltro
-// - Idempotente (não duplica listeners)
-// - Estado persistido por sessão (sessionStorage) e compatível com window.estadoFiltro
-// - Observa mudanças no container de eventos e reaplica filtros
-// - Backwards-compat: mantém as funções globais usadas hoje
-
-(function () {
-  const NAMESPACE = 'CEUFiltro';
-
-  const defaults = {
-    containerSelector: '#eventos-container',
-    cardSelector: '.CaixaDoEvento',
-    triggerSelector: '.botao-filtrar',
-    filterFormId: 'filtro-container',
-    bodyActiveClass: 'filtro-ativo',
-    // Mapeamento de chaves do formulário -> data-atributos nos cards
-    attributes: {
-      tipo_evento: 'tipo',
-      modalidade: 'modalidade',
-      localizacao: 'localizacao',
-      duracao: 'duracao',
-      certificado: 'certificado',
-      data: 'data'
-    },
-    storageKey: 'ceu.filtro.estado'
-  };
-
-  const state = {
-    options: { ...defaults },
-    initialized: false,
-    filterEl: null,
-    triggerEl: null,
-    observer: null,
-    handlers: {},
-    pageKey: null
-  };
-
-  function getPageKey() {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const pagina = params.get('pagina') || 'default';
-      return `${window.location.pathname}?pagina=${pagina}`;
-    } catch (_) {
-      return window.location.pathname || 'default';
-    }
-  }
-
-  function storageKey() {
-    return `${state.options.storageKey}|${state.pageKey || getPageKey()}`;
-  }
-
-  function saveState() {
-    // Coleta o estado atual do formulário
-    const form = document.getElementById(state.options.filterFormId) || state.filterEl;
-    const result = {};
-    if (form) {
-      form.querySelectorAll('input').forEach(el => {
-        if (el.type === 'checkbox') {
-          const name = el.name;
-          if (el.checked) {
-            if (!result[name]) result[name] = [];
-            result[name].push(el.value);
-          }
-        } else {
-          const name = el.name;
-          if (!result[name]) result[name] = [];
-          if (el.value) result[name].push(el.value);
-        }
-      });
-    }
-    // Compat com código legado
-    window.estadoFiltro = result;
-    try {
-      sessionStorage.setItem(storageKey(), JSON.stringify(result));
-    } catch (_) { /* ignore */ }
-  }
-
-  function readLegacyState() {
-    // Lê do window.estadoFiltro se existir
-    if (window.estadoFiltro && typeof window.estadoFiltro === 'object') {
-      return window.estadoFiltro;
-    }
-    return null;
-  }
-
-  function loadState() {
-    // Prioriza estado legado, depois sessionStorage
-    const legacy = readLegacyState();
-    if (legacy) return legacy;
-    try {
-      const raw = sessionStorage.getItem(storageKey());
-      if (raw) return JSON.parse(raw);
-    } catch (_) { /* ignore */ }
-    return null;
-  }
-
-  function buildFilterElement() {
+function createFilterElement() {
     const filterHtml = `
-        <form class="filtro-container" id="${state.options.filterFormId}">
+        <form class="filtro-container" id="filtro-container">
             <h1 class="filtro-titulo">Filtrar por</h1>
 
             <fieldset class="filtro-grupo">
@@ -117,7 +20,9 @@
             </div>
             </fieldset>
 
-            <div class="divisor"><div class="divisor-linha"></div></div>
+            <div class="divisor">
+            <div class="divisor-linha"></div>
+            </div>
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
@@ -141,7 +46,9 @@
             </div>
             </fieldset>
 
-            <div class="divisor"><div class="divisor-linha"></div></div>
+            <div class="divisor">
+            <div class="divisor-linha"></div>
+            </div>
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
@@ -155,7 +62,9 @@
             </div>
             </fieldset>
 
-            <div class="divisor"><div class="divisor-linha"></div></div>
+            <div class="divisor">
+            <div class="divisor-linha"></div>
+            </div>
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
@@ -170,7 +79,9 @@
             </div>
             </fieldset>
 
-            <div class="divisor"><div class="divisor-linha"></div></div>
+            <div class="divisor">
+            <div class="divisor-linha"></div>
+            </div>
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
@@ -185,7 +96,9 @@
             </div>
             </fieldset>
 
-            <div class="divisor"><div class="divisor-linha"></div></div>
+            <div class="divisor">
+            <div class="divisor-linha"></div>
+            </div>
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
@@ -204,239 +117,179 @@
     div.innerHTML = filterHtml;
     const form = div.firstElementChild;
 
-    // Restaura o estado salvo
-    const saved = loadState();
-    if (saved) {
-      for (const key in saved) {
-        const values = saved[key];
-        if (!values) continue;
-        if (key.endsWith('[]')) {
-          const cleanKey = key.slice(0, -2);
-          const elements = form.querySelectorAll(`input[name="${cleanKey}"]`);
-          elements.forEach(el => { if (values.includes(el.value)) el.checked = true; });
-        } else {
-          const element = form.querySelector(`[name="${key}"]`);
-          if (element) element.value = values[0] || '';
+    // Restaura o estado do filtro se existir
+    if (window.estadoFiltro) {
+        for (const key in window.estadoFiltro) {
+            const values = window.estadoFiltro[key];
+            if (!values) continue;
+
+            if (key.endsWith('[]')) { // Para checkboxes
+                const cleanKey = key.slice(0, -2);
+                const elements = form.querySelectorAll(`input[name="${cleanKey}"]`);
+                elements.forEach(el => {
+                    if (values.includes(el.value)) {
+                        el.checked = true;
+                    }
+                });
+            } else { // Para campos de data e outros
+                const element = form.querySelector(`[name="${key}"]`);
+                if (element) {
+                    element.value = values[0] || '';
+                }
+            }
         }
-      }
     }
+
     return form;
-  }
+}
 
-  function getElements() {
-    const container = document.querySelector(state.options.containerSelector);
-    const trigger = document.querySelector(state.options.triggerSelector);
-    const form = document.getElementById(state.options.filterFormId);
-    return { container, trigger, form };
-  }
-
-  function getCheckedValues(form, name) {
-    return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
-  }
-
-  function applyFilters() {
-    const { container } = getElements();
+function applyFiltersParticipante() {
+    const container = document.getElementById('eventos-container');
     if (!container) return;
-    const form = document.getElementById(state.options.filterFormId);
+
+    const form = document.getElementById('filtro-container');
     if (!form) return;
 
-    const getChecked = (name) => getCheckedValues(form, name);
+    const getChecked = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
 
     const tipos = getChecked('tipo_evento');
     const modalidades = getChecked('modalidade');
     const locais = getChecked('localizacao');
     const duracoes = getChecked('duracao');
-    const certificados = getChecked('certificado');
+    const certificados = getChecked('certificado'); // novo: tipo de certificado
 
     const dataInicio = form.querySelector('input[name="data-inicio"]').value || '';
     const dataFim = form.querySelector('input[name="data-fim"]').value || '';
 
-    const cards = container.querySelectorAll(state.options.cardSelector);
+    const cards = container.querySelectorAll('.CaixaDoEvento');
     cards.forEach(card => {
-      const attr = (key) => (card.dataset[state.options.attributes[key]] || '').toLowerCase();
-      const tipo = attr('tipo_evento');
-      const modalidade = attr('modalidade');
-      const local = attr('localizacao');
-      const duracao = attr('duracao');
-      const certificado = attr('certificado');
-      const data = card.dataset[state.options.attributes['data']] || '';
+        const tipo = (card.dataset.tipo || '').toLowerCase();
+        const modalidade = (card.dataset.modalidade || '').toLowerCase();
+        const local = (card.dataset.localizacao || '').toLowerCase();
+        const duracao = (card.dataset.duracao || '').toLowerCase();
+        const certificado = (card.dataset.certificado || '').toLowerCase(); // novo
+        const data = card.dataset.data || '';
 
-      let ok = true;
-      if (ok && tipos.length) ok = tipos.includes(tipo);
-      if (ok && modalidades.length) ok = modalidades.includes(modalidade);
-      if (ok && locais.length) ok = locais.includes(local);
-      if (ok && duracoes.length) ok = duracoes.includes(duracao);
-      if (ok && certificados.length) ok = certificados.includes(certificado);
-      if (ok && dataInicio) ok = data >= dataInicio;
-      if (ok && dataFim) ok = data <= dataFim;
+        let ok = true;
+        if (ok && tipos.length) ok = tipos.includes(tipo);
+        if (ok && modalidades.length) ok = modalidades.includes(modalidade);
+        if (ok && locais.length) ok = locais.includes(local);
+        if (ok && duracoes.length) ok = duracoes.includes(duracao);
+        if (ok && certificados.length) ok = certificados.includes(certificado);
+        if (ok && dataInicio) ok = data >= dataInicio;
+        if (ok && dataFim) ok = data <= dataFim;
 
-      card.dataset.filterOk = ok ? 'true' : 'false';
+        card.dataset.filterOk = ok ? 'true' : 'false';
 
-      if (!ok) {
-        card.dataset.hiddenByFilter = 'true';
-      } else {
-        delete card.dataset.hiddenByFilter;
-      }
+        // Atualiza flag de filtro sem conflitar com a busca
+        if (!ok) {
+            card.dataset.hiddenByFilter = 'true';
+        } else {
+            delete card.dataset.hiddenByFilter;
+        }
 
-      const hiddenByFilter = card.dataset.hiddenByFilter === 'true';
-      const hiddenBySearch = card.dataset.hiddenBySearch === 'true';
-      const hide = hiddenByFilter || hiddenBySearch;
-      card.style.display = hide ? 'none' : '';
+        const hiddenByFilter = card.dataset.hiddenByFilter === 'true';
+        const hiddenBySearch = card.dataset.hiddenBySearch === 'true';
+        const deveOcultar = hiddenByFilter || hiddenBySearch;
+        card.style.display = deveOcultar ? 'none' : '';
     });
-  }
+}
 
-  function wireInputs() {
-    const form = document.getElementById(state.options.filterFormId);
+function wireFilterInputsParticipante() {
+    const form = document.getElementById('filtro-container');
     if (!form) return;
     const inputs = form.querySelectorAll('input[type="checkbox"], input[type="date"]');
-    // Evita listeners duplicados usando um atributo marcador
-    inputs.forEach(inp => {
-      if (!inp.__ceuFiltroBound) {
-        inp.addEventListener('change', () => {
-          applyFilters();
-          saveState();
-          atualizarIconesDeGrupo(form);
-        });
-        inp.__ceuFiltroBound = true;
-      }
-    });
-  }
+    inputs.forEach(inp => inp.addEventListener('change', applyFiltersParticipante));
+}
 
-  function atualizarIconesDeGrupo(root) {
-    const filtroGrupos = root.querySelectorAll('.filtro-grupo');
-    filtroGrupos.forEach(grupo => {
-      const checkboxes = grupo.querySelectorAll('input[type="checkbox"]');
-      const dateInputs = grupo.querySelectorAll('input[type="date"]');
-      const tituloIcone = grupo.querySelector('.titulo-icone');
-      if (!tituloIcone) return;
-      let algumSelecionado = false;
-      checkboxes.forEach(checkbox => { if (checkbox.checked) algumSelecionado = true; });
-      dateInputs.forEach(dateInput => { if (dateInput.value) algumSelecionado = true; });
-      tituloIcone.classList.toggle('ativo', algumSelecionado);
-    });
-  }
+function inicializarFiltro() {
+    const filterButton = document.querySelector('.botao-filtrar');
+    if (!filterButton) return;
 
-  function toggleOpen(e) {
-    if (e) e.stopPropagation();
-    const form = state.filterEl || document.getElementById(state.options.filterFormId);
-    if (!form) return;
-    const ativo = form.classList.contains('ativo');
-    form.classList.toggle('ativo', !ativo);
-    document.body.classList.toggle(state.options.bodyActiveClass, !ativo);
-  }
-
-  function montarFiltro() {
-    // Evita duplicar
-    if (document.getElementById(state.options.filterFormId)) {
-      state.filterEl = document.getElementById(state.options.filterFormId);
-      wireInputs();
-      applyFilters();
-      atualizarIconesDeGrupo(state.filterEl);
-      return;
+    // Evitar adicionar o filtro se ele já existir
+    if (document.getElementById('filtro-container')) {
+        // Apenas liga os eventos caso já exista
+        wireFilterInputsParticipante();
+        applyFiltersParticipante();
+        return;
     }
-    const filterContainer = buildFilterElement();
+
+    const filterContainer = createFilterElement();
     document.body.appendChild(filterContainer);
-    state.filterEl = filterContainer;
 
-    // Eventos de abrir/fechar
-    const { trigger } = getElements();
-    state.triggerEl = trigger || state.triggerEl;
+    const toggleFiltro = (event) => {
+        if (event) event.stopPropagation();
+        const isAtivo = filterContainer.classList.contains('ativo');
+        filterContainer.classList.toggle('ativo', !isAtivo);
+        document.body.classList.toggle('filtro-ativo', !isAtivo);
+    };
 
-    if (state.triggerEl && !state.handlers.triggerClick) {
-      state.handlers.triggerClick = (ev) => toggleOpen(ev);
-      state.triggerEl.addEventListener('click', state.handlers.triggerClick);
-    }
+    filterButton.addEventListener('click', toggleFiltro);
 
-    if (!state.handlers.windowClick) {
-      state.handlers.windowClick = (event) => {
-        if (!state.filterEl) return;
-        if (state.filterEl.classList.contains('ativo') && !state.filterEl.contains(event.target)) {
-          toggleOpen();
+    // Fecha o filtro se clicar fora dele (no overlay implícito)
+    window.addEventListener('click', (event) => {
+        if (filterContainer.classList.contains('ativo') && !filterContainer.contains(event.target)) {
+            toggleFiltro();
         }
-      };
-      window.addEventListener('click', state.handlers.windowClick);
-    }
+    });
 
-    if (!state.handlers.filterClick) {
-      state.handlers.filterClick = (event) => event.stopPropagation();
-      state.filterEl.addEventListener('click', state.handlers.filterClick);
-    }
+    // Impede que cliques dentro do filtro o fechem
+    filterContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    // Status dos ícones por grupo
+    const filtroGrupos = filterContainer.querySelectorAll('.filtro-grupo');
+    filtroGrupos.forEach(grupo => {
+        const checkboxes = grupo.querySelectorAll('input[type="checkbox"]');
+        const dateInputs = grupo.querySelectorAll('input[type="date"]');
+        const tituloIcone = grupo.querySelector('.titulo-icone');
+
+        if ((checkboxes.length > 0 || dateInputs.length > 0) && tituloIcone) {
+            const atualizarStatusIcone = () => {
+                let algumSelecionado = false;
+                checkboxes.forEach(checkbox => { if (checkbox.checked) algumSelecionado = true; });
+                dateInputs.forEach(dateInput => { if (dateInput.value) algumSelecionado = true; });
+                tituloIcone.classList.toggle('ativo', algumSelecionado);
+            };
+            checkboxes.forEach(checkbox => checkbox.addEventListener('change', atualizarStatusIcone));
+            dateInputs.forEach(dateInput => dateInput.addEventListener('change', atualizarStatusIcone));
+            atualizarStatusIcone();
+        }
+    });
 
     // Liga inputs e aplica uma passada inicial
-    wireInputs();
-    applyFilters();
-    atualizarIconesDeGrupo(state.filterEl);
+    wireFilterInputsParticipante();
+    applyFiltersParticipante();
+}
 
-    // Observa mudanças no container para reaplicar
-    const { container } = getElements();
-    if (container) {
-      if (state.observer) {
-        state.observer.disconnect();
-        state.observer = null;
-      }
-      state.observer = new MutationObserver(() => applyFilters());
-      state.observer.observe(container, { childList: true, subtree: true, attributes: true });
+// Garante que a função de remoção esteja disponível globalmente e salve o estado
+function removerFiltroExistente() {
+    const filtroContainer = document.getElementById('filtro-container');
+    if (filtroContainer) {
+        const form = filtroContainer.tagName === 'FORM' ? filtroContainer : (filtroContainer.querySelector('form') || filtroContainer);
+        window.estadoFiltro = {};
+        form.querySelectorAll('input').forEach(el => {
+            if (el.type === 'checkbox') {
+                const name = `${el.name}[]`;
+                if (el.checked) {
+                    if (!window.estadoFiltro[name]) window.estadoFiltro[name] = [];
+                    window.estadoFiltro[name].push(el.value);
+                }
+            } else {
+                const name = el.name;
+                if (!window.estadoFiltro[name]) window.estadoFiltro[name] = [];
+                if (el.value) window.estadoFiltro[name].push(el.value);
+            }
+        });
+        filtroContainer.remove();
     }
-  }
+    document.body.classList.remove('filtro-ativo');
+}
 
-  function init(options) {
-    state.options = { ...defaults, ...(options || {}) };
-    state.pageKey = getPageKey();
-    montarFiltro();
-    state.initialized = true;
-  }
-
-  function destroy() {
-    // Salva o estado e desmonta listeners/observer/DOM
-    try { saveState(); } catch (_) {}
-
-    if (state.observer) {
-      try { state.observer.disconnect(); } catch (_) {}
-      state.observer = null;
-    }
-
-    if (state.triggerEl && state.handlers.triggerClick) {
-      try { state.triggerEl.removeEventListener('click', state.handlers.triggerClick); } catch (_) {}
-    }
-    if (state.handlers.windowClick) {
-      try { window.removeEventListener('click', state.handlers.windowClick); } catch (_) {}
-    }
-    if (state.filterEl && state.handlers.filterClick) {
-      try { state.filterEl.removeEventListener('click', state.handlers.filterClick); } catch (_) {}
-    }
-
-    state.handlers = {};
-
-    const el = document.getElementById(state.options.filterFormId) || state.filterEl;
-    if (el && el.parentNode) {
-      try { el.parentNode.removeChild(el); } catch (_) {}
-    }
-    document.body.classList.remove(state.options.bodyActiveClass);
-
-    state.filterEl = null;
-    state.triggerEl = null;
-    state.initialized = false;
-  }
-
-  function isActive() {
-    return !!document.getElementById(state.options.filterFormId);
-  }
-
-  // Expor API moderna
-  window.CEUFiltro = {
-    init,
-    destroy,
-    apply: applyFilters,
-    saveState,
-    isActive,
-    setOptions(opts) { state.options = { ...state.options, ...(opts || {}) }; },
-    wireInputs
-  };
-
-  // Backwards compatibility
-  window.applyFiltersParticipante = function () { return window.CEUFiltro.apply(); };
-  window.wireFilterInputsParticipante = function () { return window.CEUFiltro.wireInputs(); };
-  window.removerFiltroExistente = function () { return window.CEUFiltro.destroy(); };
-  window.inicializarFiltro = function (opts) { return window.CEUFiltro.init(opts); };
-})();
+// Expor utilitários
+window.applyFiltersParticipante = applyFiltersParticipante;
+window.wireFilterInputsParticipante = wireFilterInputsParticipante;
+window.removerFiltroExistente = removerFiltroExistente;
+window.inicializarFiltro = inicializarFiltro;
 
