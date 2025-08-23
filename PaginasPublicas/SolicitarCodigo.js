@@ -75,11 +75,30 @@
     mainContent.appendChild(container);
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function inicializarSolicitarCodigo() {
     inicializarMascaras();
+    var form = document.getElementById('form-solicitar-codigo');
+    if (form) {
+      // Evita múltiplos handlers
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+        mostrarMensagemSolicitacaoEnviada();
+      }, { once: true });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    inicializarSolicitarCodigo();
   });
 
-  // Se você recarregar o formulário via AJAX, chame inicializarMascaras() após inserir o HTML do formulário.
+  // Export para reuso após navegação dinâmica
+  window.inicializarSolicitarCodigo = inicializarSolicitarCodigo;
+
+  // Se você recarregar o formulário via AJAX, chame inicializarSolicitarCodigo() após inserir o HTML do formulário.
   // Exemplo:
   // document.getElementById('main-content').innerHTML = ...novoHTML...
-  // inicializarMascaras();
+  // inicializarSolicitarCodigo();

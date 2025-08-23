@@ -120,9 +120,9 @@
                 <h1 class="titulo-login sombra-texto-comum" id="titulo-redefinir">
                     Digite o e-mail cadastrado para redefinir a senha
                 </h1>
-                <form class="formulario-login" id="form-redefinir" onsubmit="return false;">
+                <form class="formulario-login" id="form-redefinir" name="redefinir_senha" method="post" onsubmit="return false;">
                     <div class="grupo-formulario">
-                        <input type="email" id="email" name="email" placeholder="E-mail"
+                        <input type="email" id="email" name="redefinir_senha[email]" placeholder="E-mail"
                             class="input-formulario email-input" required>
                     </div>
                     <div class="acoes-formulario" id="acoes-formulario">

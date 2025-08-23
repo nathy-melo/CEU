@@ -9,12 +9,13 @@
 </head>
 <style>
     .container-formulario-recuperacao {
+        white-space: nowrap;
         background-color: var(--caixas);
-        border-radius: 0.2625rem;
-        padding: 1.1375rem 1.61875rem 1.75rem;
+        border-radius: 1rem;
+        padding: 1.15rem 1.6rem 1.75rem;
         max-width: 33.6rem;
         width: 100%;
-        box-shadow: 0 0.4375rem 1.09375rem rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0.45rem 1.1rem rgba(0, 0, 0, 0.15);
     }
 
     .titulo-recuperacao {
@@ -24,9 +25,9 @@
         font-size: 2rem;
         line-height: 1.3;
         text-align: center;
-        text-shadow: 0 0.1rem 0.175rem var(--sombra-leve);
+        text-shadow: 0 0.1rem 0.18rem var(--sombra-leve);
         margin-top: 0;
-        margin-bottom: 1.925rem;
+        margin-bottom: 1.93rem;
     }
 
     .formulario-recuperacao {
@@ -37,15 +38,15 @@
     .grupo-input {
         display: flex;
         flex-direction: column;
-        gap: 1.225rem;
-        margin-bottom: 3.45625rem;
+        gap: 1.23rem;
+        margin-bottom: 3.46rem;
     }
 
     .input-email {
         background-color: var(--branco);
         border: none;
         border-radius: 0.5rem;
-        height: 1.70625rem;
+        height: 1.71rem;
         padding: 0 0.7rem;
         font-family: 'Inter', sans-serif;
         font-size: 0.7rem;
@@ -70,17 +71,17 @@
 
     .btn {
         background-color: var(--botao);
-        border-radius: 0.2625rem;
+        border-radius: 0.25rem;
         border: none;
         color: var(--branco);
-        width: 6.43125rem;
-        height: 2.84375rem;
+        width: 6.45rem;
+        height: 2.85rem;
         font-family: 'Inter', sans-serif;
         font-size: 1.05rem;
         font-weight: 700;
         cursor: pointer;
         transition: background-color 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 0.175rem 0.2625rem rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0.18rem 0.25rem rgba(0, 0, 0, 0.1);
     }
 
     .btn:hover {
@@ -88,7 +89,7 @@
     }
 
     .btn:active {
-        transform: translateY(0.0875rem);
+        transform: translateY(0.09rem);
     }
 
     .apenas-leitor-tela {
@@ -108,12 +109,12 @@
     <div id="main-content">
         <div class="container-formulario-recuperacao">
             <h1 class="titulo-recuperacao">E-mails de recuperação salvos:</h1>
-            <form class="formulario-recuperacao">
+            <form class="formulario-recuperacao" id="form-email-recuperacao" name="email_recuperacao" method="post">
                 <div class="grupo-input">
                     <label for="email1" class="apenas-leitor-tela">E-mail salvo</label>
-                    <input type="email" id="email1" class="input-email" value="email@exemplo.com" readonly>
+                    <input type="email" id="email1" name="email_recuperacao[email_salvo]" class="input-email" value="email@exemplo.com" readonly>
                     <label for="email2" class="apenas-leitor-tela">Adicionar outro e-mail</label>
-                    <input type="email" id="email2" class="input-email" placeholder="Adicione outro e-mail..." readonly>
+                    <input type="email" id="email2" name="email_recuperacao[email_adicional]" class="input-email" placeholder="Adicione outro e-mail..." readonly>
                 </div>
                 <div class="grupo-botoes">
                     <button type="button" onclick="history.back()" class="btn">Voltar</button>

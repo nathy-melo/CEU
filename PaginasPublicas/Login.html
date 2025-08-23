@@ -185,14 +185,14 @@
                         Clique aqui para criar
                     </a>
                 </p>
-                <form class="formulario-login" onsubmit="event.preventDefault();" method="post">
+                <form class="formulario-login" onsubmit="event.preventDefault();" method="post" id="form-login" name="login">
                     <div class="grupo-formulario">
-                        <input type="email" id="email" name="email" placeholder="E-mail"
-                            class="input-formulario email-input">
+                        <input type="email" id="email" name="login[email]" placeholder="E-mail"
+                            class="input-formulario email-input" required>
                     </div>
                     <div class="grupo-formulario">
-                        <input type="password" id="password" name="password" placeholder="Senha"
-                            class="input-formulario password-input">
+                        <input type="password" id="password" name="login[senha]" placeholder="Senha"
+                            class="input-formulario password-input" required>
                     </div>
                     <div class="acoes-formulario">
                         <a onclick="carregarPagina('redefinirSenha')"
