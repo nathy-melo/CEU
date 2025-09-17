@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de participante</title>
+    <title>Cadastro de organizador</title>
 </head>
 <body>
     <?php
@@ -14,14 +14,15 @@
     $cpf = $_POST['cpf'];
     $email = $_POST['email'];
     $senha = $_POST['senha'];
+    $codigo_acesso = $_POST['codigo_acesso'];
     
-    $sql = "INSERT INTO participante (CPF, Nome, Email, Senha) VALUES (
-        '$cpf', '$nome_completo', '$email', '$senha')";
+    $sql = "INSERT INTO organizador (CPF, Nome, email, Senha, Codigo) VALUES (
+        '$cpf', '$nome_completo', '$email', '$senha', '$codigo_acesso')";
 
     mysqli_query($conexao, $sql) 
         or die ("Erro ao tentar cadastrar registro." . mysqli_error($conexao));
     
-    header('Location: ../PaginasParticipante/ContainerParticipante.php?pagina=inicio');
+    header('Location: ../PaginasOrganizador/ContainerOrganizador.php?pagina=inicio');
     exit();
     ?>
     
