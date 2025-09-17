@@ -19,7 +19,7 @@
 
     mysqli_query($conexao, $sql) 
         or die ("Erro ao tentar cadastrar registro." . mysqli_error($conexao));
-    //Tem que fazr o link com a pagina container publico (acho???)
+    //Tem que fazr o link com a pagina container participante (acho???)
     ?>
     
 </body>
