@@ -16,7 +16,7 @@
     $senha = $_POST['senha'];
     $codigo_acesso = $_POST['codigo_acesso'];
     
-    $sql = "INSERT INTO organizador (CPF, Nome, email, Senha, Codigo) VALUES (
+    $sql = "INSERT INTO organizador (CPF, Nome, Email, Senha, Codigo) VALUES (
         '$cpf', '$nome_completo', '$email', '$senha', '$codigo_acesso')";
 
     mysqli_query($conexao, $sql) 

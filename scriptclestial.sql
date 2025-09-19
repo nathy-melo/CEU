@@ -29,7 +29,7 @@ RA char(7));
 create table if not exists organizador(
 CPF char(11) primary key,
 Nome varchar(100),
-email varchar(100),
+Email varchar(100),
 Senha varchar(20),
 Codigo varchar(8)
 );
