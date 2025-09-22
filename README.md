@@ -53,3 +53,24 @@ Se quiser adicionar botões no menu para navegar para a nova página, use:
 ```html
 <button onclick="carregarPagina('minhanova')">Minha Nova Página</button>
 ```
+
+# Configuração do Banco de Dados
+
+Na pasta `BancoDados` existem dois arquivos importantes para preparar o ambiente no phpMyAdmin:
+
+1. `BancodeDados.sql`  
+   - Contém a estrutura (tabelas, chaves etc.).  
+   - Caso o banco ainda não exista, acesse o phpMyAdmin, selecione (ou crie) o banco e importe este arquivo primeiro.
+
+2. `InserirDados.sql`  
+   - Contém dados iniciais (registros de exemplo / obrigatórios).  
+   - Após importar o `BancodeDados.sql`, importe este arquivo para popular as tabelas.
+
+Passos rápidos:
+1. Abrir http://localhost/phpmyadmin
+2. Criar (se necessário) o banco com o nome esperado pelo projeto (confira no código de conexão PHP).
+3. Aba Importar -> selecionar `BancodeDados.sql` -> Executar.
+4. Aba Importar -> selecionar `InserirDados.sql` -> Executar.
+5. Verificar se as tabelas e registros foram criados.
+
+Se fizer alterações futuras na estrutura, gerar novo script e atualizar o `BancodeDados.sql`. Para novos dados padrão, atualizar somente o `InserirDados.sql`.

@@ -7,9 +7,11 @@ categoria varchar(40) not null,
 nome varchar(100) not null,
 lugar varchar(40) not null,
 descricao varchar(500),
+publico_alvo varchar(100),
 inicio datetime not null,
 conclusao datetime not null,
-duracao float -- pesquisar se isso está certo mesmo  not null
+duracao float, -- pesquisar se isso está certo mesmo
+certificado tinyint(1) not null default 0
 );
 
 create table if not exists certificado(

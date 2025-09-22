@@ -12,12 +12,12 @@
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
-        'inicio' => 'Inicio.html',
+        'inicio' => 'Inicio.php',
         'login' => 'Login.html',
         'cadastroP' => 'CadastroParticipante.html',
         'cadastroO' => 'CadastroOrganizador.html',
         'redefinirSenha' => 'RedefinirSenha.html',
-        'evento' => 'CartaodoEvento.html',
+        'evento' => 'CartaodoEvento.php',
         'solicitarCodigo' => 'SolicitarCodigo.html',
         // Globais reutilizáveis
         'faleConosco' => '../PaginasGlobais/FaleConosco.html',
@@ -114,7 +114,7 @@
         // =========================
         const rotas = {
             'inicio': {
-                html: 'Inicio.html',
+                html: 'Inicio.php',
                 js: ['../PaginasGlobais/Filtro.js', 'Inicio.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
@@ -144,7 +144,7 @@
                 }
             },
             'evento': {
-                html: 'CartaodoEvento.html',
+                html: 'CartaodoEvento.php',
                 js: [],
                 init: () => { }
             },
