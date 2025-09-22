@@ -110,7 +110,7 @@
 
   .campo-descricao {
     grid-column: 1 / 3;
-    grid-row: 3 / 4;
+    grid-row: 3 / 5;
   }
 
   .caixa-descricao {
@@ -119,16 +119,21 @@
 
   .campo-publico {
     grid-column: 3 / 4;
-    grid-row: 3 / 4;
+    grid-row: 3 / 5;
   }
 
   .campo-categoria {
     grid-column: 4 / 5;
-    grid-row: 3 / 4;
+    grid-row: 3 / 5;
+  }
+
+  .campo-certificado {
+    grid-column: 3 / 4;
+    grid-row: 4 / 5;
   }
 
   .rodape-cartao {
-    grid-column: 3 / 5;
+    grid-column: 4 / 5;
     grid-row: 4 / 5;
     display: flex;
     flex-direction: column;
@@ -198,19 +203,20 @@
           <div class="grupo-campo campo-publico">
             <label for="audience">Público alvo:</label>
             <div id="audience" class="caixa-valor"><?php echo htmlspecialchars($evento['publico_alvo'] ?? 'Não informado'); ?></div>
-            <label for="certificado">Certificado:</label>
-            <div id="certificado" class="caixa-valor"><?php echo $certificado; ?></div>
           </div>
           <div class="grupo-campo campo-categoria">
             <label for="category">Categoria:</label>
             <div id="category" class="caixa-valor"><?php echo htmlspecialchars($evento['categoria']); ?></div>
           </div>
-          <div class="rodape-cartao">
-            <p class="texto-login">Acesse uma conta para se inscrever</p>
-            <button onclick="carregarPagina('inicio')" class="botao botao-voltar">Voltar</button>
+          <div class="grupo-campo campo-certificado">
+            <label for="certificate">Certificado:</label>
+            <div id="certificate" class="caixa-valor"><?php echo $certificado; ?></div>
+            <div class="rodape-cartao">
+              <p class="texto-login">Acesse uma conta para se inscrever</p>
+              <button onclick="carregarPagina('inicio')" class="botao botao-voltar">Voltar</button>
+            </div>
           </div>
         </div>
-      </div>
     </main>
   </div>
 </body>
