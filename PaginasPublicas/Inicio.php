@@ -12,9 +12,25 @@
     <?php
     include_once '../BancoDados/conexao.php';
 
-    // Buscar eventos (ajuste a ordem se quiser)
-    $sql = "SELECT cod_evento, categoria, nome, inicio, certificado FROM evento ORDER BY inicio";
+    // Buscar eventos trazendo campos usados no filtro
+    $sql = "SELECT cod_evento, categoria, nome, inicio, conclusao, duracao, certificado, lugar FROM evento ORDER BY inicio";
     $res = mysqli_query($conexao, $sql);
+
+    // Mapear texto e converter para string simples
+    function formatar($txt) {
+        $map = [
+            'Á'=>'A','À'=>'A','Â'=>'A','Ã'=>'A','Ä'=>'A','á'=>'a','à'=>'a','â'=>'a','ã'=>'a','ä'=>'a',
+            'É'=>'E','È'=>'E','Ê'=>'E','Ë'=>'E','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e',
+            'Í'=>'I','Ì'=>'I','Î'=>'I','Ï'=>'I','í'=>'i','ì'=>'i','î'=>'i','ï'=>'i',
+            'Ó'=>'O','Ò'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','ó'=>'o','ò'=>'o','ô'=>'o','õ'=>'o','ö'=>'o',
+            'Ú'=>'U','Ù'=>'U','Û'=>'U','Ü'=>'U','ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u',
+            'Ç'=>'C','ç'=>'c'
+        ];
+        $txt = strtr($txt ?? '', $map);
+        $txt = strtolower($txt);
+        $txt = str_replace(' ', '_', $txt);
+        return preg_replace('/[^a-z0-9_]/','', $txt);
+    }
     ?>
 
     <div id="main-content">
@@ -22,7 +38,7 @@
             <div class="barra-pesquisa-container">
                 <div class="barra-pesquisa">
                     <div class="campo-pesquisa-wrapper">
-                        <input class="campo-pesquisa" type="text" placeholder="Procurar (ainda não filtra)" />
+                        <input class="campo-pesquisa" type="text" placeholder="Procurar eventos" />
                         <button class="botao-pesquisa" aria-label="Procurar">
                             <div class="icone-pesquisa">
                                 <img src="../Imagens/lupa.png" alt="Lupa">
@@ -43,16 +59,37 @@
         <div class="container" id="eventos-container">
             <?php if ($res && mysqli_num_rows($res) > 0): ?>
                 <?php while ($ev = mysqli_fetch_assoc($res)):
+                    $dataInicioISO = date('Y-m-d', strtotime($ev['inicio']));
                     $dataFormatada = date('d/m/y', strtotime($ev['inicio']));
+                    $tipo = formatar($ev['categoria']); // liga com os checkboxes tipo_evento
+                    $local = formatar($ev['lugar']);    // liga com localizacao (se quiser usar no futuro)
+                    // Mapeia duração numérica (horas) para faixas usadas no filtro (opcional)
+                    $duracaoFaixa = '';
+                    if (is_numeric($ev['duracao'])) {
+                        $h = (float)$ev['duracao'];
+                        if ($h < 1) { $duracaoFaixa = 'menos_1h'; }
+                        elseif ($h < 2) { $duracaoFaixa = '1h_2h'; }
+                        elseif ($h < 4) { $duracaoFaixa = '2h_4h'; }
+                        else { $duracaoFaixa = 'mais_5h'; }
+                    }
+                    // Certificado: simples sim/nao (o filtro tem as mesmas palavras)
+                    $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
                 ?>
                     <a class="botao CaixaDoEvento"
                         style="text-decoration:none;color:inherit;display:block;"
-                        href="ContainerPublico.php?pagina=evento&id=<?= (int)$ev['cod_evento'] ?>">
+                        href="ContainerPublico.php?pagina=evento&id=<?= (int)$ev['cod_evento'] ?>"
+                        data-tipo="<?= htmlspecialchars($tipo) ?>"
+                        data-localizacao="<?= htmlspecialchars($local) ?>"
+                        data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>"
+                        data-certificado="<?= $cert ?>"
+                        data-data="<?= $dataInicioISO ?>"
+                    >
                         <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                         <div class="EventoInfo">
                             Categoria: <?= htmlspecialchars($ev['categoria']) ?><br>
                             Data: <?= $dataFormatada ?><br>
-                            Certificado: <?= ((int)$ev['certificado'] === 1 ? 'Sim' : 'Não') ?>
+                            Local: <?= htmlspecialchars($ev['lugar']) ?><br>
+                            Certificado: <?= ($cert === 'sim' ? 'Sim' : 'Não') ?>
                         </div>
                     </a>
                 <?php endwhile; ?>

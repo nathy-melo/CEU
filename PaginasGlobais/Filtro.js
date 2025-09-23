@@ -102,13 +102,12 @@ function createFilterElement() {
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
-                Categorização do Certificado
+                Certificado
                 <span class="titulo-icone"></span>
             </legend>
             <div class="lista-checkbox">
-                <label class="item-checkbox"><input type="checkbox" name="certificado" value="ensino"><span class="checkbox-personalizado"></span><span>Ensino</span></label>
-                <label class="item-checkbox"><input type="checkbox" name="certificado" value="pesquisa"><span class="checkbox-personalizado"></span><span>Pesquisa</span></label>
-                <label class="item-checkbox"><input type="checkbox" name="certificado" value="extensao"><span class="checkbox-personalizado"></span><span>Extensão</span></label>
+                <label class="item-checkbox"><input type="checkbox" name="certificado" value="sim"><span class="checkbox-personalizado"></span><span>Com certificado</span></label>
+                <label class="item-checkbox"><input type="checkbox" name="certificado" value="nao"><span class="checkbox-personalizado"></span><span>Sem certificado</span></label>
             </div>
             </fieldset>
         </form>
@@ -153,7 +152,6 @@ function applyFiltersParticipante() {
     const getChecked = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
 
     const tipos = getChecked('tipo_evento');
-    const modalidades = getChecked('modalidade');
     const locais = getChecked('localizacao');
     const duracoes = getChecked('duracao');
     const certificados = getChecked('certificado'); // novo: tipo de certificado
@@ -164,7 +162,6 @@ function applyFiltersParticipante() {
     const cards = container.querySelectorAll('.CaixaDoEvento');
     cards.forEach(card => {
         const tipo = (card.dataset.tipo || '').toLowerCase();
-        const modalidade = (card.dataset.modalidade || '').toLowerCase();
         const local = (card.dataset.localizacao || '').toLowerCase();
         const duracao = (card.dataset.duracao || '').toLowerCase();
         const certificado = (card.dataset.certificado || '').toLowerCase(); // novo
@@ -172,7 +169,6 @@ function applyFiltersParticipante() {
 
         let ok = true;
         if (ok && tipos.length) ok = tipos.includes(tipo);
-        if (ok && modalidades.length) ok = modalidades.includes(modalidade);
         if (ok && locais.length) ok = locais.includes(local);
         if (ok && duracoes.length) ok = duracoes.includes(duracao);
         if (ok && certificados.length) ok = certificados.includes(certificado);
