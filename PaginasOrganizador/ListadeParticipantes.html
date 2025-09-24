@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Participantes</title>
+  <link rel="stylesheet" href="../styleGlobal.css" />
+</head>
+<style>
+  :root {
+    --bg-page: #d1eaff;
+    --bg-container: #4f6c8c;
+    --bg-table: #deeaff;
+    --bg-white: #ffffff;
+    --bg-green: #2c9533;
+    --bg-red: #ff0000;
+    --bg-dark-blue: #0a1449;
+    --bg-light-blue: #6598d2;
+    --text-white: #ffffff;
+    --border-main: #0a1449;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-page);
+    color: #000;
+  }
+  
+  a, button {
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    background: none;
+    font-family: inherit;
+    padding: 0;
+    color: inherit;
+  }
+  
+  img {
+    max-width: 100%;
+    display: block;
+  }
+  
+  .manager-container {
+    max-width: 1471px;
+    margin: 50px auto;
+    padding: 40px 58px;
+    background-color: var(--bg-container);
+    border-radius: 16px;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+  
+  .manager-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  
+  .title {
+    color: var(--text-white);
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    font-size: 70px;
+    line-height: 1.2;
+    text-align: center;
+    text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
+    margin: 0;
+  }
+  
+  .management-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px 32px;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    background-color: var(--bg-white);
+    border-radius: 8px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .action-btn img {
+    height: 28px;
+  }
+  
+  .search-form {
+    position: relative;
+    width: 100%;
+    max-width: 693px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 14px 70px 14px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+  }
+  
+  .search-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 63px;
+    background-color: var(--bg-dark-blue);
+    border-radius: 0 6px 6px 0;
+    display: grid;
+    place-items: center;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.6);
+  }
+  .search-btn img {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .bulk-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .btn-bulk {
+    padding: 8px 24px;
+    border-radius: 600px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: var(--text-white);
+  }
+  .btn-bulk.btn-white { background-color: var(--bg-white); color: #000; }
+  .btn-bulk.btn-green { background-color: var(--bg-green); }
+  .btn-bulk.btn-red { background-color: var(--bg-red); }
+  .btn-bulk img { height: 22.5px; }
+  
+  .table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .participants-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--bg-table);
+    border: 1px solid var(--border-main);
+    font-size: 15px;
+  }
+  
+  .participants-table th,
+  .participants-table td {
+    border: 1px solid var(--border-main);
+    padding: 16px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  
+  .participants-table thead {
+    font-weight: bold;
+  }
+  
+  .col-select { text-align: center; }
+  .col-select img { margin: 0 auto; }
+  .col-data p { margin: 0 0 4px 0; }
+  .col-data p:last-child { margin-bottom: 0; }
+  
+  .actions-group, .status-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 220px;
+  }
+  
+  .btn-table-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 600px;
+    color: var(--text-white);
+    width: 100%;
+  }
+  .btn-table-action.btn-green { background-color: var(--bg-green); }
+  .btn-table-action.btn-red { background-color: var(--bg-red); }
+  .btn-table-action.btn-neutral { background-color: var(--bg-container); }
+  .btn-table-action img { height: 22.5px; }
+  
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border-radius: 600px;
+    color: var(--text-white);
+    white-space: nowrap;
+  }
+  .status-badge.confirmed { background-color: var(--bg-green); }
+  .status-badge.denied { background-color: var(--bg-red); }
+  .status-badge img { height: 22.5px; }
+  
+  .manager-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  
+  .btn-back {
+    background-color: var(--bg-light-blue);
+    padding: 8px 50px;
+    border-radius: 3px;
+    color: #000;
+    font-size: 18px;
+  }
+
+  .select-checkbox {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--bg-dark-blue);
+    cursor: pointer;
+  }
+  .selected-row {
+    background-color: #b3d4fc !important;
+  }
+  </style>
+<body>
+  <section id="participants-manager-section">
+    <div class="manager-container">
+      <header class="manager-header">
+        <h1 class="title">Gerenciar Participantes</h1>
+        
+        <div class="management-actions-grid">
+          <button class="botao action-btn">
+            <span>Adicionar</span>
+            <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
+          </button>
+          <button class="action-btn">
+            <span>Importar Lista de Presença</span>
+            <img src="importar.svg" alt="Importar icon">
+          </button>
+          <button class="botao action-btn">
+            <span>Exportar Lista de Presença</span>
+            <img src="exportar.svg" alt="Exportar icon">
+          </button>
+          <button class="action-btn">
+            <span>Enviar Mensagem</span>
+            <img src="email.svg" alt="Mensagem icon">
+          </button>
+          <button class="action-btn">
+            <span>Importar Lista de Inscritos</span>
+            <img src="importar lista.svg" alt="Importar icon">
+          </button>
+          <button class="action-btn">
+            <span>Exportar Lista de Inscritos</span>
+            <img src="exportar lista.svg" alt="Exportar icon">
+          </button>
+        </div>
+  
+        <form class="search-form">
+          <input type="search" class="search-input" placeholder="Procure por nome, RA ou CPF">
+          <button type="submit" class="search-btn" aria-label="Procurar">
+            <img src="lupa.svg" alt="Lupa">
+          </button>
+        </form>
+  
+        <div class="bulk-actions">
+          <button class="btn-bulk btn-white">
+            <span>Desselecionar Todos</span>
+            <img src="grupo de pessoas.svg" alt="">
+          </button>
+          <button class="btn-bulk btn-green">
+            <span>Confirmar Presenças</span>
+            <img src="../Imagens/Certo.svg" alt="">
+          </button>
+          <button class="btn-bulk btn-red">
+            <span>Excluir Participantes</span>
+            <img src="excluir.svg" alt="">
+          </button>
+        </div>
+      </header>
+  
+      <div class="table-wrapper">
+        <table class="participants-table">
+          <thead>
+            <tr>
+              <th>Selecionar</th>
+              <th>Dados do Participante</th>
+              <th>Modificar</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Selecionar" class="col-select">
+                <input type="checkbox" class="select-checkbox">
+              </td>
+              <td data-label="Dados do Participante" class="col-data">
+                <p>Nome: Canimana Ipanema</p>
+                <p>E-mail: cai2132@email.com</p>
+                <p>Registro Acadêmico: 0123456</p>
+                <p>Data de Inscrição: 10/01/25 - 14:36</p>
+              </td>
+              <td data-label="Modificar" class="col-modify">
+                <div class="actions-group">
+                  <button class="botao btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="botao btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
+                  <button class="botao btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+                </div>
+              </td>
+              <td data-label="Status" class="col-status">
+                <div class="status-group">
+                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Selecionar" class="col-select">
+                <input type="checkbox" class="select-checkbox">
+              </td>
+              <td data-label="Dados do Participante" class="col-data">
+                <p>Nome: Gean Brito</p>
+                <p>E-mail: gege@email.com</p>
+                <p>Registro Acadêmico: 0465441</p>
+                <p>Data de Inscrição: 10/01/25 - 14:36</p>
+              </td>
+              <td data-label="Modificar" class="col-modify">
+                <div class="actions-group">
+                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
+                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+                </div>
+              </td>
+              <td data-label="Status" class="col-status">
+                <div class="status-group">
+                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="../Imagens/Certo.svg"></span></div>
+                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Selecionar" class="col-select">
+                <input type="checkbox" class="select-checkbox">
+              </td>
+              <td data-label="Dados do Participante" class="col-data">
+                <p>Nome: Italo Xavier</p>
+                <p>E-mail: capitwice22@email.com</p>
+                <p>Registro Acadêmico: 0979123</p>
+                <p>Data de Inscrição: 10/01/25 - 14:37</p>
+              </td>
+              <td data-label="Modificar" class="col-modify">
+                <div class="actions-group">
+                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="certificado].svg" alt=""></button>
+                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
+                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+                </div>
+              </td>
+              <td data-label="Status" class="col-status">
+                <div class="status-group">
+                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Selecionar" class="col-select">
+                <input type="checkbox" class="select-checkbox">
+              </td>
+              <td data-label="Dados do Participante" class="col-data">
+                <p>Nome: Natasha Figueira</p>
+                <p>E-mail: natashafig16@email.com</p>
+                <p>Registro Acadêmico: 0231463</p>
+                <p>Data de Inscrição: 10/01/25 - 14:37</p>
+              </td>
+              <td data-label="Modificar" class="col-modify">
+                <div class="actions-group">
+                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
+                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+                </div>
+              </td>
+              <td data-label="Status" class="col-status">
+                <div class="status-group">
+                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge denied">Não Confirmada <img src="errado.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge denied">Indisponível <img src="errado.svg " alt=""></span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Selecionar" class="col-select">
+                <input type="checkbox" class="select-checkbox">
+              </td>
+              <td data-label="Dados do Participante" class="col-data">
+                <p>Nome: Vinícius Y-piranga</p>
+                <p>E-mail: viny67@email.com</p>
+                <p>Registro Acadêmico: 0254688</p>
+                <p>Data de Inscrição: 10/01/25 - 14:37</p>
+              </td>
+              <td data-label="Modificar" class="col-modify">
+                <div class="actions-group">
+                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
+                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+                </div>
+              </td>
+              <td data-label="Status" class="col-status">
+                <div class="status-group">
+                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="certificado].svg" alt=""></span></div>
+                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Selecionar" class="col-select">
+                <input type="checkbox" class="select-checkbox">
+              </td>
+              <td data-label="Dados do Participante" class="col-data">
+                <p>Nome: Virgílio Ouro Preto</p>
+                <p>E-mail: virgilio.ouro@email.com</p>
+                <p>Registro Acadêmico: 0987364</p>
+                <p>Data de Inscrição: 10/01/25 - 14:38</p>
+              </td>
+              <td data-label="Modificar" class="col-modify">
+                <div class="actions-group">
+                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
+                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+                </div>
+              </td>
+              <td data-label="Status" class="col-status">
+                <div class="status-group">
+                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge denied">Não Confirmada <img src="errado.svg" alt=""></span></div>
+                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge denied">Indisponível <img src="errado.svg" alt=""></span></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="manager-footer">
+        <a href="#" class="btn-back">Voltar</a>
+      </footer>
+    </div>
+  </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.select-checkbox').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      var tr = checkbox.closest('tr');
+      if (checkbox.checked) {
+        tr.classList.add('selected-row');
+      } else {
+        tr.classList.remove('selected-row');
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
