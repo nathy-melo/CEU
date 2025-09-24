@@ -44,6 +44,11 @@ body {
   align-items: center;
 }
 
+body.inicio-publico { /* Estilo para q a barra de pesquisa fique no topo */
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+}
 
 /* ====== Botões ====== */
 
