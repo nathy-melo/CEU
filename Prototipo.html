@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protótipo Cartão do Evento</title>
+    <link rel="stylesheet" href="styleGlobal.css" />
+    <style>
+        .cartao-evento {
+            background-color: var(--caixas, #ffffff);
+            border-radius: 1.875rem;
+            box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.4);
+            padding: 1.875rem;
+            width: 100%;
+            max-width: 60rem;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(7, auto);
+            gap: 0.9rem;
+        }
+
+        /* Campos seguem grid original adaptado */
+        .cartao-evento>div {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            font-size: 1rem;
+        }
+
+        .grupo-campo label {
+            font-weight: 700;
+            font-size: 1.05rem;
+            line-height: 1.2;
+            margin-bottom: 0.35rem;
+        }
+
+        .caixa-valor {
+            background-color: var(--branco, #ffffff);
+            color: var(--preto, #000);
+            border-radius: 2rem;
+            padding: 0.55rem 0.9rem;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            min-height: 2.1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.35);
+        }
+
+        .caixa-descricao {
+            min-height: 14rem;
+            padding: 1rem;
+            text-align: left;
+            line-height: 1.4;
+            font-weight: 500;
+            overflow-y: auto; /* Barra de rolagem vertical */
+            resize: vertical; /* Permite redimensionar manualmente */
+            word-break: break-word; /* Quebra palavras longas */
+            white-space: pre-line; /* Mantém quebras de linha e quebra automático */
+            max-width: 100%; /* Garante que não ultrapasse a caixa */
+        }
+
+        /* Grid positions renomeadas */
+        .Nome {
+            grid-column: span 4 / span 4;
+        }
+
+        .Local {
+            grid-column: span 4 / span 4;
+            grid-column-start: 5;
+        }
+
+        .DataDeInicio {
+            grid-column: span 2 / span 2;
+            grid-row-start: 2;
+        }
+
+        .DataDeFim {
+            grid-column: span 2 / span 2;
+            grid-column-start: 3;
+            grid-row-start: 2;
+        }
+
+        .HorarioDeInicio {
+            grid-column: span 2 / span 2;
+            grid-column-start: 5;
+            grid-row-start: 2;
+        }
+
+        .HorarioDeFim {
+            grid-column: span 2 / span 2;
+            grid-column-start: 7;
+            grid-row-start: 2;
+        }
+
+        .PublicoAlvo {
+            grid-column: span 2 / span 2;
+            grid-row-start: 3;
+        }
+
+        .Categoria {
+            grid-column: span 2 / span 2;
+            grid-column-start: 3;
+            grid-row-start: 3;
+        }
+
+        .Certificado {
+            grid-column: span 2 / span 2;
+            grid-column-start: 5;
+            grid-row-start: 3;
+        }
+
+        .Modalidade {
+            grid-column: span 2 / span 2;
+            grid-column-start: 7;
+            grid-row-start: 3;
+        }
+
+        .Imagem {
+            grid-column: span 4 / span 4;
+            grid-row: span 3 / span 3;
+            grid-row-start: 4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .Descricao {
+            grid-column: span 4 / span 4;
+            grid-row: span 3 / span 3;
+            grid-column-start: 5;
+            grid-row-start: 4;
+        }
+
+        .BotaoVoltar {
+            grid-column: span 2 / span 2;
+            grid-row-start: 7;
+        }
+
+        .BotaoSerColaborador {
+            grid-column: span 2 / span 2;
+            grid-column-start: 4;
+            grid-row-start: 7;
+        }
+
+        .BotaoInscrever {
+            grid-column: span 2 / span 2;
+            grid-column-start: 7;
+            grid-row-start: 7;
+        }
+
+        /* Imagem */
+        .campo-imagem {
+            background: var(--branco, #fff);
+            border-radius: 1.5rem;
+            box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .campo-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Botões */
+        .botoes,
+        .BotaoVoltar,
+        .BotaoSerColaborador,
+        .BotaoInscrever {
+            align-items: center;
+        }
+
+        .botao {
+            background-color: var(--botao);
+            color: var(--branco, #fff);
+            border-radius: 0.35rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0.15rem 0.55rem 0 rgba(0, 0, 0, 0.25);
+            transition: background .25s, transform .15s;
+            width: 100%;
+        }
+
+        .botao:hover {
+            background-color: var(--botao-hover, #0253cc);
+        }
+
+        .botao:active {
+            transform: translateY(1px);
+        }
+
+        .BotaoVoltar .botao,
+        .BotaoSerColaborador .botao,
+        .BotaoInscrever .botao {
+            background: var(--botao, #0166ff);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cartao-evento">
+        <div class="Nome grupo-campo">
+            <label>Nome:</label>
+            <div class="caixa-valor">Evento X</div>
+        </div>
+        <div class="Local grupo-campo">
+            <label>Local:</label>
+            <div class="caixa-valor">Auditório Central</div>
+        </div>
+        <div class="DataDeInicio grupo-campo">
+            <label>Data de Início:</label>
+            <div class="caixa-valor">07/03/25</div>
+        </div>
+        <div class="DataDeFim grupo-campo">
+            <label>Data de Fim:</label>
+            <div class="caixa-valor">07/03/25</div>
+        </div>
+        <div class="HorarioDeInicio grupo-campo">
+            <label>Horário de Início:</label>
+            <div class="caixa-valor">13:00</div>
+        </div>
+        <div class="HorarioDeFim grupo-campo">
+            <label>Horário de Fim:</label>
+            <div class="caixa-valor">14:00</div>
+        </div>
+        <div class="PublicoAlvo grupo-campo">
+            <label>Público Alvo:</label>
+            <div class="caixa-valor">Estudantes</div>
+        </div>
+        <div class="Categoria grupo-campo">
+            <label>Categoria:</label>
+            <div class="caixa-valor">Oficina</div>
+        </div>
+        <div class="Certificado grupo-campo">
+            <label>Certificado:</label>
+            <div class="caixa-valor">Sim</div>
+        </div>
+        <div class="Modalidade grupo-campo">
+            <label>Modalidade:</label>
+            <div class="caixa-valor">Presencial</div>
+        </div>
+        <div class="Imagem campo-imagem">
+            <img src="Imagens/CEU-Vetor.png" alt="Imagem do evento">
+        </div>
+        <div class="Descricao grupo-campo">
+            <label>Descrição:</label>
+            <div class="caixa-valor caixa-descricao">Descrição detalhada do evento. Este espaço pode conter várias
+                linhas de texto explicando os objetivos, programação e outras informações relevantes.</div>
+        </div>
+        <div class="BotaoVoltar">
+            <button class="botao" onclick="history.back()">Voltar</button>
+        </div>
+        <div class="BotaoSerColaborador">
+            <button class="botao">Ser colaborador</button>
+        </div>
+        <div class="BotaoInscrever">
+            <button class="botao">Inscreva-se</button>
+        </div>
+    </div>
+</body>
+
+</html>
