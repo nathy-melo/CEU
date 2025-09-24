@@ -7,17 +7,19 @@
     <title>Protótipo Cartão do Evento</title>
     <link rel="stylesheet" href="styleGlobal.css" />
     <style>
+
         .cartao-evento {
             background-color: var(--caixas);
-            border-radius: 1.875rem;
+            border-radius: 2rem;
             box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.4);
-            padding: 1.875rem;
+            padding: 2rem;
             width: 100%;
             max-width: 60rem;
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(7, auto);
-            gap: 0.9rem;
+            gap: 1rem;
+            margin: 1rem auto 1rem auto;
         }
 
         /* Campos seguem grid original adaptado */
@@ -64,6 +66,10 @@
             word-break: break-word;
             white-space: pre-line;
             max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 1em;
         }
 
         .Nome {
@@ -169,15 +175,16 @@
             min-height: 16rem;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
         }
 
         .campo-imagem img {
-            width: auto;
+            width: 100%;
             height: 100%;
-            max-height: 15rem;
-            object-fit: contain;
+            object-fit: cover;
             display: block;
+            margin: 0;
+            padding: 0;
         }
 
         /* Botões */
@@ -214,6 +221,49 @@
         .BotaoSerColaborador .botao,
         .BotaoInscrever .botao {
             background: var(--botao, #0166ff);
+        }
+
+        .carrossel-imagens {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+        }
+        .carrossel-imagens img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1.5rem;
+            box-shadow: 0 0.15rem 0.75rem 0 rgba(0,0,0,0.25);
+        }
+        .carrossel-btn {
+            background: none;
+            color: var(--azul-escuro);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.8;
+            z-index: 2;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carrossel-btn:hover {
+            color: var(--botao);
+        }
+        .carrossel-anterior {
+            left: 0.5rem;
+        }
+        .carrossel-proxima {
+            right: 0.5rem;
         }
     </style>
 </head>
@@ -261,7 +311,11 @@
             <div class="caixa-valor">Presencial</div>
         </div>
         <div class="Imagem campo-imagem">
-            <img src="Imagens/CEU-Logo.png" alt="Imagem do evento">
+            <div class="carrossel-imagens">
+                <button class="carrossel-btn carrossel-anterior" onclick="mudarImagem(-1)">⮜</button>
+                <img id="imagem-carrossel" src="Imagens/20250916_084902.jpg" alt="Imagem do evento">
+                <button class="carrossel-btn carrossel-proxima" onclick="mudarImagem(1)">⮞</button>
+            </div>
         </div>
         <div class="Descricao grupo-campo">
             <label>Descrição:</label>
@@ -277,6 +331,35 @@
             <button class="botao">Inscreva-se</button>
         </div>
     </div>
+    <div id="modal-imagem" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;">
+        <button onclick="fecharModalImagem()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:2.5rem;color:var(--branco);cursor:pointer;z-index:10001;">&times;</button>
+        <button class="carrossel-btn carrossel-anterior" onclick="mudarImagemModal(-1)" style="left:2rem;top:50%;position:absolute;">⮜</button>
+        <img id="imagem-ampliada" src="" alt="Imagem ampliada" style="max-width:90vw;max-height:90vh;border-radius:2rem;box-shadow:0 0.5rem 2rem rgba(0,0,0,0.5);">
+        <button class="carrossel-btn carrossel-proxima" onclick="mudarImagemModal(1)" style="right:2rem;top:50%;position:absolute;">⮞</button>
+    </div>
+    <script>
+        const imagens = [
+            'Imagens/20250916_084902.jpg',
+            'Imagens/20250923_131004.jpg',
+            'Imagens/CEU-Logo.png'
+        ];
+        let indiceAtual = 0;
+        function mudarImagem(direcao) {
+            indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
+            document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+        }
+        function mudarImagemModal(direcao) {
+            indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
+            document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+        }
+        document.getElementById('imagem-carrossel').onclick = function() {
+            document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+            document.getElementById('modal-imagem').style.display = 'flex';
+        };
+        function fecharModalImagem() {
+            document.getElementById('modal-imagem').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>
