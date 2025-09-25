@@ -6,17 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar conta como Participante</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <script src="ValidacoesComuns.js" defer></script>
+    <script src="ValidacoesCadastro.js" defer></script>
 
     <style>
         .sombra-texto {
             text-shadow: 0px 0.275em 1.375em var(sombra-padrao);
         }
 
+        #main-content {
+            --altura-extra-aviso: 0em;
+        }
+
+        #main-content.main-content--com-aviso {
+            --altura-extra-aviso: 3.2em;
+        }
+
         .cartao-cadastro {
             background-color: var(--caixas);
             border-radius: 2em;
             width: 30rem;
-            height: 30em;
+            min-height: calc(30em + var(--altura-extra-aviso));
+            height: auto;
             padding: 0.5em 2em 1.3em 2em;
             box-sizing: border-box;
             display: flex;
@@ -25,6 +36,7 @@
             justify-content: flex-start;
             position: relative;
             box-shadow: 0 0 11px 0 var(--sombra-forte);
+            transition: min-height 0.25s ease;
         }
 
         .cartao-cadastro-titulo {
@@ -277,6 +289,33 @@
             max-width: 6em;
             flex: 1 1 0;
         }
+
+        /* caixa de mensagens compartilhada */
+        #erro-cadastro {
+            display: none;
+            color: #ff0000;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            border-radius: 0.5em;
+            padding: 0.6em;
+            margin: 0.5em 0 0.2em 0;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        #erro-cadastro.sucesso {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            border-color: #28a745;
+        }
+
+        #erro-cadastro.info {
+            color: #17a2b8;
+            background-color: rgba(23, 162, 184, 0.1);
+            border-color: #17a2b8;
+        }
     </style>
 </head>
 
@@ -294,7 +333,9 @@
                 </div>
             </div>
 
-            <form action="CadastroParticipante.php" class="cartao-cadastro-formulario" method="post" id="form-cadastro-participante" name="cadastro_participante">
+            <div id="erro-cadastro"></div>
+            <form action="CadastroParticipante.php" class="cartao-cadastro-formulario" method="post"
+                id="form-cadastro-participante" name="cadastro_participante">
                 <div class="formulario-grupo">
                     <input type="text" id="nome-completo" name="nome_completo" placeholder="Nome Completo"
                         class="formulario-input" required>

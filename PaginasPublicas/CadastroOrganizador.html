@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar conta como Organizador</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <script src="ValidacoesComuns.js" defer></script>
+    <script src="ValidacoesCadastro.js" defer></script>
 
     <style>
         body {
@@ -30,6 +32,7 @@
             position: absolute;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 11px 0 var(--sombra-forte);
+            transition: min-height 0.25s ease;
         }
 
         .cartao-cadastro-titulo {
@@ -117,6 +120,11 @@
             margin-bottom: 6.776em;
         }
 
+        #main-content.main-content--com-aviso .cartao-cadastro-formulario {
+            margin-top: 0.8em;
+            margin-bottom: 3.0em;
+        }
+
         .formulario-grupo {
             width: 100%;
             margin: 0 auto;
@@ -152,6 +160,10 @@
             max-width: 100%;
             position: absolute;
             left: 0;
+            bottom: 4.5em;
+        }
+
+        #main-content.main-content--com-aviso .cartao-cadastro-termos {
             bottom: 4.5em;
         }
 
@@ -318,11 +330,55 @@
             font-size: 0.88rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 0.165em;
+            margin-bottom: 0.55em;
             margin-top: 0;
             width: 100%;
             max-width: 100%;
+        }
+
+        #main-content.main-content--com-aviso .aviso-codigo-organizador {
             margin-bottom: 0.55em;
+        }
+
+        /* caixa de mensagens compartilhada */
+        #erro-cadastro {
+            display: none;
+            color: #ff0000;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            border-radius: 0.5em;
+            padding: 0.6em;
+            margin: 0.5em 0 0.2em 0;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        #erro-cadastro.sucesso {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            border-color: #28a745;
+        }
+
+        #erro-cadastro.info {
+            color: #17a2b8;
+            background-color: rgba(23, 162, 184, 0.1);
+            border-color: #17a2b8;
+        }
+
+        /* Adaptação dinâmica igual ao participante */
+        #main-content {
+            --altura-extra-aviso: 0em;
+        }
+
+        #main-content.main-content--com-aviso {
+            --altura-extra-aviso: 3.2em;
+        }
+
+        #main-content.main-content--com-aviso .cartao-cadastro {
+            min-height: calc(30em + var(--altura-extra-aviso));
+            height: auto;
         }
 
         /*botão solicitar código*/
@@ -334,6 +390,10 @@
             width: 100%;
             position: absolute;
             transform: translate(-50%, calc(-50% + 17.4em));
+        }
+
+        #main-content.main-content--com-aviso .div-botao-solicitar-codigo {
+            transform: translate(-50%, calc(-50% + 17.4em + var(--altura-extra-aviso)));
         }
 
         .botao-solicitar-codigo {
@@ -387,7 +447,9 @@
             </div>
 
             <p class="aviso-codigo-organizador">O cadastro como organizador exige um código de acesso</p>
-            <form action = "CadastroOrganizador.php" class="cartao-cadastro-formulario" method="post" id="form-cadastro-organizador" name="cadastro_organizador">
+            <div id="erro-cadastro"></div>
+            <form action="CadastroOrganizador.php" class="cartao-cadastro-formulario" method="post"
+                id="form-cadastro-organizador" name="cadastro_organizador">
                 <div class="formulario-grupo">
                     <input type="text" id="codigo-acesso" name="codigo_acesso" placeholder="Código de Acesso"
                         class="formulario-input" required>

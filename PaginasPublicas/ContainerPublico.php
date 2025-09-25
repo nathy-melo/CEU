@@ -47,17 +47,43 @@
         function carregarScripts(lista, callback) {
             const alvo = document.getElementById('conteudo-dinamico') || document.body;
             let index = 0;
+
             function proximo() {
-                if (index < lista.length) {
-                    const script = document.createElement('script');
-                    script.src = lista[index++] + '?t=' + new Date().getTime();
-                    script.onload = proximo;
-                    script.onerror = () => console.error('Falha ao carregar o script:', script.src);
-                    alvo.appendChild(script);
-                } else if (callback) {
-                    callback();
+                if (index >= lista.length) {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                    return;
                 }
+
+                const caminho = lista[index++];
+                const jaCarregado = Array.from(document.getElementsByTagName('script')).some(function (scriptExistente) {
+                    const idDinamico = scriptExistente.getAttribute('data-dynamic-id');
+                    if (idDinamico && idDinamico === caminho) {
+                        return true;
+                    }
+                    if (scriptExistente.src && scriptExistente.src.indexOf(caminho) !== -1) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (jaCarregado) {
+                    proximo();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.setAttribute('data-dynamic-id', caminho);
+                script.src = caminho + (caminho.indexOf('?') === -1 ? '?t=' : '&t=') + new Date().getTime();
+                script.onload = proximo;
+                script.onerror = function () {
+                    console.error('Falha ao carregar o script:', script.src);
+                    proximo();
+                };
+                alvo.appendChild(script);
             }
+
             proximo();
         }
 
@@ -123,18 +149,30 @@
             },
             'login': {
                 html: 'Login.html',
-                js: [],
-                init: () => { }
+                js: ['ValidacoesComuns.js', 'ValidacoesLogin.js'],
+                init: () => {
+                    if (typeof window.inicializarValidacoesLogin === 'function') {
+                        window.inicializarValidacoesLogin();
+                    }
+                }
             },
             'cadastroP': {
                 html: 'CadastroParticipante.html',
-                js: [],
-                init: () => { }
+                js: ['ValidacoesComuns.js', 'ValidacoesCadastro.js'],
+                init: () => {
+                    if (typeof window.inicializarValidacoesCadastro === 'function') {
+                        window.inicializarValidacoesCadastro();
+                    }
+                }
             },
             'cadastroO': {
                 html: 'CadastroOrganizador.html',
-                js: [],
-                init: () => { }
+                js: ['ValidacoesComuns.js', 'ValidacoesCadastro.js'],
+                init: () => {
+                    if (typeof window.inicializarValidacoesCadastro === 'function') {
+                        window.inicializarValidacoesCadastro();
+                    }
+                }
             },
             'redefinirSenha': {
                 html: 'RedefinirSenha.html',

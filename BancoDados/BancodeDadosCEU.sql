@@ -21,19 +21,18 @@ tipo varchar(100),
 primary key (cod_verificacao)
 );
 
-create table if not exists participante(
+create table if not exists usuario(
 CPF char(11) primary key,
 Nome varchar(100),
 Email varchar(100),
 Senha varchar(20),
-RA char(7));
-
-create table if not exists organizador(
-CPF char(11) primary key,
-Nome varchar(100),
-Email varchar(100),
-Senha varchar(20),
-Codigo varchar(8)
+RA char(7) null,
+Codigo varchar(8),
+Organizador tinyint(1) not null default 0,
+constraint chk_codigo_organizador check (
+    (Organizador = 0) OR 
+    (Organizador = 1 AND Codigo is not null)
+)
 );
 
 create table if not exists lista_de_participantes(
@@ -47,7 +46,7 @@ cod_evento int ,
 CPF char(11),
 primary key (cod_evento,CPF),
 foreign key (cod_evento) references evento(cod_evento),
-foreign key (CPF) references organizador(CPF)
+foreign key (CPF) references usuario(CPF)
 );
 
 show tables;

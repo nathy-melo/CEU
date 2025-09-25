@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Login</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <script src="ValidacoesComuns.js" defer></script>
+    <script src="ValidacoesLogin.js" defer></script>
     <style>
         .container-pagina-login {
             display: flex;
@@ -171,6 +173,45 @@
         .botao-login:hover {
             opacity: 0.9;
         }
+
+        #erro-login {
+            display: none;
+            color: #ff0000;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            border-radius: 0.5em;
+            padding: 0.75em;
+            margin-bottom: 1em;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 500;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        #erro-login.sucesso {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            border-color: #28a745;
+        }
+
+        #erro-login.info {
+            color: #17a2b8;
+            background-color: rgba(23, 162, 184, 0.1);
+            border-color: #17a2b8;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -179,25 +220,31 @@
         <div class="container-pagina-login">
             <div class="cartao-login">
                 <h1 class="titulo-login sombra-texto-comum">Acesse sua conta</h1>
+
                 <p class="prompt-cadastro">
                     <span class="texto-cadastro sombra-texto-comum">Não tem uma conta?</span>
                     <a type="button" class="link-cadastro sombra-texto-comum" onclick="carregarPagina('cadastroP')">
                         Clique aqui para criar
                     </a>
                 </p>
-                <form class="formulario-login" onsubmit="event.preventDefault();" method="post" id="form-login" name="login">
+
+                <div id="erro-login">
+                </div>
+
+
+                <form class="formulario-login" method="post" action="ProcessarLogin.php" id="form-login" name="login">
                     <div class="grupo-formulario">
-                        <input type="email" id="email" name="login[email]" placeholder="E-mail"
+                        <input type="email" id="email" name="email" placeholder="E-mail"
                             class="input-formulario email-input" required>
                     </div>
                     <div class="grupo-formulario">
-                        <input type="password" id="password" name="login[senha]" placeholder="Senha"
+                        <input type="password" id="password" name="senha" placeholder="Senha"
                             class="input-formulario password-input" required>
                     </div>
                     <div class="acoes-formulario">
                         <a onclick="carregarPagina('redefinirSenha')"
                             class="link-esqueci-senha sombra-texto-comum">Esqueci minha senha </a>
-                        <button class="botao botao-login">Entrar</button>
+                        <button type="submit" class="botao botao-login">Entrar</button>
                     </div>
                 </form>
             </div>
