@@ -11,7 +11,7 @@ function mostrarModalExcluirConta() {
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
-    container.style.background = '#4f6c8c';
+    container.style.background = 'var(--caixas)';
     container.style.borderRadius = '0.7rem';
     container.style.padding = '2rem 2.5rem 1.5rem 2.5rem';
     container.style.maxWidth = '32rem';
@@ -41,7 +41,7 @@ function mostrarModalExcluirConta() {
     var btnCancelar = document.createElement('button');
     btnCancelar.type = 'button';
     btnCancelar.textContent = 'Cancelar';
-    btnCancelar.style.backgroundColor = '#6598d2';
+    btnCancelar.style.backgroundColor = 'var(--botao)';
     btnCancelar.style.color = '#fff';
     btnCancelar.style.border = 'none';
     btnCancelar.style.borderRadius = '0.3rem';

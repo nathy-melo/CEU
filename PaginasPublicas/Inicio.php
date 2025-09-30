@@ -13,7 +13,7 @@
     include_once '../BancoDados/conexao.php';
 
     // Buscar eventos trazendo campos usados no filtro
-    $sql = "SELECT cod_evento, categoria, nome, inicio, conclusao, duracao, certificado, lugar FROM evento ORDER BY inicio";
+    $sql = "SELECT cod_evento, categoria, nome, inicio, conclusao, duracao, certificado, lugar, modalidade, imagem FROM evento ORDER BY inicio";
     $res = mysqli_query($conexao, $sql);
 
     // Mapear texto e converter para string simples
@@ -62,8 +62,9 @@
                     $dataInicioISO = date('Y-m-d', strtotime($ev['inicio']));
                     $dataFormatada = date('d/m/y', strtotime($ev['inicio']));
                     $tipo = formatar($ev['categoria']); // liga com os checkboxes tipo_evento
-                    $local = formatar($ev['lugar']);    // liga com localizacao (se quiser usar no futuro)
-                    // Mapeia duração numérica (horas) para faixas usadas no filtro (opcional)
+                    $local = formatar($ev['lugar']);    // liga com localizacao
+                    $modalidadeAttr = formatar($ev['modalidade'] ?? ''); // liga com modalidade
+                    // Mapeia duração numérica (horas) para faixas usadas no filtro
                     $duracaoFaixa = '';
                     if (is_numeric($ev['duracao'])) {
                         $h = (float)$ev['duracao'];
@@ -72,7 +73,7 @@
                         elseif ($h < 4) { $duracaoFaixa = '2h_4h'; }
                         else { $duracaoFaixa = 'mais_5h'; }
                     }
-                    // Certificado: simples sim/nao (o filtro tem as mesmas palavras)
+                    // Certificado: simples sim/nao
                     $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
                 ?>
                     <a class="botao CaixaDoEvento"
@@ -83,10 +84,12 @@
                         data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>"
                         data-certificado="<?= $cert ?>"
                         data-data="<?= $dataInicioISO ?>"
+                        data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
                     >
                         <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                         <div class="EventoInfo">
                             Categoria: <?= htmlspecialchars($ev['categoria']) ?><br>
+                            Modalidade: <?= htmlspecialchars($ev['modalidade'] ?? '') ?><br>
                             Data: <?= $dataFormatada ?><br>
                             Local: <?= htmlspecialchars($ev['lugar']) ?><br>
                             Certificado: <?= ($cert === 'sim' ? 'Sim' : 'Não') ?>

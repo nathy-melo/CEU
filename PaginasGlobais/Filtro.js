@@ -155,6 +155,7 @@ function applyFiltersParticipante() {
     const locais = getChecked('localizacao');
     const duracoes = getChecked('duracao');
     const certificados = getChecked('certificado'); // novo: tipo de certificado
+    const modalidades = getChecked('modalidade'); // novo: modalidade
 
     const dataInicio = form.querySelector('input[name="data-inicio"]').value || '';
     const dataFim = form.querySelector('input[name="data-fim"]').value || '';
@@ -164,7 +165,8 @@ function applyFiltersParticipante() {
         const tipo = (card.dataset.tipo || '').toLowerCase();
         const local = (card.dataset.localizacao || '').toLowerCase();
         const duracao = (card.dataset.duracao || '').toLowerCase();
-        const certificado = (card.dataset.certificado || '').toLowerCase(); // novo
+        const certificado = (card.dataset.certificado || '').toLowerCase();
+        const modalidade = (card.dataset.modalidade || '').toLowerCase(); // novo
         const data = card.dataset.data || '';
 
         let ok = true;
@@ -172,6 +174,7 @@ function applyFiltersParticipante() {
         if (ok && locais.length) ok = locais.includes(local);
         if (ok && duracoes.length) ok = duracoes.includes(duracao);
         if (ok && certificados.length) ok = certificados.includes(certificado);
+        if (ok && modalidades.length) ok = modalidades.includes(modalidade);
         if (ok && dataInicio) ok = data >= dataInicio;
         if (ok && dataFim) ok = data <= dataFim;
 
