@@ -29,11 +29,16 @@ Senha varchar(20),
 RA char(7) null,
 Codigo varchar(8),
 Organizador tinyint(1) not null default 0,
+TemaSite tinyint(1) not null default 0,
 constraint chk_codigo_organizador check (
     (Organizador = 0) OR 
     (Organizador = 1 AND Codigo is not null)
-)
+),
+constraint chk_tema_site check (TemaSite in (0,1))
 );
+
+-- Upgrade seguro: adiciona a coluna se já existir a tabela e a coluna ainda não existir
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS TemaSite tinyint(1) NOT NULL DEFAULT 0;
 
 create table if not exists lista_de_participantes(
 CPF char(11) primary key,

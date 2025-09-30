@@ -11,7 +11,7 @@ function mostrarMensagemFaleConosco() {
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
-    container.style.background = '#4f6c8c';
+    container.style.background = 'var(--caixas)';
     container.style.borderRadius = '2em';
     container.style.padding = '2em 2.5em';
     container.style.maxWidth = '600px';

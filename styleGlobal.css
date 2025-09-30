@@ -13,6 +13,12 @@
   --sombra-leve: rgba(0, 0, 0, 0.5);
 }
 
+:root[data-theme="dark"] {
+  --fundo: #253542;
+  --caixas: #000B18;
+  --botao: #1A4090;
+}
+
 /* Estilos para o conteúdo principal quando o menu está expandido */
 #main-content {
     transition: margin-left 0.3s;
@@ -22,9 +28,10 @@
 #main-content.shifted {
     margin-left: clamp(180px, 15vw, 220px);
 }
+
 /* ============================= */
 
-/* Scrollbar global estilizada apenas com variáveis do :root */
+/* Scrollbar global */
 html, body {
     scrollbar-width: thin;
     scrollbar-color: var(--botao) var(--caixas);
@@ -70,10 +77,10 @@ body {
   align-items: center;
 }
 
-body.inicio-publico { /* Estilo para q a barra de pesquisa fique no topo */
-  align-items: flex-start;
+/* Mantém o conteúdo FIXO no topo somente na página pública de Início */
+body.pagina-inicio {
   justify-content: center;
-  width: 100%;
+  align-items: flex-start;
 }
 
 /* ====== Botões ====== */

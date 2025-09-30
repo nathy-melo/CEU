@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 
-<body>
+<body <?php if (($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio') { echo 'class="pagina-inicio"'; } ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
@@ -135,6 +135,17 @@
             conteudo.appendChild(script);
         }
 
+        // Controla a classe do body por página pública
+        function atualizarClasseBody(pagina) {
+            const b = document.body;
+            if (!b) return;
+            if (pagina === 'inicio') {
+                b.classList.add('pagina-inicio');
+            } else {
+                b.classList.remove('pagina-inicio');
+            }
+        }
+
         // =========================
         // Definição das rotas
         // =========================
@@ -248,6 +259,7 @@
                     if (novoConteudo) {
                         document.getElementById('conteudo-dinamico').innerHTML = novoConteudo.innerHTML;
                         sincronizarMenuComConteudo();
+                        atualizarClasseBody(pagina);
                         if (typeof window.setMenuAtivoPorPagina === 'function') {
                             window.setMenuAtivoPorPagina(pagina);
                         }
@@ -273,6 +285,7 @@
                 window.setMenuAtivoPorPagina(pagina);
             }
             sincronizarMenuComConteudo();
+            atualizarClasseBody(pagina);
             executarRota(pagina);
         });
     </script>

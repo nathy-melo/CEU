@@ -7,7 +7,7 @@ function mostrarMensagemInscricaoFeita() {
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
-    container.style.background = '#4f6c8c';
+    container.style.background = 'var(--caixas)';
     container.style.borderRadius = '1.875rem';
     container.style.padding = '1.875rem';
     container.style.maxWidth = '51.5625rem';

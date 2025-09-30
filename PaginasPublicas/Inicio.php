@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 
-<body class="inicio-publico">
+<body>
     <?php
     include_once '../BancoDados/conexao.php';
 

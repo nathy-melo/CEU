@@ -1,5 +1,13 @@
+<?php
+session_start();
+if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
+    header('Location: ../PaginasPublicas/ContainerPublico.php?pagina=login&erro=login_requerido');
+    exit;
+}
+$tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
+?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" <?php if ($tema_site === 1) { echo 'data-theme="dark"'; } ?> >
 
 <head>
     <meta charset="UTF-8" />
@@ -8,7 +16,7 @@
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 
-<body>
+<body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) { echo 'class="pagina-inicio"'; } ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
@@ -24,7 +32,7 @@
         'faleconosco' => '../PaginasGlobais/FaleConosco.html',
         'redefinirSenha' => '../PaginasGlobais/RedefinirSenhaConta.html',
         'emailRecuperacao' => '../PaginasGlobais/EmailDeRecuperacao.html',
-        'temaDoSite' => '../PaginasGlobais/TemaDoSite.html',
+        'temaDoSite' => '../PaginasGlobais/TemaDoSite.php',
         'manualDeUso' => '../PaginasGlobais/ManualDeUso.html',
         'duvidasFrequentes' => '../PaginasGlobais/DuvidasFrequentes.html',
         'sobreNos' => '../PaginasGlobais/SobreNos.html',
@@ -111,6 +119,35 @@
             conteudo.appendChild(script);
         }
 
+        function executarScriptsNoConteudo(containerEl) {
+            if (!containerEl) return;
+            const scripts = Array.from(containerEl.querySelectorAll('script'));
+            scripts.forEach((oldScript) => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                if (oldScript.src) {
+                    const url = new URL(oldScript.src, window.location.href);
+                    url.searchParams.set('t', Date.now());
+                    newScript.src = url.toString();
+                    newScript.async = false;
+                } else {
+                    newScript.textContent = oldScript.textContent || '';
+                }
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
+        // Controla a classe do body por página do organizador
+        function atualizarClasseBody(pagina) {
+            const b = document.body;
+            if (!b) return;
+            if (pagina === 'inicio') {
+                b.classList.add('pagina-inicio');
+            } else {
+                b.classList.remove('pagina-inicio');
+            }
+        }
+
         // =========================
         // Definição das rotas
         // =========================
@@ -134,7 +171,6 @@
                 js: ['CartaoDoEventoOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoEvento === 'function') window.inicializarEventosCartaoEvento();
-                    // Fallback: garante o botão mesmo sem init explícito
                     setTimeout(function () {
                         var btnInscrever = document.querySelector('.botao-inscrever');
                         if (btnInscrever) {
@@ -192,7 +228,7 @@
                 init: () => { }
             },
             'temaDoSite': {
-                html: '../PaginasGlobais/TemaDoSite.html',
+                html: '../PaginasGlobais/TemaDoSite.php',
                 js: [],
                 init: () => { }
             },
@@ -239,8 +275,12 @@
                     temp.innerHTML = html;
                     const novoConteudo = temp.querySelector('#conteudo-dinamico');
                     if (novoConteudo) {
-                        document.getElementById('conteudo-dinamico').innerHTML = novoConteudo.innerHTML;
+                        const alvo = document.getElementById('conteudo-dinamico');
+                        alvo.innerHTML = novoConteudo.innerHTML;
+                        // Executa scripts embutidos na página carregada (ex.: TemaDoSite.php)
+                        executarScriptsNoConteudo(alvo);
                         sincronizarMenuComConteudo();
+                        atualizarClasseBody(pagina);
                         if (typeof window.setMenuAtivoPorPagina === 'function') {
                             window.setMenuAtivoPorPagina(pagina);
                         }
@@ -266,6 +306,7 @@
                 window.setMenuAtivoPorPagina(pagina);
             }
             sincronizarMenuComConteudo();
+            atualizarClasseBody(pagina);
             executarRota(pagina);
         });
     </script>
