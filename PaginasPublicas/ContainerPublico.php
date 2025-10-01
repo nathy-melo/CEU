@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CEU</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
 </head>
 
 <body <?php if (($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio') { echo 'class="pagina-inicio"'; } ?>>

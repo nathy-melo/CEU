@@ -57,8 +57,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const caixaPreta = document.querySelector(".caixa-preta");
   if (caixaPreta) {
     caixaPreta.addEventListener("click", () => {
-      alert("Crie seu perfil para desbloquear o menu!");
-      // Adicione aqui a ação desejada para o clique na caixa preta
+      mostrarModal();
     });
   }
 });
+
+// Função para mostrar o modal personalizado
+function mostrarModal() {
+  const modal = document.getElementById("modalCustom");
+  if (modal) {
+    modal.classList.add("mostrar");
+  }
+}
+
+// Função para fechar o modal
+function fecharModal() {
+  const modal = document.getElementById("modalCustom");
+  if (modal) {
+    modal.classList.remove("mostrar");
+  }
+}
