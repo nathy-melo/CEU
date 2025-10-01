@@ -54,7 +54,7 @@ $email = mysqli_real_escape_string($conexao, $email);
 $senha = mysqli_real_escape_string($conexao, $senha);
 
 // Busca o usuário no banco (inclui TemaSite)
-$sql = "SELECT CPF, Nome, Email, Organizador, COALESCE(TemaSite, 0) AS TemaSite FROM usuario WHERE Email = '$email' AND Senha = '$senha'";
+$sql = "SELECT CPF, Nome, Email, Organizador, COALESCE(TemaSite, 0), Senha AS TemaSite FROM usuario WHERE Email = '$email'";
 $resultado = mysqli_query($conexao, $sql);
 
 // Verifica se houve erro na consulta
@@ -73,9 +73,11 @@ if (!$resultado) {
     redirecionarComErro('erro_servidor');
 }
 
-if (mysqli_num_rows($resultado) == 1) {
+$usuario = mysqli_fetch_assoc($resultado);
+$senhaHash = $usuario['Senha'];
+
+if (password_verify($senha, $senhaHash)) {  
     // Login válido - cria a sessão
-    $usuario = mysqli_fetch_assoc($resultado);
 
     // Verifica se o usuário tem dados completos
     if (empty($usuario['CPF']) || empty($usuario['Nome'])) {

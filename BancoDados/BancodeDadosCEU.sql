@@ -28,7 +28,7 @@ create table if not exists usuario(
 CPF char(11) primary key,
 Nome varchar(100),
 Email varchar(100),
-Senha varchar(20),
+Senha varchar(255),
 RA char(7) null,
 Codigo varchar(8),
 Organizador tinyint(1) not null default 0,

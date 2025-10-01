@@ -38,8 +38,10 @@
         exit();
     }
 
+    $senhaCriptografada = password_hash($senha, PASSWORD_DEFAULT);
+
     $sql = "INSERT INTO usuario (CPF, Nome, Email, Senha, Organizador) VALUES (
-        '$cpf', '$nome_completo', '$email', '$senha', 0)";
+        '$cpf', '$nome_completo', '$email', '$senhaCriptografada', 0)";
 
     mysqli_query($conexao, $sql)
         or die("Erro ao tentar cadastrar registro." . mysqli_error($conexao));

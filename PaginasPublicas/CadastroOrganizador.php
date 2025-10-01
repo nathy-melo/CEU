@@ -17,6 +17,9 @@
     $senha = $_POST['senha'];
     $codigo_acesso = $_POST['codigo_acesso'];
 
+    // Criptografa a senha antes de salvar
+    $senhaCriptografada = password_hash($senha, PASSWORD_DEFAULT);
+
     // Verifica se o código existe e se está disponível (dados NULL) ou já está sendo usado
     $SQLVerificar = "SELECT CPF, Nome, Email FROM usuario WHERE Codigo = '$codigo_acesso'";
     $ResultadoVerificar = mysqli_query($conexao, $SQLVerificar);
@@ -27,7 +30,7 @@
 
         if (is_null($usuario['CPF']) || is_null($usuario['Nome']) || is_null($usuario['Email'])) {
             // Se os dados estão NULL, pode atualizar com as informações do usuário
-            $sql = "UPDATE usuario SET CPF = '$cpf', Nome = '$nome_completo', Email = '$email', Senha = '$senha', Organizador = 1 WHERE Codigo = '$codigo_acesso'";
+            $sql = "UPDATE usuario SET CPF = '$cpf', Nome = '$nome_completo', Email = '$email', Senha = '$senhaCriptografada', Organizador = 1 WHERE Codigo = '$codigo_acesso'";
 
             mysqli_query($conexao, $sql)
                 or die("Erro ao tentar atualizar registro." . mysqli_error($conexao));
