@@ -333,10 +333,6 @@ body.pagina-inicio {
   scrollbar-width: none;
 }
 
-body.filtro-ativo {
-  overflow: hidden;
-}
-
 .filtro-titulo {
   font-size: clamp(1.4rem, 2.5vw, 1.8rem);
   font-weight: 700;
