@@ -121,8 +121,8 @@
         .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 2; }
         .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 3; }
         .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
-        .Certificado { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
-        .Modalidade { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
+        .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
+        .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
 
         .Imagem {
             grid-column: span 4 / span 4;
@@ -179,10 +179,6 @@
             transition: background .25s, transform .15s;
             width: 100%;
         }
-
-        .botao:hover { background-color: var(--botao-hover, #0253cc); }
-        .botao:active { transform: translateY(1px); }
-        .BotaoVoltar{ background: var(--botao, #0166ff); }
 
         .carrossel-imagens {
             position: relative;
@@ -293,13 +289,13 @@
             <label>Categoria:</label>
             <div class="caixa-valor"><?php echo htmlspecialchars($evento['categoria'] ?? ''); ?></div>
         </div>
-        <div class="Certificado grupo-campo">
-            <label>Certificado:</label>
-            <div class="caixa-valor"><?php echo $certificado; ?></div>
-        </div>
         <div class="Modalidade grupo-campo">
             <label>Modalidade:</label>
             <div class="caixa-valor"><?php echo htmlspecialchars($modalidade); ?></div>
+        </div>
+        <div class="Certificado grupo-campo">
+            <label>Certificado:</label>
+            <div class="caixa-valor"><?php echo $certificado; ?></div>
         </div>
         <div class="Imagem campo-imagem">
             <div class="carrossel-imagens">
