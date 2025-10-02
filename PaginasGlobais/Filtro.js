@@ -219,8 +219,18 @@ function inicializarFiltro() {
     const toggleFiltro = (event) => {
         if (event) event.stopPropagation();
         const isAtivo = filterContainer.classList.contains('ativo');
+        const mainContent = document.getElementById('main-content');
+        
         filterContainer.classList.toggle('ativo', !isAtivo);
-        document.body.classList.toggle('filtro-ativo', !isAtivo);
+        
+        // Adiciona ou remove a classe que empurra o conteúdo para a esquerda
+        if (mainContent) {
+            if (!isAtivo) {
+                mainContent.classList.add('filtro-shifted');
+            } else {
+                mainContent.classList.remove('filtro-shifted');
+            }
+        }
     };
 
     filterButton.addEventListener('click', toggleFiltro);
