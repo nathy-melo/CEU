@@ -21,12 +21,24 @@
 
 /* Estilos para o conteúdo principal quando o menu está expandido */
 #main-content {
-    transition: margin-left 0.3s;
+    transition: margin-left 0.3s, margin-right 0.3s;
     margin-left: 0;
+    margin-right: 0;
 }
 
 #main-content.shifted {
     margin-left: clamp(180px, 15vw, 220px);
+}
+
+/* Estilos para o conteúdo principal quando o filtro está ativo */
+#main-content.filtro-shifted {
+    margin-right: clamp(150px, 15vw, 300px);
+}
+
+/* Quando ambos estão ativos (menu + filtro) */
+#main-content.shifted.filtro-shifted {
+    margin-left: clamp(180px, 15vw, 220px);
+    margin-right: clamp(150px, 15vw, 300px);
 }
 
 /* ============================= */
@@ -101,13 +113,14 @@ body.pagina-inicio {
 
 /* ====== Páginas de listagem de eventos ====== */
 .barra-pesquisa-container {
-  max-width: clamp(310px, 86%, 1150px);
+  max-width: 100%;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: clamp(8px, 1.5vw, 10px);
   margin: clamp(12px, 3vw, 20px) auto;
+  padding: 0 clamp(12px, 4vw, 40px);
 }
 
 .barra-pesquisa {
@@ -242,23 +255,46 @@ body.pagina-inicio {
 
 .container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 25vw, 300px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: clamp(12px, 2vw, 23px);
-  max-width: clamp(320px, 86vw, 1200px);
+  width: 90vw;
   padding: 0 clamp(12px, 4vw, 40px) clamp(12px, 4vw, 40px);
   margin: 0 auto;
+  box-sizing: border-box;
+  transition: width 1s ease;
+}
+
+/* Ajustes para quando só o menu está aberto */
+#main-content.shifted .container {
+  width: 75vw;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* Ajustes para quando só o filtro está aberto - caixas maiores */
+#main-content.filtro-shifted .container {
+  width: 75vw;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* Ajustes para quando ambos estão abertos */
+#main-content.shifted.filtro-shifted .container {
+  width: 60vw;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .CaixaDoEvento {
   background-color: var(--branco);
   border-radius: clamp(8px, 1.5vw, 10px);
-  padding: clamp(8px, 1.2vw, 11.5px);
+  padding: clamp(10px, 1.5vw, 15px);
   box-shadow: clamp(1px, 0.3vw, 2px) clamp(1px, 0.3vw, 2px) clamp(12px, 2.5vw, 15px) var(--sombra-forte);
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  height: clamp(140px, 30vh, 250px);
+  justify-content: space-between;
+  height: auto;
+  aspect-ratio: 3 / 2;
   position: relative;
+  overflow: hidden;
+  container-type: inline-size;
 }
 
 .CaixaDoEvento:hover {
@@ -267,17 +303,26 @@ body.pagina-inicio {
 }
 
 .EventoTitulo {
-  font-size: clamp(1rem, 1.2rem, 1.4rem);
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
   font-weight: bold;
-  margin-bottom: clamp(8px, 1.5vw, 11px);
+  margin-bottom: clamp(4px, 0.8vw, 8px);
   color: var(--azul-escuro);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .EventoInfo {
   color: var(--cinza-escuro);
-  line-height: clamp(1.4, 1.5vw, 1.6);
+  font-size: clamp(0.7rem, 0.9vw, 0.85rem);
+  line-height: 1.35;
   margin-top: auto;
   text-align: left;
+  overflow: hidden;
+  word-wrap: break-word;
+  flex-shrink: 1;
+  display: block;
 }
 
 .CaixaDoEventoAdicionar {
@@ -292,22 +337,16 @@ body.pagina-inicio {
   border-radius: clamp(8px, 1.2vw, 10px);
   background-color: #f0f8ff;
   transition: background-color 0.3s, transform 0.3s;
-  min-height: clamp(140px, 20vh, 180px);
+  aspect-ratio: 3 / 2;
 }
-
-.CaixaDoEventoAdicionar:hover {
-  background-color: #e6f2ff;
-  transform: scale(1.05);
-}
-
 
 /* ====== Filtro lateral dos eventos ====== */
 .filtro-container {
-  max-width: clamp(320px, 30vw, 380px);
-  width: clamp(85%, 90vw, 90%);
+  max-width: clamp(200px, 18%, 320px);
+  width: clamp(200px, 18%, 320px);
   height: 100vh;
   background-color: var(--caixas);
-  padding: clamp(0.8rem, 1.5vw, 1rem) clamp(1.2rem, 2vw, 1.5rem) clamp(1.6rem, 2.5vw, 2rem);
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2rem);
   color: var(--branco);
   position: fixed;
   top: 0;
@@ -315,7 +354,7 @@ body.pagina-inicio {
   transform: translateX(100%);
   transition: transform 0.4s ease-in-out;
   z-index: 1000;
-  box-shadow: 0px clamp(6px, 1.2vw, 8px) clamp(12px, 2.5vw, 16px) 0px rgba(0, 0, 0, 0.2);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
   overflow-y: auto;
   display: block;
 }
@@ -334,13 +373,13 @@ body.pagina-inicio {
 }
 
 .filtro-titulo {
-  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
   font-weight: 700;
   text-align: center;
-  margin: 0 0 clamp(0.8rem, 1.5vw, 1rem) 0;
+  margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0;
   text-shadow: var(--sombra-padrao);
   text-decoration: underline;
-  text-underline-offset: clamp(4px, 1vw, 6px);
+  text-underline-offset: clamp(4px, 0.8vw, 6px);
 }
 
 .filtro-grupo {
@@ -352,11 +391,11 @@ body.pagina-inicio {
 .grupo-titulo {
   display: flex;
   align-items: center;
-  gap: clamp(0.3rem, 0.8vw, 0.5rem);
-  margin: 0 0 clamp(0.8rem, 1.5vw, 1rem) 0;
+  gap: clamp(0.4rem, 0.8vw, 0.6rem);
+  margin: clamp(0.8rem, 1.5vw, 1.2rem) 0 clamp(0.6rem, 1.2vw, 1rem) 0;
   padding: 0;
   width: 100%;
-  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
   font-weight: 700;
   text-shadow: var(--sombra-padrao);
   text-decoration: underline;
@@ -366,7 +405,7 @@ body.pagina-inicio {
 .titulo-icone {
   width: clamp(12px, 2vw, 16px);
   height: clamp(12px, 2vw, 16px);
-  border: clamp(0.8px, 0.15vw, 1px) solid var(--branco);
+  border: clamp(1.5px, 0.3vw, 2px) solid var(--branco);
   background-color: transparent;
   display: inline-block;
   flex-shrink: 0;
@@ -379,19 +418,20 @@ body.pagina-inicio {
 
 .entradas-data {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: clamp(0.6rem, 1.2vw, 0.8rem);
 }
 
 .entrada-data {
   display: flex;
-  align-items: center;
-  gap: clamp(0.3rem, 0.8vw, 0.5rem);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.3rem, 0.6vw, 0.4rem);
 }
 
 .texto-data {
-  font-size: clamp(1rem, 1.8vw, 1.2rem);
-  font-weight: 400;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 500;
   line-height: 1.3;
   text-shadow: var(--shadow-md);
   margin: 0;
@@ -399,21 +439,30 @@ body.pagina-inicio {
 
 .input-data {
   background-color: #ffffff;
-  border: none;
+  border: 1px solid #ddd;
   border-radius: clamp(4px, 0.8vw, 6px);
-  padding: clamp(0.3rem, 0.8vw, 0.5rem);
+  padding: clamp(0.4rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 0.7rem);
   color: var(--azul-escuro);
   font-family: inherit;
+  font-size: clamp(0.8rem, 1.4vw, 0.95rem);
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: 500;
+}
+
+.input-data:focus {
+  outline: 2px solid var(--branco);
+  border-color: var(--branco);
 }
 
 .divisor {
-  margin: clamp(1.2rem, 2vw, 1.5rem) 0;
+  margin: clamp(1rem, 2vw, 1.5rem) 0;
 }
 
 .divisor-linha {
   width: 100%;
-  height: clamp(0.8px, 0.15vw, 1px);
-  background-color: var(--azul-escuro);
+  height: clamp(1.5px, 0.3vw, 2px);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .colunas-checkbox {
@@ -424,25 +473,30 @@ body.pagina-inicio {
 .coluna {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.3rem, 0.8vw, 0.5rem);
+  gap: clamp(0.4rem, 0.8vw, 0.6rem);
 }
 
 .lista-checkbox {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.3rem, 0.8vw, 0.5rem);
+  gap: clamp(0.5rem, 1vw, 0.7rem);
 }
 
 .item-checkbox {
   display: flex;
   align-items: center;
-  gap: clamp(0.8rem, 1.5vw, 1rem);
-  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  gap: clamp(0.6rem, 1.2vw, 0.8rem);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
   font-weight: 400;
   text-shadow: var(--sombra-padrao);
   cursor: pointer;
-  line-height: 1.3;
+  line-height: 1.4;
   position: relative;
+  padding: clamp(0.15rem, 0.3vw, 0.2rem) 0;
+}
+
+.item-checkbox:hover {
+  opacity: 0.9;
 }
 
 .item-checkbox input[type="checkbox"] {
@@ -454,17 +508,19 @@ body.pagina-inicio {
 }
 
 .item-checkbox .checkbox-personalizado {
-  height: clamp(10px, 1.5vw, 12px);
-  width: clamp(10px, 1.5vw, 12px);
+  height: clamp(14px, 2.5vw, 18px);
+  width: clamp(14px, 2.5vw, 18px);
   background-color: transparent;
-  border: clamp(0.8px, 0.15vw, 1px) solid var(--branco);
+  border: clamp(1.5px, 0.3vw, 2px) solid var(--branco);
   display: inline-block;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 3px;
+  transition: all 0.2s ease;
 }
 
 .item-checkbox input:checked~.checkbox-personalizado {
   background-color: var(--branco);
+  box-shadow: 0 0 0 2px var(--caixas) inset;
 }
 
 /* ====== Estilos dos Menus Laterais ====== */
