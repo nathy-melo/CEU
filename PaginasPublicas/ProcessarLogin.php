@@ -53,8 +53,10 @@ if (strlen($senha) < 4) {
 $email = mysqli_real_escape_string($conexao, $email);
 $senha = mysqli_real_escape_string($conexao, $senha);
 
-// Busca o usuário no banco (inclui TemaSite)
-$sql = "SELECT CPF, Nome, Email, Organizador, COALESCE(TemaSite, 0), Senha AS TemaSite FROM usuario WHERE Email = '$email'";
+// Busca o usuário no banco (inclui TemaSite corretamente e mantém a coluna Senha com seu nome)
+// OBS: Antes a query alias-ava Senha como TemaSite, sobrescrevendo o TemaSite verdadeiro e
+// removendo a chave 'Senha' do resultado -> password_verify sempre falhava.
+$sql = "SELECT CPF, Nome, Email, Organizador, COALESCE(TemaSite, 0) AS TemaSite, Senha FROM usuario WHERE Email = '$email'";
 $resultado = mysqli_query($conexao, $sql);
 
 // Verifica se houve erro na consulta
@@ -74,9 +76,16 @@ if (!$resultado) {
 }
 
 $usuario = mysqli_fetch_assoc($resultado);
+
+// Se não encontrou usuário
+if (!$usuario) {
+    mysqli_close($conexao);
+    redirecionarComErro('credenciais_invalidas');
+}
+
 $senhaHash = $usuario['Senha'];
 
-if (password_verify($senha, $senhaHash)) {  
+if ($senhaHash && password_verify($senha, $senhaHash)) {  
     // Login válido - cria a sessão
 
     // Verifica se o usuário tem dados completos

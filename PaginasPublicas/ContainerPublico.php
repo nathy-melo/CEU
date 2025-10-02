@@ -288,8 +288,11 @@
             sincronizarMenuComConteudo();
             atualizarClasseBody(pagina);
             executarRota(pagina);
+            // Garante aplicação dos botões de senha após primeira carga
+            if (typeof window.aplicarToggleSenhas === 'function') { window.aplicarToggleSenhas(); }
         });
     </script>
+    <script src="ToggleSenha.js"></script>
 </body>
 
 </html>
