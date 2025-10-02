@@ -255,9 +255,9 @@ body.pagina-inicio {
 
 .container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: clamp(12px, 2vw, 23px);
-  width: 85vw;
+  width: 90vw;
   padding: 0 clamp(12px, 4vw, 40px) clamp(12px, 4vw, 40px);
   margin: 0 auto;
   box-sizing: border-box;
@@ -308,9 +308,6 @@ body.pagina-inicio {
   margin-bottom: clamp(4px, 0.8vw, 8px);
   color: var(--azul-escuro);
   line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 0;
