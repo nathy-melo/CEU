@@ -2,10 +2,10 @@
 
 // ========== CONFIGURAÇÕES PARA TESTES ==========
 // Mude estas variáveis para true/false para ativar/desativar validações
-var VALIDAR_CPF = true;           // true = valida CPF, false = não valida
-var VALIDAR_EMAIL = true;         // true = valida email, false = não valida  
-var VALIDAR_SENHA = true;         // true = valida senha, false = não valida
-var SENHA_MINIMA = 8;             // mínimo de caracteres (0 = desativar)
+var VALIDAR_CPF = false;           // true = valida CPF, false = não valida
+var VALIDAR_EMAIL = false;         // true = valida email, false = não valida  
+var VALIDAR_SENHA = false;         // true = valida senha, false = não valida
+var SENHA_MINIMA = 0;             // mínimo de caracteres (0 = desativar)
 // ================================================
 
 function validarCadastroParticipante() {
@@ -59,20 +59,9 @@ function validarCadastroParticipante() {
         return false;
     }
 
-    mostrarMensagem('🔄 Cadastrando...', 'info', 'erro-cadastro');
-
-    var botao = document.getElementById('btnCadastrar');
-    if (botao) {
-        botao.disabled = true;
-        botao.textContent = 'Cadastrando...';
-
-        setTimeout(function reativarBotaoCadastroParticipanteDepoisDoAtraso() {
-            botao.disabled = false;
-            botao.textContent = 'Cadastrar';
-        }, 5000);
-    }
-
-    return true;
+    // Envio via AJAX
+    enviarCadastroAjax('form-cadastro-participante', 'CadastroParticipante.php');
+    return false; // evita envio padrão
 }
 
 function validarCadastroOrganizador() {
@@ -128,20 +117,8 @@ function validarCadastroOrganizador() {
         return false;
     }
 
-    mostrarMensagem('🔄 Cadastrando...', 'info', 'erro-cadastro');
-
-    var botao = document.getElementById('btnCadastrar');
-    if (botao) {
-        botao.disabled = true;
-        botao.textContent = 'Cadastrando...';
-
-        setTimeout(function reativarBotaoCadastroOrganizadorDepoisDoAtraso() {
-            botao.disabled = false;
-            botao.textContent = 'Cadastrar';
-        }, 5000);
-    }
-
-    return true;
+    enviarCadastroAjax('form-cadastro-organizador', 'CadastroOrganizador.php');
+    return false;
 }
 
 function inicializarValidacoesCadastro() {
@@ -155,9 +132,7 @@ function inicializarValidacoesCadastro() {
     var formParticipante = document.getElementById('form-cadastro-participante');
     if (formParticipante && !formParticipante.dataset.validacaoCadastroAtiva) {
         formParticipante.addEventListener('submit', function validarEnvioCadastroParticipante(event) {
-            if (!validarCadastroParticipante()) {
-                event.preventDefault();
-            }
+            if (!validarCadastroParticipante()) { event.preventDefault(); }
         });
         formParticipante.dataset.validacaoCadastroAtiva = '1';
     }
@@ -222,9 +197,7 @@ function inicializarValidacoesCadastro() {
     var formOrganizador = document.getElementById('form-cadastro-organizador');
     if (formOrganizador && !formOrganizador.dataset.validacaoCadastroAtiva) {
         formOrganizador.addEventListener('submit', function validarEnvioCadastroOrganizador(event) {
-            if (!validarCadastroOrganizador()) {
-                event.preventDefault();
-            }
+            if (!validarCadastroOrganizador()) { event.preventDefault(); }
         });
         formOrganizador.dataset.validacaoCadastroAtiva = '1';
     }
@@ -285,6 +258,9 @@ function inicializarValidacoesCadastro() {
         });
         confirmarOrganizador.dataset.validacaoCadastroAtiva = '1';
     }
+
+    // Aplica toggle global (script ToggleSenha.js)
+    if (typeof window.aplicarToggleSenhas === 'function') { window.aplicarToggleSenhas(); }
     
 }
 
@@ -296,6 +272,60 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializarValidacoesCadastro);
 } else {
     inicializarValidacoesCadastro();
+}
+
+// ================= Envio AJAX Reutilizável =================
+function enviarCadastroAjax(idFormulario, urlDestino) {
+    var formulario = document.getElementById(idFormulario);
+    if (!formulario) return;
+
+    var botaoCadastrar = document.getElementById('btnCadastrar');
+    if (botaoCadastrar) { botaoCadastrar.disabled = true; botaoCadastrar.textContent = 'Cadastrando...'; }
+    mostrarMensagem('🔄 Cadastrando...', 'info', 'erro-cadastro');
+
+    var dadosFormulario = new FormData(formulario);
+    var requisicao = new XMLHttpRequest();
+    requisicao.open('POST', urlDestino, true);
+    requisicao.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    requisicao.onreadystatechange = function() {
+        if (requisicao.readyState === 4) {
+            if (botaoCadastrar) { botaoCadastrar.disabled = false; botaoCadastrar.textContent = 'Cadastrar'; }
+            try {
+                var resposta = JSON.parse(requisicao.responseText);
+                if (resposta.status === 'sucesso') {
+                    var segundosRestantes = 10;
+                    function atualizarMensagemSucesso(){
+                        var textoBase = (resposta.mensagem || '✅ Cadastro realizado!');
+                        mostrarMensagem(textoBase, 'sucesso', 'erro-cadastro');
+                        var caixaMensagem = document.getElementById('erro-cadastro');
+                        if (caixaMensagem) {
+                            caixaMensagem.classList.add('mensagem-multilinha');
+                            caixaMensagem.innerHTML = '<span>' + textoBase + '</span><br><span style="font-weight:500; font-size:0.9em; opacity:0.9;">Redirecionando em ' + segundosRestantes + 's...</span>';
+                        }
+                    }
+                    atualizarMensagemSucesso();
+                    var temporizador = setInterval(function(){
+                        segundosRestantes--;
+                        if (segundosRestantes <= 0){
+                            clearInterval(temporizador);
+                            carregarPagina('login');
+                        } else {
+                            atualizarMensagemSucesso();
+                        }
+                    }, 1000);
+                } else {
+                    mostrarMensagem(resposta.mensagem || '❌ Erro ao cadastrar.', 'erro', 'erro-cadastro');
+                }
+            } catch(erro){
+                mostrarMensagem('❌ Erro inesperado. Tente novamente.', 'erro', 'erro-cadastro');
+            }
+        }
+    };
+    requisicao.onerror = function(){
+        if (botaoCadastrar) { botaoCadastrar.disabled = false; botaoCadastrar.textContent = 'Cadastrar'; }
+        mostrarMensagem('❌ Falha de rede. Verifique sua conexão.', 'erro', 'erro-cadastro');
+    };
+    requisicao.send(dadosFormulario);
 }
 
 /* 

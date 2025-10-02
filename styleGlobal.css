@@ -688,3 +688,58 @@ body.pagina-inicio {
   transition: background-color 0.3s ease;
 }
 
+/* ======================= */
+/* Toggle de Senha (Global)*/
+/* ======================= */
+.btn-toggle-senha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0.8em; /* alinhado ao padding horizontal interno */
+  width: 1.6em;
+  height: 1.6em;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0;            /* escondido inicialmente */
+  pointer-events: none;   /* não clicável enquanto invisível */
+  transition: opacity 0.25s ease;
+}
+
+.btn-toggle-senha img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: brightness(0) invert(0.2);
+}
+
+body[data-theme="dark"] .btn-toggle-senha img {
+  filter: brightness(1) invert(0);
+}
+
+.btn-toggle-senha--visivel {
+  opacity: 0.85;
+  pointer-events: auto;
+}
+
+.btn-toggle-senha--visivel:hover {
+  opacity: 1;
+}
+
+/* Mensagens multiline do cadastro */
+#erro-cadastro.mensagem-multilinha {
+  line-height: 1.2;
+  flex-direction: column;
+}
+
+#erro-cadastro.mensagem-duas-linhas {
+  line-height: 1.15;
+}
+

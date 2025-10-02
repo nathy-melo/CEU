@@ -1,15 +1,15 @@
 // Validações específicas da página de login
 
 function validarLogin() {
-    var emailInput = document.getElementById('email');
-    var senhaInput = document.getElementById('password');
+    var campoEmail = document.getElementById('email');
+    var campoSenha = document.getElementById('password');
 
-    if (!emailInput || !senhaInput) {
+    if (!campoEmail || !campoSenha) {
         return true;
     }
 
-    var email = emailInput.value.trim();
-    var senha = senhaInput.value.trim();
+    var email = campoEmail.value.trim();
+    var senha = campoSenha.value.trim();
 
     if (!email || !senha) {
         mostrarMensagem('⚠️ Todos os campos são obrigatórios!', 'erro', 'erro-login');
@@ -28,14 +28,14 @@ function validarLogin() {
 
     mostrarMensagem('🔄 Verificando suas credenciais...', 'info', 'erro-login');
 
-    var botao = document.querySelector('.botao-login');
-    if (botao) {
-        botao.disabled = true;
-        botao.textContent = 'Entrando...';
+    var botaoEntrar = document.querySelector('.botao-login');
+    if (botaoEntrar) {
+        botaoEntrar.disabled = true;
+        botaoEntrar.textContent = 'Entrando...';
 
         setTimeout(function reativarBotaoLoginDepoisDoAtraso() {
-            botao.disabled = false;
-            botao.textContent = 'Entrar';
+            botaoEntrar.disabled = false;
+            botaoEntrar.textContent = 'Entrar';
         }, 5000);
     }
 
@@ -45,42 +45,43 @@ function validarLogin() {
 function inicializarValidacoesLogin() {
     exibirErroURLPadrao();
 
-    var formLogin = document.getElementById('form-login');
-    if (formLogin && !formLogin.dataset.validacaoLoginAtiva) {
-        formLogin.addEventListener('submit', function validarEnvioDoFormularioLogin(event) {
+    // Aplica toggle global (script ToggleSenha.js)
+    if (typeof window.aplicarToggleSenhas === 'function') { window.aplicarToggleSenhas(); }
+
+    var formularioLogin = document.getElementById('form-login');
+    if (formularioLogin && !formularioLogin.dataset.validacaoLoginAtiva) {
+        formularioLogin.addEventListener('submit', function validarEnvioDoFormularioLogin(event) {
             if (!validarLogin()) {
                 event.preventDefault();
             }
         });
-        formLogin.dataset.validacaoLoginAtiva = '1';
+        formularioLogin.dataset.validacaoLoginAtiva = '1';
     }
-
-    var emailLogin = document.getElementById('email');
-    if (emailLogin && !emailLogin.dataset.validacaoLoginAtiva) {
-        emailLogin.addEventListener('focus', function limparErrosAoFocarEmailLogin() {
+    var campoEmailLogin = document.getElementById('email');
+    if (campoEmailLogin && !campoEmailLogin.dataset.validacaoLoginAtiva) {
+        campoEmailLogin.addEventListener('focus', function limparErrosAoFocarEmailLogin() {
             limparMensagens('erro-login');
         });
-        emailLogin.addEventListener('blur', function validarEmailLoginAoPerderFoco() {
-            var valor = emailLogin.value.trim();
+        campoEmailLogin.addEventListener('blur', function validarEmailLoginAoPerderFoco() {
+            var valor = campoEmailLogin.value.trim();
             if (valor && !validarEmail(valor)) {
                 mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-login');
             }
         });
-        emailLogin.dataset.validacaoLoginAtiva = '1';
+        campoEmailLogin.dataset.validacaoLoginAtiva = '1';
     }
-
-    var senhaLogin = document.getElementById('password');
-    if (senhaLogin && !senhaLogin.dataset.validacaoLoginAtiva) {
-        senhaLogin.addEventListener('focus', function limparErrosAoFocarSenhaLogin() {
+    var campoSenhaLogin = document.getElementById('password');
+    if (campoSenhaLogin && !campoSenhaLogin.dataset.validacaoLoginAtiva) {
+        campoSenhaLogin.addEventListener('focus', function limparErrosAoFocarSenhaLogin() {
             limparMensagens('erro-login');
         });
-        senhaLogin.addEventListener('blur', function validarSenhaLoginAoPerderFoco() {
-            var valor = senhaLogin.value.trim();
+        campoSenhaLogin.addEventListener('blur', function validarSenhaLoginAoPerderFoco() {
+            var valor = campoSenhaLogin.value.trim();
             if (valor && valor.length < 8) {
                 mostrarMensagem('⚠️ A senha deve ter pelo menos 8 caracteres!', 'erro', 'erro-login');
             }
         });
-        senhaLogin.dataset.validacaoLoginAtiva = '1';
+        campoSenhaLogin.dataset.validacaoLoginAtiva = '1';
     }
 }
 
@@ -88,8 +89,5 @@ if (typeof window !== 'undefined') {
     window.inicializarValidacoesLogin = inicializarValidacoesLogin;
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializarValidacoesLogin);
-} else {
-    inicializarValidacoesLogin();
-}
+if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', inicializarValidacoesLogin); }
+else { inicializarValidacoesLogin(); }

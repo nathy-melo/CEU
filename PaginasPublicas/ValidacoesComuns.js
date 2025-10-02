@@ -29,8 +29,26 @@ function mostrarMensagem(mensagem, tipo, containerId) {
         caixinha.classList.add('info');
     }
 
-    caixinha.textContent = mensagem;
+    // Detecta se é multi-linha (permitiremos <br> depois que o chamador ajustar innerHTML)
+    var multiline = /<br\s*\/?>/i.test(mensagem) || mensagem.length > 90; // heurística simples
+    // Mantém somente texto inicialmente para evitar injection
+    caixinha.innerHTML = '';
+    caixinha.textContent = mensagem.replace(/<br\s*\/?>/ig, ' ');
     caixinha.style.display = 'block';
+    caixinha.classList.toggle('mensagem-duas-linhas', multiline);
+
+    var TERMOS_BOTTOM_BASE = 4.5;       // distância padrão em 'em'
+    var TERMOS_BOTTOM_MULTILINE = 3;  // distância quando mensagem tem 2+ linhas
+
+
+    // Aplicação simples: escolhe um bottom fixo dependendo se é multi-linha
+    var termosEls = document.querySelectorAll('.cartao-cadastro-termos');
+    termosEls.forEach(function (el) {
+        if (!el.dataset.bottomOriginal) {
+            el.dataset.bottomOriginal = (window.getComputedStyle(el).bottom || TERMOS_BOTTOM_BASE + 'em');
+        }
+        el.style.bottom = (multiline ? TERMOS_BOTTOM_MULTILINE : TERMOS_BOTTOM_BASE) + 'em';
+    });
 
     var cartaoCadastro = caixinha.closest('.cartao-cadastro');
     if (cartaoCadastro) {
@@ -58,6 +76,12 @@ function limparMensagens(containerId) {
     if (caixinha) {
         caixinha.style.display = 'none';
         caixinha.textContent = '';
+        caixinha.classList.remove('mensagem-duas-linhas');
+        var cartao = caixinha.closest('.cartao-cadastro-formulario');
+        var spacer = cartao ? cartao.querySelector('[data-spacer="cadastro"]') : null;
+        if (spacer) {
+            spacer.style.height = '1.65em';
+        }
         caixinha.classList.remove('sucesso');
         caixinha.classList.remove('info');
 
@@ -80,6 +104,11 @@ function limparMensagens(containerId) {
             }
         }
     }
+    // Restaura posição fixada para estado base
+    var termosEls = document.querySelectorAll('.cartao-cadastro-termos');
+    termosEls.forEach(function (el) {
+        el.style.bottom = TERMOS_BOTTOM_BASE + 'em';
+    });
 }
 
 // VALIDAÇÕES BÁSICAS
@@ -90,7 +119,7 @@ function validarEmail(email) {
 
 // Logica desativada por facilidade de testes
 function validarCPF(cpf) {
-    
+
     if (!cpf) {
         return false;
     }
@@ -133,7 +162,7 @@ function validarCPF(cpf) {
     }
 
     return resto === parseInt(cpf.charAt(10));
-    
+
 }
 
 function adicionarMascara(input, mascara) {
@@ -167,20 +196,14 @@ function adicionarMascara(input, mascara) {
 
 // ERROS DA URL
 function exibirErroURLPadrao() {
-    var pagina = window.location.search;
-    if (!pagina || pagina.indexOf('erro=') === -1) {
+    var busca = window.location.search;
+    if (!busca || busca.indexOf('erro=') === -1) {
         return;
     }
 
-    var tipoErro = '';
-    var partes = pagina.split('erro=');
-    if (partes.length > 1) {
-        tipoErro = partes[1].split('&')[0];
-    }
-
-    if (!tipoErro) {
-        return;
-    }
+    var params = new URLSearchParams(busca);
+    var tipoErro = params.get('erro');
+    if (!tipoErro) { return; }
 
     var mensagem = '❌ Erro desconhecido. Tente novamente.';
 
@@ -227,8 +250,12 @@ function exibirErroURLPadrao() {
 
     mostrarMensagem(mensagem);
 
-    var urlSemParametros = window.location.href.split('?')[0];
+    // Remove somente o parâmetro 'erro' mantendo outros (ex: pagina=login)
+    params.delete('erro');
+    var novaQuery = params.toString();
+    var base = window.location.href.split('?')[0];
+    var novaURL = novaQuery ? (base + '?' + novaQuery) : base;
     if (window.history && window.history.replaceState) {
-        window.history.replaceState({}, document.title, urlSemParametros);
+        window.history.replaceState({}, document.title, novaURL);
     }
 }
