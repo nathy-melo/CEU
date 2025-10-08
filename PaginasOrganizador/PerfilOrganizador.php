@@ -182,8 +182,11 @@ mysqli_close($conexao);
     }
 
     .botao-cancelar {
-        background-color: #6c757d;
+        background-color: #dc3545;
         width: 8.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .botao-excluir {

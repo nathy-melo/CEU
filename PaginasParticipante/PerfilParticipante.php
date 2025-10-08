@@ -151,7 +151,9 @@ mysqli_close($conexao);
 
     .acoes-formulario {
         margin-top: 1.25rem;
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
     }
 
     .botao {
@@ -169,25 +171,26 @@ mysqli_close($conexao);
         background-color: var(--botao);
     }
 
+    .botao:hover {
+        opacity: 0.9;
+    }
+
     .botao-editar {
         background-color: var(--botao);
         width: 7.5rem;
-        float: right;
     }
 
     .botao-salvar {
         background-color: #28a745;
         width: 7.5rem;
-        float: right;
-        margin-right: 0.5rem;
     }
 
     .botao-cancelar {
-        background-color: #6c757d;
+        background-color: #dc3545;
         width: 7.5rem;
-        float: right;
-        clear: right;
-        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .botao-excluir {
