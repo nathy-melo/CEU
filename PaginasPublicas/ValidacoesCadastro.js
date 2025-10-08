@@ -28,23 +28,23 @@ function validarCadastroParticipante() {
         return false;
     }
 
-    if (MODO_TESTE_CADASTRO_CPF) {
+    if (VALIDAR_CPF) {
         if (!validarCPF(cpf)) {
             mostrarMensagem('⚠️ CPF inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (MODO_TESTE_CADASTRO_EMAIL) {
+    if (VALIDAR_EMAIL) {
         if (!validarEmail(email)) {
             mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (MODO_TESTE_CADASTRO_SENHA) {
-        if (MODO_TESTE_SENHA_MINIMA > 0 && senha.length < MODO_TESTE_SENHA_MINIMA) {
-            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+    if (VALIDAR_SENHA) {
+        if (SENHA_MINIMA > 0 && senha.length < SENHA_MINIMA) {
+            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
             return false;
         }
 
@@ -86,23 +86,23 @@ function validarCadastroOrganizador() {
         return false;
     }
 
-    if (MODO_TESTE_CADASTRO_CPF) {
+    if (VALIDAR_CPF) {
         if (!validarCPF(cpf)) {
             mostrarMensagem('⚠️ CPF inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (MODO_TESTE_CADASTRO_EMAIL) {
+    if (VALIDAR_EMAIL) {
         if (!validarEmail(email)) {
             mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (MODO_TESTE_CADASTRO_SENHA) {
-        if (MODO_TESTE_SENHA_MINIMA > 0 && senha.length < MODO_TESTE_SENHA_MINIMA) {
-            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+    if (VALIDAR_SENHA) {
+        if (SENHA_MINIMA > 0 && senha.length < SENHA_MINIMA) {
+            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
             return false;
         }
 
@@ -153,7 +153,7 @@ function inicializarValidacoesCadastro() {
         });
         emailParticipante.addEventListener('blur', function validarEmailParticipanteAoPerderFoco() {
             var valor = emailParticipante.value.trim();
-            if (valor && MODO_TESTE_CADASTRO_EMAIL) {
+            if (valor && VALIDAR_EMAIL) {
                 if (!validarEmail(valor)) {
                     mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
                 }
@@ -169,9 +169,9 @@ function inicializarValidacoesCadastro() {
         });
         senhaParticipante.addEventListener('blur', function validarSenhaParticipanteAoPerderFoco() {
             var valorSenha = senhaParticipante.value.trim();
-            if (valorSenha && MODO_TESTE_CADASTRO_SENHA) {
-                if (MODO_TESTE_SENHA_MINIMA > 0 && valorSenha.length < MODO_TESTE_SENHA_MINIMA) {
-                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+            if (valorSenha && VALIDAR_SENHA) {
+                if (SENHA_MINIMA > 0 && valorSenha.length < SENHA_MINIMA) {
+                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
                 }
             }
         });
@@ -185,7 +185,7 @@ function inicializarValidacoesCadastro() {
         confirmarParticipante.addEventListener('blur', function validarConfirmacaoParticipanteAoPerderFoco() {
             var valorSenha = senhaParticipante ? senhaParticipante.value.trim() : '';
             var valorConfirmar = confirmarParticipante.value.trim();
-            if (valorConfirmar && MODO_TESTE_CADASTRO_SENHA) {
+            if (valorConfirmar && VALIDAR_SENHA) {
                 if (valorConfirmar !== valorSenha) {
                     mostrarMensagem('⚠️ As senhas não coincidem!', 'erro', 'erro-cadastro');
                 }
@@ -218,7 +218,7 @@ function inicializarValidacoesCadastro() {
         });
         emailOrganizador.addEventListener('blur', function validarEmailOrganizadorAoPerderFoco() {
             var valorOrganizador = emailOrganizador.value.trim();
-            if (valorOrganizador && MODO_TESTE_CADASTRO_EMAIL) {
+            if (valorOrganizador && VALIDAR_EMAIL) {
                 if (!validarEmail(valorOrganizador)) {
                     mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
                 }
@@ -234,9 +234,9 @@ function inicializarValidacoesCadastro() {
         });
         senhaOrganizador.addEventListener('blur', function validarSenhaOrganizadorAoPerderFoco() {
             var valorSenhaOrganizador = senhaOrganizador.value.trim();
-            if (valorSenhaOrganizador && MODO_TESTE_CADASTRO_SENHA) {
-                if (MODO_TESTE_SENHA_MINIMA > 0 && valorSenhaOrganizador.length < MODO_TESTE_SENHA_MINIMA) {
-                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+            if (valorSenhaOrganizador && VALIDAR_SENHA) {
+                if (SENHA_MINIMA > 0 && valorSenhaOrganizador.length < SENHA_MINIMA) {
+                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
                 }
             }
         });
@@ -250,7 +250,7 @@ function inicializarValidacoesCadastro() {
         confirmarOrganizador.addEventListener('blur', function validarConfirmacaoOrganizadorAoPerderFoco() {
             var valorSenhaOrganizador = senhaOrganizador ? senhaOrganizador.value.trim() : '';
             var valorConfirmarOrganizador = confirmarOrganizador.value.trim();
-            if (valorConfirmarOrganizador && MODO_TESTE_CADASTRO_SENHA) {
+            if (valorConfirmarOrganizador && VALIDAR_SENHA) {
                 if (valorConfirmarOrganizador !== valorSenhaOrganizador) {
                     mostrarMensagem('⚠️ As senhas não coincidem!', 'erro', 'erro-cadastro');
                 }
