@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Simplificado - CEU Admin</title>
+    <link rel="stylesheet" href="styleAdmin.css">
+</head>
+
+<body>
+    <div class="admin-login-container">
+        <div class="admin-login-box">
+            <div class="admin-logo">
+                🔐
+            </div>
+            <h2 class="admin-title">Acesso Administrativo</h2>
+            <p class="admin-subtitle">Sistema de gerenciamento de códigos</p>
+
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="usuario">Usuário:</label>
+                    <input type="text" id="usuario" name="usuario" value="infofriends" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" name="senha" value="12345678" required
+                        autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-admin-login">
+                    Entrar no Sistema
+                </button>
+
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+
+            <a href="../index.php" class="back-link">← Voltar ao site principal</a>
+
+            <div class="security-notice">
+                <strong>⚠️ Área Restrita:</strong> Acesso exclusivo para administradores autorizados.
+                Tentativas de acesso não autorizadas são monitoradas.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            const errorDiv = document.getElementById('errorMessage');
+
+            // Limpar mensagens de erro
+            errorDiv.style.display = 'none';
+
+            if (!usuario || !senha) {
+                showError('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            // Armazenar credenciais temporariamente no localStorage para contornar problema de sessão
+            const credentialsHash = btoa(usuario + ':' + senha);
+            localStorage.setItem('admin_temp_auth', credentialsHash);
+
+            // Fazer requisição AJAX para verificar credenciais
+            fetch('AutenticacaoAdmin.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    usuario: usuario,
+                    senha: senha
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Login bem-sucedido, redirecionar
+                        console.log('Login realizado com sucesso, redirecionando...');
+                        window.location.href = 'PainelAdmin.html';
+                    } else {
+                        localStorage.removeItem('admin_temp_auth');
+                        showError(data.message || 'Credenciais inválidas.');
+                    }
+                })
+                .catch(error => {
+                    localStorage.removeItem('admin_temp_auth');
+                    console.error('Erro:', error);
+                    showError('Erro ao processar login. Tente novamente.');
+                });
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

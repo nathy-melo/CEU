@@ -2,8 +2,83 @@
 // Carrega os dados do usuário da sessão do banco de dados
 require_once '../BancoDados/conexao.php';
 
+// Processa solicitação AJAX para código de organizador
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo'])) {
+    function responderJson($status, $mensagem) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'sucesso' => $status === 'sucesso',
+            'mensagem' => $mensagem
+        ]);
+        exit;
+    }
+
+    // Verifica se o usuário está logado e não é organizador
+    if (!isset($_SESSION['cpf']) || (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1)) {
+        responderJson('erro', 'Acesso negado.');
+    }
+
+    $codigo = trim($_POST['codigo']);
+
+    if (!$codigo) {
+        responderJson('erro', '⚠️ Código é obrigatório.');
+    }
+
+    // Verifica se o código existe na tabela de códigos (sistema atualizado)
+    require_once '../BancoDados/conexao.php';
+    
+    // Verificar se o código existe e está ativo
+    $sql = "SELECT id, codigo, ativo, usado FROM codigos_organizador WHERE codigo = ? AND ativo = 1 AND usado = 0";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $codigo);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if (mysqli_num_rows($result) > 0) {
+        // Código é válido, pode promover o usuário
+        $cpfUsuario = $_SESSION['cpf'];
+        $codigoData = mysqli_fetch_assoc($result);
+        
+        // Marca o código como usado
+        $sqlUpdate = "UPDATE codigos_organizador SET usado = 1, data_uso = NOW(), usado_por = ? WHERE id = ?";
+        $stmtUpdate = mysqli_prepare($conexao, $sqlUpdate);
+        mysqli_stmt_bind_param($stmtUpdate, "si", $cpfUsuario, $codigoData['id']);
+        
+        if (mysqli_stmt_execute($stmtUpdate)) {
+            // Atualiza o usuário para organizador
+            $sql = "UPDATE usuario SET Organizador = 1, Codigo = ? WHERE CPF = ?";
+            $stmtUser = mysqli_prepare($conexao, $sql);
+            mysqli_stmt_bind_param($stmtUser, "ss", $codigo, $cpfUsuario);
+            
+            if (mysqli_stmt_execute($stmtUser)) {
+                // Atualiza a sessão
+                $_SESSION['organizador'] = 1;
+                $_SESSION['codigo'] = $codigo;
+                
+                mysqli_close($conexao);
+                responderJson('sucesso', '✅ Parabéns! Você agora é um organizador.');
+            } else {
+                $erroBanco = mysqli_error($conexao);
+                mysqli_close($conexao);
+                responderJson('erro', '❌ Erro ao atualizar usuário: ' . $erroBanco);
+            }
+        } else {
+            mysqli_close($conexao);
+            responderJson('erro', '❌ Erro ao processar código.');
+        }
+    } else {
+        mysqli_close($conexao);
+        responderJson('erro', '⚠️ Código de acesso inválido ou já utilizado.');
+    }
+}
+
 $cpfUsuario = $_SESSION['cpf'];
 $dadosUsuario = null;
+
+// Reconecta ao banco se a conexão foi fechada no processamento AJAX
+if (!isset($conexao) || !$conexao) {
+    require_once '../BancoDados/conexao.php';
+}
 
 // Busca todos os dados do usuário no banco
 $consultaSQL = "SELECT Nome, Email, CPF, RA, Codigo, Organizador FROM usuario WHERE CPF = ?";
@@ -152,8 +227,24 @@ mysqli_close($conexao);
     .acoes-formulario {
         margin-top: 1.25rem;
         display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .linha-botoes-principais {
+        display: flex;
         justify-content: flex-end;
         gap: 0.75rem;
+        width: 100%;
+    }
+
+    .linha-botao-organizador {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
 
     .botao {
@@ -191,6 +282,17 @@ mysqli_close($conexao);
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    .botao-tornar-organizador {
+        background-color: var(--tema-site);
+        width: auto;
+        padding: 0.5rem 1.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
     }
 
     .botao-excluir {
@@ -242,6 +344,107 @@ mysqli_close($conexao);
         color: #721c24;
         background-color: #f8d7da;
         border: 1px solid #f5c6cb;
+    }
+
+    /* Modal para solicitar código de organizador */
+    .modal-codigo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: var(--caixas);
+        border-radius: 0.5rem;
+        padding: 2rem;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 0.5rem 2rem var(--sombra-padrao);
+    }
+
+    .modal-titulo {
+        color: var(--branco);
+        font-weight: 700;
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 0.125rem 0.5rem var(--sombra-padrao);
+    }
+
+    .modal-texto {
+        color: var(--branco);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .modal-acoes {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    .modal-acoes .botao {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 7.5rem;
+    }
+
+    .modal-acoes .botao-cancelar {
+        background-color: #dc3545;
+    }
+
+    .modal-acoes .botao-salvar {
+        background-color: #28a745;
+    }
+
+    /* Força centralização do texto nos botões do modal */
+    .modal-codigo .botao {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    /* Centralização específica para o botão solicitar código */
+    .modal-codigo #btn-solicitar-codigo {
+        margin: 0 auto;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .modal-solicitar-codigo {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .modal-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 0.3125rem;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 0.1rem;
+    }
+
+    .modal-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.3);
     }
 </style>
 
@@ -307,9 +510,16 @@ mysqli_close($conexao);
                     </div>
                     
                     <div class="acoes-formulario">
-                        <button type="button" class="botao botao-editar" id="btn-editar">Editar</button>
-                        <button type="button" class="botao botao-cancelar hidden" id="btn-cancelar">Cancelar</button>
-                        <button type="submit" class="botao botao-salvar hidden" id="btn-salvar">Salvar</button>
+                        <?php if (!$dadosUsuario['Organizador']): ?>
+                        <div class="linha-botao-organizador">
+                            <button type="button" class="botao botao-tornar-organizador hidden" id="btn-tornar-organizador">Deseja se tornar um organizador?</button>
+                        </div>
+                        <?php endif; ?>
+                        <div class="linha-botoes-principais">
+                            <button type="button" class="botao botao-editar" id="btn-editar">Editar</button>
+                            <button type="button" class="botao botao-cancelar hidden" id="btn-cancelar">Cancelar</button>
+                            <button type="submit" class="botao botao-salvar hidden" id="btn-salvar">Salvar</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -319,6 +529,24 @@ mysqli_close($conexao);
             </div>
         </div>
     </div>
+
+    <!-- Modal para solicitar código de organizador -->
+    <div id="modal-codigo" class="modal-codigo hidden">
+        <div class="modal-content">
+            <h2 class="modal-titulo">Tornar-se Organizador</h2>
+            <p class="modal-texto">Para se tornar um organizador, você precisa de um código de acesso fornecido pela administração.</p>
+            <div id="alert-modal"></div>
+            <input type="text" id="input-codigo" class="modal-input" placeholder="Digite o código de organizador" maxlength="8">
+            <div class="modal-acoes">
+                <button type="button" class="botao botao-cancelar" id="btn-cancelar-modal">Cancelar</button>
+                <button type="button" class="botao botao-salvar" id="btn-confirmar-codigo">Confirmar</button>
+            </div>
+            <div class="modal-solicitar-codigo">
+                <button type="button" class="botao" id="btn-solicitar-codigo" style="background-color: var(--tema-site); font-size: 0.9rem;">Solicitar código de acesso</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
     <script src="PerfilParticipante.js"></script>
 </body>

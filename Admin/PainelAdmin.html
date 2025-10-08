@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - CEU</title>
+    <link rel="stylesheet" href="styleAdmin.css">
+</head>
+
+<body>
+    <div class="admin-page-container">
+        <div id="loadingScreen"
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+            <div style="text-align: center; color: white;">
+                <div
+                    style="width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;">
+                </div>
+                <p>Carregando painel administrativo...</p>
+            </div>
+        </div>
+
+        <div id="adminPanel" style="display: none;">
+            <div class="admin-header">
+                <h1>🔐 Painel Administrativo - CEU</h1>
+                <p class="subtitle">Sistema de Gerenciamento Completo</p>
+            </div>
+
+            <div class="admin-container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+
+                <!-- Navegação -->
+                <div class="admin-nav"
+                    style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; padding: 10px 0;">
+                    <button id="btnDashboard" class="btn-secondary active" onclick="showSection('dashboard')">📊
+                        Dashboard</button>
+                    <button id="btnEventos" class="btn-secondary" onclick="showSection('eventos')">🎯 Eventos</button>
+                    <button id="btnUsuarios" class="btn-secondary" onclick="showSection('usuarios')">👥
+                        Usuários</button>
+                    <button id="btnCodigos" class="btn-secondary" onclick="showSection('codigos')">🎫 Códigos</button>
+                    <button id="btnCertificados" class="btn-secondary" onclick="showSection('certificados')">📜
+                        Certificados</button>
+                    <button id="btnSair" class="btn-secondary" onclick="logout()"
+                        style="margin-left: auto; background: #dc3545;">🚪 Sair</button>
+                </div>
+
+                <!-- Dashboard -->
+                <div id="dashboard" class="admin-section active">
+                    <h3>📊 Dashboard do Sistema</h3>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div
+                            style="background: rgba(40, 167, 69, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;">
+                            <h4 style="margin: 0; color: #28a745;">� Total de Eventos</h4>
+                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalEventos">-</p>
+                            <small>Eventos cadastrados no sistema</small>
+                        </div>
+                        <div
+                            style="background: rgba(0, 123, 255, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #007bff;">
+                            <h4 style="margin: 0; color: #007bff;">👥 Total de Usuários</h4>
+                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalUsuarios">-</p>
+                            <small>Usuários registrados</small>
+                        </div>
+                        <div
+                            style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107;">
+                            <h4 style="margin: 0; color: #ffc107;">👑 Organizadores</h4>
+                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalOrganizadores">-</p>
+                            <small>Usuários com perfil organizador</small>
+                        </div>
+                        <div
+                            style="background: rgba(220, 53, 69, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #dc3545;">
+                            <h4 style="margin: 0; color: #dc3545;">🎫 Códigos Ativos</h4>
+                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalCodigos">-</p>
+                            <small>Códigos de organizador disponíveis</small>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h4>📈 Estatísticas Recentes</h4>
+                        <div style="background: white; padding: 20px; border-radius: 10px;">
+                            <div id="estatisticas">Carregando estatísticas...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gerenciamento de Eventos -->
+                <div id="eventos" class="admin-section">
+                    <h3>🎯 Gerenciamento de Eventos</h3>
+
+                    <div
+                        style="margin-top: 35px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn-generate" onclick="showModalEvento()">➕ Novo Evento</button>
+                        <button class="btn-secondary" onclick="carregarEventos()">🔄 Atualizar</button>
+                        <button class="btn-secondary" onclick="exportarEventos()">📊 Exportar</button>
+                    </div>
+
+                    <div id="eventosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                        <p>Carregando eventos...</p>
+                    </div>
+                </div>
+
+                <!-- Gerenciamento de Usuários -->
+                <div id="usuarios" class="admin-section">
+                    <h3>👥 Gerenciamento de Usuários</h3>
+
+                    <div
+                        style="margin-top: 35px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn-secondary" onclick="carregarUsuarios()">🔄 Atualizar</button>
+                        <button class="btn-secondary" onclick="exportarUsuarios()">📊 Exportar</button>
+                        <input type="text" id="searchUsuarios" placeholder="🔍 Buscar por nome, CPF ou email..."
+                            class="search-input" style="width: 350px;" oninput="buscarUsuarios()">
+                        <button class="clear-search" onclick="limparBuscaUsuarios()">✖ Limpar</button>
+                    </div>
+
+                    <div id="usuariosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                        <p>Carregando usuários...</p>
+                    </div>
+                </div>
+
+                <!-- Gerenciamento de Códigos -->
+                <div id="codigos" class="admin-section">
+                    <h3>🎫 Gerenciamento de Códigos</h3>
+
+                    <div
+                        style="margin-top: 35px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn-generate" onclick="gerarNovoCodigo()">➕ Gerar Código</button>
+                        <button class="btn-secondary" onclick="carregarCodigos()">🔄 Atualizar</button>
+                        <button class="btn-secondary" onclick="gerarCodigosLote()">📦 Gerar em Lote</button>
+                        <input type="text" id="searchCodigos" placeholder="🔍 Buscar código..." class="search-input"
+                            style="width: 250px;" oninput="buscarCodigos()">
+                        <button class="clear-search" onclick="limparBuscaCodigos()">✖ Limpar</button>
+                    </div>
+
+                    <div id="codigosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                        <p>Carregando códigos...</p>
+                    </div>
+                </div>
+
+                <!-- Gerenciamento de Certificados -->
+                <div id="certificados" class="admin-section">
+                    <h3>📜 Gerenciamento de Certificados</h3>
+
+                    <div
+                        style="margin-top: 35px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn-secondary" onclick="carregarCertificados()">🔄 Atualizar</button>
+                        <button class="btn-secondary" onclick="validarCertificados()">✅ Validar Todos</button>
+                    </div>
+
+                    <div id="certificadosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                        <p>Carregando certificados...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Eventos -->
+    <div id="modalEvento"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
+        <div
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; max-height: 80%; overflow-y: auto;">
+            <h3 id="modalEventoTitle">Novo Evento</h3>
+            <form id="formEvento">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                    <div>
+                        <label>Código do Evento:</label>
+                        <input type="number" id="cod_evento" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div>
+                        <label>Categoria:</label>
+                        <select id="categoria" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="">Selecione...</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Palestra">Palestra</option>
+                            <option value="Curso">Curso</option>
+                            <option value="Semana">Semana</option>
+                            <option value="Minicurso">Minicurso</option>
+                            <option value="Hackathon">Hackathon</option>
+                            <option value="Conferência">Conferência</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label>Nome do Evento:</label>
+                        <input type="text" id="nome" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div>
+                        <label>Local:</label>
+                        <input type="text" id="lugar" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div>
+                        <label>Modalidade:</label>
+                        <select id="modalidade" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="Presencial">Presencial</option>
+                            <option value="Online">Online</option>
+                            <option value="Híbrido">Híbrido</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label>Descrição:</label>
+                        <textarea id="descricao"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label>Público Alvo:</label>
+                        <input type="text" id="publico_alvo"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div>
+                        <label>Duração (horas):</label>
+                        <input type="number" step="0.5" id="duracao"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div>
+                        <label>Data/Hora Início:</label>
+                        <input type="datetime-local" id="inicio" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div>
+                        <label>Data/Hora Fim:</label>
+                        <input type="datetime-local" id="conclusao" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label>
+                            <input type="checkbox" id="certificado"> Gera Certificado
+                        </label>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn-generate">Salvar Evento</button>
+                    <button type="button" class="btn-secondary" onclick="fecharModalEvento()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Gerenciamento de Códigos -->
+    <div id="codes" class="admin-section">
+        <h3>🎫 Gerenciamento de Códigos</h3>
+
+        <div style="margin-bottom: 20px;">
+            <button class="btn-generate" onclick="gerarNovoCodigo()">➕ Gerar Novo Código</button>
+            <button class="btn-secondary" onclick="carregarCodigos()">🔄 Atualizar Lista</button>
+        </div>
+
+        <div id="codigosList" style="background: white; border-radius: 10px; padding: 20px;">
+            <p>Carregando códigos...</p>
+        </div>
+    </div>
+
+    <!-- Área de Teste -->
+    <div id="test" class="admin-section">
+        <h3>🧪 Área de Teste</h3>
+
+        <div style="background: white; padding: 20px; border-radius: 10px;">
+            <h4>Teste de Funcionalidades</h4>
+
+            <div style="margin: 15px 0;">
+                <button class="btn-test" onclick="testarConexaoBD()">🗄️ Testar Banco de Dados</button>
+                <button class="btn-test" onclick="testarSessao()">👤 Testar Sessão</button>
+                <button class="btn-test" onclick="testarLogs()">📝 Verificar Logs</button>
+            </div>
+
+            <div id="testResults"
+                style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; min-height: 100px; margin-top: 15px;">
+                Clique em um dos botões acima para executar testes.
+            </div>
+        </div>
+    </div>
+
+    </div>
+    </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .admin-nav button.active {
+            background: #28a745 !important;
+            transform: scale(1.05);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .data-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-ativo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inativo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-usado {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .btn-edit {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-toggle {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        /* Estilos para campos de busca */
+        .search-input {
+            padding: 10px 15px 10px 15px !important;
+            border: 2px solid #e3e6f0 !important;
+            border-radius: 25px !important;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            border-color: #007bff !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .clear-search {
+            background: #6c757d !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 12px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            margin-left: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .clear-search:hover {
+            background: #545b62 !important;
+        }
+
+        .search-results-info {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #495057;
+            border-left: 4px solid #007bff;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+
+    <script>
+        let currentData = {};
+
+        // Verificar autenticação ao carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            verificarAuth();
+        });
+
+        function verificarAuth() {
+            const tempAuth = localStorage.getItem('admin_temp_auth');
+
+            if (!tempAuth) {
+                console.log('Sem credenciais temporárias, redirecionando...');
+                window.location.href = 'LoginAdmin.html';
+                return;
+            }
+
+            // Decodificar e verificar
+            try {
+                const decoded = atob(tempAuth);
+                const [usuario, senha] = decoded.split(':');
+
+                if (usuario === 'infofriends' && senha === '12345678') {
+                    console.log('Credenciais válidas, mostrando painel...');
+                    // Criar sessão no servidor para o PHP
+                    fetch('GerenciadorAdmin.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ admin_temp_auth: tempAuth })
+                    }).then(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        document.getElementById('adminPanel').style.display = 'block';
+                        carregarDashboard();
+                    });
+                } else {
+                    throw new Error('Credenciais inválidas');
+                }
+            } catch (error) {
+                console.error('Erro na verificação:', error);
+                localStorage.removeItem('admin_temp_auth');
+                window.location.href = 'LoginAdmin.html';
+            }
+        }
+
+        // Função auxiliar para fazer requisições à API
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
+                credentials: 'same-origin'
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            // Adicionar timestamp para evitar cache
+            const timestamp = new Date().getTime();
+            const baseUrl = `GerenciadorAdmin.php?action=${endpoint}`;
+            const url = `${baseUrl}&_t=${timestamp}`;
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+
+                return result;
+            } catch (error) {
+                console.error('Erro na API:', error);
+                alert('Erro: ' + error.message);
+                throw error;
+            }
+        }
+
+        function showSection(sectionId) {
+            // Ocultar todas as seções
+            const sections = document.querySelectorAll('.admin-section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Remover active de todos os botões
+            const buttons = document.querySelectorAll('.admin-nav button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Mostrar seção selecionada
+            document.getElementById(sectionId).classList.add('active');
+            const buttonId = 'btn' + sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+            const button = document.getElementById(buttonId);
+            if (button) button.classList.add('active');
+
+            // Carregar dados específicos da seção
+            switch (sectionId) {
+                case 'dashboard':
+                    carregarDashboard();
+                    break;
+                case 'eventos':
+                    carregarEventos();
+                    break;
+                case 'usuarios':
+                    carregarUsuarios();
+                    break;
+                case 'codigos':
+                    carregarCodigos();
+                    break;
+                case 'certificados':
+                    carregarCertificados();
+                    break;
+            }
+        }
+
+        // =======================================
+        // DASHBOARD
+        // =======================================
+
+        async function carregarDashboard() {
+            try {
+                const result = await apiCall('dashboard');
+                const stats = result.data;
+
+                document.getElementById('totalEventos').textContent = stats.eventos;
+                document.getElementById('totalUsuarios').textContent = stats.usuarios;
+                document.getElementById('totalOrganizadores').textContent = stats.organizadores;
+                document.getElementById('totalCodigos').textContent = stats.codigos;
+
+                // Estatísticas detalhadas
+                let html = '<h5>📊 Eventos por Categoria</h5>';
+                html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0;">';
+
+                stats.eventos_por_categoria.forEach(cat => {
+                    html += `<div style="background: #f8f9fa; padding: 10px; border-radius: 5px; text-align: center;">
+                        <strong>${cat.categoria}</strong><br>
+                        <span style="font-size: 20px; color: #007bff;">${cat.total}</span>
+                    </div>`;
+                });
+
+                html += '</div><h5>🕒 Últimos Eventos</h5><ul>';
+
+                stats.ultimos_eventos.forEach(evento => {
+                    const data = new Date(evento.inicio).toLocaleDateString();
+                    html += `<li><strong>${evento.nome}</strong> - ${data} (${evento.modalidade})</li>`;
+                });
+
+                html += '</ul>';
+
+                document.getElementById('estatisticas').innerHTML = html;
+
+            } catch (error) {
+                document.getElementById('estatisticas').innerHTML = '<p style="color: red;">Erro ao carregar estatísticas.</p>';
+            }
+        }
+
+        // =======================================
+        // EVENTOS
+        // =======================================
+
+        async function carregarEventos() {
+            try {
+                const result = await apiCall('eventos');
+                currentData.eventos = result.data;
+
+                let html = '<div class="table-responsive"><table class="data-table">';
+                html += '<thead><tr><th>ID</th><th>Nome</th><th>Categoria</th><th>Data Início</th><th>Local</th><th>Modalidade</th><th>Certificado</th><th>Ações</th></tr></thead><tbody>';
+
+                result.data.forEach(evento => {
+                    const dataInicio = new Date(evento.inicio).toLocaleDateString();
+                    const certificado = evento.certificado ? 'Sim' : 'Não';
+
+                    html += `<tr>
+                        <td>${evento.cod_evento}</td>
+                        <td><strong>${evento.nome}</strong></td>
+                        <td><span class="status-badge status-ativo">${evento.categoria}</span></td>
+                        <td>${dataInicio}</td>
+                        <td>${evento.lugar}</td>
+                        <td>${evento.modalidade}</td>
+                        <td>${certificado}</td>
+                        <td>
+                            <button class="btn-small btn-edit" onclick="editarEvento(${evento.cod_evento})">✏️ Editar</button>
+                            <button class="btn-small btn-delete" onclick="excluirEvento(${evento.cod_evento})">🗑️ Excluir</button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('eventosContainer').innerHTML = html;
+
+            } catch (error) {
+                document.getElementById('eventosContainer').innerHTML = '<p style="color: red;">Erro ao carregar eventos.</p>';
+            }
+        }
+
+        // =======================================
+        // USUÁRIOS
+        // =======================================
+
+        async function carregarUsuarios() {
+            try {
+                // Limpar dados antigos para forçar reload
+                currentData.usuarios = [];
+
+                // Mostrar loading
+                document.getElementById('usuariosContainer').innerHTML = '<p>🔄 Carregando usuários...</p>';
+
+                const result = await apiCall('usuarios');
+                currentData.usuarios = result.data;
+
+                // Usa a nova função de renderização
+                renderizarUsuarios(currentData.usuarios);
+
+                console.log('Usuários carregados:', currentData.usuarios.length);
+
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+                document.getElementById('usuariosContainer').innerHTML = '<p style="color: red;">Erro ao carregar usuários.</p>';
+            }
+        }
+
+        // =======================================
+        // CÓDIGOS
+        // =======================================
+
+        async function carregarCodigos() {
+            try {
+                // Limpar dados antigos para forçar reload
+                currentData.codigos = [];
+
+                // Mostrar loading
+                document.getElementById('codigosContainer').innerHTML = '<p>🔄 Carregando códigos...</p>';
+
+                const result = await apiCall('codigos');
+                currentData.codigos = result.data;
+
+                // Usa a nova função de renderização
+                renderizarCodigos(currentData.codigos);
+
+                console.log('Códigos carregados:', currentData.codigos.length);
+
+            } catch (error) {
+                console.error('Erro ao carregar códigos:', error);
+                document.getElementById('codigosContainer').innerHTML = '<p style="color: red;">Erro ao carregar códigos.</p>';
+            }
+        }
+
+        // =======================================
+        // CERTIFICADOS
+        // =======================================
+
+        async function carregarCertificados() {
+            try {
+                const result = await apiCall('certificados');
+                currentData.certificados = result.data;
+
+                let html = '<div class="table-responsive"><table class="data-table">';
+                html += '<thead><tr><th>Código Verificação</th><th>Modelo</th><th>Tipo</th><th>Ações</th></tr></thead><tbody>';
+
+                result.data.forEach(cert => {
+                    html += `<tr>
+                        <td><strong>${cert.cod_verificacao}</strong></td>
+                        <td>${cert.modelo}</td>
+                        <td>${cert.tipo}</td>
+                        <td>
+                            <button class="btn-small btn-edit" onclick="validarCertificado('${cert.cod_verificacao}')">✅ Validar</button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('certificadosContainer').innerHTML = html;
+
+            } catch (error) {
+                document.getElementById('certificadosContainer').innerHTML = '<p style="color: red;">Erro ao carregar certificados.</p>';
+            }
+        }
+
+        // =======================================
+        // AÇÕES DOS BOTÕES
+        // =======================================
+
+        async function gerarNovoCodigo() {
+            // Pergunta se quer gerar automaticamente ou inserir manualmente
+            const opcao = confirm('🔐 GERAÇÃO DE CÓDIGO\n\n✅ OK = Gerar código automático (seguro)\n❌ Cancelar = Inserir código manualmente');
+
+            let codigo = '';
+            if (!opcao) {
+                // Modo manual
+                codigo = prompt('📝 CÓDIGO MANUAL\n\nDigite o código (exatamente 8 caracteres):\n• Letras: A-Z (exceto I, O)\n• Números: 2-9 (exceto 0, 1)\n\nExemplo: AB3C5XYZ');
+                if (!codigo) return; // Cancelou
+
+                codigo = codigo.toUpperCase().trim();
+                if (codigo.length !== 8) {
+                    alert('❌ ERRO: O código deve ter exatamente 8 caracteres!\n\nVocê digitou: ' + codigo.length + ' caracteres');
+                    return;
+                }
+
+                if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(codigo)) {
+                    alert('❌ FORMATO INVÁLIDO!\n\nUse apenas:\n• Letras: A, B, C, D, E, F, G, H, J, K, L, M, N, P, Q, R, S, T, U, V, W, X, Y, Z\n• Números: 2, 3, 4, 5, 6, 7, 8, 9\n\n(Sem: I, O, 0, 1)');
+                    return;
+                }
+            }
+
+            // Pergunta pelas observações SEPARADAMENTE
+            const observacoes = prompt('📋 OBSERVAÇÕES (opcional)\n\nDescreva o propósito deste código:\n(deixe vazio se não quiser observações)') || '';
+
+            try {
+                const payload = { observacoes };
+                if (codigo) {
+                    payload.codigo = codigo;
+                    console.log('Enviando código manual:', codigo);
+                } else {
+                    console.log('Gerando código automático');
+                }
+
+                console.log('Payload completo:', payload);
+
+                const response = await apiCall('codigos', 'POST', payload);
+                alert('✅ CÓDIGO CRIADO COM SUCESSO!\n\n🔑 Código: ' + response.codigo + '\n📋 Observações: ' + (observacoes || 'Nenhuma') + '\n\n🔒 Este código é único e seguro!');
+                carregarCodigos();
+            } catch (error) {
+                console.error('Erro ao criar código:', error);
+                alert('❌ Erro ao criar código. Verifique o console para detalhes.');
+            }
+        }
+
+        async function toggleCodigo(id, novoStatus) {
+            try {
+                // Garantir que novoStatus seja um boolean válido
+                const ativo = Boolean(novoStatus);
+                const action = ativo ? 'ativar' : 'desativar';
+
+                if (confirm(`Confirma ${action} este código?`)) {
+                    await apiCall('codigos', 'PUT', {
+                        id: parseInt(id),
+                        ativo: ativo,
+                        observacoes: ''
+                    });
+                    alert(`✅ Código ${ativo ? 'ativado' : 'desativado'} com sucesso!`);
+                    carregarCodigos();
+                }
+            } catch (error) {
+                console.error('Erro ao alterar status do código:', error);
+                alert('❌ Erro ao alterar status do código');
+            }
+        }
+
+        async function excluirCodigo(id) {
+            if (confirm('Tem certeza que deseja excluir este código?')) {
+                try {
+                    await apiCall(`codigos&id=${id}`, 'DELETE');
+                    carregarCodigos();
+                } catch (error) {
+                    // Erro já tratado na função apiCall
+                }
+            }
+        }
+
+        async function toggleOrganizador(cpf, novoStatus) {
+            let codigo = null;
+            if (novoStatus) {
+                codigo = prompt('Digite o código de organizador para este usuário:');
+                if (!codigo) return;
+            }
+
+            try {
+                await apiCall('usuarios', 'PUT', { CPF: cpf, Organizador: novoStatus, Codigo: codigo });
+                carregarUsuarios();
+            } catch (error) {
+                // Erro já tratado na função apiCall
+            }
+        }
+
+        async function excluirUsuario(cpf) {
+            if (confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
+                try {
+                    await apiCall(`usuarios&id=${cpf}`, 'DELETE');
+                    carregarUsuarios();
+                } catch (error) {
+                    // Erro já tratado na função apiCall
+                }
+            }
+        }
+
+        async function excluirEvento(id) {
+            if (confirm('Tem certeza que deseja excluir este evento?')) {
+                try {
+                    await apiCall(`eventos&id=${id}`, 'DELETE');
+                    carregarEventos();
+                } catch (error) {
+                    // Erro já tratado na função apiCall
+                }
+            }
+        }
+
+        // =======================================
+        // MODAL DE EVENTOS
+        // =======================================
+
+        function showModalEvento(eventoId = null) {
+            document.getElementById('modalEvento').style.display = 'block';
+
+            if (eventoId) {
+                // Editar evento existente
+                const evento = currentData.eventos.find(e => e.cod_evento == eventoId);
+                if (evento) {
+                    document.getElementById('modalEventoTitle').textContent = 'Editar Evento';
+                    document.getElementById('cod_evento').value = evento.cod_evento;
+                    document.getElementById('categoria').value = evento.categoria;
+                    document.getElementById('nome').value = evento.nome;
+                    document.getElementById('lugar').value = evento.lugar;
+                    document.getElementById('modalidade').value = evento.modalidade;
+                    document.getElementById('descricao').value = evento.descricao;
+                    document.getElementById('publico_alvo').value = evento.publico_alvo;
+                    document.getElementById('duracao').value = evento.duracao;
+                    document.getElementById('inicio').value = evento.inicio.slice(0, 16);
+                    document.getElementById('conclusao').value = evento.conclusao.slice(0, 16);
+                    document.getElementById('certificado').checked = evento.certificado == 1;
+                }
+            } else {
+                // Novo evento
+                document.getElementById('modalEventoTitle').textContent = 'Novo Evento';
+                document.getElementById('formEvento').reset();
+            }
+        }
+
+        function fecharModalEvento() {
+            document.getElementById('modalEvento').style.display = 'none';
+        }
+
+        function editarEvento(id) {
+            showModalEvento(id);
+        }
+
+        // Form submission
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('formEvento').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const data = {};
+
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+                // Adicionar campos não capturados pelo FormData
+                data.cod_evento = document.getElementById('cod_evento').value;
+                data.categoria = document.getElementById('categoria').value;
+                data.nome = document.getElementById('nome').value;
+                data.lugar = document.getElementById('lugar').value;
+                data.modalidade = document.getElementById('modalidade').value;
+                data.descricao = document.getElementById('descricao').value;
+                data.publico_alvo = document.getElementById('publico_alvo').value;
+                data.duracao = document.getElementById('duracao').value;
+                data.inicio = document.getElementById('inicio').value;
+                data.conclusao = document.getElementById('conclusao').value;
+                data.certificado = document.getElementById('certificado').checked;
+
+                try {
+                    // Verificar se é edição ou criação
+                    const isEdit = currentData.eventos && currentData.eventos.some(e => e.cod_evento == data.cod_evento);
+
+                    if (isEdit) {
+                        await apiCall('eventos', 'PUT', data);
+                    } else {
+                        await apiCall('eventos', 'POST', data);
+                    }
+
+                    fecharModalEvento();
+                    carregarEventos();
+                    alert('Evento salvo com sucesso!');
+                } catch (error) {
+                    // Erro já tratado na função apiCall
+                }
+            });
+        });
+
+        function exportarEventos() {
+            alert('Funcionalidade de exportação será implementada em breve.');
+        }
+
+        function exportarUsuarios() {
+            alert('Funcionalidade de exportação será implementada em breve.');
+        }
+
+        function gerarCodigosLote() {
+            const quantidade = prompt('Quantos códigos deseja gerar?');
+            if (quantidade && parseInt(quantidade) > 0) {
+                alert(`Funcionalidade de geração em lote será implementada. Solicitado: ${quantidade} códigos.`);
+            }
+        }
+
+        function validarCertificados() {
+            alert('Funcionalidade de validação será implementada em breve.');
+        }
+
+        function validarCertificado(codigo) {
+            alert(`Validando certificado: ${codigo}`);
+        }
+
+        // =======================================
+        // FUNCIONALIDADES DE BUSCA
+        // =======================================
+
+        // Variáveis para controle de timeout de busca
+        let timeoutBuscaUsuarios = null;
+        let timeoutBuscaCodigos = null;
+
+        // Função para buscar usuários
+        function buscarUsuarios() {
+            // Limpa timeout anterior
+            if (timeoutBuscaUsuarios) {
+                clearTimeout(timeoutBuscaUsuarios);
+            }
+
+            // Define novo timeout para evitar muitas requisições
+            timeoutBuscaUsuarios = setTimeout(() => {
+                const termo = document.getElementById('searchUsuarios').value.trim().toLowerCase();
+
+                if (!currentData.usuarios) {
+                    console.log('Dados de usuários não carregados');
+                    return;
+                }
+
+                let usuariosFiltrados = currentData.usuarios;
+
+                if (termo) {
+                    usuariosFiltrados = currentData.usuarios.filter(usuario => {
+                        return (
+                            usuario.Nome.toLowerCase().includes(termo) ||
+                            usuario.CPF.includes(termo) ||
+                            usuario.Email.toLowerCase().includes(termo) ||
+                            (usuario.RA && usuario.RA.includes(termo))
+                        );
+                    });
+                }
+
+                renderizarUsuarios(usuariosFiltrados);
+            }, 300); // 300ms de delay
+        }
+
+        // Função para buscar códigos
+        function buscarCodigos() {
+            // Limpa timeout anterior
+            if (timeoutBuscaCodigos) {
+                clearTimeout(timeoutBuscaCodigos);
+            }
+
+            // Define novo timeout para evitar muitas requisições
+            timeoutBuscaCodigos = setTimeout(() => {
+                const termo = document.getElementById('searchCodigos').value.trim().toUpperCase();
+
+                if (!currentData.codigos) {
+                    console.log('Dados de códigos não carregados');
+                    return;
+                }
+
+                let codigosFiltrados = currentData.codigos;
+
+                if (termo) {
+                    codigosFiltrados = currentData.codigos.filter(codigo => {
+                        return (
+                            codigo.codigo.includes(termo) ||
+                            (codigo.observacoes && codigo.observacoes.toLowerCase().includes(termo.toLowerCase())) ||
+                            (codigo.usado_por && codigo.usado_por.toLowerCase().includes(termo.toLowerCase())) ||
+                            codigo.id.toString() === termo
+                        );
+                    });
+                }
+
+                renderizarCodigos(codigosFiltrados);
+            }, 300); // 300ms de delay
+        }
+
+        // Função para renderizar usuários filtrados
+        function renderizarUsuarios(usuarios) {
+            let html = '<div class="table-responsive"><table class="data-table">';
+            html += '<thead><tr><th>CPF</th><th>Nome</th><th>Email</th><th>RA</th><th>Organizador</th><th>Código</th><th>Ações</th></tr></thead><tbody>';
+
+            if (usuarios.length === 0) {
+                html += '<tr><td colspan="7" class="no-results">Nenhum usuário encontrado com os critérios de busca</td></tr>';
+            } else {
+                usuarios.forEach(usuario => {
+                    const organizador = usuario.Organizador ? 'Sim' : 'Não';
+                    const statusClass = usuario.Organizador ? 'status-ativo' : 'status-inativo';
+
+                    html += `<tr>
+                        <td>${usuario.CPF}</td>
+                        <td><strong>${usuario.Nome}</strong></td>
+                        <td>${usuario.Email}</td>
+                        <td>${usuario.RA || '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${organizador}</span></td>
+                        <td>${usuario.Codigo || '-'}</td>
+                        <td>
+                            <button class="btn-small btn-toggle" onclick="toggleOrganizador('${usuario.CPF}', ${!usuario.Organizador})">
+                                ${usuario.Organizador ? '👤 Remover Org' : '👑 Tornar Org'}
+                            </button>
+                            <button class="btn-small btn-delete" onclick="excluirUsuario('${usuario.CPF}')">🗑️ Excluir</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+
+            html += '</tbody></table></div>';
+            html += `<div class="search-results-info">📊 Mostrando ${usuarios.length} de ${currentData.usuarios.length} usuários</div>`;
+            document.getElementById('usuariosContainer').innerHTML = html;
+        }
+
+        // Função para renderizar códigos filtrados
+        function renderizarCodigos(codigos) {
+            let html = '<div class="table-responsive"><table class="data-table">';
+            html += '<thead><tr><th>ID</th><th>Código</th><th>Status</th><th>Usado</th><th>Data Criação</th><th>Usado Por</th><th>Observações</th><th>Ações</th></tr></thead><tbody>';
+
+            if (codigos.length === 0) {
+                html += '<tr><td colspan="8" class="no-results">Nenhum código encontrado com os critérios de busca</td></tr>';
+            } else {
+                codigos.forEach(codigo => {
+                    const ativo = codigo.ativo == 1 ? 'Ativo' : 'Inativo';
+                    const usado = codigo.usado == 1 ? 'Sim' : 'Não';
+                    const statusClass = codigo.ativo == 1 ? (codigo.usado == 1 ? 'status-usado' : 'status-ativo') : 'status-inativo';
+                    const dataCriacao = new Date(codigo.data_criacao).toLocaleDateString();
+
+                    html += `<tr>
+                        <td>${codigo.id}</td>
+                        <td><strong>${codigo.codigo}</strong></td>
+                        <td><span class="status-badge ${statusClass}">${ativo}</span></td>
+                        <td>${usado}</td>
+                        <td>${dataCriacao}</td>
+                        <td>${codigo.usado_por || '-'}</td>
+                        <td>${codigo.observacoes || '-'}</td>
+                        <td>
+                            <button class="btn-small btn-toggle" onclick="toggleCodigo(${codigo.id}, ${codigo.ativo == 1 ? 0 : 1})">
+                                ${codigo.ativo == 1 ? '🔒 Desativar' : '🔓 Ativar'}
+                            </button>
+                            <button class="btn-small btn-delete" onclick="excluirCodigo(${codigo.id})">🗑️ Excluir</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+
+            html += '</tbody></table></div>';
+            html += `<div class="search-results-info">📊 Mostrando ${codigos.length} de ${currentData.codigos.length} códigos</div>`;
+            document.getElementById('codigosContainer').innerHTML = html;
+        }
+
+        // Funções para limpar buscas
+        function limparBuscaUsuarios() {
+            document.getElementById('searchUsuarios').value = '';
+            if (currentData.usuarios) {
+                renderizarUsuarios(currentData.usuarios);
+            }
+        }
+
+        function limparBuscaCodigos() {
+            document.getElementById('searchCodigos').value = '';
+            if (currentData.codigos) {
+                renderizarCodigos(currentData.codigos);
+            }
+        }
+
+        function logout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                localStorage.removeItem('admin_temp_auth');
+                window.location.href = 'LoginAdmin.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

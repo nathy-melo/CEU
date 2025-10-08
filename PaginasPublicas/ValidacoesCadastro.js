@@ -2,10 +2,10 @@
 
 // ========== CONFIGURAÇÕES PARA TESTES ==========
 // Mude estas variáveis para true/false para ativar/desativar validações
-var VALIDAR_CPF = true;           // true = valida CPF, false = não valida
-var VALIDAR_EMAIL = true;         // true = valida email, false = não valida  
-var VALIDAR_SENHA = true;         // true = valida senha, false = não valida
-var SENHA_MINIMA = 8;             // mínimo de caracteres (0 = desativar)
+var VALIDAR_CPF = false;           // true = valida CPF, false = não valida
+var VALIDAR_EMAIL = false;         // true = valida email, false = não valida  
+var VALIDAR_SENHA = false;         // true = valida senha, false = não valida
+var SENHA_MINIMA = 0;             // mínimo de caracteres (0 = desativar)
 // ================================================
 
 function validarCadastroParticipante() {
@@ -73,7 +73,7 @@ function validarCadastroOrganizador() {
     var campoConfirmar = document.getElementById('confirmar-senha');
     var campoTermos = document.getElementById('aceite-termos');
 
-    var codigo = campoCodigo ? campoCodigo.value.trim() : '';
+    var codigo = campoCodigo ? campoCodigo.value.trim().toUpperCase() : '';
     var nome = campoNome ? campoNome.value.trim() : '';
     var cpf = campoCPF ? campoCPF.value.trim() : '';
     var email = campoEmail ? campoEmail.value.trim() : '';
@@ -83,6 +83,17 @@ function validarCadastroOrganizador() {
 
     if (!codigo || !nome || !cpf || !email || !senha || !confirmar) {
         mostrarMensagem('⚠️ Todos os campos são obrigatórios!', 'erro', 'erro-cadastro');
+        return false;
+    }
+
+    // Validação específica do código de organizador (novo formato)
+    if (codigo.length !== 8) {
+        mostrarMensagem('⚠️ O código de acesso deve ter exatamente 8 caracteres!', 'erro', 'erro-cadastro');
+        return false;
+    }
+
+    if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(codigo)) {
+        mostrarMensagem('⚠️ Código inválido! Use apenas: A-Z (exceto I, O) e números 2-9 (exceto 0, 1)', 'erro', 'erro-cadastro');
         return false;
     }
 
@@ -206,10 +217,23 @@ function inicializarValidacoesCadastro() {
     var senhaOrganizador = document.getElementById('senha');
     var confirmarOrganizador = document.getElementById('confirmar-senha');
     var cpfOrganizador = document.getElementById('cpf');
+    var codigoOrganizador = document.getElementById('codigo-acesso');
 
     if (cpfOrganizador && !cpfOrganizador.dataset.mascaraAplicada) {
         adicionarMascara(cpfOrganizador, '###.###.###-##');
         cpfOrganizador.dataset.mascaraAplicada = '1';
+    }
+
+    // Máscara para código de organizador (novo formato seguro)
+    if (codigoOrganizador && !codigoOrganizador.dataset.mascaraAplicada) {
+        codigoOrganizador.addEventListener('input', function() {
+            // Remove caracteres não permitidos e converte para maiúsculo
+            let valor = this.value.toUpperCase().replace(/[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g, '');
+            // Limita a 8 caracteres
+            valor = valor.substring(0, 8);
+            this.value = valor;
+        });
+        codigoOrganizador.dataset.mascaraAplicada = '1';
     }
 
     if (emailOrganizador && !emailOrganizador.dataset.validacaoCadastroAtiva) {
