@@ -11,6 +11,23 @@
 
 <body <?php if (($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio') { echo 'class="pagina-inicio"'; } ?>>
     <?php
+    // Inicia sessão para verificar se usuário está logado
+    session_start();
+    
+    // Se usuário já está logado, redireciona para a área apropriada
+    if (isset($_SESSION['cpf']) && !empty($_SESSION['cpf'])) {
+        // Atualiza timestamp de atividade
+        $_SESSION['ultima_atividade'] = time();
+        
+        // Determina para onde redirecionar baseado no tipo de usuário
+        if (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1) {
+            header('Location: ../PaginasOrganizador/ContainerOrganizador.php?pagina=inicio');
+        } else {
+            header('Location: ../PaginasParticipante/ContainerParticipante.php?pagina=inicio');
+        }
+        exit();
+    }
+    
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
         'inicio' => 'Inicio.php',
@@ -247,6 +264,11 @@
         }
 
         function carregarPagina(pagina) {
+            // Limpeza completa antes de carregar nova página
+            if (typeof window.limpezaCompleta === 'function') {
+                window.limpezaCompleta();
+            }
+            
             // Remove o filtro lateral (se existir) antes de trocar de página (versão pública)
             if (typeof window.removerFiltroExistente === 'function') {
                 try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
@@ -292,6 +314,7 @@
             if (typeof window.aplicarToggleSenhas === 'function') { window.aplicarToggleSenhas(); }
         });
     </script>
+    <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="ToggleSenha.js"></script>
 </body>
 

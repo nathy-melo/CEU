@@ -42,5 +42,5 @@ if (session_id() !== '' || isset($_COOKIE[$sessionCookieName])) {
 session_write_close();
 
 // Redireciona para a página pública de login
-header('Location: ../PaginasPublicas/ContainerPublico.php?pagina=login&logout=ok');
+header('Location: ../PaginasPublicas/ContainerPublico.php?pagina=login');
 exit;

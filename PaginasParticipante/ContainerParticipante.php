@@ -1,7 +1,50 @@
 <?php
+// Configuração do tempo de sessão para 60 segundos
+ini_set('session.gc_maxlifetime', 60);
+session_set_cookie_params(60);
+
 session_start();
+
+// Verifica se a sessão expirou
+if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 60)) {
+    // Sessão expirou - mostra página especial
+    session_unset();
+    session_destroy();
+    
+    // Mostra página de sessão expirada ao invés de redirecionamento direto
+    echo '<!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sessão Expirada - CEU</title>
+        <link rel="stylesheet" href="../styleGlobal.css">
+        <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png">
+    </head>
+    <body>
+        <div id="modalSessaoExpirada" class="modal-personalizado mostrar">
+            <div class="conteudo-modal-personalizado">
+                <div class="cabecalho-modal-personalizado">Um anjo sussurrou no seu ouvido:</div>
+                <div class="corpo-modal-personalizado">Sua sessão expirou. Você precisa fazer login novamente para continuar.</div>
+                <button class="botao botao-modal-personalizado" onclick="window.location.href=\'../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada\'">Fazer Login</button>
+            </div>
+        </div>
+    </body>
+    </html>';
+    exit;
+}
+
+// Atualiza o timestamp da última atividade
+$_SESSION['ultima_atividade'] = time();
+
 if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
     header('Location: ../PaginasPublicas/ContainerPublico.php?pagina=login&erro=login_requerido');
+    exit;
+}
+
+// Verifica se não é um organizador tentando acessar área de participante
+if (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1) {
+    header('Location: ../PaginasOrganizador/ContainerOrganizador.php?pagina=inicio');
     exit;
 }
 $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
@@ -25,7 +68,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'evento' => 'CartaodoEventoParticipante.html',
         'eventoInscrito' => 'CartaodoEventoInscrito.html',
         'meusEventos' => 'MeusEventosParticipante.html',
-        'perfil' => 'PerfilParticipante.html',
+        'perfil' => 'PerfilParticipante.php',
         'certificados' => 'CerticadosParticipante.html',
         'configuracoes' => 'ConfiguracoesParticipante.html',
         // Reaproveita conteúdos globais quando aplicável
@@ -271,6 +314,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         }
 
         function carregarPagina(pagina) {
+            // Limpeza completa antes de carregar nova página
+            if (typeof window.limpezaCompleta === 'function') {
+                window.limpezaCompleta();
+            }
+            
             removerFiltroExistente();
             fetch('ContainerParticipante.php?pagina=' + encodeURIComponent(pagina))
                 .then(response => response.text())
@@ -287,6 +335,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         atualizarClasseBody(pagina);
                         if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);
                         executarRota(pagina);
+                        
+                        // Reinicia verificação de sessão para nova página
+                        if (typeof window.reiniciarVerificacaoSessao === 'function') {
+                            window.reiniciarVerificacaoSessao(60);
+                        }
                     }
                     window.history.pushState({}, '', '?pagina=' + pagina);
                 });
@@ -310,6 +363,8 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             executarRota(pagina);
         });
     </script>
+    <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
+    <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
 </body>
 
 </html>

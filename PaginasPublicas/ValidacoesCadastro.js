@@ -2,10 +2,10 @@
 
 // ========== CONFIGURAÇÕES PARA TESTES ==========
 // Mude estas variáveis para true/false para ativar/desativar validações
-var VALIDAR_CPF = false;           // true = valida CPF, false = não valida
-var VALIDAR_EMAIL = false;         // true = valida email, false = não valida  
-var VALIDAR_SENHA = false;         // true = valida senha, false = não valida
-var SENHA_MINIMA = 0;             // mínimo de caracteres (0 = desativar)
+var MODO_TESTE_CADASTRO_CPF = false;    // true = valida CPF, false = não valida
+var MODO_TESTE_CADASTRO_EMAIL = true;   // true = valida email, false = não valida  
+var MODO_TESTE_CADASTRO_SENHA = false;  // true = valida senha, false = não valida
+var MODO_TESTE_SENHA_MINIMA = 0;        // mínimo de caracteres (0 = desativar)
 // ================================================
 
 function validarCadastroParticipante() {
@@ -28,23 +28,23 @@ function validarCadastroParticipante() {
         return false;
     }
 
-    if (VALIDAR_CPF) {
+    if (MODO_TESTE_CADASTRO_CPF) {
         if (!validarCPF(cpf)) {
             mostrarMensagem('⚠️ CPF inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (VALIDAR_EMAIL) {
+    if (MODO_TESTE_CADASTRO_EMAIL) {
         if (!validarEmail(email)) {
             mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (VALIDAR_SENHA) {
-        if (SENHA_MINIMA > 0 && senha.length < SENHA_MINIMA) {
-            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+    if (MODO_TESTE_CADASTRO_SENHA) {
+        if (MODO_TESTE_SENHA_MINIMA > 0 && senha.length < MODO_TESTE_SENHA_MINIMA) {
+            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
             return false;
         }
 
@@ -86,23 +86,23 @@ function validarCadastroOrganizador() {
         return false;
     }
 
-    if (VALIDAR_CPF) {
+    if (MODO_TESTE_CADASTRO_CPF) {
         if (!validarCPF(cpf)) {
             mostrarMensagem('⚠️ CPF inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (VALIDAR_EMAIL) {
+    if (MODO_TESTE_CADASTRO_EMAIL) {
         if (!validarEmail(email)) {
             mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
             return false;
         }
     }
 
-    if (VALIDAR_SENHA) {
-        if (SENHA_MINIMA > 0 && senha.length < SENHA_MINIMA) {
-            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+    if (MODO_TESTE_CADASTRO_SENHA) {
+        if (MODO_TESTE_SENHA_MINIMA > 0 && senha.length < MODO_TESTE_SENHA_MINIMA) {
+            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
             return false;
         }
 
@@ -153,7 +153,7 @@ function inicializarValidacoesCadastro() {
         });
         emailParticipante.addEventListener('blur', function validarEmailParticipanteAoPerderFoco() {
             var valor = emailParticipante.value.trim();
-            if (valor && VALIDAR_EMAIL) {
+            if (valor && MODO_TESTE_CADASTRO_EMAIL) {
                 if (!validarEmail(valor)) {
                     mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
                 }
@@ -169,9 +169,9 @@ function inicializarValidacoesCadastro() {
         });
         senhaParticipante.addEventListener('blur', function validarSenhaParticipanteAoPerderFoco() {
             var valorSenha = senhaParticipante.value.trim();
-            if (valorSenha && VALIDAR_SENHA) {
-                if (SENHA_MINIMA > 0 && valorSenha.length < SENHA_MINIMA) {
-                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+            if (valorSenha && MODO_TESTE_CADASTRO_SENHA) {
+                if (MODO_TESTE_SENHA_MINIMA > 0 && valorSenha.length < MODO_TESTE_SENHA_MINIMA) {
+                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
                 }
             }
         });
@@ -185,7 +185,7 @@ function inicializarValidacoesCadastro() {
         confirmarParticipante.addEventListener('blur', function validarConfirmacaoParticipanteAoPerderFoco() {
             var valorSenha = senhaParticipante ? senhaParticipante.value.trim() : '';
             var valorConfirmar = confirmarParticipante.value.trim();
-            if (valorConfirmar && VALIDAR_SENHA) {
+            if (valorConfirmar && MODO_TESTE_CADASTRO_SENHA) {
                 if (valorConfirmar !== valorSenha) {
                     mostrarMensagem('⚠️ As senhas não coincidem!', 'erro', 'erro-cadastro');
                 }
@@ -218,7 +218,7 @@ function inicializarValidacoesCadastro() {
         });
         emailOrganizador.addEventListener('blur', function validarEmailOrganizadorAoPerderFoco() {
             var valorOrganizador = emailOrganizador.value.trim();
-            if (valorOrganizador && VALIDAR_EMAIL) {
+            if (valorOrganizador && MODO_TESTE_CADASTRO_EMAIL) {
                 if (!validarEmail(valorOrganizador)) {
                     mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
                 }
@@ -234,9 +234,9 @@ function inicializarValidacoesCadastro() {
         });
         senhaOrganizador.addEventListener('blur', function validarSenhaOrganizadorAoPerderFoco() {
             var valorSenhaOrganizador = senhaOrganizador.value.trim();
-            if (valorSenhaOrganizador && VALIDAR_SENHA) {
-                if (SENHA_MINIMA > 0 && valorSenhaOrganizador.length < SENHA_MINIMA) {
-                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+            if (valorSenhaOrganizador && MODO_TESTE_CADASTRO_SENHA) {
+                if (MODO_TESTE_SENHA_MINIMA > 0 && valorSenhaOrganizador.length < MODO_TESTE_SENHA_MINIMA) {
+                    mostrarMensagem('⚠️ A senha deve ter pelo menos ' + MODO_TESTE_SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
                 }
             }
         });
@@ -250,7 +250,7 @@ function inicializarValidacoesCadastro() {
         confirmarOrganizador.addEventListener('blur', function validarConfirmacaoOrganizadorAoPerderFoco() {
             var valorSenhaOrganizador = senhaOrganizador ? senhaOrganizador.value.trim() : '';
             var valorConfirmarOrganizador = confirmarOrganizador.value.trim();
-            if (valorConfirmarOrganizador && VALIDAR_SENHA) {
+            if (valorConfirmarOrganizador && MODO_TESTE_CADASTRO_SENHA) {
                 if (valorConfirmarOrganizador !== valorSenhaOrganizador) {
                     mostrarMensagem('⚠️ As senhas não coincidem!', 'erro', 'erro-cadastro');
                 }
@@ -294,20 +294,106 @@ function enviarCadastroAjax(idFormulario, urlDestino) {
                 var resposta = JSON.parse(requisicao.responseText);
                 if (resposta.status === 'sucesso') {
                     var segundosRestantes = 10;
+                    var timerAtivo = true;
+                    var listenersCancelamento = []; // Array para armazenar as funções dos listeners
+                    
                     function atualizarMensagemSucesso(){
                         var textoBase = (resposta.mensagem || '✅ Cadastro realizado!');
                         mostrarMensagem(textoBase, 'sucesso', 'erro-cadastro');
                         var caixaMensagem = document.getElementById('erro-cadastro');
                         if (caixaMensagem) {
                             caixaMensagem.classList.add('mensagem-multilinha');
-                            caixaMensagem.innerHTML = '<span>' + textoBase + '</span><br><span style="font-weight:500; font-size:0.9em; opacity:0.9;">Redirecionando em ' + segundosRestantes + 's...</span>';
+                            if (timerAtivo) {
+                                caixaMensagem.innerHTML = '<span>' + textoBase + '</span><br><span style="font-weight:500; font-size:0.9em; opacity:0.9;">Redirecionando em ' + segundosRestantes + 's... <em>(clique ou digite algo para cancelar)</em></span>';
+                            } else {
+                                caixaMensagem.innerHTML = '<span>' + textoBase + '</span><br><span style="font-weight:500; font-size:0.9em; opacity:0.7;">Redirecionamento cancelado. <a href="#" onclick="carregarPagina(\'login\')" style="color: var(--azul-principal); text-decoration: underline;">Clique aqui para ir ao login</a></span>';
+                            }
                         }
                     }
+                    
+                    function cancelarTimer() {
+                        console.log('cancelarTimer chamada. Timer ativo:', timerAtivo, 'Window timer:', !!window.temporizadorCadastro);
+                        if (timerAtivo && window.temporizadorCadastro) {
+                            console.log('✅ Timer de redirecionamento cancelado pela interação do usuário');
+                            clearInterval(window.temporizadorCadastro);
+                            window.temporizadorCadastro = null;
+                            timerAtivo = false;
+                            atualizarMensagemSucesso();
+                            removerListenersInteracao();
+                        } else {
+                            console.log('❌ Timer não cancelado - já inativo ou não existe');
+                        }
+                    }
+                    
+                    function adicionarListenersInteracao() {
+                        // Eventos que cancelam o timer (exceto mousemove)
+                        const eventosInteracao = [
+                            'click', 'dblclick',
+                            'keydown', 'keypress', 'keyup',
+                            'input', 'change',
+                            'focus', 'blur',
+                            'scroll', 'wheel',
+                            'touchstart', 'touchend',
+                            'mousedown', 'mouseup'
+                        ];
+                        
+                        console.log('Adicionando listeners para cancelar timer:', eventosInteracao);
+                        
+                        eventosInteracao.forEach(evento => {
+                            // Criar uma função wrapper para cada evento para poder remover depois
+                            const listenerWrapper = function(e) {
+                                console.log('Evento detectado para cancelar timer:', evento, e.type);
+                                cancelarTimer();
+                            };
+                            
+                            document.addEventListener(evento, listenerWrapper, { passive: true });
+                            
+                            // Guardar referência para remoção posterior
+                            listenersCancelamento.push({
+                                evento: evento,
+                                funcao: listenerWrapper
+                            });
+                        });
+                    }
+                    
+                    function removerListenersInteracao() {
+                        console.log('Removendo listeners de cancelamento:', listenersCancelamento.length);
+                        listenersCancelamento.forEach(item => {
+                            document.removeEventListener(item.evento, item.funcao);
+                        });
+                        listenersCancelamento = [];
+                    }
+                    
                     atualizarMensagemSucesso();
-                    var temporizador = setInterval(function(){
+                    
+                    // Limpar timer anterior se existir
+                    if (window.temporizadorCadastro) {
+                        clearInterval(window.temporizadorCadastro);
+                    }
+                    
+                    // Adicionar listeners para cancelar timer
+                    adicionarListenersInteracao();
+                    
+                    // Teste rápido - adicionar um listener de clique especial para debug
+                    document.addEventListener('click', function(e) {
+                        console.log('CLIQUE DETECTADO:', e.target, 'Timer ativo:', timerAtivo);
+                    }, { once: false });
+                    
+                    console.log('Timer de cadastro iniciado. Timer ativo:', timerAtivo);
+                    
+                    window.temporizadorCadastro = setInterval(function(){
+                        if (!timerAtivo) {
+                            clearInterval(window.temporizadorCadastro);
+                            window.temporizadorCadastro = null;
+                            return;
+                        }
+                        
                         segundosRestantes--;
                         if (segundosRestantes <= 0){
-                            clearInterval(temporizador);
+                            clearInterval(window.temporizadorCadastro);
+                            window.temporizadorCadastro = null;
+                            timerAtivo = false;
+                            removerListenersInteracao();
                             carregarPagina('login');
                         } else {
                             atualizarMensagemSucesso();
@@ -327,28 +413,3 @@ function enviarCadastroAjax(idFormulario, urlDestino) {
     };
     requisicao.send(dadosFormulario);
 }
-
-/* 
-=== COMO USAR AS CONFIGURAÇÕES DE TESTE ===
-
-Para desativar validações rapidamente durante testes, 
-edite as variáveis no topo do arquivo:
-
-// Exemplos:
-var VALIDAR_CPF = false;     // Não valida CPF
-var VALIDAR_EMAIL = false;   // Não valida email  
-var VALIDAR_SENHA = false;   // Não valida senha
-var SENHA_MINIMA = 3;        // Senha mínima de 3 caracteres
-var SENHA_MINIMA = 0;        // Desativa validação de tamanho
-
-// Para testes rápidos, desative tudo:
-var VALIDAR_CPF = false;
-var VALIDAR_EMAIL = false; 
-var VALIDAR_SENHA = false;
-
-// Para voltar ao normal:
-var VALIDAR_CPF = true;
-var VALIDAR_EMAIL = true;
-var VALIDAR_SENHA = true;
-var SENHA_MINIMA = 8;
-*/

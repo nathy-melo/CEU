@@ -1,5 +1,9 @@
 // Validações específicas da página de login
 
+// ============= MODO TESTE =============
+// Defina como true para desativar algumas validações durante testes
+const MODO_TESTE_LOGIN = true; // Mude para false para ativar validações
+
 function validarLogin() {
     var campoEmail = document.getElementById('email');
     var campoSenha = document.getElementById('password');
@@ -11,7 +15,7 @@ function validarLogin() {
     var email = campoEmail.value.trim();
     var senha = campoSenha.value.trim();
 
-    if (!email || !senha) {
+    if (!email || (!senha && !MODO_TESTE_LOGIN)) {
         mostrarMensagem('⚠️ Todos os campos são obrigatórios!', 'erro', 'erro-login');
         return false;
     }
@@ -21,9 +25,19 @@ function validarLogin() {
         return false;
     }
 
-    if (senha.length < 8) {
+    if (!MODO_TESTE_LOGIN && senha.length < 8) {
         mostrarMensagem('⚠️ A senha deve ter pelo menos 8 caracteres!', 'erro', 'erro-login');
         return false;
+    }
+
+    // Se estiver em modo debug e senha estiver vazia, define uma senha padrão
+    if (MODO_TESTE_LOGIN && !senha) {
+        campoSenha.value = '12345678'; // Senha padrão para testes
+        console.log('🔧 [DEBUG] Senha padrão aplicada para testes');
+    }
+
+    if (MODO_TESTE_LOGIN) {
+        console.log('🔧 [DEBUG] Modo debug ativo - validações de senha desativadas');
     }
 
     mostrarMensagem('🔄 Verificando suas credenciais...', 'info', 'erro-login');
@@ -33,9 +47,15 @@ function validarLogin() {
         botaoEntrar.disabled = true;
         botaoEntrar.textContent = 'Entrando...';
 
-        setTimeout(function reativarBotaoLoginDepoisDoAtraso() {
+        // Limpar timeout anterior se existir
+        if (window.timeoutBotaoLogin) {
+            clearTimeout(window.timeoutBotaoLogin);
+        }
+
+        window.timeoutBotaoLogin = setTimeout(function reativarBotaoLoginDepoisDoAtraso() {
             botaoEntrar.disabled = false;
             botaoEntrar.textContent = 'Entrar';
+            window.timeoutBotaoLogin = null;
         }, 5000);
     }
 

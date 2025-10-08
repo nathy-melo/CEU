@@ -1,5 +1,9 @@
 // Funções compartilhadas entre as páginas de login e cadastro
 
+// Constantes para posicionamento dos termos
+var TERMOS_BOTTOM_BASE = 4.5;       // distância padrão em 'em'
+var TERMOS_BOTTOM_MULTILINE = 3;    // distância quando mensagem tem 2+ linhas
+
 // MENSAGENS NA TELA
 function mostrarMensagem(mensagem, tipo, containerId) {
     if (!tipo) {
@@ -36,10 +40,6 @@ function mostrarMensagem(mensagem, tipo, containerId) {
     caixinha.textContent = mensagem.replace(/<br\s*\/?>/ig, ' ');
     caixinha.style.display = 'block';
     caixinha.classList.toggle('mensagem-duas-linhas', multiline);
-
-    var TERMOS_BOTTOM_BASE = 4.5;       // distância padrão em 'em'
-    var TERMOS_BOTTOM_MULTILINE = 3;  // distância quando mensagem tem 2+ linhas
-
 
     // Aplicação simples: escolhe um bottom fixo dependendo se é multi-linha
     var termosEls = document.querySelectorAll('.cartao-cadastro-termos');
