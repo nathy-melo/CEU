@@ -99,8 +99,52 @@
             -moz-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230166ff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: calc(100% - 0.5rem) center;
-            background-size: 1.5rem;
+            background-position: calc(100% - 0.75rem) center;
+            background-size: 1.75rem;
+            padding-right: 2.5rem;
+        }
+
+        /* Estilização específica para as opções do select */
+        .campo-select option {
+            background-color: var(--fundo);
+            color: var(--preto, #000);
+            padding: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* Placeholder (primeira opção) */
+        .campo-select option:disabled {
+            color: #888;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        /* Quando nenhuma opção válida está selecionada */
+        .campo-select:invalid,
+        .campo-select[value=""] {
+            color: #888;
+            font-weight: 500;
+        }
+
+        /* Quando uma opção válida está selecionada */
+        .campo-select:valid:not([value=""]) {
+            color: var(--preto, #000);
+            font-weight: 700;
+        }
+
+        /* Firefox: remover seta padrão */
+        @-moz-document url-prefix() {
+            .campo-select {
+                text-indent: 0.01px;
+                text-overflow: '';
+            }
+        }
+
+        /* Edge/IE: remover seta padrão */
+        .campo-select::-ms-expand {
+            display: none;
         }
 
         /* Ajustes específicos para inputs de data e hora */
@@ -157,33 +201,6 @@
             background-color: rgba(1, 102, 255, 0.15);
             color: var(--botao, #0166ff);
             border-radius: 0.25rem;
-        }
-
-        .campo-select option {
-            background-color: var(--branco);
-            color: var(--preto, #000);
-            padding: 0.75rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .campo-select option:first-child {
-            color: #888;
-            font-style: italic;
-        }
-
-        .campo-select option:hover,
-        .campo-select option:checked {
-            background-color: var(--botao, #0166ff);
-            color: var(--branco, #fff);
-        }
-
-        .campo-select:invalid {
-            color: #888;
-        }
-
-        .campo-select:valid {
-            color: var(--preto, #000);
         }
 
         .caixa-valor {
@@ -348,6 +365,11 @@
             width: 3rem;
             height: 3rem;
             fill: #888;
+        }
+        /* Ajuste para quando usar <img> no lugar do SVG inline */
+        .campo-imagem-placeholder img {
+            width: 3rem;
+            height: 3rem;
         }
 
         #input-imagem {
@@ -524,6 +546,11 @@
             height: 1rem;
             fill: white;
         }
+        /* Ajuste para quando usar <img> no lugar do SVG inline */
+        .btn-adicionar-mais img {
+            width: 1rem;
+            height: 1rem;
+        }
     </style>
 </head>
 
@@ -581,19 +608,20 @@
                 </select>
             </div>
             <div class="Certificado grupo-campo">
-                <label for="certificado"><span style="color: red;">*</span> Certificado:</label>
+                <label for="certificado"><span style="color: red;">*</span> Tipo de Certificado:</label>
                 <select id="certificado" class="campo-select" required>
                     <option value="">Selecione</option>
-                    <option value="Sim">Sim</option>
-                    <option value="Não">Não</option>
+                    <option value="Sem certificacao">Sem certificação</option>
+                    <option value="Ensino">Ensino</option>
+                    <option value="Pesquisa">Pesquisa</option>
+                    <option value="Extensao">Extensão</option>
+                    <option value="Outro">Outro</option>
                 </select>
             </div>
             <div class="Imagem grupo-campo">
                 <div class="campo-imagem" id="campo-imagem" onclick="document.getElementById('input-imagem').click()">
                     <div class="campo-imagem-placeholder" id="placeholder-imagem">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                        </svg>
+                        <img src="Imagens/AdicionarImagem.svg" alt="Adicionar imagem" />
                         <span>Clique para adicionar imagens</span>
                     </div>
                     <div class="carrossel-imagens" id="carrossel-imagens" style="display: none;">
@@ -602,9 +630,7 @@
                         <img id="imagem-carrossel" src="" alt="Imagem do evento" />
                         <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
                         <button type="button" class="btn-adicionar-mais" onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                            </svg>
+                            <img src="Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                             Adicionar mais imagens
                         </button>
                     </div>

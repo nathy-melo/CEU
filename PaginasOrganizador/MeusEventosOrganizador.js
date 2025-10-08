@@ -58,6 +58,16 @@ function inicializarFiltroEventos() {
     }
 }
 
+// Função para adicionar novo evento
+function adicionarNovoEvento() {
+    if (typeof carregarPagina === 'function') {
+        carregarPagina('adicionarEvento');
+    }
+}
+
+// Torna a função global
+window.adicionarNovoEvento = adicionarNovoEvento;
+
 document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML
 window.inicializarFiltroEventos = inicializarFiltroEventos;
