@@ -26,7 +26,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
         'meusEventos' => 'MeusEventosOrganizador.html',
         'adicionarEvento' => 'AdicionarEvento.html',
-        'perfil' => 'PerfilOrganizador.html',
+        'perfil' => 'PerfilOrganizador.php',
         'certificados' => 'CertificadosOrganizador.html',
         'configuracoes' => 'ConfiguracoesOrganizador.html',
         // Reaproveita conteúdos globais quando aplicável
