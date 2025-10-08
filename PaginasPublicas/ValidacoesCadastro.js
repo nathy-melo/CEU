@@ -2,10 +2,10 @@
 
 // ========== CONFIGURAÇÕES PARA TESTES ==========
 // Mude estas variáveis para true/false para ativar/desativar validações
-var VALIDAR_CPF = false;           // true = valida CPF, false = não valida
-var VALIDAR_EMAIL = false;         // true = valida email, false = não valida  
-var VALIDAR_SENHA = false;         // true = valida senha, false = não valida
-var SENHA_MINIMA = 0;             // mínimo de caracteres (0 = desativar)
+var VALIDAR_CPF = true;           // true = valida CPF, false = não valida
+var VALIDAR_EMAIL = true;         // true = valida email, false = não valida  
+var VALIDAR_SENHA = true;         // true = valida senha, false = não valida
+var SENHA_MINIMA = 8;             // mínimo de caracteres (0 = desativar)
 // ================================================
 
 function validarCadastroParticipante() {
