@@ -25,6 +25,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'evento' => 'CartaodoEventoOrganizador.html',
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
         'meusEventos' => 'MeusEventosOrganizador.html',
+        'adicionarEvento' => 'AdicionarEvento.html',
         'perfil' => 'PerfilOrganizador.html',
         'certificados' => 'CertificadosOrganizador.html',
         'configuracoes' => 'ConfiguracoesOrganizador.html',
@@ -245,6 +246,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             },
             'sobreNos': {
                 html: '../PaginasGlobais/SobreNos.html',
+                js: [],
+                init: () => { }
+            },
+            'adicionarEvento': {
+                html: 'AdicionarEvento.html',
                 js: [],
                 init: () => { }
             }
