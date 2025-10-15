@@ -1,5 +1,5 @@
 <?php
-// Inicia a sessão
+// Inicia a sessão apenas se não houver uma ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
+    session_start();
 }
-session_start();
 
 // Define o cabeçalho para JSON
 header('Content-Type: application/json');
@@ -36,16 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once('../BancoDados/conexao.php');
 
 // Obtém os dados do formulário
-$nome = isset($_POST['nome']) ? trim($_POST['nome']) : '';
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $telefone = isset($_POST['telefone']) ? trim($_POST['telefone']) : null;
 $ra = isset($_POST['ra']) ? trim($_POST['ra']) : null;
 
 // Valida os campos obrigatórios
-if (empty($nome) || empty($email)) {
+if (empty($email)) {
     echo json_encode([
         'sucesso' => false,
-        'mensagem' => 'Nome e e-mail são obrigatórios.'
+        'mensagem' => 'E-mail é obrigatório.'
     ]);
     exit;
 }
@@ -89,16 +88,15 @@ if (mysqli_num_rows($resultado_verifica) > 0) {
 mysqli_stmt_close($stmt_verifica);
 
 // Atualiza os dados do usuário
-$sql_atualiza = "UPDATE usuario SET Nome = ?, Email = ?, RA = ? WHERE CPF = ?";
+$sql_atualiza = "UPDATE usuario SET Email = ?, RA = ? WHERE CPF = ?";
 $stmt_atualiza = mysqli_prepare($conexao, $sql_atualiza);
 
 // Se RA estiver vazio, define como NULL
 $ra_value = empty($ra) ? null : $ra;
-mysqli_stmt_bind_param($stmt_atualiza, "ssss", $nome, $email, $ra_value, $cpf);
+mysqli_stmt_bind_param($stmt_atualiza, "sss", $email, $ra_value, $cpf);
 
 if (mysqli_stmt_execute($stmt_atualiza)) {
-    // Atualiza os dados na sessão
-    $_SESSION['nome'] = $nome;
+    // Atualiza os dados na sessão (mantém o nome como estava)
     $_SESSION['email'] = $email;
     
     mysqli_stmt_close($stmt_atualiza);

@@ -7,6 +7,13 @@
     <title>Redefnir Senha</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
     <style>
+        .visually-hidden {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
         .container-pagina-login {
             display: flex;
             justify-content: center;
@@ -122,8 +129,9 @@
                 </h1>
                 <form class="formulario-login" id="form-redefinir" name="redefinir_senha" method="post" onsubmit="return false;">
                     <div class="grupo-formulario">
+                        <label for="email" class="visually-hidden">E-mail</label>
                         <input type="email" id="email" name="redefinir_senha[email]" placeholder="E-mail"
-                            class="input-formulario email-input" required>
+                            class="input-formulario email-input" required autocomplete="email">
                     </div>
                     <div class="acoes-formulario" id="acoes-formulario">
                         <button type="button" class="botao botao-login" onclick="carregarPagina('login')"

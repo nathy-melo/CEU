@@ -7,6 +7,15 @@
     <title>Painel Administrativo - CEU</title>
     <link rel="stylesheet" href="../styleGlobal.css">
     <link rel="stylesheet" href="styleAdmin.css">
+    <style>
+        .visually-hidden {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
 <body>
@@ -101,8 +110,9 @@
                         style="margin-top: 35px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
                         <button class="btn-secondary" onclick="carregarUsuarios()">🔄 Atualizar</button>
                         <button class="btn-secondary" onclick="exportarUsuarios()">📊 Exportar</button>
-                        <input type="text" id="searchUsuarios" placeholder="🔍 Buscar por nome, CPF ou email..."
-                            class="search-input" style="width: 350px;" oninput="buscarUsuarios()">
+                        <label for="searchUsuarios" class="visually-hidden">Buscar usuários</label>
+                        <input type="text" id="searchUsuarios" name="searchUsuarios" placeholder="🔍 Buscar por nome, CPF ou email..."
+                            class="search-input" style="width: 350px;" oninput="buscarUsuarios()" autocomplete="off">
                         <button class="clear-search" onclick="limparBuscaUsuarios()">✖ Limpar</button>
                     </div>
 
@@ -120,8 +130,9 @@
                         <button class="btn-generate" onclick="gerarNovoCodigo()">➕ Gerar Código</button>
                         <button class="btn-secondary" onclick="carregarCodigos()">🔄 Atualizar</button>
                         <button class="btn-secondary" onclick="gerarCodigosLote()">📦 Gerar em Lote</button>
-                        <input type="text" id="searchCodigos" placeholder="🔍 Buscar código..." class="search-input"
-                            style="width: 250px;" oninput="buscarCodigos()">
+                        <label for="searchCodigos" class="visually-hidden">Buscar códigos</label>
+                        <input type="text" id="searchCodigos" name="searchCodigos" placeholder="🔍 Buscar código..." class="search-input"
+                            style="width: 250px;" oninput="buscarCodigos()" autocomplete="off">
                         <button class="clear-search" onclick="limparBuscaCodigos()">✖ Limpar</button>
                     </div>
 
@@ -158,12 +169,12 @@
             <form id="formEvento">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
                     <div class="form-group">
-                        <label>Código do Evento:</label>
-                        <input type="number" id="cod_evento" required>
+                        <label for="cod_evento">Código do Evento:</label>
+                        <input type="number" id="cod_evento" name="cod_evento" required autocomplete="off">
                     </div>
                     <div class="form-group">
-                        <label>Categoria:</label>
-                        <select id="categoria" required>
+                        <label for="categoria">Categoria:</label>
+                        <select id="categoria" name="categoria" required autocomplete="off">
                             <option value="">Selecione...</option>
                             <option value="Workshop">Workshop</option>
                             <option value="Palestra">Palestra</option>
@@ -175,49 +186,49 @@
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
-                        <label>Nome do Evento:</label>
-                        <input type="text" id="nome" required>
+                        <label for="nome">Nome do Evento:</label>
+                        <input type="text" id="nome" name="nome" required autocomplete="off">
                     </div>
                     <div class="form-group">
-                        <label>Local:</label>
-                        <input type="text" id="lugar" required>
+                        <label for="lugar">Local:</label>
+                        <input type="text" id="lugar" name="lugar" required autocomplete="off">
                     </div>
                     <div class="form-group">
-                        <label>Modalidade:</label>
-                        <select id="modalidade" required>
+                        <label for="modalidade">Modalidade:</label>
+                        <select id="modalidade" name="modalidade" required autocomplete="off">
                             <option value="Presencial">Presencial</option>
                             <option value="Online">Online</option>
                             <option value="Híbrido">Híbrido</option>
                         </select>
                     </div>
                     <div style="grid-column: span 2;">
-                        <label>Descrição:</label>
-                        <textarea id="descricao"
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; height: 80px;"></textarea>
+                        <label for="descricao">Descrição:</label>
+                        <textarea id="descricao" name="descricao"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; height: 80px;" autocomplete="off"></textarea>
                     </div>
                     <div>
-                        <label>Público Alvo:</label>
-                        <input type="text" id="publico_alvo"
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <label for="publico_alvo">Público Alvo:</label>
+                        <input type="text" id="publico_alvo" name="publico_alvo"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" autocomplete="off">
                     </div>
                     <div>
-                        <label>Duração (horas):</label>
-                        <input type="number" step="0.5" id="duracao"
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <label for="duracao">Duração (horas):</label>
+                        <input type="number" step="0.5" id="duracao" name="duracao"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" autocomplete="off">
                     </div>
                     <div>
-                        <label>Data/Hora Início:</label>
-                        <input type="datetime-local" id="inicio" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <label for="inicio">Data/Hora Início:</label>
+                        <input type="datetime-local" id="inicio" name="inicio" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" autocomplete="off">
                     </div>
                     <div>
-                        <label>Data/Hora Fim:</label>
-                        <input type="datetime-local" id="conclusao" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <label for="conclusao">Data/Hora Fim:</label>
+                        <input type="datetime-local" id="conclusao" name="conclusao" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" autocomplete="off">
                     </div>
                     <div style="grid-column: span 2;">
-                        <label>
-                            <input type="checkbox" id="certificado"> Gera Certificado
+                        <label for="certificado">
+                            <input type="checkbox" id="certificado" name="certificado" value="1"> Gera Certificado
                         </label>
                     </div>
                 </div>

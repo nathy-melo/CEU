@@ -1,4 +1,9 @@
 <?php
+// Inicia a sessão apenas se não estiver ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Carrega os dados do usuário da sessão do banco de dados
 require_once '../BancoDados/conexao.php';
 
@@ -296,14 +301,14 @@ mysqli_close($conexao);
     }
 
     .botao-excluir {
-        background-color: #7a0909;
+        background-color: #dc3545;
         width: 10rem;
         font-size: 1.25rem;
         padding: 0.5rem 0;
     }
 
     .botao-sair {
-        background-color: #253542;
+        background-color: var(--botao);
         width: 8.75rem;
         font-size: 1.25rem;
         padding: 0.5rem 0;
@@ -327,6 +332,26 @@ mysqli_close($conexao);
         display: none !important;
     }
 
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+
+    .label-formulario {
+        display: block;
+        color: var(--branco);
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        letter-spacing: 0;
+    }
+
     .alert {
         padding: 0.75rem 1rem;
         margin-bottom: 1rem;
@@ -344,6 +369,28 @@ mysqli_close($conexao);
         color: #721c24;
         background-color: #f8d7da;
         border: 1px solid #f5c6cb;
+    }
+
+    /* Alertas específicos para o modal */
+    .modal-codigo .alert {
+        margin-bottom: 1rem;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .modal-codigo .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .modal-codigo .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 
     /* Modal para solicitar código de organizador */
@@ -457,20 +504,20 @@ mysqli_close($conexao);
                 <h1 class="titulo-cartao">Seus Dados</h1>
                 <form id="form-perfil-participante" name="perfil_participante" method="post">
                     <div class="grupo-formulario">
-                        <label for="name">Nome Completo:</label>
+                        <span class="label-formulario">Nome Completo:</span>
                         <div class="controle-formulario campo-nao-editavel" data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">
                             <span id="name-display"><?php echo htmlspecialchars($dadosUsuario['Nome'] ?? 'Nome não encontrado'); ?></span>
                         </div>
                     </div>
                     <div class="grupo-formulario">
-                        <label for="email">E-mail:</label>
+                        <label for="email-input">E-mail:</label>
                         <div class="controle-formulario">
                             <span id="email-display"><?php echo htmlspecialchars($dadosUsuario['Email'] ?? 'Email não encontrado'); ?></span>
-                            <input type="email" id="email-input" name="email" value="<?php echo htmlspecialchars($dadosUsuario['Email'] ?? ''); ?>" class="hidden" required>
+                            <input type="email" id="email-input" name="email" value="<?php echo htmlspecialchars($dadosUsuario['Email'] ?? ''); ?>" class="hidden" required autocomplete="email">
                         </div>
                     </div>
                     <div class="grupo-formulario">
-                        <label for="cpf">CPF:</label>
+                        <span class="label-formulario">CPF:</span>
                         <div class="controle-formulario campo-nao-editavel" data-tooltip="Este campo não pode ser alterado">
                             <span id="cpf-display"><?php 
                                 $cpfFormatado = $dadosUsuario['CPF'] ?? '';
@@ -485,17 +532,17 @@ mysqli_close($conexao);
                     
                     <?php if (!$dadosUsuario['Organizador']): ?>
                     <div class="grupo-formulario">
-                        <label for="ra">RA (Registro Acadêmico):</label>
+                        <label for="ra-input">RA (Registro Acadêmico):</label>
                         <div class="controle-formulario">
                             <span id="ra-display"><?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?></span>
-                            <input type="text" id="ra-input" name="ra" value="<?php echo htmlspecialchars($dadosUsuario['RA'] ?? ''); ?>" class="hidden" maxlength="7" placeholder="Ex: 1234567">
+                            <input type="text" id="ra-input" name="ra" value="<?php echo htmlspecialchars($dadosUsuario['RA'] ?? ''); ?>" class="hidden" maxlength="7" placeholder="Ex: 1234567" autocomplete="off">
                         </div>
                     </div>
                     <?php endif; ?>
                     
                     <?php if ($dadosUsuario['Organizador']): ?>
                     <div class="grupo-formulario">
-                        <label for="codigo">Código de Organizador:</label>
+                        <span class="label-formulario">Código de Organizador:</span>
                         <div class="controle-formulario campo-nao-editavel" data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">
                             <span id="codigo-display"><?php echo htmlspecialchars($dadosUsuario['Codigo'] ?? 'Código não encontrado'); ?></span>
                         </div>
@@ -503,7 +550,7 @@ mysqli_close($conexao);
                     <?php endif; ?>
                     
                     <div class="grupo-formulario">
-                        <label for="tipo-conta">Tipo de Conta:</label>
+                        <span class="label-formulario">Tipo de Conta:</span>
                         <div class="controle-formulario campo-nao-editavel" data-tooltip="Este campo não pode ser alterado">
                             <span id="tipo-conta-display"><?php echo ($dadosUsuario['Organizador'] == 1) ? 'Organizador' : 'Participante'; ?></span>
                         </div>
@@ -536,7 +583,8 @@ mysqli_close($conexao);
             <h2 class="modal-titulo">Tornar-se Organizador</h2>
             <p class="modal-texto">Para se tornar um organizador, você precisa de um código de acesso fornecido pela administração.</p>
             <div id="alert-modal"></div>
-            <input type="text" id="input-codigo" class="modal-input" placeholder="Digite o código de organizador" maxlength="8">
+            <label for="input-codigo" class="sr-only">Código de organizador</label>
+            <input type="text" id="input-codigo" name="codigo" class="modal-input" placeholder="Digite o código de organizador" maxlength="8" autocomplete="off">
             <div class="modal-acoes">
                 <button type="button" class="botao botao-cancelar" id="btn-cancelar-modal">Cancelar</button>
                 <button type="button" class="botao botao-salvar" id="btn-confirmar-codigo">Confirmar</button>

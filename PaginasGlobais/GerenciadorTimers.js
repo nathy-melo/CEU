@@ -21,7 +21,10 @@
             delay: delay,
             timestamp: Date.now()
         });
-        console.log(`[Gerenciador Timers] Registrado interval ID: ${id}, delay: ${delay}ms`);
+        // Log reduzido apenas para debugging importante
+        if (delay > 10000 || callback.name) { // Só loga se for delay grande ou função nomeada
+            console.log(`[Gerenciador Timers] Registrado interval ID: ${id}, delay: ${delay}ms`);
+        }
         return id;
     };
     
@@ -35,7 +38,10 @@
             delay: delay,
             timestamp: Date.now()
         });
-        console.log(`[Gerenciador Timers] Registrado timeout ID: ${id}, delay: ${delay}ms`);
+        // Log reduzido apenas para debugging importante
+        if (delay > 5000 || callback.name) { // Só loga se for delay grande ou função nomeada
+            console.log(`[Gerenciador Timers] Registrado timeout ID: ${id}, delay: ${delay}ms`);
+        }
         return id;
     };
     
@@ -43,30 +49,33 @@
     window.clearInterval = function(id) {
         clearIntervalOriginal.call(this, id);
         intervalosAtivos = intervalosAtivos.filter(timer => timer.id !== id);
-        console.log(`[Gerenciador Timers] Limpo interval ID: ${id}`);
+        // console.log(`[Gerenciador Timers] Limpo interval ID: ${id}`); // Log desabilitado
     };
     
     // Função para limpar timeouts
     window.clearTimeout = function(id) {
         clearTimeoutOriginal.call(this, id);
         timeoutsAtivos = timeoutsAtivos.filter(timer => timer.id !== id);
-        console.log(`[Gerenciador Timers] Limpo timeout ID: ${id}`);
+        // console.log(`[Gerenciador Timers] Limpo timeout ID: ${id}`); // Log desabilitado
     };
     
     // Função para limpar todos os timers ativos
     function limparTodosOsTimers() {
-        console.log(`[Gerenciador Timers] Limpando ${intervalosAtivos.length} intervalos e ${timeoutsAtivos.length} timeouts`);
+        // Log apenas se houver muitos timers para limpar
+        if (intervalosAtivos.length > 3 || timeoutsAtivos.length > 3) {
+            console.log(`[Gerenciador Timers] Limpando ${intervalosAtivos.length} intervalos e ${timeoutsAtivos.length} timeouts`);
+        }
         
         // Limpar todos os intervalos
         intervalosAtivos.forEach(timer => {
             clearIntervalOriginal(timer.id);
-            console.log(`[Gerenciador Timers] Limpando interval: ${timer.callback} (${timer.delay}ms)`);
+            // console.log(`[Gerenciador Timers] Limpando interval: ${timer.callback} (${timer.delay}ms)`); // Log reduzido
         });
         
         // Limpar todos os timeouts
         timeoutsAtivos.forEach(timer => {
             clearTimeoutOriginal(timer.id);
-            console.log(`[Gerenciador Timers] Limpando timeout: ${timer.callback} (${timer.delay}ms)`);
+            // console.log(`[Gerenciador Timers] Limpando timeout: ${timer.callback} (${timer.delay}ms)`); // Log reduzido
         });
         
         // Resetar arrays

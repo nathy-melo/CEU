@@ -254,18 +254,23 @@
           <p class="subtitulo-formulario">Receba por e-mail</p>
         </header>
         <form class="corpo-formulario" id="form-solicitar-codigo" name="solicitar_codigo" method="post">
-          <input type="text" class="entrada-formulario" id="nome-completo" name="solicitar_codigo[nome_completo]" placeholder="Nome" required>
+          <label for="nome-completo" class="visually-hidden">Nome completo</label>
+          <input type="text" class="entrada-formulario" id="nome-completo" name="solicitar_codigo[nome_completo]" placeholder="Nome" required autocomplete="name">
+          <label for="email" class="visually-hidden">E-mail</label>
           <input type="email" class="entrada-formulario" id="email" name="solicitar_codigo[email]" placeholder="E-mail" required
-            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Digite um e-mail válido">
+            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Digite um e-mail válido" autocomplete="email">
           <div class="linha-formulario">
+            <label for="cpf" class="visually-hidden">CPF</label>
             <input type="text" class="entrada-formulario" id="cpf" name="solicitar_codigo[cpf]" placeholder="CPF" required
-              pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00" maxlength="14">
+              pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00" maxlength="14" autocomplete="off">
+            <label for="data-nascimento" class="visually-hidden">Data de nascimento</label>
             <input type="text" class="entrada-formulario" id="data-nascimento" name="solicitar_codigo[data_nascimento]" placeholder="Data de Nascimento" required
-              pattern="\d{2}/\d{2}/\d{4}" title="Digite a data no formato dd/mm/aaaa">
+              pattern="\d{2}/\d{2}/\d{4}" title="Digite a data no formato dd/mm/aaaa" autocomplete="bday">
           </div>
-          <textarea class="area-texto-formulario" id="mensagem" name="solicitar_codigo[mensagem]" placeholder="Mensagem" required></textarea>
+          <label for="mensagem" class="visually-hidden">Mensagem</label>
+          <textarea class="area-texto-formulario" id="mensagem" name="solicitar_codigo[mensagem]" placeholder="Mensagem" required autocomplete="off"></textarea>
           <div class="grupo-termos">
-            <label class="rotulo-termos">
+            <label for="aceite-termos" class="rotulo-termos">
               Concordo com os <a onclick="carregarPagina('termos')" class="link-termos">Termos de Condições</a>
               <span class="switch-toggle">
                 <input type="checkbox" id="aceite-termos" name="solicitar_codigo[aceite_termos]" value="1" required>

@@ -17,12 +17,12 @@
 
     // Função para atualizar timestamp da última atividade
     function atualizarTimestampUltimaAtividade() {
-        console.log('Atividade detectada:', new Date().toLocaleTimeString()); // Debug
+        // Removido console.log para evitar poluição do console
         timestampUltimaAtividade = Date.now();
         
         // Se havia modal de aviso ativo, remove
         if (modalAvisoSessaoAtivo) {
-            console.log('Removendo modal de aviso devido à atividade'); // Debug
+            // console.log('Removendo modal de aviso devido à atividade'); // Debug desabilitado
             removerModalAvisoSessao();
         }
     }
@@ -38,7 +38,7 @@
 
     // Função para adicionar listeners de atividade
     function adicionarListenersAtividadeUsuario() {
-        console.log('Adicionando listeners de atividade'); // Debug
+        // console.log('Adicionando listeners de atividade'); // Debug desabilitado
         eventosAtividadeUsuario.forEach(evento => {
             document.addEventListener(evento, atualizarTimestampUltimaAtividade, {
                 passive: true,
@@ -53,7 +53,7 @@
 
     // Função para remover listeners de atividade
     function removerListenersAtividadeUsuario() {
-        console.log('Removendo listeners de atividade'); // Debug
+        // console.log('Removendo listeners de atividade'); // Debug desabilitado
         eventosAtividadeUsuario.forEach(evento => {
             document.removeEventListener(evento, atualizarTimestampUltimaAtividade, {
                 passive: true,
@@ -68,7 +68,7 @@
 
     // Função para mostrar modal de sessão expirada
     function mostrarModalSessaoExpirada() {
-        console.log('MOSTRAR MODAL SESSÃO EXPIRADA - Iniciando'); // Debug
+        // console.log('MOSTRAR MODAL SESSÃO EXPIRADA - Iniciando'); // Debug desabilitado
         
         // Remove modal antigo se existir
         const modalSessaoExistente = document.getElementById('modalSessaoExpirada');
@@ -96,7 +96,7 @@
         // Adiciona ao body
         document.body.appendChild(modalSessaoExpirada);
         
-        console.log('MODAL SESSÃO EXPIRADA - Adicionado ao DOM'); // Debug
+        // console.log('MODAL SESSÃO EXPIRADA - Adicionado ao DOM'); // Debug desabilitado
         
         // Adiciona evento ao botão (sem redirecionamento automático)
         const btnLogin = modalSessaoExpirada.querySelector('#btnFazerLoginNovamente');
@@ -124,9 +124,10 @@
         fetch('./VerificarSessao.php')
             .then(response => response.json())
             .then(dadosResposta => {
-                console.log('Resposta do servidor:', dadosResposta); // Debug
+                // Log apenas se sessão não estiver ativa (importante)
                 if (!dadosResposta.ativa) {
-                    console.log('Sessão inativa detectada pelo servidor'); // Debug
+                    console.log('Resposta do servidor:', dadosResposta);
+                    console.log('Sessão inativa detectada pelo servidor');
                     pararVerificacaoSessao();
                     // SEMPRE mostra o modal, nunca redireciona automaticamente
                     mostrarModalSessaoExpirada();
@@ -165,21 +166,24 @@
         const tempoInativo = timestampAtual - timestampUltimaAtividade;
         const segundosInativos = Math.floor(tempoInativo / 1000);
         
-        console.log(`Verificando inatividade: ${segundosInativos}s de ${tempoLimiteSessaoInatividade/1000}s`); // Debug
+        // Debug apenas quando próximo do limite (reduzindo spam)
+        if (segundosInativos % 10 === 0 || segundosInativos > 50) {
+            console.log(`Verificando inatividade: ${segundosInativos}s de ${tempoLimiteSessaoInatividade/1000}s`);
+        }
         
         // Se passou do tempo limite, expira a sessão
         if (tempoInativo >= tempoLimiteSessaoInatividade) {
-            console.log('Sessão expirada por inatividade - MOSTRANDO MODAL'); // Debug
+            console.log('Sessão expirada por inatividade - MOSTRANDO MODAL');
             pararVerificacaoSessao();
             
             // Expira a sessão no servidor também, mas SEMPRE mostra modal
             fetch('./VerificarSessao.php?forcar_expiracao=1')
                 .then(() => {
-                    console.log('Sessão expirada no servidor - mostrando modal'); // Debug
+                    // console.log('Sessão expirada no servidor - mostrando modal'); // Debug reduzido
                     mostrarModalSessaoExpirada();
                 })
                 .catch(() => {
-                    console.log('Erro ao expirar no servidor - mostrando modal mesmo assim'); // Debug
+                    console.log('Erro ao expirar no servidor - mostrando modal mesmo assim');
                     mostrarModalSessaoExpirada();
                 });
             return;
@@ -188,14 +192,14 @@
         // Se faltam 20 segundos e não há modal ativo, mostra aviso
         const tempoRestante = tempoLimiteSessaoInatividade - tempoInativo;
         if (tempoRestante <= 20000 && !modalAvisoSessaoAtivo) {
-            console.log('Mostrando aviso de sessão expirando'); // Debug
+            console.log('Mostrando aviso de sessão expirando');
             mostrarAvisoSessaoProximaExpiracao();
         }
     }
 
     // Função para iniciar verificação de sessão
     function iniciarVerificacaoSessao(tempoSessaoSegundos = 60) {
-        console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos`); // Debug
+        // console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos`); // Debug reduzido
         
         // Para qualquer verificação anterior
         pararVerificacaoSessao();
@@ -205,7 +209,7 @@
         timestampUltimaAtividade = Date.now();
         modalAvisoSessaoAtivo = false;
         
-        console.log('Última atividade inicial:', new Date(timestampUltimaAtividade).toLocaleTimeString()); // Debug
+        // console.log('Última atividade inicial:', new Date(timestampUltimaAtividade).toLocaleTimeString()); // Debug desabilitado
         
         // Adiciona listeners de atividade
         adicionarListenersAtividadeUsuario();
@@ -216,12 +220,12 @@
         // Verifica inatividade a cada 1 segundo
         intervaloVerificacaoInatividade = setInterval(verificarInatividade, 1000);
         
-        console.log('Sistema de verificação de sessão iniciado'); // Debug
+        // console.log('Sistema de verificação de sessão iniciado'); // Debug desabilitado
     }
 
     // Função para parar verificação de sessão
     function pararVerificacaoSessao() {
-        console.log('Parando verificação de sessão'); // Debug
+        // console.log('Parando verificação de sessão'); // Debug desabilitado
         
         // Remove listeners de atividade
         removerListenersAtividadeUsuario();
@@ -241,7 +245,7 @@
 
     // Função para reiniciar verificação de sessão (útil após navegação)
     function reiniciarVerificacaoSessao(tempoSessaoSegundos = 60) {
-        console.log('Reiniciando verificação de sessão'); // Debug
+        // console.log('Reiniciando verificação de sessão'); // Debug desabilitado
         pararVerificacaoSessao();
         setTimeout(() => {
             iniciarVerificacaoSessao(tempoSessaoSegundos);

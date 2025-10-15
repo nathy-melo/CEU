@@ -280,7 +280,7 @@ function mostrarModalExcluirConta() {
     var btnConfirmar = document.createElement('button');
     btnConfirmar.type = 'button';
     btnConfirmar.textContent = 'Confirmar';
-    btnConfirmar.style.backgroundColor = '#7a0909';
+    btnConfirmar.style.backgroundColor = '#dc3545';
     btnConfirmar.style.color = '#fff';
     btnConfirmar.style.border = 'none';
     btnConfirmar.style.borderRadius = '0.3rem';
@@ -340,6 +340,56 @@ function inicializarEventosPerfilParticipante() {
         btnExcluir.addEventListener('click', mostrarModalExcluirConta);
     }
     
+    // ========== EVENTOS DO MODAL DE CÓDIGO ORGANIZADOR ==========
+    // Botão para abrir modal
+    const btnTornarOrganizador = document.getElementById('btn-tornar-organizador');
+    if (btnTornarOrganizador) {
+        btnTornarOrganizador.addEventListener('click', mostrarModalCodigo);
+    }
+    
+    // Botão cancelar modal
+    const btnCancelarModal = document.getElementById('btn-cancelar-modal');
+    if (btnCancelarModal) {
+        btnCancelarModal.addEventListener('click', esconderModalCodigo);
+    }
+    
+    // Botão confirmar código
+    const btnConfirmarCodigo = document.getElementById('btn-confirmar-codigo');
+    if (btnConfirmarCodigo) {
+        btnConfirmarCodigo.addEventListener('click', processarCodigoOrganizador);
+    }
+    
+    // Botão solicitar código
+    const btnSolicitarCodigo = document.getElementById('btn-solicitar-codigo');
+    if (btnSolicitarCodigo) {
+        btnSolicitarCodigo.addEventListener('click', solicitarCodigo);
+    }
+    
+    // Input código (Enter para confirmar e máscara)
+    const inputCodigo = document.getElementById('input-codigo');
+    if (inputCodigo) {
+        // Aplicar máscara durante digitação
+        inputCodigo.addEventListener('input', function() {
+            aplicarMascaraCodigo(this);
+        });
+        
+        inputCodigo.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                processarCodigoOrganizador();
+            }
+        });
+    }
+    
+    // Fechar modal ao clicar fora
+    const modalCodigo = document.getElementById('modal-codigo');
+    if (modalCodigo) {
+        modalCodigo.addEventListener('click', function(e) {
+            if (e.target === modalCodigo) {
+                esconderModalCodigo();
+            }
+        });
+    }
+    
     // Inicializar tooltips
     inicializarTooltips();
     
@@ -361,6 +411,14 @@ function inicializarTooltips() {
         return tooltip;
     }
     
+    // Remover tooltip existente
+    function removerTooltip() {
+        if (tooltip) {
+            tooltip.classList.remove('show');
+            tooltip.textContent = '';
+        }
+    }
+    
     // Encontrar todos os elementos com data-tooltip
     const elementosComTooltip = document.querySelectorAll('[data-tooltip]');
     
@@ -368,8 +426,17 @@ function inicializarTooltips() {
         elemento.addEventListener('mouseenter', function(e) {
             const tooltipTexto = this.getAttribute('data-tooltip');
             if (tooltipTexto) {
+                removerTooltip(); // Remove qualquer tooltip anterior
                 const tooltipEl = criarTooltip();
                 tooltipEl.textContent = tooltipTexto;
+                
+                // Posicionar inicialmente
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX + 15;
+                const y = e.clientY + 15;
+                
+                tooltipEl.style.left = x + 'px';
+                tooltipEl.style.top = y + 'px';
                 tooltipEl.classList.add('show');
             }
         });
@@ -390,10 +457,13 @@ function inicializarTooltips() {
         });
         
         elemento.addEventListener('mouseleave', function() {
-            if (tooltip) {
-                tooltip.classList.remove('show');
-            }
+            removerTooltip();
         });
+    });
+    
+    // Remover tooltip se o mouse sair da janela
+    document.addEventListener('mouseleave', function() {
+        removerTooltip();
     });
 }
 
@@ -455,10 +525,16 @@ function processarCodigoOrganizador() {
     .then(response => response.json())
     .then(data => {
         if (data.sucesso) {
-            mostrarAlerta('Parabéns! Você agora é um organizador. A página será recarregada.', 'success');
+            // Mostra o alerta no modal primeiro
+            mostrarAlertaModal('Parabéns! Você agora é um organizador. A página será recarregada.', 'success');
             setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+                // Depois esconde o modal e mostra o alerta principal
+                esconderModalCodigo();
+                mostrarAlerta('Parabéns! Você agora é um organizador. A página será recarregada.', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }, 1500);
         } else {
             mostrarAlertaModal(data.mensagem || 'Código inválido.', 'danger');
         }
@@ -471,63 +547,14 @@ function processarCodigoOrganizador() {
 
 // Função para solicitar código (redireciona para Fale Conosco)
 function solicitarCodigo() {
-    esconderModalCodigo();
-    // Você pode implementar um redirecionamento ou abrir o Fale Conosco
-    mostrarAlerta('Redirecionando para o Fale Conosco para solicitar código...', 'success');
+    // Mostra alerta no modal primeiro
+    mostrarAlertaModal('Redirecionando para o Fale Conosco para solicitar código...', 'success');
     setTimeout(() => {
-        // Substitua por sua lógica de redirecionamento
-        window.location.href = '../PaginasGlobais/FaleConosco.html';
+        esconderModalCodigo();
+        // Mostra alerta na página principal também
+        mostrarAlerta('Redirecionando para o Fale Conosco para solicitar código...', 'success');
+        setTimeout(() => {
+            window.location.href = '../PaginasGlobais/FaleConosco.html';
+        }, 1000);
     }, 1500);
 }
-
-// Adicionar eventos após o DOM estar carregado
-document.addEventListener('DOMContentLoaded', function() {
-    // Botão para abrir modal
-    const btnTornarOrganizador = document.getElementById('btn-tornar-organizador');
-    if (btnTornarOrganizador) {
-        btnTornarOrganizador.addEventListener('click', mostrarModalCodigo);
-    }
-    
-    // Botão cancelar modal
-    const btnCancelarModal = document.getElementById('btn-cancelar-modal');
-    if (btnCancelarModal) {
-        btnCancelarModal.addEventListener('click', esconderModalCodigo);
-    }
-    
-    // Botão confirmar código
-    const btnConfirmarCodigo = document.getElementById('btn-confirmar-codigo');
-    if (btnConfirmarCodigo) {
-        btnConfirmarCodigo.addEventListener('click', processarCodigoOrganizador);
-    }
-    
-    // Botão solicitar código
-    const btnSolicitarCodigo = document.getElementById('btn-solicitar-codigo');
-    if (btnSolicitarCodigo) {
-        btnSolicitarCodigo.addEventListener('click', solicitarCodigo);
-    }
-    
-    // Input código (Enter para confirmar e máscara)
-    const inputCodigo = document.getElementById('input-codigo');
-    if (inputCodigo) {
-        // Aplicar máscara durante digitação
-        inputCodigo.addEventListener('input', function() {
-            aplicarMascaraCodigo(this);
-        });
-        
-        inputCodigo.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                processarCodigoOrganizador();
-            }
-        });
-    }
-    
-    // Fechar modal ao clicar fora
-    const modalCodigo = document.getElementById('modal-codigo');
-    if (modalCodigo) {
-        modalCodigo.addEventListener('click', function(e) {
-            if (e.target === modalCodigo) {
-                esconderModalCodigo();
-            }
-        });
-    }
-}); 

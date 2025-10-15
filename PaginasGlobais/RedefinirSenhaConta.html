@@ -6,20 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Redefinir Senha</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
-</head>
-<style>
-    .redefinir-senha-container {
-        background-color: var(--caixas);
-        border-radius: 1rem;
-        padding: 1.75rem 2.2rem;
-        width: 100%;
-        min-width: 30rem;
-        box-shadow: 0rem 0.45rem 1.3rem var(--sombra-leve);
-    }
+    <style>
+        .visually-hidden {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        
+        .redefinir-senha-container {
+            background-color: var(--caixas);
+            border-radius: 1rem;
+            padding: 1.75rem 2.2rem;
+            width: 100%;
+            min-width: 30rem;
+            box-shadow: 0rem 0.45rem 1.3rem var(--sombra-leve);
+        }
 
-    .redefinir-senha-titulo {
-        color: var(--branco);
-        font-family: 'Inter', sans-serif;
+        .redefinir-senha-titulo {
+            color: var(--branco);
+            font-family: 'Inter', sans-serif;
         font-weight: 700;
         font-size: 2.5em;
         line-height: 1.2;
@@ -96,16 +103,19 @@
             <h1 class="redefinir-senha-titulo">Redefinir Senha</h1>
             <form class="redefinir-senha-formulario" method="post" id="form-redefinir-senha-conta" name="redefinir_senha_conta">
                 <div class="grupo-formulario">
+                    <label for="current-password" class="visually-hidden">Senha atual</label>
                     <input type="password" id="current-password" name="redefinir_senha_conta[senha_atual]"
-                        placeholder="Digite a sua senha atual" required>
+                        placeholder="Digite a sua senha atual" required autocomplete="current-password">
                 </div>
                 <div class="grupo-formulario">
+                    <label for="new-password" class="visually-hidden">Nova senha</label>
                     <input type="password" id="new-password" name="redefinir_senha_conta[nova_senha]" placeholder="Digite a nova senha"
-                        required>
+                        required autocomplete="new-password">
                 </div>
                 <div class="grupo-formulario">
+                    <label for="confirm-password" class="visually-hidden">Confirmar nova senha</label>
                     <input type="password" id="confirm-password" name="redefinir_senha_conta[confirmar_senha]"
-                        placeholder="Confirme a nova senha" required>
+                        placeholder="Confirme a nova senha" required autocomplete="new-password">
                 </div>
                 <div class="acoes-formulario">
                     <button type="button" class="botao" onclick="history.back()">Voltar</button>

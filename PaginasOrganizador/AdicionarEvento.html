@@ -559,35 +559,35 @@
         <form id="form-evento" class="cartao-evento">
             <div class="Nome grupo-campo">
                 <label for="nome"><span style="color: red;">*</span> Nome:</label>
-                <input type="text" id="nome" class="campo-input" placeholder="Digite o nome do evento" required>
+                <input type="text" id="nome" name="nome" class="campo-input" placeholder="Digite o nome do evento" required autocomplete="off">
             </div>
             <div class="Local grupo-campo">
                 <label for="local"><span style="color: red;">*</span> Local:</label>
-                <input type="text" id="local" class="campo-input" placeholder="Digite o local do evento" required>
+                <input type="text" id="local" name="local" class="campo-input" placeholder="Digite o local do evento" required autocomplete="off">
             </div>
             <div class="DataDeInicio grupo-campo">
                 <label for="data-inicio"><span style="color: red;">*</span> Data de Início:</label>
-                <input type="date" id="data-inicio" class="campo-input" required>
+                <input type="date" id="data-inicio" name="data_inicio" class="campo-input" required autocomplete="off">
             </div>
             <div class="DataDeFim grupo-campo">
                 <label for="data-fim"><span style="color: red;">*</span> Data de Fim:</label>
-                <input type="date" id="data-fim" class="campo-input" required>
+                <input type="date" id="data-fim" name="data_fim" class="campo-input" required autocomplete="off">
             </div>
             <div class="HorarioDeInicio grupo-campo">
                 <label for="horario-inicio"><span style="color: red;">*</span> Horário de Início:</label>
-                <input type="time" id="horario-inicio" class="campo-input" required>
+                <input type="time" id="horario-inicio" name="horario_inicio" class="campo-input" required autocomplete="off">
             </div>
             <div class="HorarioDeFim grupo-campo">
                 <label for="horario-fim"><span style="color: red;">*</span> Horário de Fim:</label>
-                <input type="time" id="horario-fim" class="campo-input" required>
+                <input type="time" id="horario-fim" name="horario_fim" class="campo-input" required autocomplete="off">
             </div>
             <div class="PublicoAlvo grupo-campo">
                 <label for="publico-alvo"><span style="color: red;">*</span> Público Alvo:</label>
-                <input type="text" id="publico-alvo" class="campo-input" placeholder="Ex: Estudantes" required>
+                <input type="text" id="publico-alvo" name="publico_alvo" class="campo-input" placeholder="Ex: Estudantes" required autocomplete="off">
             </div>
             <div class="Categoria grupo-campo">
                 <label for="categoria"><span style="color: red;">*</span> Categoria:</label>
-                <select id="categoria" class="campo-select" required>
+                <select id="categoria" name="categoria" class="campo-select" required autocomplete="off">
                     <option value="">Selecione</option>
                     <option value="Palestra">Palestra</option>
                     <option value="Workshop">Workshop</option>
@@ -600,7 +600,7 @@
             </div>
             <div class="Modalidade grupo-campo">
                 <label for="modalidade"><span style="color: red;">*</span> Modalidade:</label>
-                <select id="modalidade" class="campo-select" required>
+                <select id="modalidade" name="modalidade" class="campo-select" required autocomplete="off">
                     <option value="">Selecione</option>
                     <option value="Presencial">Presencial</option>
                     <option value="Online">Online</option>
@@ -609,7 +609,7 @@
             </div>
             <div class="Certificado grupo-campo">
                 <label for="certificado"><span style="color: red;">*</span> Tipo de Certificado:</label>
-                <select id="certificado" class="campo-select" required>
+                <select id="certificado" name="certificado" class="campo-select" required autocomplete="off">
                     <option value="">Selecione</option>
                     <option value="Sem certificacao">Sem certificação</option>
                     <option value="Ensino">Ensino</option>
@@ -635,11 +635,11 @@
                         </button>
                     </div>
                 </div>
-                <input type="file" id="input-imagem" accept="image/*" multiple onchange="adicionarImagens(event)">
+                <input type="file" id="input-imagem" name="imagens_evento" accept="image/*" multiple onchange="adicionarImagens(event)" autocomplete="off">
             </div>
             <div class="Descricao grupo-campo">
                 <label for="descricao"><span style="color: red;">*</span> Descrição:</label>
-                <textarea id="descricao" class="campo-textarea" placeholder="Descreva o evento, incluindo detalhes, objetivos, público alvo, estrutura, palestrantes, etc." required></textarea>
+                <textarea id="descricao" name="descricao" class="campo-textarea" placeholder="Descreva o evento, incluindo detalhes, objetivos, público alvo, estrutura, palestrantes, etc." required autocomplete="off"></textarea>
             </div>
             <div class="BotaoVoltar">
                 <button type="button" class="botao" onclick="history.back()">Voltar</button>

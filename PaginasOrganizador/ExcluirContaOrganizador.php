@@ -1,5 +1,5 @@
 <?php
-// Inicia a sessão
+// Inicia a sessão apenas se não houver uma ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
+    session_start();
 }
-session_start();
 
 // Define o cabeçalho para JSON
 header('Content-Type: application/json');

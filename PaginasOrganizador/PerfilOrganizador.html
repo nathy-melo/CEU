@@ -173,29 +173,29 @@
                 <h1 class="titulo-cartao">Seus Dados</h1>
                 <form id="form-perfil-organizador" name="perfil_organizador" method="post">
                     <div class="grupo-formulario">
-                        <label for="name">Nome:</label>
+                        <label for="name-input">Nome:</label>
                         <div id="name" class="controle-formulario">Aurora do Nascimento</div>
-                        <input type="text" id="name-input" class="controle-formulario-input escondido" value="Aurora do Nascimento" required>
+                        <input type="text" id="name-input" name="name" class="controle-formulario-input escondido" value="Aurora do Nascimento" required autocomplete="name">
                     </div>
                     <div class="grupo-formulario">
-                        <label for="email">E-mail:</label>
+                        <label for="email-input">E-mail:</label>
                         <div id="email" class="controle-formulario">aurora.nascimento@exemplo.com</div>
-                        <input type="email" id="email-input" class="controle-formulario-input escondido" value="aurora.nascimento@exemplo.com" required>
+                        <input type="email" id="email-input" name="email" class="controle-formulario-input escondido" value="aurora.nascimento@exemplo.com" required autocomplete="email">
                     </div>
                     <div class="grupo-formulario">
-                        <label for="phone">Telefone:</label>
+                        <label for="phone-input">Telefone:</label>
                         <div id="phone" class="controle-formulario">(00) 91234-5678</div>
-                        <input type="tel" id="phone-input" class="controle-formulario-input escondido" value="(00) 91234-5678">
+                        <input type="tel" id="phone-input" name="phone" class="controle-formulario-input escondido" value="(00) 91234-5678" autocomplete="tel">
                     </div>
                     <div class="grupo-formulario">
-                        <label for="cpf">CPF:</label>
+                        <label for="cpf-input">CPF:</label>
                         <div id="cpf" class="controle-formulario">123.456.789.-00</div>
-                        <input type="text" id="cpf-input" class="controle-formulario-input escondido" value="123.456.789.-00" readonly>
+                        <input type="text" id="cpf-input" name="cpf" class="controle-formulario-input escondido" value="123.456.789.-00" readonly autocomplete="off">
                     </div>
                     <div class="grupo-formulario">
-                        <label for="ra">RA (Opcional):</label>
+                        <label for="ra-input">RA (Opcional):</label>
                         <div id="ra" class="controle-formulario">1234567</div>
-                        <input type="text" id="ra-input" class="controle-formulario-input escondido" value="1234567" maxlength="7">
+                        <input type="text" id="ra-input" name="ra" class="controle-formulario-input escondido" value="1234567" maxlength="7" autocomplete="off">
                     </div>
                     <div class="acoes-formulario">
                         <button type="button" class="botao botao-editar" id="btn-editar">Editar</button>
