@@ -240,7 +240,7 @@ mysqli_close($conexao);
 
     .linha-botoes-principais {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         gap: 0.75rem;
         width: 100%;
     }
