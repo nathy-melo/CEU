@@ -1,5 +1,5 @@
 <?php
-// Inicia a sessão
+// Inicia a sessão apenas se não estiver ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
+    session_start();
 }
-session_start();
 
 // Verifica se o usuário está logado
 if (!isset($_SESSION['cpf']) || !isset($_SESSION['organizador']) || $_SESSION['organizador'] != 1) {
