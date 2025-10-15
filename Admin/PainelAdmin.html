@@ -5,16 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - CEU</title>
+    <link rel="stylesheet" href="../styleGlobal.css">
     <link rel="stylesheet" href="styleAdmin.css">
 </head>
 
 <body>
     <div class="admin-page-container">
         <div id="loadingScreen"
-            style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-            <div style="text-align: center; color: white;">
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--fundo); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+            <div style="text-align: center; color: var(--branco);">
                 <div
-                    style="width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;">
+                    style="width: 50px; height: 50px; border: 3px solid var(--caixas); border-top: 3px solid var(--botao); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;">
                 </div>
                 <p>Carregando painel administrativo...</p>
             </div>
@@ -48,37 +49,31 @@
                     <h3>📊 Dashboard do Sistema</h3>
                     <div
                         style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
-                        <div
-                            style="background: rgba(40, 167, 69, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;">
-                            <h4 style="margin: 0; color: #28a745;">� Total de Eventos</h4>
-                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalEventos">-</p>
+                        <div class="stats-card" style="border-left-color: #28a745;">
+                            <h4 style="color: #28a745;">🎯 Total de Eventos</h4>
+                            <p id="totalEventos">-</p>
                             <small>Eventos cadastrados no sistema</small>
                         </div>
-                        <div
-                            style="background: rgba(0, 123, 255, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #007bff;">
-                            <h4 style="margin: 0; color: #007bff;">👥 Total de Usuários</h4>
-                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalUsuarios">-</p>
+                        <div class="stats-card" style="border-left-color: var(--botao);">
+                            <h4 style="color: var(--botao);">👥 Total de Usuários</h4>
+                            <p id="totalUsuarios">-</p>
                             <small>Usuários registrados</small>
                         </div>
-                        <div
-                            style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107;">
-                            <h4 style="margin: 0; color: #ffc107;">👑 Organizadores</h4>
-                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalOrganizadores">-</p>
+                        <div class="stats-card" style="border-left-color: #ffc107;">
+                            <h4 style="color: #ffc107;">👑 Organizadores</h4>
+                            <p id="totalOrganizadores">-</p>
                             <small>Usuários com perfil organizador</small>
                         </div>
-                        <div
-                            style="background: rgba(220, 53, 69, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #dc3545;">
-                            <h4 style="margin: 0; color: #dc3545;">🎫 Códigos Ativos</h4>
-                            <p style="font-size: 32px; margin: 10px 0; font-weight: bold;" id="totalCodigos">-</p>
+                        <div class="stats-card" style="border-left-color: #dc3545;">
+                            <h4 style="color: #dc3545;">🎫 Códigos Ativos</h4>
+                            <p id="totalCodigos">-</p>
                             <small>Códigos de organizador disponíveis</small>
                         </div>
                     </div>
 
-                    <div style="margin-top: 30px;">
-                        <h4>📈 Estatísticas Recentes</h4>
-                        <div style="background: white; padding: 20px; border-radius: 10px;">
-                            <div id="estatisticas">Carregando estatísticas...</div>
-                        </div>
+                    <div style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 15px;">📈 Estatísticas Recentes</h4>
+                        <div id="estatisticas">Carregando estatísticas...</div>
                     </div>
                 </div>
 
@@ -93,7 +88,7 @@
                         <button class="btn-secondary" onclick="exportarEventos()">📊 Exportar</button>
                     </div>
 
-                    <div id="eventosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                    <div class="admin-container" id="eventosContainer">
                         <p>Carregando eventos...</p>
                     </div>
                 </div>
@@ -111,7 +106,7 @@
                         <button class="clear-search" onclick="limparBuscaUsuarios()">✖ Limpar</button>
                     </div>
 
-                    <div id="usuariosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                    <div class="admin-container" id="usuariosContainer">
                         <p>Carregando usuários...</p>
                     </div>
                 </div>
@@ -130,7 +125,7 @@
                         <button class="clear-search" onclick="limparBuscaCodigos()">✖ Limpar</button>
                     </div>
 
-                    <div id="codigosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                    <div class="admin-container" id="codigosContainer">
                         <p>Carregando códigos...</p>
                     </div>
                 </div>
@@ -145,7 +140,7 @@
                         <button class="btn-secondary" onclick="validarCertificados()">✅ Validar Todos</button>
                     </div>
 
-                    <div id="certificadosContainer" style="background: white; border-radius: 10px; padding: 20px;">
+                    <div class="admin-container" id="certificadosContainer">
                         <p>Carregando certificados...</p>
                     </div>
                 </div>
@@ -157,20 +152,18 @@
     <!-- Modal para Eventos -->
     <div id="modalEvento"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
-        <div
-            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; max-height: 80%; overflow-y: auto;">
+        <div class="admin-container"
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 600px; max-height: 80%; overflow-y: auto;">
             <h3 id="modalEventoTitle">Novo Evento</h3>
             <form id="formEvento">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
-                    <div>
+                    <div class="form-group">
                         <label>Código do Evento:</label>
-                        <input type="number" id="cod_evento" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <input type="number" id="cod_evento" required>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label>Categoria:</label>
-                        <select id="categoria" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <select id="categoria" required>
                             <option value="">Selecione...</option>
                             <option value="Workshop">Workshop</option>
                             <option value="Palestra">Palestra</option>
@@ -181,20 +174,17 @@
                             <option value="Conferência">Conferência</option>
                         </select>
                     </div>
-                    <div style="grid-column: span 2;">
+                    <div class="form-group" style="grid-column: span 2;">
                         <label>Nome do Evento:</label>
-                        <input type="text" id="nome" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <input type="text" id="nome" required>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label>Local:</label>
-                        <input type="text" id="lugar" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <input type="text" id="lugar" required>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label>Modalidade:</label>
-                        <select id="modalidade" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <select id="modalidade" required>
                             <option value="Presencial">Presencial</option>
                             <option value="Online">Online</option>
                             <option value="Híbrido">Híbrido</option>

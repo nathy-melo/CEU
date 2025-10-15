@@ -1,129 +1,178 @@
 /* 
  * CSS Administrativo Unificado - CEU
- * Garantir que todas as páginas admin tenham o mesmo fundo degradê
+ * Seguindo o padrão visual do site principal
  */
 
+/* Importar variáveis CSS do site principal */
+:root {
+  --branco: #FFFFFF;
+  --preto: #000000;
+  --botao: #6598D2;
+  --caixas: #4F6C8C;
+  --fundo: #D1EAFF;
+  --cinza-escuro: #333333;
+  --cinza-medio: #888888;
+  --azul-escuro: #0a1449;
+  --azul-claro: #8ad7da;
+  --sombra-padrao: rgba(0, 0, 0, 0.6);
+  --sombra-forte: rgba(0, 0, 0, 0.8);
+  --sombra-leve: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="dark"] {
+  --fundo: #253542;
+  --caixas: #000B18;
+  --botao: #1A4090;
+}
+
 /* Reset global para páginas administrativas */
-* {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Fundo degradê obrigatório para todas as páginas admin */
+/* Fundo padrão do site para admin */
 html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    min-height: 100vh !important;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    font-family: Arial, sans-serif !important;
-    overflow-x: hidden !important;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: var(--fundo);
+    font-family: 'Inter', sans-serif;
+    color: var(--branco);
+    overflow-x: hidden;
 }
 
-/* Força o fundo mesmo se houver CSS conflitante */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    z-index: -1000;
+/* Scrollbar padrão do site */
+html, body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--botao) var(--caixas);
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+    width: 0.8rem;
+    background: var(--caixas);
+    border-radius: 1rem;
+}
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--botao) 60%, var(--caixas) 100%);
+    border-radius: 1rem;
+    box-shadow: 0 0.1rem 0.3rem 0 var(--sombra-leve);
+    border: 2px solid var(--branco);
+}
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--botao) 60%, var(--caixas) 100%);
+}
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+    background: var(--caixas);
+    border-radius: 1rem;
 }
 
 /* Container principal das páginas administrativas */
 .admin-page-container {
-    min-height: 100vh !important;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: transparent !important;
+    padding: 15px;
 }
 
 /* Header administrativo */
 .admin-header {
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(10px);
-    color: white !important;
-    padding: 20px 0;
+    background-color: var(--caixas);
+    color: var(--branco);
+    padding: 15px 20px;
     text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0rem 0.1rem 1rem var(--sombra-leve);
+    width: 100%;
+    max-width: none;
 }
 
 .admin-header h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    color: white !important;
+    color: var(--branco);
+    text-shadow: 0px 2px 8px var(--preto);
 }
 
 .admin-header .subtitle {
-    margin: 5px 0 0 0;
-    font-size: 14px;
+    margin: 3px 0 0 0;
+    font-size: 15px;
     opacity: 0.9;
-    color: white !important;
+    color: var(--branco);
 }
 
 /* Seções administrativas */
 .admin-section {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(20px);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    margin-bottom: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--preto);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0rem 0.1rem 1rem var(--sombra-leve);
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.admin-section h3 {
+    color: var(--azul-escuro);
+    margin-bottom: 15px;
+    font-size: 22px;
+    border-bottom: 2px solid var(--botao);
+    padding-bottom: 8px;
 }
 
 /* Container de login específico */
 .admin-login-container {
-    min-height: 100vh !important;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent !important;
     padding: 20px;
 }
 
-/* Caixa de login */
+/* Caixa de login seguindo padrão do site */
 .admin-login-box {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
+    background-color: var(--caixas);
+    color: var(--branco);
     padding: 40px;
     border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    box-shadow: 0rem 0.1rem 1rem var(--sombra-leve);
     width: 100%;
     max-width: 400px;
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .admin-logo {
     width: 80px;
     height: 80px;
     margin: 0 auto 20px;
-    background: #ff6b6b;
+    background-color: var(--botao);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    color: white;
+    color: var(--branco);
     font-weight: bold;
+    box-shadow: 0rem 0.1rem 0.5rem var(--sombra-leve);
 }
 
 .admin-title {
-    color: #333;
+    color: var(--branco);
     margin-bottom: 10px;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 600;
+    text-shadow: 0px 4px 10px var(--preto);
 }
 
 .admin-subtitle {
-    color: #666;
+    color: var(--branco);
     margin-bottom: 30px;
-    font-size: 14px;
+    font-size: 16px;
+    opacity: 0.9;
 }
 
 .form-group {
@@ -134,160 +183,407 @@ body::before {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: #333;
+    color: var(--branco);
     font-weight: 500;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e1e5e9;
-    border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s;
-    box-sizing: border-box;
 }
 
-.form-group input:focus {
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--botao);
+    border-radius: 8px;
+    font-size: 18px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    background-color: var(--branco);
+    color: var(--preto);
+    font-family: 'Inter', sans-serif;
+}
+
+.form-group input:focus, .form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--azul-escuro);
+    box-shadow: 0 0 0 2px rgba(106, 152, 210, 0.3);
 }
 
 .error-message {
     color: #ff4757;
     margin-top: 15px;
     padding: 10px;
-    background: #fff5f5;
-    border: 1px solid #fed7d7;
+    background-color: rgba(255, 71, 87, 0.1);
+    border: 1px solid rgba(255, 71, 87, 0.3);
     border-radius: 5px;
     display: none;
+    font-size: 12px;
 }
 
 .back-link {
     margin-top: 20px;
     display: block;
-    color: #667eea;
+    color: var(--azul-claro);
     text-decoration: none;
     font-size: 14px;
+    transition: color 0.3s ease;
 }
 
 .back-link:hover {
+    color: var(--branco);
     text-decoration: underline;
 }
 
 .security-notice {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
     padding: 10px;
     margin-top: 20px;
     font-size: 12px;
-    color: #6c757d;
+    color: var(--branco);
+    opacity: 0.9;
 }
 
-/* Garantir que nenhum elemento sobreponha o fundo */
+/* Garantir que caixas admin usem padrão do site */
 .admin-login-box,
 .test-container,
 .admin-container {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
+    background-color: var(--caixas);
+    color: var(--branco);
 }
 
-/* Botões administrativos */
+/* Sobrescrever background específico para admin-container */
+.admin-container {
+    background-color: var(--caixas) !important;
+    color: var(--branco) !important;
+}
+
+/* Containers internos com background claro */
+#eventosContainer,
+#usuariosContainer, 
+#codigosContainer,
+#certificadosContainer {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    color: var(--preto) !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+}
+
+/* Botões administrativos seguindo padrão do site */
+.btn, .botao,
 .btn-admin-login,
 .btn-generate,
 .btn-secondary,
 .btn-test {
     border: none;
-    border-radius: 25px;
     cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-    padding: 14px 28px; /* Aumentado de 12px 24px para 14px 28px */
-    margin: 4px; /* Adicionado margin para espaçamento extra */
-    font-weight: 500;
-    min-width: 120px; /* Largura mínima para consistência */
-    white-space: nowrap; /* Evita quebra de texto */
-}
-
-.btn-admin-login {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: white !important;
-    width: 100%;
-    padding: 12px;
-    border: none;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0rem 0.1rem 0.5rem var(--sombra-leve);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    will-change: transform;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-generate {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
-    color: white !important;
-}
-
-.btn-secondary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: white !important;
-}
-
-.btn-test {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: white !important;
-    text-decoration: none !important;
-}
-
-/* Hover effects */
+.btn:hover, .botao:hover,
 .btn-admin-login:hover,
 .btn-generate:hover,
 .btn-secondary:hover,
 .btn-test:hover {
+    transform: translateY(-0.0625rem) scale(1.02);
+    box-shadow: 0rem 0.2rem 0.6rem var(--sombra-leve);
+}
+
+.btn-admin-login {
+    background-color: var(--botao);
+    color: var(--branco);
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 8px;
+    border-radius: 8px;
+}
+
+.btn-generate {
+    background-color: #28a745;
+    color: var(--branco);
+    padding: 12px 24px;
+    font-size: 16px;
+    margin: 3px;
+    min-width: 120px;
+    white-space: nowrap;
+    border-radius: 8px;
+}
+
+.btn-secondary {
+    background-color: var(--botao);
+    color: var(--branco);
+    padding: 12px 24px;
+    font-size: 16px;
+    margin: 3px;
+    min-width: 120px;
+    white-space: nowrap;
+    border-radius: 8px;
+}
+
+.btn-test {
+    background-color: var(--botao);
+    color: var(--branco);
+    padding: 12px 24px;
+    font-size: 16px;
+    margin: 3px;
+    min-width: 120px;
+    white-space: nowrap;
+    border-radius: 8px;
+}
+
+/* Container administrativo principal */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: var(--caixas);
+    border-radius: 10px;
+    box-shadow: 0rem 0.1rem 1rem var(--sombra-leve);
+    color: var(--branco);
+}
+
+/* Navegação administrativa */
+.admin-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.admin-nav .btn-secondary.active {
+    background-color: var(--azul-escuro);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-
-/* Remover qualquer background conflitante de CSS externos */
-.container, .main, .content, .wrapper {
-    background: transparent !important;
-}
-
-/* Forçar texto branco em elementos sobre o degradê */
-.admin-header *,
-.admin-nav button {
-    color: white !important;
+    box-shadow: 0rem 0.2rem 0.8rem var(--sombra-leve);
 }
 
 /* Estilos para botões pequenos da tabela */
 .btn-small {
-    padding: 8px 12px !important; /* Aumentado de 5px 10px para 8px 12px */
-    font-size: 13px !important; /* Aumentado de 12px para 13px */
-    margin: 3px !important; /* Aumentado de 2px para 3px */
-    border: none !important;
-    border-radius: 6px !important; /* Aumentado de 4px para 6px */
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    font-weight: 500 !important;
-    min-width: 80px !important; /* Largura mínima para consistência */
+    padding: 10px 15px;
+    font-size: 15px;
+    margin: 3px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    min-width: 100px;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--botao);
+    color: var(--branco);
 }
 
-/* Estilos para campos de busca com mais espaçamento */
+.btn-small:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0rem 0.1rem 0.4rem var(--sombra-leve);
+}
+
+/* Campos de busca */
 .search-input {
-    margin: 5px 8px !important; /* Adicionado margin para espaçamento */
+    margin: 5px 8px;
+    padding: 10px 15px;
+    border: 2px solid var(--botao);
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: var(--branco);
+    color: var(--preto);
+    font-family: 'Inter', sans-serif;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--azul-escuro);
+    box-shadow: 0 0 0 2px rgba(106, 152, 210, 0.3);
 }
 
 .clear-search {
-    margin: 5px 8px !important; /* Adicionado margin para espaçamento */
+    margin: 5px 8px;
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: var(--branco);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
 }
 
-/* Melhorar espaçamento em containers de ações */
-.admin-nav {
-    gap: 15px !important; /* Aumentar gap padrão */
-    padding: 10px 0 !important; /* Adicionar padding vertical */
+.clear-search:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
 }
 
-/* Loading screen com fundo degradê */
+/* Loading screen seguindo padrão do site */
 #loadingScreen {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background-color: var(--fundo);
+    color: var(--branco);
+}
+
+/* Tabelas administrativas */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: var(--branco);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0rem 0.1rem 0.5rem var(--sombra-leve);
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(79, 108, 140, 0.2);
+    font-size: 16px;
+}
+
+.admin-table th {
+    background-color: var(--caixas);
+    color: var(--branco);
+    font-weight: 600;
+}
+
+.admin-table tr:hover {
+    background-color: rgba(79, 108, 140, 0.1);
+}
+
+/* Cards de estatísticas */
+.stats-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0rem 0.1rem 0.5rem var(--sombra-leve);
+    border-left: 4px solid var(--botao);
+    margin-bottom: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.stats-card h4 {
+    margin: 0;
+    color: var(--azul-escuro);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.stats-card p {
+    font-size: 30px;
+    margin: 6px 0;
+    font-weight: bold;
+    color: var(--preto);
+    line-height: 1;
+}
+
+.stats-card small {
+    color: var(--cinza-medio);
+    font-size: 12px;
+    line-height: 1.2;
+    display: block;
+}
+
+/* Animação para loading spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Modal estilos */
+.modal-content {
+    background-color: var(--branco);
+    border-radius: 15px;
+    padding: 30px;
+    color: var(--preto);
+}
+
+.modal-content h3 {
+    color: var(--azul-escuro);
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+/* Esconder seções inativas no admin */
+.admin-section {
+    display: none;
+}
+
+.admin-section.active {
+    display: block;
+}
+
+/* Seção de estatísticas específicas */
+#estatisticas {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    color: var(--preto);
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+/* Grid para categorias de eventos */
+.categoria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.categoria-item {
+    text-align: center;
+    padding: 12px;
+    background-color: #efefef !important;
+    border-radius: 6px;
+    border-left: 3px solid var(--botao);
+}
+
+.categoria-item h5 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    color: var(--azul-escuro);
+    font-weight: 600;
+}
+
+.categoria-item span {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--botao);
+}
+
+/* Lista de últimos eventos */
+.eventos-recentes {
+    margin-top: 15px;
+}
+
+.eventos-recentes h5 {
+    color: var(--azul-escuro);
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.evento-item {
+    padding: 10px 15px;
+    margin-bottom: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 4px;
+    border-left: 2px solid var(--botao);
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.evento-item strong {
+    color: var(--azul-escuro);
 }

@@ -27,6 +27,12 @@ if (empty($tempAuth)) {
     $_SESSION['admin_temp_auth'] = 'authenticated';
 }
 
+// Se é uma requisição POST para criar sessão sem action, retornar sucesso
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_GET['action'])) {
+    echo json_encode(['success' => true, 'message' => 'Autenticação confirmada']);
+    exit;
+}
+
 // Função para logs de segurança
 function logAdminAction($action, $details = '') {
     error_log("[" . date('Y-m-d H:i:s') . "] Admin Action: $action | Details: $details");
@@ -80,8 +86,12 @@ try {
             break;
             
         default:
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Ação não reconhecida']);
+            if (empty($action)) {
+                echo json_encode(['success' => true, 'message' => 'API Admin funcionando']);
+            } else {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Ação não reconhecida: ' . $action]);
+            }
     }
 } catch (Exception $e) {
     http_response_code(500);
