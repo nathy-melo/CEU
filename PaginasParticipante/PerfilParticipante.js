@@ -554,7 +554,7 @@ function solicitarCodigo() {
         // Mostra alerta na página principal também
         mostrarAlerta('Redirecionando para o Fale Conosco para solicitar código...', 'success');
         setTimeout(() => {
-            window.location.href = '../PaginasGlobais/FaleConosco.html';
+            carregarPagina('faleconosco');
         }, 1000);
     }, 1500);
 }
