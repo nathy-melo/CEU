@@ -17,121 +17,534 @@
 
   .cartao-evento {
     background-color: var(--caixas);
-    border-radius: 1.875rem;
-    box-shadow: 0 0.15rem 0.75rem 0 var(--sombra-padrao);
-    padding: 1.875rem;
+    border-radius: 2rem;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.4);
+    padding: 2rem;
     width: 100%;
-    max-width: 51.5625rem;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .corpo-cartao {
+    max-width: 60rem;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.875rem 0.975rem;
-    align-items: start;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(7, auto);
+    gap: 1rem;
+    margin: 1rem auto;
   }
 
-  .grupo-campo {
+  .cartao-evento > div {
+    background: none;
+    border: none;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    justify-content: flex-start;
+    align-items: stretch;
+    font-size: 1rem;
   }
 
   .grupo-campo label,
   .grupo-campo .rotulo-campo {
     font-weight: 700;
-    font-size: 1.35rem;
+    font-size: 1.05rem;
     line-height: 1.2;
-    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  /* Classe unificada para todos os campos de input */
+  .campo-input,
+  .campo-select,
+  .campo-textarea {
+    background-color: var(--branco);
+    color: var(--preto, #000);
+    border-radius: 2rem;
+    padding: 0.55rem 0.9rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    min-height: 2.1rem;
+    border: 2px solid transparent;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.35);
+    transition: all 0.3s ease;
+    display: none;
+  }
+
+  .campo-input:hover,
+  .campo-select:hover,
+  .campo-textarea:hover {
+    border-color: var(--botao, #0166ff);
+    background-color: #f8f9fa;
+    transform: scale(1.02);
+    box-shadow: 0 0.25rem 1rem 0 rgba(1, 102, 255, 0.25);
+  }
+
+  .campo-input:focus,
+  .campo-select:focus,
+  .campo-textarea:focus {
+    outline: none;
+    border-color: var(--botao, #0166ff);
+    background-color: var(--branco);
+    box-shadow: 0 0 0 3px rgba(1, 102, 255, 0.15);
+  }
+
+  .campo-input::placeholder,
+  .campo-textarea::placeholder {
+    color: #888;
+    font-weight: 500;
+  }
+
+  /* Ajustes específicos para textarea */
+  .campo-textarea {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+    min-height: 14rem;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+
+  /* Ajustes específicos para select */
+  .campo-select {
+    text-align-last: center;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230166ff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 0.75rem) center;
+    background-size: 1.75rem;
+    padding-right: 2.5rem;
+  }
+
+  .campo-select option {
+    background-color: var(--fundo);
+    color: var(--preto, #000);
+    padding: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .campo-select option:disabled {
+    color: #888;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .campo-select:invalid,
+  .campo-select[value=""] {
+    color: #888;
+    font-weight: 500;
+  }
+
+  .campo-select:valid:not([value=""]) {
+    color: var(--preto, #000);
+    font-weight: 700;
+  }
+
+  /* Ajustes específicos para inputs de data e hora */
+  input[type="date"],
+  input[type="time"] {
+    cursor: pointer;
+    width: 100%;
+    padding: 0.55rem 0.9rem;
+    position: relative;
+  }
+
+  /* Quando visível, adicionar flexbox para centralização */
+  input[type="date"].campo-input,
+  input[type="time"].campo-input {
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Forçar o wrapper a ficar centralizado */
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+  input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+    display: inline-flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  input[type="date"]::-webkit-datetime-edit,
+  input[type="time"]::-webkit-datetime-edit {
+    display: inline-flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Posicionar o ícone na direita */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    filter: invert(27%) sepia(88%) saturate(2598%) hue-rotate(201deg) brightness(99%) contrast(101%);
+    position: absolute;
+    right: 0.5rem;
+    margin-left: auto;
+  }
+
+  input[type="date"]:hover::-webkit-calendar-picker-indicator,
+  input[type="time"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+  }
+
+  input[type="date"]::-webkit-datetime-edit-month-field,
+  input[type="date"]::-webkit-datetime-edit-day-field,
+  input[type="date"]::-webkit-datetime-edit-year-field,
+  input[type="time"]::-webkit-datetime-edit-hour-field,
+  input[type="time"]::-webkit-datetime-edit-minute-field,
+  input[type="time"]::-webkit-datetime-edit-ampm-field {
+    color: var(--preto, #000);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  input[type="date"]::-webkit-datetime-edit-text,
+  input[type="time"]::-webkit-datetime-edit-text {
+    color: var(--preto, #000);
+    font-weight: 700;
   }
 
   .caixa-valor {
     background-color: var(--branco);
-    border-radius: 1.875rem;
+    border-radius: 2rem;
     color: var(--preto);
-    padding: 0.45rem 0.9rem;
+    padding: 0.55rem 0.9rem;
     text-align: center;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    min-height: 2.025rem;
+    min-height: 2.1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0.15rem 0.75rem 0 var(--sombra-leve);
-  }
-
-  .campo-nome {
-    grid-column: 1 / 3;
-  }
-
-  .campo-local {
-    grid-column: 3 / 5;
-  }
-
-  .campo-descricao {
-    grid-column: 1 / 3;
-    grid-row: 3 / 4;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.35);
   }
 
   .caixa-descricao {
-    min-height: 15.45rem;
+    min-height: 14rem;
+    padding: 1rem;
+    text-align: left;
+    line-height: 1.4;
+    font-weight: 500;
+    overflow-y: auto;
+    resize: vertical;
+    word-break: break-word;
+    white-space: pre-line;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 1em;
   }
 
-  .campo-publico {
-    grid-column: 3 / 4;
-    grid-row: 3 / 4;
+  .Nome { grid-column: span 4 / span 4; }
+  .Organizador { grid-column: span 4 / span 4; grid-column-start: 5; }
+
+  /* Container para o campo organizador com botão */
+  .campo-organizador-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .campo-categoria {
-    grid-column: 4 / 5;
-    grid-row: 3 / 4;
+  .campo-organizador {
+    background-color: var(--branco);
+    color: var(--preto, #000);
+    border-radius: 2rem;
+    padding: 0.55rem 0.9rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    min-height: 2.1rem;
+    border: 2px solid transparent;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.35);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    opacity: 0.9;
   }
 
-  .rodape-cartao {
-    grid-column: 3 / 5;
-    grid-row: 3 / 4;
+  .btn-adicionar-colaborador {
+    background-color: var(--botao);
+    color: var(--branco);
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0.15rem 0.55rem 0 rgba(0, 0, 0, 0.25);
+    transition: background 0.25s, transform 0.15s;
+    flex-shrink: 0;
+  }
+
+  .btn-adicionar-colaborador:hover {
+    background-color: var(--botao);
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+
+  .btn-adicionar-colaborador:active {
+    transform: scale(0.95);
+  }
+
+  .Local { grid-column: span 8 / span 8; grid-row-start: 2; }
+  .DataDeInicio { grid-column: span 2 / span 2; grid-row-start: 3; }
+  .DataDeFim { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
+  .HorarioDeInicio { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
+  .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
+  .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 4; }
+  .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 4; }
+  .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 4; }
+  .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 4; }
+
+  .Imagem {
+    grid-column: span 4 / span 4;
+    grid-row: span 3 / span 3;
+    grid-row-start: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 16rem;
+    min-height: 16rem;
+  }
+
+  .Descricao {
+    grid-column: span 4 / span 4;
+    grid-row: span 3 / span 3;
+    grid-column-start: 5;
+    grid-row-start: 5;
+  }
+
+  .BotaoVoltar { grid-column: span 2 / span 2; grid-row-start: 8; }
+  .BotaoParticipantes { grid-column: span 2 / span 2; grid-column-start: 4; grid-row-start: 8; }
+  .BotaoEditar { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 8; }
+
+  .campo-imagem {
+    background: var(--branco, #fff);
+    border-radius: 1.5rem;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 16rem;
+    min-height: 16rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .campo-imagem:hover {
+    background: var(--cinza-claro, #f0f0f0);
+  }
+
+  .campo-imagem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .campo-imagem-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    gap: 0.75rem;
-    margin-top: 0;
-    justify-content: flex-end;
-    height: 100%;
-    align-self: stretch;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #888;
+    font-size: 0.95rem;
+    padding: 1rem;
   }
 
-  .texto-login {
-    font-weight: 700;
-    font-size: 1.05rem;
-    line-height: 1.2;
-    margin: 0;
+  .campo-imagem-placeholder img {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  #input-imagem {
+    display: none;
   }
 
   .botao-voltar,
-  .botao-editar {
+  .botao-editar,
+  .botao-participantes,
+  .botao-cancelar,
+  .botao-excluir,
+  .botao-salvar {
     background-color: var(--botao);
-    border-radius: 0.225rem;
+    border-radius: 0.35rem;
     color: var(--branco);
-    padding: 0.6rem 2rem;
+    padding: 0.75rem 1.5rem;
     text-decoration: none;
     font-weight: 700;
-    font-size: 1.125rem;
+    font-size: 1rem;
     display: inline-block;
     border: none;
     cursor: pointer;
-    min-width: 8rem;
-    margin: 0 0.3rem;
+    box-shadow: 0 0.15rem 0.55rem 0 rgba(0, 0, 0, 0.25);
+    transition: background .25s, transform .15s;
+    width: 100%;
+    text-align: center;
   }
 
-  .botoes-rodape {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 0.5rem;
+  .botao-voltar:active,
+  .botao-editar:active,
+  .botao-participantes:active,
+  .botao-cancelar:active,
+  .botao-excluir:active,
+  .botao-salvar:active {
+    transform: translateY(1px);
+  }
+
+  .botao-excluir {
+    background-color: #dc3545;
+  }
+
+  .botao-excluir:hover {
+    background-color: #c82333;
+  }
+
+  .carrossel-imagens {
+    position: relative;
     width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .carrossel-imagens img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1.5rem;
+    box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .carrossel-btn {
+    background: none;
+    color: var(--azul-escuro);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    z-index: 2;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .carrossel-btn:hover { color: var(--botao); }
+  .carrossel-anterior { left: 0.5rem; }
+  .carrossel-proxima { right: 0.5rem; }
+
+  .btn-remover-imagem {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: background 0.3s;
+  }
+
+  .btn-remover-imagem:hover {
+    background: rgba(255, 0, 0, 1);
+  }
+
+  .btn-adicionar-mais {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(1, 102, 255, 0.9);
+    color: white;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    z-index: 3;
+    transition: background 0.3s;
+    box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-adicionar-mais:hover {
+    background: rgba(1, 102, 255, 1);
+  }
+
+  .btn-adicionar-mais img {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .modal-imagem {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-imagem-btn-fechar {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: var(--branco);
+    cursor: pointer;
+    z-index: 10001;
+  }
+
+  .modal-imagem-btn-anterior { left: 2rem; top: 50%; position: absolute; }
+  .modal-imagem-btn-proxima { right: 2rem; top: 50%; position: absolute; }
+
+  .modal-imagem-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 2rem;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
   }
 </style>
 
@@ -139,53 +552,130 @@
   <div id="main-content">
     <main id="secao-detalhes-evento" class="secao-detalhes-evento">
       <div class="cartao-evento">
-        <div class="corpo-cartao">
-          <div class="grupo-campo campo-nome">
-            <span class="rotulo-campo">Nome:</span>
-            <div id="event-name" class="caixa-valor">Evento X</div>
+        <div class="Nome grupo-campo">
+          <span class="rotulo-campo">Nome:</span>
+          <div id="event-name" class="caixa-valor">Evento X</div>
+          <input type="text" id="input-nome" class="campo-input" placeholder="Digite o nome do evento" autocomplete="off">
+        </div>
+        <div class="Organizador grupo-campo">
+          <span class="rotulo-campo">Organizado por:</span>
+          <div class="campo-organizador-wrapper">
+            <div class="campo-organizador">Nome do Organizador</div>
+            <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()" title="Adicionar colaborador">+</button>
           </div>
-          <div class="grupo-campo campo-local">
-            <span class="rotulo-campo">Local:</span>
-            <div id="event-local" class="caixa-valor">Auditório</div>
-          </div>
-          <div class="grupo-campo campo-data-inicio">
-            <span class="rotulo-campo">Data de início:</span>
-            <div id="start-date" class="caixa-valor">07/03/25</div>
-          </div>
-          <div class="grupo-campo campo-data-fim">
-            <span class="rotulo-campo">Data de fim:</span>
-            <div id="end-date" class="caixa-valor">07/03/25</div>
-          </div>
-          <div class="grupo-campo campo-hora-inicio">
-            <span class="rotulo-campo">Horário início:</span>
-            <div id="start-time" class="caixa-valor">13:00</div>
-          </div>
-          <div class="grupo-campo campo-hora-fim">
-            <span class="rotulo-campo">Horário fim:</span>
-            <div id="end-time" class="caixa-valor">14:00</div>
-          </div>
-          <div class="grupo-campo campo-descricao">
-            <span class="rotulo-campo">Descrição:</span>
-            <div id="description" class="caixa-valor caixa-descricao">Descrição</div>
-          </div>
-          <div class="grupo-campo campo-publico">
-            <span class="rotulo-campo">Público alvo:</span>
-            <div id="audience" class="caixa-valor">Estudantes</div>
-          </div>
-          <div class="grupo-campo campo-categoria">
-            <span class="rotulo-campo">Categoria:</span>
-            <div id="category" class="caixa-valor">Oficina</div>
-          </div>
-          <div class="rodape-cartao">
-            <div class="botoes-rodape">
-              <button onclick="history.back()" class="botao botao-voltar">Voltar</button>
-              <button class="botao botao-editar">Editar</button>
+        </div>
+        <div class="Local grupo-campo">
+          <span class="rotulo-campo">Local:</span>
+          <div id="event-local" class="caixa-valor">Auditório</div>
+          <input type="text" id="input-local" class="campo-input" placeholder="Digite o local do evento" autocomplete="off">
+        </div>
+        <div class="DataDeInicio grupo-campo">
+          <span class="rotulo-campo">Data de início:</span>
+          <div id="start-date" class="caixa-valor">07/03/25</div>
+          <input type="date" id="input-data-inicio" class="campo-input" autocomplete="off">
+        </div>
+        <div class="DataDeFim grupo-campo">
+          <span class="rotulo-campo">Data de fim:</span>
+          <div id="end-date" class="caixa-valor">07/03/25</div>
+          <input type="date" id="input-data-fim" class="campo-input" autocomplete="off">
+        </div>
+        <div class="HorarioDeInicio grupo-campo">
+          <span class="rotulo-campo">Horário início:</span>
+          <div id="start-time" class="caixa-valor">13:00</div>
+          <input type="time" id="input-horario-inicio" class="campo-input" autocomplete="off">
+        </div>
+        <div class="HorarioDeFim grupo-campo">
+          <span class="rotulo-campo">Horário fim:</span>
+          <div id="end-time" class="caixa-valor">14:00</div>
+          <input type="time" id="input-horario-fim" class="campo-input" autocomplete="off">
+        </div>
+        <div class="PublicoAlvo grupo-campo">
+          <span class="rotulo-campo">Público alvo:</span>
+          <div id="audience" class="caixa-valor">Estudantes</div>
+          <input type="text" id="input-publico-alvo" class="campo-input" placeholder="Ex: Estudantes" autocomplete="off">
+        </div>
+        <div class="Categoria grupo-campo">
+          <span class="rotulo-campo">Categoria:</span>
+          <div id="category" class="caixa-valor">Oficina</div>
+          <select id="input-categoria" class="campo-select" autocomplete="off">
+            <option value="">Selecione</option>
+            <option value="Palestra">Palestra</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Seminário">Seminário</option>
+            <option value="Conferência">Conferência</option>
+            <option value="Curso">Curso</option>
+            <option value="Treinamento">Treinamento</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="Modalidade grupo-campo">
+          <span class="rotulo-campo">Modalidade:</span>
+          <div id="modality" class="caixa-valor">Presencial</div>
+          <select id="input-modalidade" class="campo-select" autocomplete="off">
+            <option value="">Selecione</option>
+            <option value="Presencial">Presencial</option>
+            <option value="Online">Online</option>
+            <option value="Híbrido">Híbrido</option>
+          </select>
+        </div>
+        <div class="Certificado grupo-campo">
+          <span class="rotulo-campo">Certificado:</span>
+          <div id="certificate" class="caixa-valor">Sim</div>
+          <select id="input-certificado" class="campo-select" autocomplete="off">
+            <option value="">Selecione</option>
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+            <option value="Ensino">Ensino</option>
+            <option value="Pesquisa">Pesquisa</option>
+            <option value="Extensão">Extensão</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="Imagem grupo-campo">
+          <div class="campo-imagem" id="campo-imagem">
+            <div class="campo-imagem-placeholder" id="placeholder-imagem" style="display: none;">
+              <img src="../Imagens/AdicionarImagem.svg" alt="Adicionar imagem" />
+              <span>Clique para adicionar imagens</span>
+            </div>
+            <div class="carrossel-imagens" id="carrossel-imagens">
+              <button type="button" class="btn-remover-imagem" id="btn-remover-imagem" onclick="event.stopPropagation(); removerImagemAtual();">&times;</button>
+              <button type="button" class="carrossel-btn carrossel-anterior" onclick="event.stopPropagation(); mudarImagem(-1)">⮜</button>
+              <img id="imagem-carrossel" src="../Imagens/CEU-Logo.png" alt="Imagem do evento" />
+              <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
+              <button type="button" class="btn-adicionar-mais" onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
+                <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
+                Adicionar mais imagens
+              </button>
             </div>
           </div>
+          <input type="file" id="input-imagem" name="imagens_evento" accept="image/*" multiple onchange="adicionarImagens(event)" autocomplete="off">
+        </div>
+        <div class="Descricao grupo-campo">
+          <span class="rotulo-campo">Descrição:</span>
+          <div id="description" class="caixa-valor caixa-descricao">Descrição do evento</div>
+          <textarea id="input-descricao" class="campo-textarea" placeholder="Descreva o evento..." autocomplete="off"></textarea>
+        </div>
+        <div class="BotaoVoltar">
+          <button id="btn-voltar" class="botao-voltar">Voltar</button>
+        </div>
+        <div class="BotaoParticipantes">
+          <button id="btn-participantes" class="botao-participantes">Participantes</button>
+        </div>
+        <div class="BotaoEditar">
+          <button id="btn-editar" class="botao-editar">Editar</button>
         </div>
       </div>
     </main>
+
+    <div id="modal-imagem" class="modal-imagem">
+      <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
+      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">⮜</button>
+      <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img" />
+      <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">⮞</button>
+    </div>
   </div>
+
+  <script src="CartaoDoEventoOrganizando.js"></script>
 </body>
 
 </html>

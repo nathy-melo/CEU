@@ -3,10 +3,10 @@ function aplicarMascaraRA(input) {
     input.value = input.value.replace(/\D/g, '').substring(0, 7);
 }
 
-// Função para aplicar máscara de código organizador (formato seguro: 8 caracteres A-Z, 2-9)
+// Função para aplicar máscara de código organizador (formato seguro: 8 caracteres A-Z, 1-9)
 function aplicarMascaraCodigo(input) {
     // Remove caracteres não permitidos e converte para maiúsculo
-    let valor = input.value.toUpperCase().replace(/[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g, '');
+    let valor = input.value.toUpperCase().replace(/[^ABCDEFGHJKLMNPQRSTUVWXYZ123456789]/g, '');
     
     // Limita a 8 caracteres
     valor = valor.substring(0, 8);

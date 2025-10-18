@@ -1,3 +1,22 @@
+<?php
+// busca o nome do usuário logado
+require_once('../BancoDados/conexao.php');
+
+$cpfUsuario = $_SESSION['cpf'];
+$consultaSQL = "SELECT Nome FROM usuario WHERE CPF = ?";
+$declaracaoPreparada = mysqli_prepare($conexao, $consultaSQL);
+
+if ($declaracaoPreparada) {
+    mysqli_stmt_bind_param($declaracaoPreparada, "s", $cpfUsuario);
+    mysqli_stmt_execute($declaracaoPreparada);
+    $resultadoConsulta = mysqli_stmt_get_result($declaracaoPreparada);
+    $dadosUsuario = mysqli_fetch_assoc($resultadoConsulta);
+    mysqli_stmt_close($declaracaoPreparada);
+}
+
+$nomeOrganizador = $dadosUsuario['Nome'] ?? 'Organizador';
+mysqli_close($conexao);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -239,61 +258,124 @@
             grid-column: span 4 / span 4;
         }
 
-        .Local {
+        .Organizador {
             grid-column: span 4 / span 4;
             grid-column-start: 5;
         }
 
+        /* Container para o campo organizador com botão */
+        .campo-organizador-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Campo organizador somente leitura */
+        .campo-organizador {
+            background-color: var(--branco);
+            color: var(--preto, #000);
+            border-radius: 2rem;
+            padding: 0.55rem 0.9rem;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            min-height: 2.1rem;
+            border: 2px solid transparent;
+            box-shadow: 0 0.15rem 0.75rem 0 rgba(0, 0, 0, 0.35);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        /* Botão adicionar colaborador */
+        .btn-adicionar-colaborador {
+            background-color: var(--botao);
+            color: var(--branco);
+            border: none;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            min-width: 2.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0.15rem 0.55rem 0 rgba(0, 0, 0, 0.25);
+            transition: background 0.25s, transform 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-adicionar-colaborador:hover {
+            background-color: var(--botao);
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-adicionar-colaborador:active {
+            transform: scale(0.95);
+        }
+
+        .Local {
+            grid-column: span 8 / span 8;
+            grid-row-start: 2;
+        }
+
         .DataDeInicio {
             grid-column: span 2 / span 2;
-            grid-row-start: 2;
+            grid-row-start: 3;
         }
 
         .DataDeFim {
             grid-column: span 2 / span 2;
             grid-column-start: 3;
-            grid-row-start: 2;
+            grid-row-start: 3;
         }
 
         .HorarioDeInicio {
             grid-column: span 2 / span 2;
             grid-column-start: 5;
-            grid-row-start: 2;
+            grid-row-start: 3;
         }
 
         .HorarioDeFim {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 2;
+            grid-row-start: 3;
         }
 
         .PublicoAlvo {
             grid-column: span 2 / span 2;
-            grid-row-start: 3;
+            grid-row-start: 4;
         }
 
         .Categoria {
             grid-column: span 2 / span 2;
             grid-column-start: 3;
-            grid-row-start: 3;
+            grid-row-start: 4;
         }
 
         .Modalidade {
             grid-column: span 2 / span 2;
             grid-column-start: 5;
-            grid-row-start: 3;
+            grid-row-start: 4;
         }
 
         .Certificado {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 3;
+            grid-row-start: 4;
         }
 
         .Imagem {
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
-            grid-row-start: 4;
+            grid-row-start: 5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -305,18 +387,18 @@
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
             grid-column-start: 5;
-            grid-row-start: 4;
+            grid-row-start: 5;
         }
 
         .BotaoVoltar {
             grid-column: span 2 / span 2;
-            grid-row-start: 7;
+            grid-row-start: 8;
         }
 
         .BotaoCriar {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 7;
+            grid-row-start: 8;
         }
 
         .campo-imagem {
@@ -561,6 +643,13 @@
                 <label for="nome"><span style="color: red;">*</span> Nome:</label>
                 <input type="text" id="nome" name="nome" class="campo-input" placeholder="Digite o nome do evento" required autocomplete="off">
             </div>
+            <div class="Organizador grupo-campo">
+                <label>Organizado por:</label>
+                <div class="campo-organizador-wrapper">
+                    <div class="campo-organizador"><?php echo htmlspecialchars($nomeOrganizador); ?></div>
+                    <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()" title="Adicionar colaborador">+</button>
+                </div>
+            </div>
             <div class="Local grupo-campo">
                 <label for="local"><span style="color: red;">*</span> Local:</label>
                 <input type="text" id="local" name="local" class="campo-input" placeholder="Digite o local do evento" required autocomplete="off">
@@ -621,7 +710,7 @@
             <div class="Imagem grupo-campo">
                 <div class="campo-imagem" id="campo-imagem" onclick="document.getElementById('input-imagem').click()">
                     <div class="campo-imagem-placeholder" id="placeholder-imagem">
-                        <img src="Imagens/AdicionarImagem.svg" alt="Adicionar imagem" />
+                        <img src="../Imagens/AdicionarImagem.svg" alt="Adicionar imagem" />
                         <span>Clique para adicionar imagens</span>
                     </div>
                     <div class="carrossel-imagens" id="carrossel-imagens" style="display: none;">
@@ -630,7 +719,7 @@
                         <img id="imagem-carrossel" src="" alt="Imagem do evento" />
                         <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
                         <button type="button" class="btn-adicionar-mais" onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
-                            <img src="Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
+                            <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                             Adicionar mais imagens
                         </button>
                     </div>
@@ -679,6 +768,12 @@
                                     categoria && certificado && modalidade && descricao;
 
             document.getElementById('btn-criar').disabled = !todosPreenchidos;
+        }
+
+        // Função para abrir modal de colaboradores
+        function abrirModalColaboradores() {
+            alert('Funcionalidade de adicionar colaboradores em desenvolvimento!\n\nEm breve você poderá adicionar outros organizadores para colaborar com este evento.');
+            // TODO: Implementar modal para adicionar colaboradores
         }
 
         // Adicionar listeners para validar em tempo real
@@ -774,6 +869,7 @@
             
             const evento = {
                 nome: document.getElementById('nome').value,
+                organizador: document.getElementById('organizador').value,
                 local: document.getElementById('local').value,
                 dataInicio: document.getElementById('data-inicio').value,
                 dataFim: document.getElementById('data-fim').value,

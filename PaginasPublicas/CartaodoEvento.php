@@ -11,7 +11,11 @@
     include_once('../BancoDados/conexao.php');
 
     $id_evento = isset($_GET['id']) ? (int)$_GET['id'] : 1;
-    $sql = "SELECT * FROM evento WHERE cod_evento = $id_evento";
+    $sql = "SELECT e.*, u.Nome as nome_organizador 
+            FROM evento e 
+            LEFT JOIN organiza o ON e.cod_evento = o.cod_evento 
+            LEFT JOIN usuario u ON o.CPF = u.CPF 
+            WHERE e.cod_evento = $id_evento";
     $resultado = mysqli_query($conexao, $sql);
 
 // Verificar se encontrou o evento
@@ -22,6 +26,7 @@
         $data_fim = date('d/m/y', strtotime($evento['conclusao']));
         $hora_inicio = date('H:i', strtotime($evento['inicio']));
         $hora_fim = date('H:i', strtotime($evento['conclusao']));
+        $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
     } else {
 // Se não encontrou o evento, usar dados padrão
         $evento = array(
@@ -38,6 +43,7 @@
         $data_fim = '00/00/00';
         $hora_inicio = '00:00';
         $hora_fim = '00:00';
+        $nome_organizador = 'Não informado';
     }
 
     $certificado = (isset($evento['certificado']) && (int)$evento['certificado'] === 1) ? 'Sim' : 'Não';
@@ -114,20 +120,21 @@
         }
 
         .Nome { grid-column: span 4 / span 4; }
-        .Local { grid-column: span 4 / span 4; grid-column-start: 5; }
-        .DataDeInicio { grid-column: span 2 / span 2; grid-row-start: 2; }
-        .DataDeFim { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 2; }
-        .HorarioDeInicio { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 2; }
-        .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 2; }
-        .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 3; }
-        .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
-        .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
-        .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
+        .Organizador { grid-column: span 4 / span 4; grid-column-start: 5; }
+        .Local { grid-column: span 8 / span 8; grid-row-start: 2; }
+        .DataDeInicio { grid-column: span 2 / span 2; grid-row-start: 3; }
+        .DataDeFim { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
+        .HorarioDeInicio { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
+        .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
+        .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 4; }
+        .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 4; }
+        .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 4; }
+        .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 4; }
 
         .Imagem {
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
-            grid-row-start: 4;
+            grid-row-start: 5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -135,11 +142,11 @@
             min-height: 16rem;
         }
 
-        .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 4; }
+        .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 5; }
 
-        .BotaoVoltar { grid-column: span 2 / span 2; grid-row-start: 7; }
+        .BotaoVoltar { grid-column: span 2 / span 2; grid-row-start: 8; }
 
-        .MensagemLogin { grid-column: span 3 / span 3; grid-column-start: 6; grid-row-start: 7; align-self: center; }
+        .MensagemLogin { grid-column: span 3 / span 3; grid-column-start: 6; grid-row-start: 8; align-self: center; }
 
         /* Imagem */
         .campo-imagem {
@@ -260,6 +267,10 @@
         <div class="Nome grupo-campo">
             <label>Nome:</label>
             <div class="caixa-valor"><?php echo htmlspecialchars($evento['nome']); ?></div>
+        </div>
+        <div class="Organizador grupo-campo">
+            <label>Organizado por:</label>
+            <div class="caixa-valor"><?php echo htmlspecialchars($nome_organizador); ?></div>
         </div>
         <div class="Local grupo-campo">
             <label>Local:</label>

@@ -174,7 +174,6 @@ mysqli_close($conexao);
     .botao-editar {
         background-color: var(--botao);
         width: 7.5rem;
-        margin-left: auto;
     }
 
     .botao-confirmar {
@@ -185,9 +184,6 @@ mysqli_close($conexao);
     .botao-cancelar {
         background-color: #dc3545;
         width: 8.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .escondido {
@@ -330,13 +326,6 @@ mysqli_close($conexao);
         box-sizing: border-box;
     }
 
-    .linha-botoes-principais {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        width: 100%;
-    }
-
     .alert {
         padding: 0.75rem 1rem;
         margin-bottom: 1rem;
@@ -405,11 +394,9 @@ mysqli_close($conexao);
                     </div>
                     
                     <div class="acoes-formulario">
-                        <div class="linha-botoes-principais">
-                            <button type="button" class="botao botao-editar" id="btn-editar">Editar</button>
-                            <button type="button" class="botao botao-cancelar hidden" id="btn-cancelar">Cancelar</button>
-                            <button type="submit" class="botao botao-salvar hidden" id="btn-salvar">Salvar</button>
-                        </div>
+                        <button type="button" class="botao botao-editar" id="btn-editar">Editar</button>
+                        <button type="button" class="botao botao-cancelar hidden" id="btn-cancelar">Cancelar</button>
+                        <button type="submit" class="botao botao-salvar hidden" id="btn-salvar">Salvar</button>
                     </div>
                 </form>
             </div>
