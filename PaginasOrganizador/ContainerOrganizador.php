@@ -1,16 +1,16 @@
 <?php
-// Configuração do tempo de sessão para 60 segundos
-ini_set('session.gc_maxlifetime', 60);
-session_set_cookie_params(60);
+// Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
+ini_set('session.gc_maxlifetime', 360);
+session_set_cookie_params(360);
 
 session_start();
 
-// Verifica se a sessão expirou
-if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 60)) {
+// Verifica se a sessão expirou (5 minutos de inatividade)
+if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 300)) {
     // Sessão expirou - mostra página especial
     session_unset();
     session_destroy();
-    
+
     // Mostra página de sessão expirada ao invés de redirecionamento direto
     echo '<!DOCTYPE html>
     <html lang="pt-br">
@@ -50,7 +50,9 @@ if (!isset($_SESSION['organizador']) || $_SESSION['organizador'] != 1) {
 $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 ?>
 <!DOCTYPE html>
-<html lang="pt-br" <?php if ($tema_site === 1) { echo 'data-theme="dark"'; } ?> >
+<html lang="pt-br" <?php if ($tema_site === 1) {
+                        echo 'data-theme="dark"';
+                    } ?>>
 
 <head>
     <meta charset="UTF-8" />
@@ -60,12 +62,14 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
 </head>
 
-<body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) { echo 'class="pagina-inicio"'; } ?>>
+<body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) {
+            echo 'class="pagina-inicio"';
+        } ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
-        'inicio' => 'InicioOrganizador.html',
-        'evento' => 'CartaodoEventoOrganizador.html',
+        'inicio' => 'InicioOrganizador.php',
+        'evento' => 'CartaodoEventoOrganizador.php',
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
         'meusEventos' => 'MeusEventosOrganizador.html',
         'adicionarEvento' => 'AdicionarEvento.php',
@@ -84,7 +88,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     ];
     $pagina = $_GET['pagina'] ?? 'inicio';
     $arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
-?>
+    ?>
 
     <!-- Menu fixo -->
     <?php include 'MenuO.html'; ?>
@@ -106,6 +110,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         function carregarScripts(lista, callback) {
             const alvo = document.getElementById('conteudo-dinamico') || document.body;
             let index = 0;
+
             function proximo() {
                 if (index < lista.length) {
                     const script = document.createElement('script');
@@ -147,7 +152,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     }
                 });
             });
-            menuContentObserver.observe(menu, { attributes: true });
+            menuContentObserver.observe(menu, {
+                attributes: true
+            });
         }
 
         function carregarFaleConoscoScript() {
@@ -158,7 +165,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             const script = document.createElement('script');
             script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
             script.setAttribute('data-faleconosco', '1');
-            script.onload = function () {
+            script.onload = function() {
                 if (typeof window.inicializarFaleConosco === 'function') window.inicializarFaleConosco();
             };
             conteudo.appendChild(script);
@@ -198,7 +205,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // =========================
         const rotas = {
             'inicio': {
-                html: 'InicioOrganizador.html',
+                html: 'InicioOrganizador.php',
                 js: ['../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
@@ -212,14 +219,14 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'evento': {
-                html: 'CartaodoEventoOrganizador.html',
+                html: 'CartaodoEventoOrganizador.php',
                 js: ['CartaoDoEventoOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoEvento === 'function') window.inicializarEventosCartaoEvento();
-                    setTimeout(function () {
+                    setTimeout(function() {
                         var btnInscrever = document.querySelector('.botao-inscrever');
                         if (btnInscrever) {
-                            btnInscrever.onclick = function () {
+                            btnInscrever.onclick = function() {
                                 if (typeof window.mostrarMensagemInscricaoFeita === 'function') {
                                     window.mostrarMensagemInscricaoFeita();
                                 }
@@ -231,7 +238,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'eventoOrganizado': {
                 html: 'CartaoDoEventoOrganizando.html',
                 js: ['CartaoDoEventoOrganizando.js'],
-                init: () => { }
+                init: () => {}
             },
             'perfil': {
                 html: 'PerfilOrganizador.html',
@@ -243,17 +250,19 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'certificados': {
                 html: 'CertificadosOrganizador.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'configuracoes': {
                 html: 'ConfiguracoesOrganizador.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'faleconosco': {
                 html: '../PaginasGlobais/FaleConosco.html',
                 js: [],
-                init: () => { carregarFaleConoscoScript(); }
+                init: () => {
+                    carregarFaleConoscoScript();
+                }
             },
             'redefinirSenha': {
                 html: '../PaginasGlobais/RedefinirSenhaConta.html',
@@ -265,37 +274,37 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'termos': {
                 html: '../PaginasGlobais/TermosDeCondicoes.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'emailRecuperacao': {
                 html: '../PaginasGlobais/EmailDeRecuperacao.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'temaDoSite': {
                 html: '../PaginasGlobais/TemaDoSite.php',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'manualDeUso': {
                 html: '../PaginasGlobais/ManualDeUso.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'duvidasFrequentes': {
                 html: '../PaginasGlobais/DuvidasFrequentes.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'sobreNos': {
                 html: '../PaginasGlobais/SobreNos.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'adicionarEvento': {
                 html: 'AdicionarEvento.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             }
         };
         globalThis.rotas = rotas;
@@ -308,22 +317,33 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             if (!rota) return;
             const scripts = Array.isArray(rota.js) ? rota.js : [];
             if (scripts.length) {
-                carregarScripts(scripts, () => { if (typeof rota.init === 'function') rota.init(); });
+                carregarScripts(scripts, () => {
+                    if (typeof rota.init === 'function') rota.init();
+                });
             } else {
                 if (typeof rota.init === 'function') rota.init();
             }
         }
 
-        function carregarPagina(pagina) {
+        function carregarPagina(pagina, codEvento) {
             // Limpeza completa antes de carregar nova página
             if (typeof window.limpezaCompleta === 'function') {
                 window.limpezaCompleta();
             }
-            
+
             if (typeof window.removerFiltroExistente === 'function') {
-                try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
+                try {
+                    window.removerFiltroExistente();
+                } catch (e) {
+                    /* noop */ }
             }
-            fetch('ContainerOrganizador.php?pagina=' + encodeURIComponent(pagina))
+
+            let url = 'ContainerOrganizador.php?pagina=' + encodeURIComponent(pagina);
+            if (codEvento) {
+                url += '&cod_evento=' + encodeURIComponent(codEvento);
+            }
+
+            fetch(url)
                 .then(response => response.text())
                 .then(html => {
                     const temp = document.createElement('div');
@@ -340,26 +360,38 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                             window.setMenuAtivoPorPagina(pagina);
                         }
                         executarRota(pagina);
-                        
-                        // Reinicia verificação de sessão para nova página
+
+                        // Se for página de evento organizado, carrega dados do evento
+                        if (pagina === 'eventoOrganizado' && codEvento) {
+                            setTimeout(() => {
+                                if (typeof window.carregarDadosEvento === 'function') {
+                                    window.carregarDadosEvento(codEvento);
+                                }
+                            }, 100);
+                        }
+
+                        // Reinicia verificação de sessão para nova página (5 minutos)
                         if (typeof window.reiniciarVerificacaoSessao === 'function') {
-                            window.reiniciarVerificacaoSessao(60);
+                            window.reiniciarVerificacaoSessao(300);
                         }
                     }
-                    window.history.pushState({}, '', '?pagina=' + pagina);
+                    window.history.pushState({}, '', url);
                 });
         }
 
         // =========================
         // Eventos de inicialização
         // =========================
-        window.onpopstate = function () {
+        window.carregarPagina = carregarPagina;
+
+        window.onpopstate = function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
-            carregarPagina(pagina);
+            const codEvento = params.get('cod_evento');
+            carregarPagina(pagina, codEvento);
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') {

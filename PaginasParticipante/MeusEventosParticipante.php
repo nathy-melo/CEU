@@ -2,9 +2,9 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos Acontecendo</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meus Eventos</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
@@ -20,7 +20,7 @@
             <div class="barra-pesquisa-container">
                 <div class="barra-pesquisa">
                     <div class="campo-pesquisa-wrapper">
-                        <input class="campo-pesquisa" type="text" id="busca-meus-eventos-org" name="busca_meus_eventos_org" placeholder="Procurar eventos" autocomplete="off" />
+                        <input class="campo-pesquisa" type="text" id="busca-meus-eventos" name="busca_meus_eventos" placeholder="Procurar eventos" autocomplete="off" />
                         <button class="botao-pesquisa" aria-label="Procurar">
                             <div class="icone-pesquisa">
                                 <img src="../Imagens/lupa.png" alt="Lupa">
@@ -39,15 +39,11 @@
         </div>
 
         <div class="container" id="eventos-container">
-            <!-- Caixas de evento -->
-            <div class="botao CaixaDoEventoAdicionar" onclick="adicionarNovoEvento()">
-                +
-            </div>
-            <!-- Eventos serão carregados dinamicamente via JavaScript -->
+            <!-- Eventos serão carregados via JavaScript -->
         </div>
     </div>
     <script src="../PaginasGlobais/Filtro.js"></script>
-    <script src="MeusEventosOrganizador.js"></script>
+    <script src="MeusEventosParticipante.js"></script>
 </body>
 
 </html>

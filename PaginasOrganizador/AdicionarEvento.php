@@ -1,4 +1,182 @@
 <?php
+// Processa o formulário quando enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json; charset=utf-8');
+
+    require_once('../BancoDados/conexao.php');
+
+    $cpfOrganizador = $_SESSION['cpf'];
+
+    // Recebe os dados do formulário
+    $nome = $_POST['nome'] ?? '';
+    $local = $_POST['local'] ?? '';
+    $dataInicio = $_POST['data_inicio'] ?? '';
+    $dataFim = $_POST['data_fim'] ?? '';
+    $horarioInicio = $_POST['horario_inicio'] ?? '';
+    $horarioFim = $_POST['horario_fim'] ?? '';
+    $publicoAlvo = $_POST['publico_alvo'] ?? '';
+    $categoria = $_POST['categoria'] ?? '';
+    $modalidade = $_POST['modalidade'] ?? '';
+    $certificado = $_POST['certificado'] ?? '';
+    $descricao = $_POST['descricao'] ?? '';
+
+    // Validação básica
+    if (
+        empty($nome) || empty($local) || empty($dataInicio) || empty($dataFim) ||
+        empty($horarioInicio) || empty($horarioFim) || empty($publicoAlvo) ||
+        empty($categoria) || empty($modalidade) || empty($certificado) || empty($descricao)
+    ) {
+        echo json_encode(['erro' => 'Todos os campos são obrigatórios']);
+        exit;
+    }
+
+    // Combina data e hora
+    $inicio = $dataInicio . ' ' . $horarioInicio . ':00';
+    $conclusao = $dataFim . ' ' . $horarioFim . ':00';
+
+    // Calcula duração em horas
+    $dataInicioObj = new DateTime($inicio);
+    $dataConclusaoObj = new DateTime($conclusao);
+    $intervalo = $dataInicioObj->diff($dataConclusaoObj);
+    $duracao = ($intervalo->days * 24) + $intervalo->h + ($intervalo->i / 60);
+
+    // Converte certificado para booleano
+    $certificadoBool = ($certificado !== 'Sem certificacao') ? 1 : 0;
+
+    // Processa upload de múltiplas imagens
+    $imagensUpload = [];
+    $caminhoImagemPrincipal = null;
+    
+    if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name'][0])) {
+        $totalImagens = count($_FILES['imagens_evento']['name']);
+        $tamanhoMaximo = 10 * 1024 * 1024; // 10MB em bytes
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        for ($i = 0; $i < $totalImagens; $i++) {
+            // Verifica se houve erro no upload
+            if ($_FILES['imagens_evento']['error'][$i] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+            
+            $nomeArquivo = $_FILES['imagens_evento']['name'][$i];
+            $tmpName = $_FILES['imagens_evento']['tmp_name'][$i];
+            $tamanhoArquivo = $_FILES['imagens_evento']['size'][$i];
+            $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+            
+            // Valida tamanho do arquivo
+            if ($tamanhoArquivo > $tamanhoMaximo) {
+                $tamanhoMB = round($tamanhoArquivo / 1024 / 1024, 2);
+                echo json_encode(['erro' => "A imagem '{$nomeArquivo}' excede o limite de 10MB. Tamanho: {$tamanhoMB}MB"]);
+                exit;
+            }
+            
+            // Valida extensão
+            if (!in_array($extensao, $extensoesPermitidas)) {
+                echo json_encode(['erro' => "Formato de imagem não permitido em '{$nomeArquivo}'. Use: JPG, JPEG, PNG, GIF ou WEBP"]);
+                exit;
+            }
+            
+            // Gera nome único
+            $nomeUnico = uniqid() . '_' . time() . '_' . $i . '.' . $extensao;
+            $destino = '../ImagensEventos/' . $nomeUnico;
+            
+            if (move_uploaded_file($tmpName, $destino)) {
+                $caminhoCompleto = 'ImagensEventos/' . $nomeUnico;
+                $imagensUpload[] = [
+                    'caminho' => $caminhoCompleto,
+                    'ordem' => $i,
+                    'principal' => ($i === 0) ? 1 : 0
+                ];
+                
+                // A primeira imagem é a principal
+                if ($i === 0) {
+                    $caminhoImagemPrincipal = $caminhoCompleto;
+                }
+            } else {
+                echo json_encode(['erro' => "Erro ao fazer upload da imagem '{$nomeArquivo}'"]);
+                exit;
+            }
+        }
+    }
+
+    // Gera código único para o evento
+    $sqlMaxCod = "SELECT IFNULL(MAX(cod_evento), 0) + 1 as proximo_cod FROM evento";
+    $resultMaxCod = mysqli_query($conexao, $sqlMaxCod);
+    $rowMaxCod = mysqli_fetch_assoc($resultMaxCod);
+    $codEvento = $rowMaxCod['proximo_cod'];
+
+    // Inicia transação
+    mysqli_begin_transaction($conexao);
+
+    try {
+        // Insere evento (mantém campo imagem com a principal para compatibilidade)
+        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
+        mysqli_stmt_bind_param(
+            $stmtEvento,
+            "isssssssdsss",
+            $codEvento,
+            $categoria,
+            $nome,
+            $local,
+            $descricao,
+            $publicoAlvo,
+            $inicio,
+            $conclusao,
+            $duracao,
+            $certificadoBool,
+            $modalidade,
+            $caminhoImagemPrincipal
+        );
+
+        if (!mysqli_stmt_execute($stmtEvento)) {
+            throw new Exception('Erro ao inserir evento: ' . mysqli_error($conexao));
+        }
+
+        // Insere múltiplas imagens na tabela imagens_evento
+        if (!empty($imagensUpload)) {
+            $sqlImagem = "INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES (?, ?, ?, ?)";
+            $stmtImagem = mysqli_prepare($conexao, $sqlImagem);
+            
+            foreach ($imagensUpload as $img) {
+                mysqli_stmt_bind_param($stmtImagem, "isii", $codEvento, $img['caminho'], $img['ordem'], $img['principal']);
+                if (!mysqli_stmt_execute($stmtImagem)) {
+                    throw new Exception('Erro ao inserir imagem: ' . mysqli_error($conexao));
+                }
+            }
+            mysqli_stmt_close($stmtImagem);
+        }
+
+        // Vincula organizador ao evento
+        $sqlOrganiza = "INSERT INTO organiza (cod_evento, CPF) VALUES (?, ?)";
+        $stmtOrganiza = mysqli_prepare($conexao, $sqlOrganiza);
+        mysqli_stmt_bind_param($stmtOrganiza, "is", $codEvento, $cpfOrganizador);
+
+        if (!mysqli_stmt_execute($stmtOrganiza)) {
+            throw new Exception('Erro ao vincular organizador: ' . mysqli_error($conexao));
+        }
+
+        // Commit da transação
+        mysqli_commit($conexao);
+
+        mysqli_stmt_close($stmtEvento);
+        mysqli_stmt_close($stmtOrganiza);
+        mysqli_close($conexao);
+
+        echo json_encode(['sucesso' => true, 'cod_evento' => $codEvento, 'mensagem' => 'Evento criado com sucesso!']);
+        exit;
+    } catch (Exception $e) {
+        // Rollback em caso de erro
+        mysqli_rollback($conexao);
+        mysqli_close($conexao);
+
+        echo json_encode(['erro' => $e->getMessage()]);
+        exit;
+    }
+}
+
 // busca o nome do usuário logado
 require_once('../BancoDados/conexao.php');
 
@@ -79,7 +257,7 @@ mysqli_close($conexao);
         .campo-textarea:hover {
             border-color: var(--botao, #0166ff);
             background-color: #f8f9fa;
-            transform:scale(1.02);
+            transform: scale(1.02);
             box-shadow: 0 0.25rem 1rem 0 rgba(1, 102, 255, 0.25);
         }
 
@@ -448,6 +626,7 @@ mysqli_close($conexao);
             height: 3rem;
             fill: #888;
         }
+
         /* Ajuste para quando usar <img> no lugar do SVG inline */
         .campo-imagem-placeholder img {
             width: 3rem;
@@ -602,8 +781,8 @@ mysqli_close($conexao);
             bottom: 0.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(1, 102, 255, 0.9);
-            color: white;
+            background: var(--botao);
+            color: var(--branco);
             border: none;
             border-radius: 1.5rem;
             padding: 0.4rem 1rem;
@@ -615,12 +794,14 @@ mysqli_close($conexao);
             justify-content: center;
             gap: 0.3rem;
             z-index: 3;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
             box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
         }
 
         .btn-adicionar-mais:hover {
-            background: rgba(1, 102, 255, 1);
+            background: var(--botao);
+            opacity: 0.9;
+            transform: translateX(-50%) scale(1.05);
         }
 
         .btn-adicionar-mais svg {
@@ -628,6 +809,7 @@ mysqli_close($conexao);
             height: 1rem;
             fill: white;
         }
+
         /* Ajuste para quando usar <img> no lugar do SVG inline */
         .btn-adicionar-mais img {
             width: 1rem;
@@ -763,9 +945,9 @@ mysqli_close($conexao);
             const modalidade = document.getElementById('modalidade').value;
             const descricao = document.getElementById('descricao').value.trim();
 
-            const todosPreenchidos = nome && local && dataInicio && dataFim && 
-                                    horarioInicio && horarioFim && publicoAlvo && 
-                                    categoria && certificado && modalidade && descricao;
+            const todosPreenchidos = nome && local && dataInicio && dataFim &&
+                horarioInicio && horarioFim && publicoAlvo &&
+                categoria && certificado && modalidade && descricao;
 
             document.getElementById('btn-criar').disabled = !todosPreenchidos;
         }
@@ -784,7 +966,22 @@ mysqli_close($conexao);
 
         function adicionarImagens(event) {
             const files = Array.from(event.target.files);
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB em bytes
+            
             files.forEach(file => {
+                // Validar tamanho do arquivo
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`Erro: A imagem "${file.name}" excede o limite de 10MB.\nTamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                    return; // Pula este arquivo
+                }
+                
+                // Validar tipo de arquivo
+                const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!tiposPermitidos.includes(file.type)) {
+                    alert(`Erro: O arquivo "${file.name}" não é uma imagem válida.\nFormatos aceitos: JPG, JPEG, PNG, GIF, WEBP`);
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     imagens.push(e.target.result);
@@ -796,6 +993,9 @@ mysqli_close($conexao);
                 };
                 reader.readAsDataURL(file);
             });
+            
+            // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
+            event.target.value = '';
         }
 
         function mostrarCarrossel() {
@@ -866,26 +1066,40 @@ mysqli_close($conexao);
 
         document.getElementById('form-evento').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const evento = {
-                nome: document.getElementById('nome').value,
-                organizador: document.getElementById('organizador').value,
-                local: document.getElementById('local').value,
-                dataInicio: document.getElementById('data-inicio').value,
-                dataFim: document.getElementById('data-fim').value,
-                horarioInicio: document.getElementById('horario-inicio').value,
-                horarioFim: document.getElementById('horario-fim').value,
-                publicoAlvo: document.getElementById('publico-alvo').value,
-                categoria: document.getElementById('categoria').value,
-                certificado: document.getElementById('certificado').value,
-                modalidade: document.getElementById('modalidade').value,
-                descricao: document.getElementById('descricao').value,
-                imagens: imagens
-            };
 
-            console.log('Evento criado:', evento);
-            alert('Evento criado com sucesso!');
-            // Aqui você pode adicionar código para enviar os dados para o servidor
+            const formData = new FormData(this);
+
+            // Desabilita o botão durante o envio
+            const btnCriar = document.getElementById('btn-criar');
+            btnCriar.disabled = true;
+            btnCriar.textContent = 'Criando...';
+
+            fetch('AdicionarEvento.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        alert(data.mensagem || 'Evento criado com sucesso!');
+                        // Redireciona para a página de meus eventos
+                        if (typeof carregarPagina === 'function') {
+                            carregarPagina('meusEventos');
+                        } else {
+                            window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+                        }
+                    } else {
+                        alert('Erro ao criar evento: ' + (data.erro || 'Erro desconhecido'));
+                        btnCriar.disabled = false;
+                        btnCriar.textContent = 'Criar evento';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao criar evento. Por favor, tente novamente.');
+                    btnCriar.disabled = false;
+                    btnCriar.textContent = 'Criar evento';
+                });
         });
 
         // Validação inicial

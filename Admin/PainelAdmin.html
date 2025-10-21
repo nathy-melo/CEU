@@ -49,6 +49,7 @@
                     <button id="btnCodigos" class="btn-secondary" onclick="showSection('codigos')">🎫 Códigos</button>
                     <button id="btnCertificados" class="btn-secondary" onclick="showSection('certificados')">📜
                         Certificados</button>
+                    <button id="btnBackups" class="btn-secondary" onclick="showSection('backups')">🔒 Backups</button>
                     <button id="btnSair" class="btn-secondary" onclick="logout()"
                         style="margin-left: auto; background: #dc3545;">🚪 Sair</button>
                 </div>
@@ -153,6 +154,31 @@
 
                     <div class="admin-container" id="certificadosContainer">
                         <p>Carregando certificados...</p>
+                    </div>
+                </div>
+
+                <!-- Gerenciamento de Backups -->
+                <div id="backups" class="admin-section">
+                    <h3>🔒 Gerenciamento de Backups</h3>
+
+                    <div style="margin-top: 35px; margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+                        <button class="btn-generate" onclick="carregarBackups()">💾 Fazer Backup Agora</button>
+                        <button class="btn-secondary" onclick="carregarListaBackups()">🔄 Atualizar Lista</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                        <div class="stats-card" style="border-left-color: var(--botao);">
+                            <h4 style="color: var(--botao);">💾 Tamanho BD</h4>
+                            <p id="infoBDTamanho">-</p>
+                        </div>
+                        <div class="stats-card" style="border-left-color: #28a745;">
+                            <h4 style="color: #28a745;">📁 Backups</h4>
+                            <p id="infoBDTotal">0</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-container" id="backupsContainer">
+                        <p>Carregando backups...</p>
                     </div>
                 </div>
 
@@ -316,16 +342,16 @@
         .data-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--botao);
         }
 
         .data-table th {
-            background-color: #f8f9fa;
+            background-color: var(--botao);
             font-weight: bold;
         }
 
         .data-table tr:hover {
-            background-color: #f5f5f5;
+            background-color: var(--botao);
         }
 
         .status-badge {
@@ -370,8 +396,26 @@
         }
 
         .btn-toggle {
+            background: #28a745;
+            color: #212529;
+        }
+
+        .btn-download {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #28a745;
+        }
+
+        .btn-restore {
             background: #ffc107;
             color: #212529;
+        }
+
+        .btn-restore:hover {
+            background: #e0a800;
         }
 
         /* Estilos para campos de busca */
@@ -542,6 +586,10 @@
                     break;
                 case 'certificados':
                     carregarCertificados();
+                    break;
+                case 'backups':
+                    carregarInfoBackups();
+                    carregarListaBackups();
                     break;
             }
         }
@@ -1097,6 +1145,152 @@
             if (confirm('Deseja realmente sair do sistema?')) {
                 localStorage.removeItem('admin_temp_auth');
                 window.location.href = 'LoginAdmin.html';
+            }
+        }
+
+        // =======================================
+        // BACKUPS
+        // =======================================
+
+        async function carregarInfoBackups() {
+            try {
+                const response = await fetch('GerenciadorBackup.php?acao=info');
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    document.getElementById('infoBDTamanho').textContent = data.tamanho;
+                }
+            } catch (e) {
+                console.error('Erro ao carregar info:', e);
+            }
+        }
+
+        async function carregarBackups() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Processando...';
+
+            try {
+                const response = await fetch('GerenciadorBackup.php?acao=fazer-backup', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    alert('✓ Backup realizado com sucesso!');
+                    await carregarListaBackups();
+                    await carregarInfoBackups();
+                } else {
+                    alert('✗ Erro: ' + data.mensagem);
+                }
+            } catch (e) {
+                alert('Erro ao fazer backup: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Fazer Backup Agora';
+            }
+        }
+
+        async function carregarListaBackups() {
+            try {
+                const response = await fetch('GerenciadorBackup.php?acao=listar', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    document.getElementById('infoBDTotal').textContent = data.total;
+                    
+                    let html = '';
+                    if (data.total === 0) {
+                        html = '<p style="text-align: center; padding: 20px; color: #999;">📁 Nenhum backup disponível</p>';
+                    } else {
+                        html = '<div class="table-responsive"><table class="data-table">';
+                        html += '<thead><tr>';
+                        html += '<th>Data/Hora</th>';
+                        html += '<th>Tamanho</th>';
+                        html += '<th>Ações</th>';
+                        html += '</tr></thead><tbody>';
+                        
+                        data.backups.forEach(backup => {
+                            html += '<tr>';
+                            html += '<td>' + backup.data + '</td>';
+                            html += '<td>' + backup.tamanhoFormatado + '</td>';
+                            html += '<td>';
+                            html += '<button class="btn-small btn-download" onclick="baixarBackup(\'' + backup.nome + '\')">📥 Baixar</button> ';
+                            html += '<button class="btn-small btn-restore" onclick="restaurarBackupConfirm(\'' + backup.nome + '\')">↻ Restaurar</button> ';
+                            html += '<button class="btn-small btn-delete" onclick="deletarBackupConfirm(\'' + backup.nome + '\')">🗑️ Deletar</button>';
+                            html += '</td>';
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table></div>';
+                    }
+                    
+                    document.getElementById('backupsContainer').innerHTML = html;
+                } else {
+                    document.getElementById('backupsContainer').innerHTML = '<p style="color: red;">Erro ao carregar backups</p>';
+                }
+            } catch (e) {
+                document.getElementById('backupsContainer').innerHTML = '<p style="color: red;">Erro: ' + e.message + '</p>';
+            }
+        }
+
+        function baixarBackup(nome) {
+            window.location.href = 'GerenciadorBackup.php?acao=baixar&arquivo=' + encodeURIComponent(nome);
+        }
+
+        function restaurarBackupConfirm(nome) {
+            if (!confirm('⚠️  Tem certeza? Isto vai RESTAURAR o banco de dados e SUBSTITUIR todos os dados atuais!')) {
+                return;
+            }
+            restaurarBackup(nome);
+        }
+
+        async function restaurarBackup(nome) {
+            try {
+                const formData = new FormData();
+                formData.append('arquivo', nome);
+                
+                const response = await fetch('GerenciadorBackup.php?acao=restaurar', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    alert('✓ Backup restaurado com sucesso!');
+                    location.reload();
+                } else {
+                    alert('✗ Erro: ' + data.mensagem);
+                }
+            } catch (e) {
+                alert('Erro ao restaurar: ' + e.message);
+            }
+        }
+
+        function deletarBackupConfirm(nome) {
+            if (!confirm('Tem certeza que deseja deletar este backup?')) {
+                return;
+            }
+            deletarBackup(nome);
+        }
+
+        async function deletarBackup(nome) {
+            try {
+                const formData = new FormData();
+                formData.append('arquivo', nome);
+                
+                const response = await fetch('GerenciadorBackup.php?acao=deletar', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    alert('✓ Backup deletado com sucesso!');
+                    await carregarListaBackups();
+                } else {
+                    alert('✗ Erro: ' + data.mensagem);
+                }
+            } catch (e) {
+                alert('Erro ao deletar: ' + e.message);
             }
         }
     </script>

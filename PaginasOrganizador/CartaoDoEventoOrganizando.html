@@ -486,8 +486,8 @@
     bottom: 0.5rem;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(1, 102, 255, 0.9);
-    color: white;
+    background: var(--botao);
+    color: var(--branco);
     border: none;
     border-radius: 1.5rem;
     padding: 0.4rem 1rem;
@@ -499,12 +499,14 @@
     justify-content: center;
     gap: 0.3rem;
     z-index: 3;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
     box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
   }
 
   .btn-adicionar-mais:hover {
-    background: rgba(1, 102, 255, 1);
+    background: var(--botao);
+    opacity: 0.9;
+    transform: translateX(-50%) scale(1.05);
   }
 
   .btn-adicionar-mais img {

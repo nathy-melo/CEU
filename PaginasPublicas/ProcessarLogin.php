@@ -1,6 +1,6 @@
 <?php
-// Configuração do tempo de sessão para 60 segundos
-ini_set('session.gc_maxlifetime', 60);
+// Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
+ini_set('session.gc_maxlifetime', 360);
 
 // ============= MODO DE TESTE =============
 // Defina como true para desativar algumas validações durante testes
@@ -9,7 +9,7 @@ define('MODO_TESTE_LOGIN', true); // Mude para false para ativar validações
 // Ajusta o cookie da sessão para ser visível em todo o site
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
-        'lifetime' => 60, // 60 segundos
+        'lifetime' => 360, // 6 minutos (5min inatividade + 1min extensão)
         'path' => '/',
         'secure' => false,
         'httponly' => true,

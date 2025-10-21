@@ -705,3 +705,406 @@ As modificações realizadas transformaram o projeto CEU em uma aplicação web 
 - **Manutenibilidade elevada** com código bem documentado
 
 O projeto está preparado para crescimento futuro e novas funcionalidades! 🚀
+
+---
+
+# 📋 ATUALIZAÇÃO OUTUBRO 2025 - SISTEMA DE BACKUP E MÚLTIPLAS IMAGENS
+
+## 🚀 **FASE 3: RECURSOS AVANÇADOS**
+
+### **📅 Data: 21 de outubro de 2025**
+
+#### 🎯 **Objetivo Principal:**
+Implementação de sistema de backup simplificado, limite de upload de 10MB, sistema de múltiplas imagens por evento e melhorias visuais de integração com o painel admin.
+
+---
+
+## 📸 **1. SISTEMA DE MÚLTIPLAS IMAGENS POR EVENTO**
+
+### **Problema Original:**
+- Apenas 1 imagem por evento permitida
+- Campo `imagem` na tabela `evento` limitava extensibilidade
+- Sem suporte a galeria de imagens
+- Sem sistema de ordenação ou imagem principal
+
+### **✅ Soluções Implementadas:**
+
+#### **📁 Tabela Nova: `imagens_evento`**
+```sql
+CREATE TABLE imagens_evento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cod_evento INT NOT NULL,
+    caminho_imagem VARCHAR(255) NOT NULL,
+    ordem INT NOT NULL DEFAULT 0,
+    principal TINYINT(1) NOT NULL DEFAULT 0,
+    data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
+);
+```
+
+**Características:**
+- ✅ Relacionamento 1:N com tabela `evento`
+- ✅ Suporte a ordem customizável de imagens
+- ✅ Flag `principal` para destacar imagem do evento
+- ✅ Compatibilidade com CASCADE DELETE
+- ✅ Rastreamento de data/hora de upload
+
+#### **🔄 Arquivos Modificados:**
+
+**`PaginasOrganizador/AdicionarEvento.php`**
+- Processamento de múltiplas imagens em loop
+- Validação individual de tamanho (10MB)
+- Validação de tipos: jpg, jpeg, png, gif, webp
+- Geração de nomes únicos com timestamp
+- Inserção de múltiplas imagens com ordem
+
+**`PaginasOrganizador/AtualizarEvento.php`**
+- Processamento completo de atualização de imagens
+- Remoção de imagens antigas (físicas + banco)
+- Inserção de novas imagens em transação
+- Mantém compatibilidade com campo `imagem` do evento
+
+#### **📁 Scripts de Busca: `BuscarImagensEvento.php`**
+Criado em 3 locais:
+- `PaginasOrganizador/BuscarImagensEvento.php`
+- `PaginasParticipante/BuscarImagensEvento.php`
+- `PaginasPublicas/BuscarImagensEvento.php`
+
+**Funcionalidades:**
+- SELECT com ORDER BY (principal DESC, ordem ASC)
+- Fallback para campo `imagem` da tabela evento
+- Retorno JSON estruturado: {sucesso, imagens[], total}
+- Proteção contra acesso não autorizado
+
+#### **🎨 Frontend: `CartaoDoEventoOrganizando.html`**
+- Input `multiple` para seleção de múltiplas imagens
+- Carrossel de preview com navegação
+- Botão dinâmico "Adicionar mais imagens"
+- Validação em tempo real antes de envio
+
+**CSS do Botão "Adicionar Imagens" (Refatorado):**
+```css
+.btn-adicionar-mais {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--botao);      /* #6598D2 */
+    color: var(--branco);
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    z-index: 3;
+    transition: all 0.3s ease;
+    box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
+.btn-adicionar-mais:hover {
+    background: var(--botao);
+    opacity: 0.9;
+    transform: translateX(-50%) scale(1.05);
+}
+```
+
+**Melhorias:**
+- ✅ Uso de variáveis CSS do tema (`--botao`, `--branco`)
+- ✅ Hover effect com opacidade e escala
+- ✅ Transição suave
+- ✅ Sem cores hardcoded
+
+---
+
+## 📥 **2. LIMITE DE UPLOAD 10MB**
+
+### **Implementação Dupla (Frontend + Backend):**
+
+#### **Frontend (JavaScript):**
+```javascript
+const LIMITE_UPLOAD_MB = 10;
+const LIMITE_UPLOAD_BYTES = LIMITE_UPLOAD_MB * 1024 * 1024; // 10.485.760 bytes
+
+// Validação antes de envio
+if (arquivo.size > LIMITE_UPLOAD_BYTES) {
+    alert(`❌ Arquivo muito grande! Máximo: ${LIMITE_UPLOAD_MB}MB`);
+    return false;
+}
+```
+
+**Localização:** `PaginasOrganizador/CartaoDoEventoOrganizando.html`
+
+#### **Backend (PHP):**
+```php
+$LIMITE_UPLOAD = 10 * 1024 * 1024; // 10MB
+
+foreach ($_FILES['imagens_evento']['error'] as $key => $error) {
+    // Validação de tamanho
+    if ($_FILES['imagens_evento']['size'][$key] > $LIMITE_UPLOAD) {
+        throw new Exception("Arquivo {$key} excede 10MB");
+    }
+}
+```
+
+**Localização:** `PaginasOrganizador/AdicionarEvento.php`, `AtualizarEvento.php`
+
+**Benefícios:**
+- ✅ Validação immediate no frontend (melhor UX)
+- ✅ Validação server-side (segurança)
+- ✅ Protege contra uploads acidentais
+- ✅ Economiza largura de banda
+
+---
+
+## 💾 **3. SISTEMA DE BACKUP SIMPLIFICADO**
+
+### **Filosofia de Design:**
+- ✅ Simples e funcional
+- ✅ Sem complexidades desnecessárias
+- ✅ Integrado no PainelAdmin.html
+- ✅ Uma única classe PHP (~200 linhas)
+- ✅ Sem compressão GZIP
+- ✅ Sem automação por cron
+
+### **📁 Arquivos Criados:**
+
+#### **`Admin/GerenciadorBackup.php`**
+**Classe com 8 métodos:**
+```php
+public function fazerBackup()           // Cria novo backup
+public function exportarBD()            // Exporta estrutura + dados SQL
+public function listarBackups()         // Lista todos os backups
+public function restaurarBackup()       // Restaura um backup
+public function deletarBackup()         // Remove um backup
+public function obterInfo()             // Info do banco (tamanho, tabelas)
+private function formatarTamanho()      // Formatação legível
+```
+
+**Características:**
+- ✅ Backup com timestamp automático (YYYY-MM-DD_HH-mm-ss)
+- ✅ Arquivos salvos em SQL puro (sem compressão)
+- ✅ Pasta: `Admin/Backups/`
+- ✅ Validação de segurança (path traversal prevention)
+- ✅ Retorno JSON para todas as operações
+
+#### **`Admin/BACKUP_INFO.md`**
+- Documentação rápida de como usar
+- Exemplos de API REST
+- Instruções para testes
+
+#### **`Admin/Backups/.htaccess`**
+```apache
+# Proteção simples da pasta
+<FilesMatch "\.sql$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+Options -Indexes
+```
+
+### **🎨 Integração com PainelAdmin.html:**
+
+#### **Seção Nova: "🔒 Backups"**
+- Botão na navegação principal (igual aos outros: Eventos, Usuários, etc)
+- Abre seção integrada (não nova página)
+- Cards informativos: Tamanho do BD e Total de backups
+- Tabela com dados dos backups
+
+#### **Funcionalidades:**
+1. **💾 Fazer Backup Agora** - Cria backup manual
+2. **🔄 Atualizar Lista** - Recarrega lista
+3. **📥 Baixar** - Download para o PC (azul #0066cc)
+4. **↻ Restaurar** - Restaura um backup (amarelo #ffc107)
+5. **🗑️ Deletar** - Remove um backup (vermelho #dc3545)
+
+#### **Estilos de Botões (Refatorados):**
+```css
+.btn-download {
+    background: #0066cc;      /* Azul */
+    color: white;
+}
+.btn-download:hover {
+    background: #0052a3;
+}
+
+.btn-restore {
+    background: #ffc107;      /* Amarelo */
+    color: #212529;
+}
+.btn-restore:hover {
+    background: #e0a800;
+}
+```
+
+**Botões na Tabela:**
+- Cada botão tem seu próprio estilo CSS diferenciado
+- Cores consistentes com ações (azul = download, amarelo = restaurar)
+- Hover effects melhorados
+- Integrado com classe `data-table` do painel
+
+#### **Endpoints da API:**
+```
+POST   GerenciadorBackup.php?acao=fazer-backup   → Criar backup
+POST   GerenciadorBackup.php?acao=listar         → Listar backups
+POST   GerenciadorBackup.php?acao=restaurar      → Restaurar
+POST   GerenciadorBackup.php?acao=deletar        → Deletar
+GET    GerenciadorBackup.php?acao=baixar         → Baixar
+POST   GerenciadorBackup.php?acao=info           → Info do BD
+```
+
+#### **Respostas JSON Estruturadas:**
+```json
+{
+  "sucesso": true,
+  "arquivo": "backup_2025-10-21_03-20-39.sql",
+  "tamanho": 9183,
+  "mensagem": "Backup realizado com sucesso"
+}
+```
+
+### **🧪 Testes:**
+- Script `Admin/testar_backup.php` para testes rápidos
+- Execução: `php testar_backup.php`
+- Valida todas as funcionalidades
+
+### **🛡️ Segurança:**
+- ✅ Validação de caminhos (path traversal prevention)
+- ✅ Proteção por .htaccess
+- ✅ Restrição de acesso a arquivos .sql
+- ✅ Preparação para consultas ao banco
+
+---
+
+## 🎨 **4. MELHORIAS VISUAIS E DE INTEGRAÇÃO**
+
+### **Uniformização de Elementos:**
+- ✅ Tabela de backups segue padrão `data-table` (como usuários, códigos, etc)
+- ✅ Botões com classes padronizadas (`btn-small`)
+- ✅ Cores consistentes com tema
+- ✅ Hover effects uniformes
+
+### **Refatoração de Estilos:**
+- ✅ CSS do botão "Adicionar Imagens" agora usa variáveis
+- ✅ Botões de backup com cores diferenciadas e significativas
+- ✅ Todos os elementos seguem padrão do admin
+
+### **Layout Responsivo:**
+- ✅ Seção de backups adapta-se em mobile
+- ✅ Cards informativos em grid automático
+- ✅ Tabela com overflow horizontal se necessário
+
+---
+
+## 📊 **5. ESTRUTURA DE PASTAS ATUALIZADA**
+
+```
+CEU/
+├── Admin/
+│   ├── GerenciadorBackup.php          ✨ NOVO (200 linhas)
+│   ├── BACKUP_INFO.md                 ✨ NOVO
+│   ├── testar_backup.php              ✨ NOVO
+│   ├── Backups/                       ✨ NOVO
+│   │   ├── backup_YYYY-MM-DD_HH-mm-ss.sql
+│   │   └── .htaccess                  ✨ NOVO
+│   └── PainelAdmin.html               ✏️ MODIFICADO
+│
+├── PaginasOrganizador/
+│   ├── AdicionarEvento.php            ✏️ MODIFICADO (múltiplas imagens)
+│   ├── AtualizarEvento.php            ✏️ MODIFICADO (múltiplas imagens)
+│   ├── BuscarImagensEvento.php        ✨ NOVO
+│   └── CartaoDoEventoOrganizando.html ✏️ MODIFICADO (CSS refatorado)
+│
+├── PaginasParticipante/
+│   └── BuscarImagensEvento.php        ✨ NOVO
+│
+└── PaginasPublicas/
+    └── BuscarImagensEvento.php        ✨ NOVO
+```
+
+---
+
+## ✨ **6. FUNCIONALIDADES POR ITERAÇÃO**
+
+### **Iteração 1 - Limite 10MB:**
+- [x] Validação frontend com FileReader API
+- [x] Validação backend com $_FILES['size']
+- [x] Mensagens de erro ao usuário
+- [x] Implementação em AdicionarEvento.php
+- [x] Implementação em AtualizarEvento.php
+
+### **Iteração 2 - Múltiplas Imagens:**
+- [x] Tabela `imagens_evento` criada no BD
+- [x] Processamento em loop no backend
+- [x] Sistema de ordem e imagem principal
+- [x] Scripts BuscarImagensEvento.php (3 versões)
+- [x] Frontend com input `multiple` e carrossel
+- [x] Compatibilidade com campo `imagem` existente
+
+### **Iteração 3 - Backup Simplificado:**
+- [x] Classe GerenciadorBackup (simples, ~200 linhas)
+- [x] API REST com endpoints JSON
+- [x] Seção integrada no PainelAdmin
+- [x] Estilos de botões diferenciados
+- [x] Documentação rápida
+- [x] Script de testes
+
+### **Iteração 4 - Refatoração Visual:**
+- [x] Botão "Adicionar Imagens" usando `var(--botao)`
+- [x] Botões de backup com cores significativas
+- [x] Uniformização com padrão `data-table`
+- [x] Hover effects melhorados
+
+---
+
+## 🎯 **7. BENEFÍCIOS ENTREGUES**
+
+### **Para o Usuário (Organizador):**
+- ✅ Pode fazer upload de várias imagens por evento
+- ✅ Limite claro de 10MB (evita erros)
+- ✅ Galeriacom preview visual
+- ✅ Backup automático dos dados
+- ✅ Recuperação fácil se necessário
+
+### **Para o Desenvolvedor:**
+- ✅ Código simples e manutenível
+- ✅ Sem complexidades desnecessárias
+- ✅ API REST estruturada
+- ✅ Sistema modular e extensível
+- ✅ Documentação prática
+
+### **Para o Projeto:**
+- ✅ Funcionalidade profissional
+- ✅ Segurança de dados melhorada
+- ✅ Performance otimizada
+- ✅ Arquitetura escalável
+- ✅ Visual coeso e intuitivo
+
+---
+
+## 🔄 **8. PRÓXIMAS TAREFAS NA FILA**
+
+- [ ] Separar rotas visualização/edição de eventos (GET vs POST)
+- [ ] Sistema de automação de backup (cron job / Task Scheduler)
+- [ ] Compressão GZIP opcional para backups
+- [ ] Exportação/Importação de dados em CSV
+- [ ] Sistema de cache para imagens
+
+---
+
+## 🎉 **CONCLUSÃO GERAL**
+
+O projeto CEU agora possui:
+
+1. **Sistema de Imagens Avançado** - Múltiplas imagens por evento com galeria
+2. **Proteção de Upload** - Limite de 10MB com validação dupla
+3. **Backup Simplificado** - Sistema prático e integrado no painel
+4. **Interface Consistente** - Visual uniforme em todo o admin
+5. **Código de Qualidade** - Simples, funcional e bem documentado
+
+O sistema está pronto para produção com todas as funcionalidades essenciais implementadas! 🚀

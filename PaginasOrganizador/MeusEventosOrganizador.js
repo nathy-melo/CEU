@@ -1,61 +1,147 @@
-function inicializarFiltroEventos() {
-    const searchInput = document.querySelector('.campo-pesquisa');
-    const searchButton = document.querySelector('.botao-pesquisa');
-    const eventosContainer = document.getElementById('eventos-container');
-
-    // Mensagem de "Sem resultados"
-    let semResultadosMsg = document.createElement('div');
-    semResultadosMsg.textContent = 'Sem resultados';
-    semResultadosMsg.style.color = '#0a1449';
-    semResultadosMsg.style.fontWeight = 'bold';
-    semResultadosMsg.style.fontSize = '1.2rem';
-    semResultadosMsg.style.gridColumn = '1/-1';
-    semResultadosMsg.style.textAlign = 'center';
-    semResultadosMsg.style.padding = '30px 0';
-
-    function filtrarEventos() {
-        const termo = searchInput.value.trim().toLowerCase();
-        const caixas = eventosContainer.querySelectorAll('.CaixaDoEvento');
-        let encontrou = false;
-
-        caixas.forEach(caixa => {
-            const titulo = caixa.querySelector('.EventoTitulo').textContent.toLowerCase();
-            const info = caixa.querySelector('.EventoInfo').textContent.toLowerCase();
-            if (termo === '' || titulo.includes(termo) || info.includes(termo)) {
-                caixa.style.display = '';
-                encontrou = true;
+function carregarEventosDoServidor() {
+    const containerEventos = document.getElementById('eventos-container');
+    const botaoAdicionarEvento = containerEventos.querySelector('.CaixaDoEventoAdicionar');
+    
+    // Limpa eventos existentes (mantém apenas o botão adicionar)
+    const eventosAntigos = containerEventos.querySelectorAll('.CaixaDoEvento');
+    eventosAntigos.forEach(eventoAntigo => eventoAntigo.remove());
+    
+    // Mostra mensagem de carregamento
+    const mensagemCarregando = document.createElement('div');
+    mensagemCarregando.className = 'loading-eventos';
+    mensagemCarregando.textContent = 'Carregando eventos...';
+    mensagemCarregando.style.gridColumn = '1/-1';
+    mensagemCarregando.style.textAlign = 'center';
+    mensagemCarregando.style.padding = '30px 0';
+    mensagemCarregando.style.color = '#0a1449';
+    containerEventos.appendChild(mensagemCarregando);
+    
+    fetch('BuscarEventosOrganizador.php')
+        .then(respostaServidor => respostaServidor.json())
+        .then(dadosRecebidos => {
+            mensagemCarregando.remove();
+            
+            if (dadosRecebidos.erro) {
+                console.error('Erro ao buscar eventos:', dadosRecebidos.erro);
+                alert('Erro ao carregar eventos: ' + dadosRecebidos.erro);
+                return;
+            }
+            
+            if (dadosRecebidos.sucesso && dadosRecebidos.eventos.length > 0) {
+                dadosRecebidos.eventos.forEach(dadosEvento => {
+                    const caixaEventoHTML = document.createElement('div');
+                    caixaEventoHTML.className = 'botao CaixaDoEvento';
+                    caixaEventoHTML.setAttribute('data-tipo', dadosEvento.categoria.toLowerCase());
+                    caixaEventoHTML.setAttribute('data-modalidade', dadosEvento.modalidade.toLowerCase());
+                    caixaEventoHTML.setAttribute('data-localizacao', dadosEvento.lugar.toLowerCase());
+                    caixaEventoHTML.setAttribute('data-data', dadosEvento.inicio.split(' ')[0]);
+                    caixaEventoHTML.setAttribute('data-certificado', dadosEvento.certificado === 'Sim' ? 'sim' : 'nao');
+                    caixaEventoHTML.setAttribute('data-cod-evento', dadosEvento.cod_evento);
+                    
+                    caixaEventoHTML.onclick = function() {
+                        carregarPagina('eventoOrganizado', dadosEvento.cod_evento);
+                    };
+                    
+                    const tituloEvento = document.createElement('div');
+                    tituloEvento.className = 'EventoTitulo';
+                    tituloEvento.textContent = dadosEvento.nome;
+                    
+                    const informacoesEvento = document.createElement('div');
+                    informacoesEvento.className = 'EventoInfo';
+                    informacoesEvento.innerHTML = `${dadosEvento.status}<br>Data: ${dadosEvento.data_formatada}<br>Certificado: ${dadosEvento.certificado}`;
+                    
+                    caixaEventoHTML.appendChild(tituloEvento);
+                    caixaEventoHTML.appendChild(informacoesEvento);
+                    containerEventos.appendChild(caixaEventoHTML);
+                });
             } else {
-                caixa.style.display = 'none';
+                const mensagemSemEventos = document.createElement('div');
+                mensagemSemEventos.textContent = 'Você ainda não criou nenhum evento';
+                mensagemSemEventos.style.gridColumn = '1/-1';
+                mensagemSemEventos.style.textAlign = 'center';
+                mensagemSemEventos.style.padding = '30px 0';
+                mensagemSemEventos.style.color = '#0a1449';
+                mensagemSemEventos.style.fontSize = '1.1rem';
+                containerEventos.appendChild(mensagemSemEventos);
+            }
+        })
+        .catch(erroRequisicao => {
+            mensagemCarregando.remove();
+            console.error('Erro ao carregar eventos:', erroRequisicao);
+            alert('Erro ao carregar eventos. Por favor, tente novamente.');
+        });
+}
+
+function inicializarFiltroEventos() {
+    const campoInputPesquisa = document.querySelector('.campo-pesquisa');
+    const botaoPesquisar = document.querySelector('.botao-pesquisa');
+    const containerEventos = document.getElementById('eventos-container');
+
+    // Cria mensagem de "Sem resultados"
+    let mensagemSemResultados = document.createElement('div');
+    mensagemSemResultados.textContent = 'Sem resultados';
+    mensagemSemResultados.style.color = '#0a1449';
+    mensagemSemResultados.style.fontWeight = 'bold';
+    mensagemSemResultados.style.fontSize = '1.2rem';
+    mensagemSemResultados.style.gridColumn = '1/-1';
+    mensagemSemResultados.style.textAlign = 'center';
+    mensagemSemResultados.style.padding = '30px 0';
+
+    function filtrarEventosPorTermoBusca() {
+        const termoBusca = campoInputPesquisa.value.trim().toLowerCase();
+        const caixasEventos = containerEventos.querySelectorAll('.CaixaDoEvento');
+        let encontrouResultados = false;
+
+        caixasEventos.forEach(caixaEvento => {
+            const elementoTitulo = caixaEvento.querySelector('.EventoTitulo');
+            const elementoInfo = caixaEvento.querySelector('.EventoInfo');
+            
+            if (elementoTitulo && elementoInfo) {
+                const textoTitulo = elementoTitulo.textContent.toLowerCase();
+                const textoInfo = elementoInfo.textContent.toLowerCase();
+                
+                if (termoBusca === '' || textoTitulo.includes(termoBusca) || textoInfo.includes(termoBusca)) {
+                    caixaEvento.style.display = '';
+                    encontrouResultados = true;
+                } else {
+                    caixaEvento.style.display = 'none';
+                }
             }
         });
 
-        // Remove mensagem anterior
-        if (eventosContainer.contains(semResultadosMsg)) {
-            eventosContainer.removeChild(semResultadosMsg);
+        // Remove mensagem anterior se existir
+        if (containerEventos.contains(mensagemSemResultados)) {
+            containerEventos.removeChild(mensagemSemResultados);
         }
 
-        if (!encontrou) {
-            eventosContainer.appendChild(semResultadosMsg);
+        // Mostra mensagem apenas se não encontrou resultados e há termo de busca
+        if (!encontrouResultados && termoBusca !== '') {
+            containerEventos.appendChild(mensagemSemResultados);
         }
     }
 
-    if (searchButton) {
-        searchButton.onclick = function (e) {
-            e.preventDefault();
-            filtrarEventos();
+    if (botaoPesquisar) {
+        botaoPesquisar.onclick = function (eventoClick) {
+            eventoClick.preventDefault();
+            filtrarEventosPorTermoBusca();
         };
     }
-    if (searchInput) {
-        searchInput.onkeydown = function (e) {
-            if (e.key === 'Enter') {
-                filtrarEventos();
+    
+    if (campoInputPesquisa) {
+        campoInputPesquisa.onkeydown = function (eventoTeclado) {
+            if (eventoTeclado.key === 'Enter') {
+                filtrarEventosPorTermoBusca();
             }
         };
     }
+    
     // Inicializa o filtro lateral quando disponível
     if (typeof inicializarFiltro === 'function') {
         inicializarFiltro();
     }
+    
+    // Carrega eventos do servidor automaticamente
+    carregarEventosDoServidor();
 }
 
 // Função para adicionar novo evento
@@ -65,8 +151,9 @@ function adicionarNovoEvento() {
     }
 }
 
-// Torna a função global
+// Torna as funções globais
 window.adicionarNovoEvento = adicionarNovoEvento;
+window.carregarEventosDoServidor = carregarEventosDoServidor;
 
 document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML

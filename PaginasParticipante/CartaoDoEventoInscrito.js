@@ -58,9 +58,37 @@ function mostrarMensagemDesinscricao() {
     btnContinuar.style.cursor = 'pointer';
     btnContinuar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
     btnContinuar.onclick = function() {
-        // Aqui você pode colocar a lógica real de desinscrição
-        alert('Inscrição cancelada!');
-        carregarPagina('meusEventos');
+        // Pegar código do evento da URL
+        var params = new URLSearchParams(window.location.search);
+        var codEvento = params.get('id');
+        
+        if (!codEvento) {
+            alert('Erro: código do evento não encontrado');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('cod_evento', codEvento);
+
+        fetch('DesinscreverEvento.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert('Inscrição cancelada com sucesso!');
+                carregarPagina('meusEventos');
+            } else {
+                alert(data.mensagem || 'Erro ao cancelar inscrição');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao processar cancelamento');
+            window.location.reload();
+        });
     };
 
     botoesWrapper.appendChild(btnCancelar);

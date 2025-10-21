@@ -37,7 +37,7 @@
             'publico_alvo' => 'Não informado',
             'certificado' => 0,
             'modalidade' => 'Presencial',
-            'imagem' => 'Imagens/CEU-Logo.png'
+            'imagem' => 'ImagensEventos/CEU-Logo.png'
         );
         $data_inicio = '00/00/00';
         $data_fim = '00/00/00';
@@ -50,7 +50,7 @@
     $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
     // Ajustar caminho da imagem relativo a esta pasta
-    $imagem_rel = isset($evento['imagem']) && $evento['imagem'] !== '' ? $evento['imagem'] : 'Imagens/CEU-Logo.png';
+    $imagem_rel = isset($evento['imagem']) && $evento['imagem'] !== '' ? $evento['imagem'] : 'ImagensEventos/CEU-Logo.png';
     $imagem_src = '../' . ltrim($imagem_rel, "/\\");
     ?>
 

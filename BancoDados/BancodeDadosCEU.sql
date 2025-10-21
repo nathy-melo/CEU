@@ -10,9 +10,8 @@ descricao varchar(500),
 publico_alvo varchar(100),
 inicio datetime not null,
 conclusao datetime not null,
-duracao float, -- pesquisar se isso está certo mesmo
+duracao float, 
 certificado tinyint(1) not null default 0,
--- Novos atributos do evento
 modalidade enum('Presencial','Online','Híbrido') not null default 'Presencial',
 imagem varchar(255) null
 );
@@ -40,10 +39,8 @@ constraint chk_codigo_organizador check (
 constraint chk_tema_site check (TemaSite in (0,1))
 );
 
--- Upgrade seguro: adiciona a coluna se já existir a tabela e a coluna ainda não existir
 ALTER TABLE usuario ADD COLUMN IF NOT EXISTS TemaSite tinyint(1) NOT NULL DEFAULT 0;
 
--- Upgrade seguro para novos atributos do evento
 ALTER TABLE evento ADD COLUMN IF NOT EXISTS modalidade enum('Presencial','Online','Híbrido') NOT NULL DEFAULT 'Presencial';
 ALTER TABLE evento ADD COLUMN IF NOT EXISTS imagem varchar(255) NULL;
 
@@ -61,7 +58,16 @@ foreign key (cod_evento) references evento(cod_evento),
 foreign key (CPF) references usuario(CPF)
 );
 
--- Tabela para códigos de organizador
+CREATE TABLE IF NOT EXISTS inscricao (
+    CPF char(11) NOT NULL,
+    cod_evento int NOT NULL,
+    data_inscricao timestamp DEFAULT CURRENT_TIMESTAMP,
+    status enum('ativa', 'cancelada') NOT NULL DEFAULT 'ativa',
+    PRIMARY KEY (CPF, cod_evento),
+    FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
+);
+
 create table if not exists codigos_organizador (
     id int auto_increment primary key,
     codigo varchar(8) unique not null,
@@ -74,7 +80,19 @@ create table if not exists codigos_organizador (
     observacoes text null comment 'Observações sobre o código'
 );
 
--- Inserção de dados de exemplo para eventos
+CREATE TABLE IF NOT EXISTS imagens_evento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cod_evento INT NOT NULL,
+    caminho_imagem VARCHAR(255) NOT NULL,
+    ordem INT NOT NULL DEFAULT 0,
+    principal TINYINT(1) NOT NULL DEFAULT 0,
+    data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
+);
+
+INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
+('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', SHA2('senha123', 256), 'ORG00001', 1, 0);
+
 INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem) VALUES
 (1, 'Workshop', 'Workshop de JavaScript', 'Sala 101', 'Aprenda conceitos básicos e avançados de JavaScript.', 'Todos', '2025-02-15 09:00:00', '2025-02-15 17:00:00', 8.0, 1, 'Presencial', 'Imagens/20250916_084902.jpg'),
 (2, 'Palestra', 'Palestra sobre IA', 'Auditório Principal', 'Discussão sobre o futuro da Inteligência Artificial.', 'Estudantes', '2025-03-10 14:00:00', '2025-03-10 16:00:00', 2.0, 1, 'Híbrido', 'Imagens/20250923_131004.jpg'),
@@ -93,6 +111,25 @@ INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo,
 (15, 'Semana', 'Semana da Inovação', 'Campus Principal', 'Evento de inovação e empreendedorismo.', 'Empreendedores', '2025-06-15 08:00:00', '2025-06-19 18:00:00', 50.0, 1, 'Presencial', 'Imagens/20250916_084902.jpg'),
 (16, 'Minicurso', 'Cybersecurity Basics', 'Sala de Segurança', 'Fundamentos de segurança da informação.', 'Todos', '2025-08-22 14:00:00', '2025-08-22 18:00:00', 4.0, 1, 'Online', 'Imagens/20250923_131004.jpg'),
 (17, 'Conferência', 'Conferência de Cloud Computing', 'Auditório 3', 'Conferência sobre tendências em computação em nuvem.', 'Estudantes', '2025-12-03 13:00:00', '2025-12-03 18:00:00', 5.0, 1, 'Híbrido', 'Imagens/20250923_131004.jpg');
+
+INSERT INTO organiza (cod_evento, CPF) VALUES
+(1, '12345678901'),
+(2, '12345678901'),
+(3, '12345678901'),
+(4, '12345678901'),
+(5, '12345678901'),
+(6, '12345678901'),
+(7, '12345678901'),
+(8, '12345678901'),
+(9, '12345678901'),
+(10, '12345678901'),
+(11, '12345678901'),
+(12, '12345678901'),
+(13, '12345678901'),
+(14, '12345678901'),
+(15, '12345678901'),
+(16, '12345678901'),
+(17, '12345678901');
 
 show tables;
 

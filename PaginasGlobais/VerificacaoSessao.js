@@ -3,7 +3,7 @@
     let intervaloVerificacaoSessao = null;
     let intervaloVerificacaoInatividade = null;
     let timestampUltimaAtividade = Date.now();
-    let tempoLimiteSessaoInatividade = 60000; // 60 segundos em milissegundos (aumentado de 30)
+    let tempoLimiteSessaoInatividade = 300000; // 300 segundos (5 minutos) em milissegundos
     let modalAvisoSessaoAtivo = false;
 
     // Lista de eventos que indicam atividade do usuário
@@ -152,7 +152,7 @@
             <div class="conteudo-modal-personalizado">
                 <div class="cabecalho-modal-personalizado">⏰ Atenção!</div>
                 <div class="corpo-modal-personalizado">
-                    Sua sessão expirará em <strong>20 segundos</strong> por inatividade.<br>
+                    Sua sessão expirará em <strong>1 minuto</strong> por inatividade.<br>
                     <em>Mova o mouse ou pressione qualquer tecla para manter a sessão ativa!</em>
                 </div>
             </div>
@@ -167,8 +167,8 @@
         const segundosInativos = Math.floor(tempoInativo / 1000);
         
         // Debug apenas quando próximo do limite (reduzindo spam)
-        if (segundosInativos % 10 === 0 || segundosInativos > 50) {
-            console.log(`Verificando inatividade: ${segundosInativos}s de ${tempoLimiteSessaoInatividade/1000}s`);
+        if (segundosInativos % 30 === 0 || segundosInativos > 270) {
+            console.log(`Verificando inatividade: ${segundosInativos}s de ${tempoLimiteSessaoInatividade/1000}s (5 minutos)`);
         }
         
         // Se passou do tempo limite, expira a sessão
@@ -189,17 +189,18 @@
             return;
         }
         
-        // Se faltam 20 segundos e não há modal ativo, mostra aviso
+        // Se falta 1 minuto (60 segundos) e não há modal ativo, mostra aviso
         const tempoRestante = tempoLimiteSessaoInatividade - tempoInativo;
-        if (tempoRestante <= 20000 && !modalAvisoSessaoAtivo) {
-            console.log('Mostrando aviso de sessão expirando');
+        if (tempoRestante <= 60000 && !modalAvisoSessaoAtivo) {
+            console.log('Mostrando aviso de sessão expirando em 1 minuto');
             mostrarAvisoSessaoProximaExpiracao();
         }
     }
 
     // Função para iniciar verificação de sessão
-    function iniciarVerificacaoSessao(tempoSessaoSegundos = 60) {
-        // console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos`); // Debug reduzido
+    function iniciarVerificacaoSessao(tempoSessaoSegundos = 300) {
+        console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
+
         
         // Para qualquer verificação anterior
         pararVerificacaoSessao();
@@ -244,8 +245,8 @@
     }
 
     // Função para reiniciar verificação de sessão (útil após navegação)
-    function reiniciarVerificacaoSessao(tempoSessaoSegundos = 60) {
-        // console.log('Reiniciando verificação de sessão'); // Debug desabilitado
+    function reiniciarVerificacaoSessao(tempoSessaoSegundos = 300) {
+        console.log(`Reiniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
         pararVerificacaoSessao();
         setTimeout(() => {
             iniciarVerificacaoSessao(tempoSessaoSegundos);
@@ -294,7 +295,8 @@
                                  window.location.pathname.includes('/PaginasOrganizador/');
         
         if (usuarioEstaLogado) {
-            iniciarVerificacaoSessao(60); // 60 segundos
+            iniciarVerificacaoSessao(300); // 300 segundos (5 minutos)
+            console.log('Sistema de verificação de sessão iniciado automaticamente (5 minutos de inatividade + 1 minuto de extensão)');
         }
     });
 })();

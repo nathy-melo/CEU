@@ -1,12 +1,12 @@
 <?php
-// Configuração do tempo de sessão para 60 segundos
-ini_set('session.gc_maxlifetime', 60);
-session_set_cookie_params(60);
+// Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
+ini_set('session.gc_maxlifetime', 360);
+session_set_cookie_params(360);
 
 session_start();
 
-// Verifica se a sessão expirou
-if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 60)) {
+// Verifica se a sessão expirou (5 minutos de inatividade)
+if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 300)) {
     // Sessão expirou - mostra página especial
     session_unset();
     session_destroy();
@@ -64,10 +64,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
-        'inicio' => 'InicioParticipante.html',
-        'evento' => 'CartaodoEventoParticipante.html',
-        'eventoInscrito' => 'CartaodoEventoInscrito.html',
-        'meusEventos' => 'MeusEventosParticipante.html',
+        'inicio' => 'InicioParticipante.php',
+        'evento' => 'CartaodoEventoParticipante.php',
+        'eventoInscrito' => 'CartaodoEventoInscrito.php',
+        'meusEventos' => 'MeusEventosParticipante.php',
         'perfil' => 'PerfilParticipante.php',
         'certificados' => 'CerticadosParticipante.html',
         'configuracoes' => 'ConfiguracoesParticipante.html',
@@ -214,7 +214,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // =========================
         const rotas = {
             'inicio': {
-                html: 'InicioParticipante.html',
+                html: 'InicioParticipante.php',
                 js: ['../PaginasGlobais/Filtro.js', 'InicioParticipante.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
@@ -222,21 +222,28 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'meusEventos': {
-                html: 'MeusEventosParticipante.html',
+                html: 'MeusEventosParticipante.php',
                 js: ['../PaginasGlobais/Filtro.js', 'MeusEventosParticipante.js'],
                 init: () => {
-                    if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Carrega eventos do servidor primeiro
+                    if (typeof window.carregarEventosDoServidor === 'function') {
+                        window.carregarEventosDoServidor();
+                    }
+                    // Depois inicializa os filtros
+                    if (typeof window.inicializarFiltroEventos === 'function') {
+                        window.inicializarFiltroEventos();
+                    }
                 }
             },
             'evento': {
-                html: 'CartaodoEventoParticipante.html',
+                html: 'CartaodoEventoParticipante.php',
                 js: ['CartaoDoEventoParticipante.js'],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoEvento === 'function') window.inicializarEventosCartaoEvento();
                 }
             },
             'eventoInscrito': {
-                html: 'CartaodoEventoInscrito.html',
+                html: 'CartaodoEventoInscrito.php',
                 js: ['CartaoDoEventoInscrito.js'],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoDoEventoInscrito === 'function') window.inicializarEventosCartaoDoEventoInscrito();
@@ -336,9 +343,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);
                         executarRota(pagina);
                         
-                        // Reinicia verificação de sessão para nova página
+                        // Reinicia verificação de sessão para nova página (5 minutos)
                         if (typeof window.reiniciarVerificacaoSessao === 'function') {
-                            window.reiniciarVerificacaoSessao(60);
+                            window.reiniciarVerificacaoSessao(300);
                         }
                     }
                     window.history.pushState({}, '', '?pagina=' + pagina);

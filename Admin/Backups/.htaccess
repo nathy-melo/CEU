@@ -1,0 +1,7 @@
+# Proteção simples da pasta de backups
+<FilesMatch "\.sql$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+Options -Indexes

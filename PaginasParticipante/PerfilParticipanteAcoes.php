@@ -1,12 +1,12 @@
 <?php
-// Configuração do tempo de sessão para 60 segundos
-ini_set('session.gc_maxlifetime', 60);
-session_set_cookie_params(60);
+// Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
+ini_set('session.gc_maxlifetime', 360);
+session_set_cookie_params(360);
 
 session_start();
 
-// Verifica se a sessão expirou
-if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 60)) {
+// Verifica se a sessão expirou (permite 5 minutos de inatividade)
+if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 300)) {
     session_unset();
     session_destroy();
     http_response_code(401);

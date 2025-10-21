@@ -1,11 +1,86 @@
 // CartaoDoEventoOrganizando.js
-(function() {
+(function () {
   'use strict';
 
   let modoEdicao = false;
-  let imagens = ['../Imagens/CEU-Logo.png'];
-  let indiceAtual = 0;
-  let dadosOriginais = {};
+  let listaImagensEvento = [];
+  let indiceImagemAtual = 0;
+  let dadosOriginaisEvento = {};
+  let codigoEventoAtual = null;
+
+  function carregarDadosEventoDoServidor(codigoEvento) {
+    if (!codigoEvento) {
+      alert('Código do evento não fornecido');
+      return;
+    }
+
+    codigoEventoAtual = codigoEvento;
+
+    fetch('BuscarDetalheEvento.php?cod_evento=' + codigoEvento)
+      .then(respostaServidor => respostaServidor.json())
+      .then(dadosRecebidos => {
+        if (dadosRecebidos.erro) {
+          alert('Erro ao carregar evento: ' + dadosRecebidos.erro);
+          history.back();
+          return;
+        }
+
+        if (dadosRecebidos.sucesso && dadosRecebidos.evento) {
+          preencherCamposComDadosEvento(dadosRecebidos.evento);
+        }
+      })
+      .catch(erroRequisicao => {
+        console.error('Erro ao carregar evento:', erroRequisicao);
+        alert('Erro ao carregar dados do evento');
+        history.back();
+      });
+  }
+
+  function preencherCamposComDadosEvento(dadosEvento) {
+    // Preenche os campos de visualização com os dados do evento
+    document.getElementById('event-name').textContent = dadosEvento.nome;
+    document.querySelector('.campo-organizador').textContent = dadosEvento.nome_organizador;
+    document.getElementById('event-local').textContent = dadosEvento.lugar;
+    document.getElementById('start-date').textContent = dadosEvento.data_inicio_formatada;
+    document.getElementById('end-date').textContent = dadosEvento.data_fim_formatada;
+    document.getElementById('start-time').textContent = dadosEvento.horario_inicio;
+    document.getElementById('end-time').textContent = dadosEvento.horario_fim;
+    document.getElementById('audience').textContent = dadosEvento.publico_alvo;
+    document.getElementById('category').textContent = dadosEvento.categoria;
+    document.getElementById('modality').textContent = dadosEvento.modalidade;
+    document.getElementById('certificate').textContent = dadosEvento.certificado;
+    document.getElementById('description').textContent = dadosEvento.descricao;
+
+    // Configura imagem do evento
+    if (dadosEvento.imagem) {
+      listaImagensEvento = ['../' + dadosEvento.imagem];
+    } else {
+      listaImagensEvento = ['../ImagensEventos/CEU-Logo.png'];
+    }
+    indiceImagemAtual = 0;
+    document.getElementById('imagem-carrossel').src = listaImagensEvento[indiceImagemAtual];
+    atualizarVisibilidadeSetas();
+
+    // Salva cópia dos dados originais para restaurar ao cancelar
+    dadosOriginaisEvento = {
+      cod_evento: dadosEvento.cod_evento,
+      nome: dadosEvento.nome,
+      local: dadosEvento.lugar,
+      dataInicio: dadosEvento.data_inicio_formatada,
+      dataFim: dadosEvento.data_fim_formatada,
+      dataInicioParaInput: dadosEvento.data_inicio_para_input,
+      dataFimParaInput: dadosEvento.data_fim_para_input,
+      horarioInicio: dadosEvento.horario_inicio,
+      horarioFim: dadosEvento.horario_fim,
+      publicoAlvo: dadosEvento.publico_alvo,
+      categoria: dadosEvento.categoria,
+      modalidade: dadosEvento.modalidade,
+      certificado: dadosEvento.certificado,
+      certificadoNumerico: dadosEvento.certificado_numerico,
+      descricao: dadosEvento.descricao,
+      imagens: [...listaImagensEvento]
+    };
+  }
 
   function abrirModalColaboradores() {
     alert('Funcionalidade de adicionar colaboradores em desenvolvimento!\n\nEm breve você poderá adicionar outros organizadores para colaborar com este evento.');
@@ -18,12 +93,12 @@
   function editarEvento() {
     if (modoEdicao) return;
     modoEdicao = true;
-    
+
     console.log('=== EDITANDO EVENTO ===');
-    
+
     try {
       // Salvar dados originais
-      dadosOriginais = {
+      dadosOriginaisEvento = {
         nome: document.getElementById('event-name').textContent,
         local: document.getElementById('event-local').textContent,
         dataInicio: document.getElementById('start-date').textContent,
@@ -35,7 +110,7 @@
         modalidade: document.getElementById('modality').textContent,
         certificado: document.getElementById('certificate').textContent,
         descricao: document.getElementById('description').textContent,
-        imagens: [...imagens]
+        imagens: [...listaImagensEvento]
       };
 
       // PRIMEIRO: Trocar os botões
@@ -45,10 +120,10 @@
       document.querySelectorAll('.caixa-valor:not(.caixa-descricao)').forEach(el => {
         if (el) el.style.display = 'none';
       });
-      
+
       const descriptionEl = document.getElementById('description');
       if (descriptionEl) descriptionEl.style.display = 'none';
-      
+
       document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
         if (el) el.style.display = 'flex';
       });
@@ -66,46 +141,33 @@
       const inputCertificado = document.getElementById('input-certificado');
       const inputDescricao = document.getElementById('input-descricao');
 
-      if (inputNome) inputNome.value = dadosOriginais.nome;
-      if (inputLocal) inputLocal.value = dadosOriginais.local;
-      
-      // Converter datas de dd/mm/yy para yyyy-mm-dd com validação
-      if (inputDataInicio && dadosOriginais.dataInicio) {
-        const partesDataInicio = dadosOriginais.dataInicio.split('/');
-        if (partesDataInicio.length === 3) {
-          const [diaI, mesI, anoI] = partesDataInicio;
-          inputDataInicio.value = `20${anoI}-${mesI}-${diaI}`;
-        }
-      }
-      
-      if (inputDataFim && dadosOriginais.dataFim) {
-        const partesDataFim = dadosOriginais.dataFim.split('/');
-        if (partesDataFim.length === 3) {
-          const [diaF, mesF, anoF] = partesDataFim;
-          inputDataFim.value = `20${anoF}-${mesF}-${diaF}`;
-        }
-      }
-      
-      if (inputHorarioInicio) inputHorarioInicio.value = dadosOriginais.horarioInicio;
-      if (inputHorarioFim) inputHorarioFim.value = dadosOriginais.horarioFim;
-      if (inputPublicoAlvo) inputPublicoAlvo.value = dadosOriginais.publicoAlvo;
-      if (inputCategoria) inputCategoria.value = dadosOriginais.categoria;
-      if (inputModalidade) inputModalidade.value = dadosOriginais.modalidade;
-      if (inputCertificado) inputCertificado.value = dadosOriginais.certificado;
-      if (inputDescricao) inputDescricao.value = dadosOriginais.descricao;
+      if (inputNome) inputNome.value = dadosOriginaisEvento.nome;
+      if (inputLocal) inputLocal.value = dadosOriginaisEvento.local;
+
+      // Usar datas no formato yyyy-mm-dd para os inputs
+      if (inputDataInicio) inputDataInicio.value = dadosOriginaisEvento.dataInicioParaInput;
+      if (inputDataFim) inputDataFim.value = dadosOriginaisEvento.dataFimParaInput;
+
+      if (inputHorarioInicio) inputHorarioInicio.value = dadosOriginaisEvento.horarioInicio;
+      if (inputHorarioFim) inputHorarioFim.value = dadosOriginaisEvento.horarioFim;
+      if (inputPublicoAlvo) inputPublicoAlvo.value = dadosOriginaisEvento.publicoAlvo;
+      if (inputCategoria) inputCategoria.value = dadosOriginaisEvento.categoria;
+      if (inputModalidade) inputModalidade.value = dadosOriginaisEvento.modalidade;
+      if (inputCertificado) inputCertificado.value = dadosOriginaisEvento.certificadoNumerico;
+      if (inputDescricao) inputDescricao.value = dadosOriginaisEvento.descricao;
 
       // Habilitar edição de imagem
       const campoImagem = document.getElementById('campo-imagem');
       const btnRemoverImagem = document.getElementById('btn-remover-imagem');
       const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
-      
+
       if (campoImagem) {
-        campoImagem.onclick = function() {
+        campoImagem.onclick = function () {
           const inputImagem = document.getElementById('input-imagem');
           if (inputImagem) inputImagem.click();
         };
       }
-      
+
       if (btnRemoverImagem) btnRemoverImagem.style.display = 'flex';
       if (btnAdicionarMais) btnAdicionarMais.style.display = 'flex';
 
@@ -120,7 +182,7 @@
 
   function trocarParaBotoesEdicao() {
     console.log('Trocando para botões de edição...');
-    
+
     const btnVoltar = document.getElementById('btn-voltar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
@@ -154,7 +216,7 @@
 
   function trocarParaBotoesVisualizacao() {
     console.log('=== INICIANDO TROCA PARA VISUALIZAÇÃO ===');
-    
+
     const btnVoltar = document.getElementById('btn-voltar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
@@ -182,15 +244,15 @@
     // Botão Voltar
     btnVoltar.textContent = 'Voltar';
     btnVoltar.className = 'botao-voltar';
-    btnVoltar.onclick = function() { 
+    btnVoltar.onclick = function () {
       console.log('Botão Voltar clicado');
-      history.back(); 
+      history.back();
     };
 
     // Botão Participantes
     btnParticipantes.textContent = 'Participantes';
     btnParticipantes.className = 'botao-participantes';
-    btnParticipantes.onclick = function() {
+    btnParticipantes.onclick = function () {
       console.log('Botão Participantes clicado');
       irParaParticipantes();
     };
@@ -198,7 +260,7 @@
     // Botão Editar
     btnEditar.textContent = 'Editar';
     btnEditar.className = 'botao-editar';
-    btnEditar.onclick = function() {
+    btnEditar.onclick = function () {
       console.log('Botão Editar clicado');
       editarEvento();
     };
@@ -216,9 +278,9 @@
   function cancelarEdicao() {
     if (!modoEdicao) return;
     modoEdicao = false;
-    
+
     console.log('=== CANCELANDO EDIÇÃO ===');
-    
+
     try {
       // Restaurar dados originais
       const eventName = document.getElementById('event-name');
@@ -233,28 +295,28 @@
       const certificate = document.getElementById('certificate');
       const description = document.getElementById('description');
       const imagemCarrossel = document.getElementById('imagem-carrossel');
-      
-      if (eventName) eventName.textContent = dadosOriginais.nome;
-      if (eventLocal) eventLocal.textContent = dadosOriginais.local;
-      if (startDate) startDate.textContent = dadosOriginais.dataInicio;
-      if (endDate) endDate.textContent = dadosOriginais.dataFim;
-      if (startTime) startTime.textContent = dadosOriginais.horarioInicio;
-      if (endTime) endTime.textContent = dadosOriginais.horarioFim;
-      if (audience) audience.textContent = dadosOriginais.publicoAlvo;
-      if (category) category.textContent = dadosOriginais.categoria;
-      if (modality) modality.textContent = dadosOriginais.modalidade;
-      if (certificate) certificate.textContent = dadosOriginais.certificado;
-      if (description) description.textContent = dadosOriginais.descricao;
-      
-      imagens = [...dadosOriginais.imagens];
-      indiceAtual = 0;
-      if (imagemCarrossel) imagemCarrossel.src = imagens[indiceAtual];
+
+      if (eventName) eventName.textContent = dadosOriginaisEvento.nome;
+      if (eventLocal) eventLocal.textContent = dadosOriginaisEvento.local;
+      if (startDate) startDate.textContent = dadosOriginaisEvento.dataInicio;
+      if (endDate) endDate.textContent = dadosOriginaisEvento.dataFim;
+      if (startTime) startTime.textContent = dadosOriginaisEvento.horarioInicio;
+      if (endTime) endTime.textContent = dadosOriginaisEvento.horarioFim;
+      if (audience) audience.textContent = dadosOriginaisEvento.publicoAlvo;
+      if (category) category.textContent = dadosOriginaisEvento.categoria;
+      if (modality) modality.textContent = dadosOriginaisEvento.modalidade;
+      if (certificate) certificate.textContent = dadosOriginaisEvento.certificado;
+      if (description) description.textContent = dadosOriginaisEvento.descricao;
+
+      listaImagensEvento = [...dadosOriginaisEvento.imagens];
+      indiceImagemAtual = 0;
+      if (imagemCarrossel) imagemCarrossel.src = listaImagensEvento[indiceImagemAtual];
 
       // Mostrar caixas de valor e esconder inputs
       document.querySelectorAll('.caixa-valor').forEach(el => {
         if (el) el.style.display = 'flex';
       });
-      
+
       document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
         if (el) el.style.display = 'none';
       });
@@ -263,7 +325,7 @@
       const campoImagem = document.getElementById('campo-imagem');
       const btnRemoverImagem = document.getElementById('btn-remover-imagem');
       const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
-      
+
       if (campoImagem) campoImagem.onclick = null;
       if (btnRemoverImagem) btnRemoverImagem.style.display = 'none';
       if (btnAdicionarMais) btnAdicionarMais.style.display = 'none';
@@ -280,23 +342,10 @@
 
   function salvarEvento() {
     if (!modoEdicao) return;
-    
+
     console.log('=== SALVANDO EVENTO ===');
-    
+
     try {
-      // Atualizar valores exibidos
-      const eventName = document.getElementById('event-name');
-      const eventLocal = document.getElementById('event-local');
-      const startDate = document.getElementById('start-date');
-      const endDate = document.getElementById('end-date');
-      const startTime = document.getElementById('start-time');
-      const endTime = document.getElementById('end-time');
-      const audience = document.getElementById('audience');
-      const category = document.getElementById('category');
-      const modality = document.getElementById('modality');
-      const certificate = document.getElementById('certificate');
-      const description = document.getElementById('description');
-      
       const inputNome = document.getElementById('input-nome');
       const inputLocal = document.getElementById('input-local');
       const inputDataInicio = document.getElementById('input-data-inicio');
@@ -309,54 +358,106 @@
       const inputCertificado = document.getElementById('input-certificado');
       const inputDescricao = document.getElementById('input-descricao');
 
-      if (eventName && inputNome) eventName.textContent = inputNome.value;
-      if (eventLocal && inputLocal) eventLocal.textContent = inputLocal.value;
-      
-      // Converter datas de yyyy-mm-dd para dd/mm/yy
-      if (startDate && inputDataInicio && inputDataInicio.value) {
-        const [anoI, mesI, diaI] = inputDataInicio.value.split('-');
-        startDate.textContent = `${diaI}/${mesI}/${anoI.slice(-2)}`;
+      // Prepara FormData
+      const formData = new FormData();
+      formData.append('cod_evento', codigoEventoAtual);
+      formData.append('nome', inputNome.value);
+      formData.append('local', inputLocal.value);
+      formData.append('data_inicio', inputDataInicio.value);
+      formData.append('data_fim', inputDataFim.value);
+      formData.append('horario_inicio', inputHorarioInicio.value);
+      formData.append('horario_fim', inputHorarioFim.value);
+      formData.append('publico_alvo', inputPublicoAlvo.value);
+      formData.append('categoria', inputCategoria.value);
+      formData.append('modalidade', inputModalidade.value);
+      formData.append('certificado', inputCertificado.value);
+      formData.append('descricao', inputDescricao.value);
+
+      // Adiciona imagens se houver novas
+      const inputImagem = document.getElementById('input-imagem');
+      if (inputImagem.files.length > 0) {
+        for (let i = 0; i < inputImagem.files.length; i++) {
+          formData.append('imagens_evento[]', inputImagem.files[i]);
+        }
       }
-      
-      if (endDate && inputDataFim && inputDataFim.value) {
-        const [anoF, mesF, diaF] = inputDataFim.value.split('-');
-        endDate.textContent = `${diaF}/${mesF}/${anoF.slice(-2)}`;
-      }
-      
-      if (startTime && inputHorarioInicio) startTime.textContent = inputHorarioInicio.value;
-      if (endTime && inputHorarioFim) endTime.textContent = inputHorarioFim.value;
-      if (audience && inputPublicoAlvo) audience.textContent = inputPublicoAlvo.value;
-      if (category && inputCategoria) category.textContent = inputCategoria.value;
-      if (modality && inputModalidade) modality.textContent = inputModalidade.value;
-      if (certificate && inputCertificado) certificate.textContent = inputCertificado.value;
-      if (description && inputDescricao) description.textContent = inputDescricao.value;
 
-      modoEdicao = false;
+      // Envia para o servidor
+      fetch('AtualizarEvento.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.sucesso) {
+            alert(data.mensagem || 'Evento atualizado com sucesso!');
 
-      // Mostrar caixas de valor e esconder inputs
-      document.querySelectorAll('.caixa-valor').forEach(el => {
-        if (el) el.style.display = 'flex';
-      });
-      
-      document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
-        if (el) el.style.display = 'none';
-      });
+            // Atualiza valores exibidos
+            const eventName = document.getElementById('event-name');
+            const eventLocal = document.getElementById('event-local');
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const startTime = document.getElementById('start-time');
+            const endTime = document.getElementById('end-time');
+            const audience = document.getElementById('audience');
+            const category = document.getElementById('category');
+            const modality = document.getElementById('modality');
+            const certificate = document.getElementById('certificate');
+            const description = document.getElementById('description');
 
-      // Desabilitar edição de imagem
-      const campoImagem = document.getElementById('campo-imagem');
-      const btnRemoverImagem = document.getElementById('btn-remover-imagem');
-      const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
-      
-      if (campoImagem) campoImagem.onclick = null;
-      if (btnRemoverImagem) btnRemoverImagem.style.display = 'none';
-      if (btnAdicionarMais) btnAdicionarMais.style.display = 'none';
+            if (eventName) eventName.textContent = inputNome.value;
+            if (eventLocal) eventLocal.textContent = inputLocal.value;
 
-      // Restaurar botões
-      console.log('Chamando trocarParaBotoesVisualizacao...');
-      trocarParaBotoesVisualizacao();
+            // Converter datas de yyyy-mm-dd para dd/mm/yy
+            if (startDate && inputDataInicio.value) {
+              const [anoI, mesI, diaI] = inputDataInicio.value.split('-');
+              startDate.textContent = `${diaI}/${mesI}/${anoI.slice(-2)}`;
+            }
 
-      alert('Evento atualizado com sucesso!');
-      console.log('=== EVENTO SALVO ===');
+            if (endDate && inputDataFim.value) {
+              const [anoF, mesF, diaF] = inputDataFim.value.split('-');
+              endDate.textContent = `${diaF}/${mesF}/${anoF.slice(-2)}`;
+            }
+
+            if (startTime) startTime.textContent = inputHorarioInicio.value;
+            if (endTime) endTime.textContent = inputHorarioFim.value;
+            if (audience) audience.textContent = inputPublicoAlvo.value;
+            if (category) category.textContent = inputCategoria.value;
+            if (modality) modality.textContent = inputModalidade.value;
+            if (certificate) certificate.textContent = inputCertificado.value;
+            if (description) description.textContent = inputDescricao.value;
+
+            modoEdicao = false;
+
+            // Mostrar caixas de valor e esconder inputs
+            document.querySelectorAll('.caixa-valor').forEach(el => {
+              if (el) el.style.display = 'flex';
+            });
+
+            document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
+              if (el) el.style.display = 'none';
+            });
+
+            // Desabilitar edição de imagem
+            const campoImagem = document.getElementById('campo-imagem');
+            const btnRemoverImagem = document.getElementById('btn-remover-imagem');
+            const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
+
+            if (campoImagem) campoImagem.onclick = null;
+            if (btnRemoverImagem) btnRemoverImagem.style.display = 'none';
+            if (btnAdicionarMais) btnAdicionarMais.style.display = 'none';
+
+            // Restaurar botões
+            trocarParaBotoesVisualizacao();
+
+          } else {
+            alert('Erro ao atualizar evento: ' + (data.erro || 'Erro desconhecido'));
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao salvar evento:', error);
+          alert('Erro ao salvar evento. Por favor, tente novamente.');
+        });
+
     } catch (error) {
       console.error('Erro ao salvar evento:', error);
       console.error('Stack trace:', error.stack);
@@ -365,34 +466,75 @@
   }
 
   function excluirEvento() {
-    if (confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) {
-      alert('Evento excluído com sucesso!');
-      console.log('Evento excluído');
-      // TODO: Implementar exclusão no backend e redirecionar
-      // history.back();
+    if (!confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) {
+      return;
     }
+
+    const formData = new FormData();
+    formData.append('cod_evento', codigoEventoAtual);
+
+    fetch('ExcluirEvento.php', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.sucesso) {
+          alert(data.mensagem || 'Evento excluído com sucesso!');
+          // Redireciona para a página de meus eventos
+          if (typeof carregarPagina === 'function') {
+            carregarPagina('meusEventos');
+          } else {
+            window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+          }
+        } else {
+          alert('Erro ao excluir evento: ' + (data.erro || 'Erro desconhecido'));
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao excluir evento:', error);
+        alert('Erro ao excluir evento. Por favor, tente novamente.');
+      });
   }
 
   function adicionarImagens(event) {
     const files = Array.from(event.target.files);
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB em bytes
+    
     files.forEach(file => {
+      // Validar tamanho do arquivo
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`Erro: A imagem "${file.name}" excede o limite de 10MB.\nTamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+        return; // Pula este arquivo
+      }
+      
+      // Validar tipo de arquivo
+      const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!tiposPermitidos.includes(file.type)) {
+        alert(`Erro: O arquivo "${file.name}" não é uma imagem válida.\nFormatos aceitos: JPG, JPEG, PNG, GIF, WEBP`);
+        return;
+      }
+      
       const reader = new FileReader();
-      reader.onload = function(e) {
-        imagens.push(e.target.result);
-        if (imagens.length === 1) {
-          indiceAtual = 0;
+      reader.onload = function (e) {
+        listaImagensEvento.push(e.target.result);
+        if (listaImagensEvento.length === 1) {
+          indiceImagemAtual = 0;
           mostrarCarrossel();
         }
         atualizarVisibilidadeSetas();
       };
       reader.readAsDataURL(file);
     });
+    
+    // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
+    event.target.value = '';
   }
 
   function mostrarCarrossel() {
     document.getElementById('placeholder-imagem').style.display = 'none';
     document.getElementById('carrossel-imagens').style.display = 'flex';
-    document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+    document.getElementById('imagem-carrossel').src = listaImagensEvento[indiceImagemAtual];
   }
 
   function esconderCarrossel() {
@@ -401,23 +543,23 @@
   }
 
   function removerImagemAtual() {
-    if (imagens.length > 0) {
-      imagens.splice(indiceAtual, 1);
-      if (imagens.length === 0) {
+    if (listaImagensEvento.length > 0) {
+      listaImagensEvento.splice(indiceImagemAtual, 1);
+      if (listaImagensEvento.length === 0) {
         esconderCarrossel();
         document.getElementById('input-imagem').value = '';
       } else {
-        if (indiceAtual >= imagens.length) {
-          indiceAtual = imagens.length - 1;
+        if (indiceImagemAtual >= listaImagensEvento.length) {
+          indiceImagemAtual = listaImagensEvento.length - 1;
         }
-        document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+        document.getElementById('imagem-carrossel').src = listaImagensEvento[indiceImagemAtual];
         atualizarVisibilidadeSetas();
       }
     }
   }
 
   function atualizarVisibilidadeSetas() {
-    const multiple = imagens.length > 1;
+    const multiple = listaImagensEvento.length > 1;
     const setDisplay = (sel) => {
       document.querySelectorAll(sel).forEach(el => {
         el.style.display = multiple ? '' : 'none';
@@ -430,16 +572,16 @@
   }
 
   function mudarImagem(direcao) {
-    if (imagens.length > 0) {
-      indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
-      document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+    if (listaImagensEvento.length > 0) {
+      indiceImagemAtual = (indiceImagemAtual + direcao + listaImagensEvento.length) % listaImagensEvento.length;
+      document.getElementById('imagem-carrossel').src = listaImagensEvento[indiceImagemAtual];
     }
   }
 
   function mudarImagemModal(direcao) {
-    if (imagens.length > 0) {
-      indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
-      document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+    if (listaImagensEvento.length > 0) {
+      indiceImagemAtual = (indiceImagemAtual + direcao + listaImagensEvento.length) % listaImagensEvento.length;
+      document.getElementById('imagem-ampliada').src = listaImagensEvento[indiceImagemAtual];
     }
   }
 
@@ -449,7 +591,7 @@
 
   function inicializarCartaoEventoOrganizando() {
     console.log('📋 Inicializando Cartão do Evento Organizando...');
-    
+
     const btnVoltar = document.getElementById('btn-voltar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
@@ -457,7 +599,7 @@
     const inputImagem = document.getElementById('input-imagem');
 
     if (btnVoltar && btnParticipantes && btnEditar) {
-      btnVoltar.onclick = function() { history.back(); };
+      btnVoltar.onclick = function () { history.back(); };
       btnParticipantes.onclick = irParaParticipantes;
       btnEditar.onclick = editarEvento;
       console.log('✓ Botões inicializados');
@@ -466,10 +608,10 @@
     }
 
     if (imagemCarrossel) {
-      imagemCarrossel.onclick = function(e) {
+      imagemCarrossel.onclick = function (e) {
         e.stopPropagation();
-        if (imagens.length > 0) {
-          document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+        if (listaImagensEvento.length > 0) {
+          document.getElementById('imagem-ampliada').src = listaImagensEvento[indiceImagemAtual];
           document.getElementById('modal-imagem').style.display = 'flex';
         }
       };
@@ -487,9 +629,21 @@
     window.mudarImagemModal = mudarImagemModal;
     window.fecharModalImagem = fecharModalImagem;
     window.removerImagemAtual = removerImagemAtual;
-    
+    window.carregarDadosEvento = carregarDadosEventoDoServidor;
+
     // Inicialização das setas
     atualizarVisibilidadeSetas();
+
+    // Carrega dados do evento se o código foi passado
+    const urlParams = new URLSearchParams(window.location.search);
+    const codEvento = urlParams.get('cod_evento');
+
+    if (codEvento) {
+      carregarDadosEventoDoServidor(codEvento);
+    } else {
+      console.warn('⚠ Código do evento não fornecido na URL');
+    }
+
     console.log('✓ CartaoDoEventoOrganizando pronto!');
   }
 
