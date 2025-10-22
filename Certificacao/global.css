@@ -1,0 +1,18 @@
+:root {
+  --bg-color: #d1eaff;
+  --card-bg-color: #4f6c8c;
+  --text-color: #ffffff;
+  --button-bg-color: #6598d2;
+}
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
