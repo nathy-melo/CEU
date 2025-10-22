@@ -76,6 +76,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'perfil' => 'PerfilOrganizador.php',
         'certificados' => 'CertificadosOrganizador.html',
         'configuracoes' => 'ConfiguracoesOrganizador.html',
+        'painelnotificacoes' => '../PaginasGlobais/PainelNotificacoes.php',
         // Reaproveita conteúdos globais quando aplicável
         'termos' => '../PaginasGlobais/TermosDeCondicoes.html',
         'faleconosco' => '../PaginasGlobais/FaleConosco.html',
@@ -305,6 +306,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: 'AdicionarEvento.html',
                 js: [],
                 init: () => {}
+            },
+            'painelnotificacoes': {
+                html: '../PaginasGlobais/PainelNotificacoes.php',
+                js: ['/CEU/PaginasGlobais/PainelNotificacoes.js'],
+                init: () => {
+                    console.log('✅ Painel de Notificações carregado (auto-inicializa via DOMContentLoaded)');
+                }
             }
         };
         globalThis.rotas = rotas;
@@ -361,6 +369,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         }
                         executarRota(pagina);
 
+                        // Reinicializa o gerenciador de notificações
+                        if (typeof window.gerenciadorNotificacoes !== 'undefined' && window.gerenciadorNotificacoes) {
+                            window.gerenciadorNotificacoes.reinicializar();
+                        }
+
                         // Se for página de evento organizado, carrega dados do evento
                         if (pagina === 'eventoOrganizado' && codEvento) {
                             setTimeout(() => {
@@ -404,6 +417,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     </script>
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
+    <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
 </body>
 
 </html>

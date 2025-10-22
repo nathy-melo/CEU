@@ -12,13 +12,26 @@
 <body>
 
   <div class="Menu expanded">
+    <!-- Botão de Notificações (Sino) - FIXADO NO TOPO, FORA DO FLUXO -->
+    <button id="botao-notificacoes" class="botao-notificacoes" title="Notificações">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span id="notificacoes-badge" class="notificacoes-badge">0</span>
+    </button>
+
     <div class="conteudo">
-      <div class="perfil">
-        <button class="botao-perfil" onclick="carregarPagina('perfil')">
-          <img src="../Imagens/FotodePerfil.webp" alt="Foto de perfil">
-          <span>Perfil</span>
-        </button>
+      <!-- Perfil -->
+      <div class="header-menu">
+        <div class="perfil">
+          <button class="botao-perfil" onclick="carregarPagina('perfil')">
+            <img src="../Imagens/FotodePerfil.webp" alt="Foto de perfil">
+            <span>Perfil</span>
+          </button>
+        </div>
       </div>
+
       <button class="botao-inicio" onclick="carregarPagina('inicio')">Início</button>
       <button class="botao-meusEventos" onclick="carregarPagina('meusEventos')">Meus eventos</button>
       <button class="botao-certificados" onclick="carregarPagina('certificados')">Certificados</button>
@@ -30,6 +43,19 @@
       <div>Dúvidas ou Sugestões?</div>
       <p>Fale Conosco</p>
     </button>
+  </div>
+
+  <!-- Caixa de Notificações (dropdown - FORA do menu) -->
+  <div id="notificacoes-caixa" class="notificacoes-dropdown">
+    <div class="notificacoes-header">
+      <div class="notificacoes-header-titulo">
+        <h3>Notificações</h3>
+        <a href="javascript:void(0)" class="notificacoes-ver-tudo" id="link-ver-tudo-notificacoes">Ver tudo</a>
+      </div>
+    </div>
+    <div id="notificacoes-lista" class="notificacoes-lista">
+      <div class="notificacoes-vazio">Carregando...</div>
+    </div>
   </div>
 
 

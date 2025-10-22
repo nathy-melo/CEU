@@ -1,0 +1,307 @@
+// ==================================================
+// PAINEL DE NOTIFICAÇÕES - SISTEMA COMPLETO
+// ==================================================
+
+let notificacoesGlobal = [];
+let filtroAtual = 'todas';
+let intervalID = null;
+
+console.log('🔵 PainelNotificacoes.js CARREGADO');
+
+// ==================================================
+// INICIALIZAÇÃO
+// ==================================================
+function inicializarPainel() {
+    console.log('🚀 Inicializando Painel de Notificações');
+    
+    // Verifica se elementos existem
+    const btnVoltar = document.getElementById('btn-voltar');
+    const btnsFiltro = document.querySelectorAll('.btn-filtro');
+    const lista = document.getElementById('lista-notificacoes');
+    
+    if (!lista) {
+        console.error('❌ Elemento lista-notificacoes não encontrado!');
+        return;
+    }
+    
+    console.log('✅ Elementos encontrados:', {
+        btnVoltar: !!btnVoltar,
+        btnsFiltro: btnsFiltro.length,
+        lista: !!lista
+    });
+    
+    // Event listener - Botão Voltar
+    if (btnVoltar) {
+        btnVoltar.addEventListener('click', () => {
+            console.log('👈 Voltando para página anterior');
+            window.history.back();
+        });
+    }
+    
+    // Event listeners - Filtros
+    btnsFiltro.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove ativo de todos
+            btnsFiltro.forEach(b => b.classList.remove('ativo'));
+            // Adiciona ao clicado
+            this.classList.add('ativo');
+            // Atualiza filtro
+            filtroAtual = this.getAttribute('data-tipo');
+            console.log('🔄 Filtro alterado para:', filtroAtual);
+            // Reexibe notificações
+            mostrarNotificacoes();
+        });
+    });
+    
+    console.log('✅ Event listeners configurados');
+    
+    // Carrega notificações iniciais
+    carregarNotificacoes();
+    
+    // Atualização automática a cada 15 segundos
+    if (intervalID) {
+        clearInterval(intervalID);
+    }
+    intervalID = setInterval(() => {
+        console.log('⏰ Recarregando notificações (polling)');
+        carregarNotificacoes();
+    }, 15000);
+    
+    console.log('✅ Sistema de polling iniciado (15s)');
+}
+
+// Aguarda DOM estar pronto
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarPainel);
+} else {
+    // DOM já está pronto, espera um tick
+    setTimeout(inicializarPainel, 100);
+}
+
+// ==================================================
+// CARREGAR NOTIFICAÇÕES DO SERVIDOR
+// ==================================================
+function carregarNotificacoes() {
+    console.log('📡 Buscando notificações...');
+    
+    fetch('../PaginasGlobais/BuscarNotificacoes.php?todas=true')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('📥 Resposta:', data);
+            
+            if (data.sucesso && Array.isArray(data.notificacoes)) {
+                notificacoesGlobal = data.notificacoes;
+                console.log(`✅ ${notificacoesGlobal.length} notificações carregadas`);
+                mostrarNotificacoes();
+            } else {
+                console.warn('⚠️ Resposta inválida:', data);
+                mostrarVazio('Erro ao carregar notificações');
+            }
+        })
+        .catch(erro => {
+            console.error('❌ Erro ao buscar notificações:', erro);
+            mostrarVazio('Erro de conexão');
+        });
+}
+
+// ==================================================
+// EXIBIR NOTIFICAÇÕES NA TELA
+// ==================================================
+function mostrarNotificacoes() {
+    const container = document.getElementById('lista-notificacoes');
+    const contador = document.getElementById('contador-notificacoes');
+    
+    if (!container) {
+        console.error('❌ Container não encontrado!');
+        return;
+    }
+    
+    // Aplica filtro
+    let notificacoesFiltradas = notificacoesGlobal;
+    if (filtroAtual !== 'todas') {
+        notificacoesFiltradas = notificacoesGlobal.filter(n => n.tipo === filtroAtual);
+    }
+    
+    console.log(`📋 Exibindo ${notificacoesFiltradas.length} de ${notificacoesGlobal.length} (filtro: ${filtroAtual})`);
+    
+    // Lista vazia
+    if (notificacoesFiltradas.length === 0) {
+        mostrarVazio(
+            filtroAtual === 'todas' 
+                ? 'Nenhuma notificação por aqui!' 
+                : 'Nenhuma notificação deste tipo'
+        );
+        if (contador) contador.textContent = '0 não lidas';
+        return;
+    }
+    
+    // Gera HTML
+    let html = '';
+    let naoLidas = 0;
+    
+    notificacoesFiltradas.forEach(notif => {
+        const lida = notif.lida == 1;
+        if (!lida) naoLidas++;
+        
+        const tipoClass = notif.tipo.replace(/_/g, '-');
+        
+        html += `
+            <div class="notificacao-item ${lida ? 'lida' : ''}" data-id="${notif.id}">
+                <div class="notificacao-topo">
+                    <span class="notificacao-tipo-badge ${tipoClass}">
+                        ${traduzirTipo(notif.tipo, true)}
+                    </span>
+                </div>
+                <div class="notificacao-mensagem">
+                    ${notif.mensagem}
+                </div>
+                <div class="notificacao-rodape">
+                    <span class="notificacao-data">
+                        ${formatarData(notif.data_criacao)}
+                    </span>
+                    ${!lida 
+                        ? `<button class="btn-marcar-lida" onclick="marcarComoLida(${notif.id})">
+                            Marcar como lida
+                           </button>` 
+                        : '<span style="color: var(--azul-claro);">✓ Lida</span>'
+                    }
+                </div>
+            </div>
+        `;
+    });
+    
+    // Insere no DOM
+    container.innerHTML = html;
+    
+    // Atualiza contador
+    if (contador) {
+        contador.textContent = naoLidas === 0 
+            ? 'Tudo lido!' 
+            : `${naoLidas} não lida${naoLidas > 1 ? 's' : ''}`;
+    }
+    
+    console.log(`✅ Interface atualizada: ${notificacoesFiltradas.length} itens, ${naoLidas} não lidas`);
+}
+
+// ==================================================
+// MENSAGEM DE LISTA VAZIA
+// ==================================================
+function mostrarVazio(mensagem) {
+    const container = document.getElementById('lista-notificacoes');
+    if (container) {
+        container.innerHTML = `
+            <div class="painel-vazio">
+                ${mensagem}
+            </div>
+        `;
+    }
+}
+
+// ==================================================
+// MARCAR NOTIFICAÇÃO COMO LIDA
+// ==================================================
+function marcarComoLida(id) {
+    console.log('📝 Marcando notificação', id, 'como lida');
+    
+    // Verifica se o endpoint existe
+    const endpoint = '../PaginasGlobais/AtualizarNotificacao.php';
+    
+    fetch(endpoint, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ 
+            id: id,
+            lida: true 
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.sucesso) {
+            console.log('✅ Notificação marcada como lida');
+            // Atualiza localmente
+            const notif = notificacoesGlobal.find(n => n.id == id);
+            if (notif) {
+                notif.lida = 1;
+            }
+            // Atualiza interface
+            mostrarNotificacoes();
+        } else {
+            console.error('❌ Erro do servidor:', data.mensagem || data);
+            alert('Erro ao marcar como lida. Tente novamente.');
+        }
+    })
+    .catch(erro => {
+        console.error('❌ Erro ao marcar como lida:', erro);
+        alert('Erro de conexão. Tente novamente.');
+    });
+}
+
+// ==================================================
+// FUNÇÕES AUXILIARES
+// ==================================================
+
+// Traduz tipo de notificação
+function traduzirTipo(tipo, apenasTexto = false) {
+    const tipos = {
+        'inscricao': apenasTexto ? 'Inscrição' : '📝 Inscrição',
+        'desinscricao': apenasTexto ? 'Desincrição' : '✖️ Desincrição',
+        'evento_cancelado': apenasTexto ? 'Cancelado' : '🚫 Cancelado',
+        'evento_prestes_iniciar': apenasTexto ? 'Iniciando' : '⏰ Iniciando',
+        'novo_participante': apenasTexto ? 'Novo Participante' : '👤 Novo Participante'
+    };
+    return tipos[tipo] || tipo;
+}
+
+// Formata data de forma amigável
+function formatarData(dataStr) {
+    try {
+        const data = new Date(dataStr);
+        const agora = new Date();
+        const diffMs = agora - data;
+        const diffMin = Math.floor(diffMs / 60000);
+        const diffHora = Math.floor(diffMs / 3600000);
+        const diffDia = Math.floor(diffMs / 86400000);
+        
+        if (diffMin < 1) return 'Agora mesmo';
+        if (diffMin < 60) return `Há ${diffMin} minuto${diffMin > 1 ? 's' : ''}`;
+        if (diffHora < 24) return `Há ${diffHora} hora${diffHora > 1 ? 's' : ''}`;
+        if (diffDia < 7) return `Há ${diffDia} dia${diffDia > 1 ? 's' : ''}`;
+        
+        // Mais de 7 dias: exibe data completa
+        return data.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        console.error('Erro ao formatar data:', e);
+        return dataStr;
+    }
+}
+
+// ==================================================
+// LIMPEZA AO SAIR DA PÁGINA
+// ==================================================
+window.addEventListener('beforeunload', () => {
+    if (intervalID) {
+        clearInterval(intervalID);
+        console.log('🧹 Polling limpo');
+    }
+});
+
+console.log('🟢 PainelNotificacoes.js PRONTO');
+

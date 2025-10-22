@@ -554,8 +554,211 @@ body.pagina-inicio {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* Header do Menu: Container de Notificações + Perfil */
+.Menu .header-menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
   margin-bottom: clamp(24px, 4vw, 30px);
   margin-top: clamp(16px, 3vw, 20px);
+}
+
+/* Botão de Notificações (Sino) - ABSOLUTO EM RELAÇÃO AO .Menu */
+.Menu .botao-notificacoes {
+  position: absolute;
+  top: clamp(1px, 1vw, 2px);
+  left: clamp(1px, 1vw, 2px);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: clamp(8px, 1.5vw, 10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--branco);
+  width: clamp(40px, 6vw, 48px);
+  height: clamp(40px, 6vw, 48px);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.Menu .botao-notificacoes:hover {
+  transform: scale(1.1);
+}
+
+.Menu .botao-notificacoes.ativo {
+  background-color: rgba(255, 255, 255, 0) !important;
+  box-shadow: none !important;
+}
+
+.Menu .botao-notificacoes svg {
+  width: clamp(20px, 3vw, 24px);
+  height: clamp(20px, 3vw, 24px);
+}
+
+/* Badge de Contador de Notificações */
+.Menu .notificacoes-badge {
+  position: absolute;
+  top: clamp(0px, 0.3vw, 2px);
+  right: clamp(0px, 0.3vw, 2px);
+  background-color: #FF4444;
+  color: white;
+  border-radius: 50%;
+  width: clamp(16px, 2.2vw, 20px);
+  height: clamp(16px, 2.2vw, 20px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(9px, 1.1vw, 11px);
+  font-weight: bold;
+  border: 2px solid var(--caixas);
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Dropdown de Notificações - FORA DO MENU */
+.notificacoes-dropdown {
+  position: fixed;
+  top: clamp(20px, 3vw, 30px);
+  left: clamp(200px, 17vw, 250px);
+  width: clamp(280px, 35vw, 380px);
+  background: var(--caixas);
+  border-radius: clamp(12px, 2vw, 16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  max-height: clamp(300px, 50vh, 450px);
+  overflow: hidden;
+  display: none;
+  border: 2px solid var(--botao);
+}
+
+.notificacoes-dropdown.mostrar {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notificacoes-header {
+  padding: clamp(12px, 2vw, 16px);
+  border-bottom: 1px solid var(--botao);
+  background: var(--botao);
+}
+
+.notificacoes-header h3 {
+  margin: 0;
+  color: var(--branco);
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 600;
+}
+
+.notificacoes-header-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(8px, 1.5vw, 12px);
+}
+
+.notificacoes-ver-tudo {
+  color: var(--bracno);
+  text-decoration: none;
+  font-size: clamp(11px, 1.3vw, 13px);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  padding: clamp(4px, 0.8vw, 6px) clamp(6px, 1.2vw, 8px);
+  border-radius: clamp(4px, 0.8vw, 6px);
+}
+
+.notificacoes-ver-tudo:hover {
+  color: var(--branco);
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: underline;
+}
+
+.notificacoes-lista {
+  max-height: clamp(250px, 45vh, 380px);
+  overflow-y: auto;
+  padding: clamp(8px, 1.5vw, 12px);
+}
+
+/* Scrollbar para lista de notificações */
+.notificacoes-lista::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notificacoes-lista::-webkit-scrollbar-thumb {
+  background: var(--botao);
+  border-radius: 3px;
+}
+
+.notificacoes-lista::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Item de Notificação */
+.notificacao-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--botao);
+  padding: clamp(10px, 1.8vw, 14px);
+  margin-bottom: clamp(8px, 1.2vw, 10px);
+  border-radius: clamp(6px, 1vw, 8px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notificacao-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(3px);
+}
+
+.notificacao-item .notificacao-tipo {
+  font-size: clamp(11px, 1.2vw, 13px);
+  color: var(--azul-claro);
+  margin-bottom: clamp(4px, 0.6vw, 6px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.notificacao-item .notificacao-mensagem {
+  font-size: clamp(12px, 1.4vw, 14px);
+  color: var(--branco);
+  line-height: 1.4;
+}
+
+.notificacoes-vazio {
+  text-align: center;
+  padding: clamp(20px, 3vw, 30px);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(13px, 1.5vw, 15px);
+}
+
+.Menu .perfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .Menu .perfil button {
@@ -798,4 +1001,6 @@ body[data-theme="dark"] .btn-toggle-senha img {
 #erro-cadastro.mensagem-duas-linhas {
   line-height: 1.15;
 }
+
+
 

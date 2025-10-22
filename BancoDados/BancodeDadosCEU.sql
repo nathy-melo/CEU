@@ -90,6 +90,18 @@ CREATE TABLE IF NOT EXISTS imagens_evento (
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
 );
 
+CREATE TABLE IF NOT EXISTS notificacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    CPF char(11) NOT NULL,
+    tipo VARCHAR(50) NOT NULL COMMENT 'Tipo: inscricao, desinscricao, evento_cancelado, evento_prestes_iniciar, etc',
+    mensagem VARCHAR(255) NOT NULL,
+    cod_evento INT NULL COMMENT 'Referência ao evento se aplicável',
+    lida TINYINT(1) NOT NULL DEFAULT 0,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL,
+);
+
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
 ('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', SHA2('senha123', 256), 'ORG00001', 1, 0);
 

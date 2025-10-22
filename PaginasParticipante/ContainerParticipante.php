@@ -71,6 +71,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'perfil' => 'PerfilParticipante.php',
         'certificados' => 'CerticadosParticipante.html',
         'configuracoes' => 'ConfiguracoesParticipante.html',
+        'painelnotificacoes' => '../PaginasGlobais/PainelNotificacoes.php',
         // Reaproveita conteúdos globais quando aplicável
         'termos' => '../PaginasGlobais/TermosDeCondicoes.html',
         'faleconosco' => '../PaginasGlobais/FaleConosco.html',
@@ -302,6 +303,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: '../PaginasGlobais/SobreNos.html',
                 js: [],
                 init: () => { }
+            },
+            'painelnotificacoes': {
+                html: '../PaginasGlobais/PainelNotificacoes.php',
+                js: ['../PaginasGlobais/PainelNotificacoes.js'],
+                init: () => {
+                    console.log('✅ Painel de Notificações carregado (auto-inicializa via DOMContentLoaded)');
+                }
             }
         };
         globalThis.rotas = rotas;
@@ -343,6 +351,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);
                         executarRota(pagina);
                         
+                        // Reinicializa o gerenciador de notificações
+                        if (typeof window.gerenciadorNotificacoes !== 'undefined' && window.gerenciadorNotificacoes) {
+                            window.gerenciadorNotificacoes.reinicializar();
+                        }
+                        
                         // Reinicia verificação de sessão para nova página (5 minutos)
                         if (typeof window.reiniciarVerificacaoSessao === 'function') {
                             window.reiniciarVerificacaoSessao(300);
@@ -372,6 +385,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     </script>
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
+    <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
 </body>
 
 </html>

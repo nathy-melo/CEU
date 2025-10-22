@@ -9,7 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Alterna o estado do menu ao clicar no botão
     toggleButton.addEventListener("click", () => {
       menu.classList.toggle("expanded");
-mainContent.classList.toggle("shifted");
+      if (mainContent) {
+        mainContent.classList.toggle("shifted");
+      }
     });
   
     // Mantém funcionalidade existente para ativar botões
