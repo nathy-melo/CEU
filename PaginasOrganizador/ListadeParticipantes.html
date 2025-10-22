@@ -240,8 +240,8 @@
         </div>
   
         <div class="acoes-em-massa">
-          <button class="botao botao-em-massa botao-branco">
-            <span>Desselecionar Todos</span>
+          <button class="botao botao-em-massa botao-branco" id="botao-toggle-selecao">
+            <span id="texto-toggle-selecao">Selecionar Todos</span>
             <img src="../Imagens/Grupo_de_pessoas.svg" alt="">
           </button>
           <button class="botao botao-em-massa botao-verde">
@@ -439,6 +439,24 @@ document.addEventListener('DOMContentLoaded', function() {
         tr.classList.remove('linha-selecionada');
       }
     });
+  });
+
+  const botaoToggleSelecao = document.getElementById('botao-toggle-selecao');
+  const textoToggleSelecao = document.getElementById('texto-toggle-selecao');
+  let todosSelecionados = false;
+
+  botaoToggleSelecao.addEventListener('click', function() {
+    todosSelecionados = !todosSelecionados;
+    document.querySelectorAll('.checkbox-selecionar').forEach(function(checkbox) {
+      checkbox.checked = todosSelecionados;
+      const tr = checkbox.closest('tr');
+      if (todosSelecionados) {
+        tr.classList.add('linha-selecionada');
+      } else {
+        tr.classList.remove('linha-selecionada');
+      }
+    });
+    textoToggleSelecao.textContent = todosSelecionados ? 'Desselecionar Todos' : 'Selecionar Todos';
   });
 });
 </script>
