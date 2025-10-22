@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS imagens_evento (
     ordem INT NOT NULL DEFAULT 0,
     principal TINYINT(1) NOT NULL DEFAULT 0,
     data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS notificacoes (
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS notificacoes (
     lida TINYINT(1) NOT NULL DEFAULT 0,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
-    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL
 );
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
