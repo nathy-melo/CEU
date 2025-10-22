@@ -183,8 +183,8 @@
 
         .btn-marcar-lida {
             background-color: transparent;
-            border: 1px solid var(--azul-claro);
-            color: var(--azul-claro);
+            border: 1px solid var(--botao);
+            color: var(--branco);
             padding: 0.3rem 0.8rem;
             border-radius: 0.25rem;
             cursor: pointer;
@@ -194,8 +194,8 @@
         }
 
         .btn-marcar-lida:hover {
-            background-color: var(--azul-claro);
-            color: var(--azul-escuro);
+            background-color: var(--botao);
+            color: #FFF;
         }
 
         /* ==== Mensagem Vazia ==== */
