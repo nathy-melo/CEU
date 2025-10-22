@@ -295,6 +295,8 @@ body.pagina-inicio {
   position: relative;
   overflow: hidden;
   container-type: inline-size;
+  width: 100%;
+  min-width: 0;
 }
 
 .CaixaDoEvento:hover {
