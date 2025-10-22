@@ -147,6 +147,8 @@
     align-items: center;
     max-height: 16rem;
     min-height: 16rem;
+    width: 100%;
+    min-width: 0;
   }
 
   .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 5; }
@@ -163,12 +165,13 @@
     overflow: hidden;
     padding: 0;
     width: 100%;
-    height: 100%;
+    min-width: 0;
+    height: 16rem;
     max-height: 16rem;
     min-height: 16rem;
     display: flex;
     justify-content: center;
-    align-items: stretch;
+    align-items: center;
   }
 
   .campo-imagem img {
@@ -206,6 +209,46 @@
   .botao-desinscrever:hover {
     background-color: #a01828;
     opacity: 1;
+  }
+
+  .modal-imagem {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-imagem-btn-fechar {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: var(--branco);
+    cursor: pointer;
+    z-index: 10001;
+  }
+
+  .modal-imagem-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 2rem;
+    box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.5);
+  }
+
+  .campo-imagem {
+    cursor: pointer;
+  }
+
+  .campo-imagem:hover {
+    opacity: 0.95;
   }
 </style>
 
@@ -272,7 +315,70 @@
         </div>
       </div>
     </main>
+
+    <!-- Modal para imagem em tela cheia -->
+    <div id="modal-imagem" class="modal-imagem">
+      <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
+      <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img">
+    </div>
   </div>
+
+  <script>
+    const codEvento = <?= $id_evento ?>;
+    let imagens = [];
+
+    // Carrega as imagens do evento
+    async function carregarImagensEvento() {
+      try {
+        const response = await fetch(`BuscarImagensEvento.php?cod_evento=${codEvento}`);
+        const dados = await response.json();
+        
+        if (dados.sucesso && dados.imagens && dados.imagens.length > 0) {
+          imagens = dados.imagens.map(img => '../' + img.caminho);
+        } else {
+          imagens = ['<?= htmlspecialchars($imagem_src) ?>'];
+        }
+        
+        // Atualiza a imagem inicial
+        if (imagens.length > 0) {
+          document.getElementById('event-image').src = imagens[0];
+        }
+      } catch (erro) {
+        console.error('Erro ao carregar imagens:', erro);
+        imagens = ['<?= htmlspecialchars($imagem_src) ?>'];
+      }
+    }
+
+    // Configura o onclick da imagem
+    document.getElementById('event-image').onclick = function (e) {
+      e.stopPropagation();
+      if (imagens.length > 0) {
+        document.getElementById('imagem-ampliada').src = imagens[0];
+        document.getElementById('modal-imagem').style.display = 'flex';
+      }
+    };
+
+    function fecharModalImagem() {
+      document.getElementById('modal-imagem').style.display = 'none';
+    }
+
+    // Fecha o modal ao clicar fora da imagem
+    document.getElementById('modal-imagem').onclick = function(e) {
+      if (e.target === this) {
+        fecharModalImagem();
+      }
+    };
+
+    // Fecha o modal ao pressionar ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        fecharModalImagem();
+      }
+    });
+
+    // Carrega as imagens quando a página é carregada
+    carregarImagensEvento();
+  </script>
   <script src="CartaoDoEventoInscrito.js"></script>
 </body>
 

@@ -32,11 +32,9 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
 }
 
 mysqli_stmt_close($stmt);
-mysqli_close($conexao);
 
 // Se não houver imagens na nova tabela, busca da tabela evento (fallback para compatibilidade)
 if (empty($imagens)) {
-    require_once('../BancoDados/conexao.php');
     $sqlEvento = "SELECT imagem FROM evento WHERE cod_evento = ?";
     $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
     mysqli_stmt_bind_param($stmtEvento, "i", $codEvento);
@@ -44,18 +42,27 @@ if (empty($imagens)) {
     $resultadoEvento = mysqli_stmt_get_result($stmtEvento);
     $linhaEvento = mysqli_fetch_assoc($resultadoEvento);
     
-    if ($linhaEvento && !empty($linhaEvento['imagem'])) {
+    if ($linhaEvento && isset($linhaEvento['imagem']) && $linhaEvento['imagem'] !== '' && $linhaEvento['imagem'] !== null) {
         $imagens[] = [
             'id' => 0,
             'caminho' => $linhaEvento['imagem'],
             'ordem' => 0,
             'principal' => true
         ];
+    } else {
+        // Se não houver imagem, usa a logo padrão do CEU
+        $imagens[] = [
+            'id' => 0,
+            'caminho' => 'ImagensEventos/CEU-Logo.png',
+            'ordem' => 0,
+            'principal' => true
+        ];
     }
     
     mysqli_stmt_close($stmtEvento);
-    mysqli_close($conexao);
 }
+
+mysqli_close($conexao);
 
 echo json_encode([
     'sucesso' => true,

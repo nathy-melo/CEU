@@ -49,8 +49,10 @@
     $certificado = (isset($evento['certificado']) && (int)$evento['certificado'] === 1) ? 'Sim' : 'Não';
     $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
-    // Ajustar caminho da imagem relativo a esta pasta
-    $imagem_rel = isset($evento['imagem']) && $evento['imagem'] !== '' ? $evento['imagem'] : 'ImagensEventos/CEU-Logo.png';
+    // Ajustar caminho da imagem relativo a esta pasta - usar CEU-Logo.png como padrão
+    $imagem_rel = (isset($evento['imagem']) && $evento['imagem'] !== '' && $evento['imagem'] !== null) 
+        ? $evento['imagem'] 
+        : 'ImagensEventos/CEU-Logo.png';
     $imagem_src = '../' . ltrim($imagem_rel, "/\\");
     ?>
 
@@ -140,6 +142,8 @@
             align-items: center;
             max-height: 16rem;
             min-height: 16rem;
+            width: 100%;
+            min-width: 0;
         }
 
         .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 5; }
@@ -156,12 +160,13 @@
             overflow: hidden;
             padding: 0;
             width: 100%;
-            height: 100%;
+            min-width: 0;
+            height: 16rem;
             max-height: 16rem;
             min-height: 16rem;
             display: flex;
             justify-content: center;
-            align-items: stretch;
+            align-items: center;
         }
 
         .campo-imagem img {
@@ -190,9 +195,11 @@
         .carrossel-imagens {
             position: relative;
             width: 100%;
-            height: 100%;
+            height: 16rem;
+            max-height: 16rem;
+            min-height: 16rem;
             display: flex;
-            align-items: stretch;
+            align-items: center;
             justify-content: center;
         }
 
@@ -336,8 +343,35 @@
     </div>
 
     <script>
-        const imagens = <?php echo json_encode([$imagem_src]); ?>;
+        let imagens = [];
         let indiceAtual = 0;
+        const codEvento = <?php echo $id_evento; ?>;
+
+        // Carrega as imagens do evento
+        async function carregarImagensEvento() {
+            try {
+                const response = await fetch(`BuscarImagensEvento.php?cod_evento=${codEvento}`);
+                const dados = await response.json();
+                
+                if (dados.sucesso && dados.imagens && dados.imagens.length > 0) {
+                    imagens = dados.imagens.map(img => '../' + img.caminho);
+                } else {
+                    // Fallback para imagem padrão
+                    imagens = ['<?php echo htmlspecialchars($imagem_src); ?>'];
+                }
+                
+                // Atualiza a imagem inicial
+                if (imagens.length > 0) {
+                    document.getElementById('imagem-carrossel').src = imagens[0];
+                }
+                
+                atualizarVisibilidadeSetas();
+            } catch (erro) {
+                console.error('Erro ao carregar imagens:', erro);
+                imagens = ['<?php echo htmlspecialchars($imagem_src); ?>'];
+                atualizarVisibilidadeSetas();
+            }
+        }
 
         // Mostrar setas apenas quando houver mais de uma imagem
         function atualizarVisibilidadeSetas() {
@@ -352,23 +386,47 @@
             setDisplay('.modal-imagem-btn-anterior');
             setDisplay('.modal-imagem-btn-proxima');
         }
-        atualizarVisibilidadeSetas();
 
         function mudarImagem(direcao) {
+            if (imagens.length === 0) return;
             indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
             document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
         }
+        
         function mudarImagemModal(direcao) {
+            if (imagens.length === 0) return;
             indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
             document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
         }
-        document.getElementById('imagem-carrossel').onclick = function () {
-            document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
-            document.getElementById('modal-imagem').style.display = 'flex';
+        
+        document.getElementById('imagem-carrossel').onclick = function (e) {
+            e.stopPropagation();
+            if (imagens.length > 0) {
+                document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+                document.getElementById('modal-imagem').style.display = 'flex';
+            }
         };
+        
         function fecharModalImagem() {
             document.getElementById('modal-imagem').style.display = 'none';
         }
+
+        // Fecha o modal ao clicar fora da imagem
+        document.getElementById('modal-imagem').onclick = function(e) {
+            if (e.target === this) {
+                fecharModalImagem();
+            }
+        };
+
+        // Fecha o modal ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                fecharModalImagem();
+            }
+        });
+
+        // Carrega as imagens quando a página é carregada
+        carregarImagensEvento();
     </script>
 </body>
 

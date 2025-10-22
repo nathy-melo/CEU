@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS notificacoes (
 );
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
-('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', SHA2('senha123', 256), 'CAIKE123', 1, 0);
+('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CAIKE123', 1, 0);
 
 INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes)
 VALUES ('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora');
