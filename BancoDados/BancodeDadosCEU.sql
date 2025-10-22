@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS imagens_evento (
     ordem INT NOT NULL DEFAULT 0,
     principal TINYINT(1) NOT NULL DEFAULT 0,
     data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS notificacoes (
@@ -99,11 +99,14 @@ CREATE TABLE IF NOT EXISTS notificacoes (
     lida TINYINT(1) NOT NULL DEFAULT 0,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
-    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL
 );
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
-('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', SHA2('senha123', 256), 'ORG00001', 1, 0);
+('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', SHA2('senha123', 256), 'CAIKE123', 1, 0);
+
+INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes)
+VALUES ('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora');
 
 INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem) VALUES
 (1, 'Workshop', 'Workshop de JavaScript', 'Sala 101', 'Aprenda conceitos básicos e avançados de JavaScript.', 'Todos', '2025-02-15 09:00:00', '2025-02-15 17:00:00', 8.0, 1, 'Presencial', 'Imagens/20250916_084902.jpg'),
