@@ -7,30 +7,6 @@
   <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
-  :root {
-    --bg-page: #d1eaff;
-    --bg-container: #4f6c8c;
-    --bg-table: #deeaff;
-    --bg-white: #ffffff;
-    --bg-green: #2c9533;
-    --bg-red: #ff0000;
-    --bg-dark-blue: #0a1449;
-    --bg-light-blue: #6598d2;
-    --text-white: #ffffff;
-    --border-main: #0a1449;
-  }
-  
-  * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-page);
-    color: #000;
-  }
-  
   a, button {
     cursor: pointer;
     text-decoration: none;
@@ -46,27 +22,28 @@
     display: block;
   }
   
-  .manager-container {
+  .container-lista {
     max-width: 1471px;
     margin: 50px auto;
     padding: 40px 58px;
-    background-color: var(--bg-container);
+    background-color: var(--caixas);
     border-radius: 16px;
     box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
     gap: 25px;
+    color: var(--preto);
   }
   
-  .manager-header {
+  .cabecalho-lista {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 30px;
   }
   
-  .title {
-    color: var(--text-white);
+  .titulo {
+    color: var(--branco);
     font-family: "Inter", sans-serif;
     font-weight: 700;
     font-size: 70px;
@@ -76,15 +53,15 @@
     margin: 0;
   }
   
-  .management-actions-grid {
+  .grade-acoes-gerenciamento {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px 32px;
     justify-content: center;
   }
   
-  .action-btn {
-    background-color: var(--bg-white);
+  .botao-acao {
+    background-color: var(--branco);
     border-radius: 8px;
     padding: 8px 16px;
     display: flex;
@@ -94,42 +71,11 @@
     font-size: 16px;
     white-space: nowrap;
   }
-  .action-btn img {
+  .botao-acao img {
     height: 28px;
   }
   
-  .search-form {
-    position: relative;
-    width: 100%;
-    max-width: 693px;
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 14px 70px 14px 20px;
-    border-radius: 6px;
-    border: none;
-    font-size: 16px;
-  }
-  
-  .search-btn {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    width: 63px;
-    background-color: var(--bg-dark-blue);
-    border-radius: 0 6px 6px 0;
-    display: grid;
-    place-items: center;
-    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.6);
-  }
-  .search-btn img {
-    width: 45px;
-    height: 45px;
-  }
-  
-  .bulk-actions {
+  .acoes-em-massa {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -137,172 +83,180 @@
     width: 100%;
   }
   
-  .btn-bulk {
+  .botao-em-massa {
     padding: 8px 24px;
     border-radius: 600px;
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 16px;
-    color: var(--text-white);
+    color: var(--branco);
   }
-  .btn-bulk.btn-white { background-color: var(--bg-white); color: #000; }
-  .btn-bulk.btn-green { background-color: var(--bg-green); }
-  .btn-bulk.btn-red { background-color: var(--bg-red); }
-  .btn-bulk img { height: 22.5px; }
+  .botao-em-massa.botao-branco { background-color: var(--branco); color: #000; }
+  .botao-em-massa.botao-verde { background-color: var(--verde); }
+  .botao-em-massa.botao-vermelho { background-color: var(--vermelho); }
+  .botao-em-massa img { height: 22.5px; }
   
-  .table-wrapper {
+  .envoltorio-tabela {
     overflow-x: auto;
   }
   
-  .participants-table {
+  .tabela-participantes {
     width: 100%;
     border-collapse: collapse;
-    background-color: var(--bg-table);
-    border: 1px solid var(--border-main);
+    background-color: var(--tabela_participantes);
+    border: 1px solid var(--azul-escuro);
     font-size: 15px;
   }
   
-  .participants-table th,
-  .participants-table td {
-    border: 1px solid var(--border-main);
+  .tabela-participantes th,
+  .tabela-participantes td {
+    border: 1px solid var(--azul-escuro);
     padding: 16px;
     text-align: left;
     vertical-align: middle;
   }
   
-  .participants-table thead {
+  .tabela-participantes thead {
     font-weight: bold;
   }
+
+  .tabela-participantes th:first-child { text-align: center; }
+  .tabela-participantes td.coluna-selecionar { text-align: center; }
   
-  .col-select { text-align: center; }
-  .col-select img { margin: 0 auto; }
-  .col-data p { margin: 0 0 4px 0; }
-  .col-data p:last-child { margin-bottom: 0; }
+  .coluna-dados p { margin: 0 0 4px 0; }
+  .coluna-dados p:last-child { margin-bottom: 0; }
   
-  .actions-group, .status-group {
+  .grupo-acoes, .grupo-status {
     display: flex;
     flex-direction: column;
     gap: 8px;
     min-width: 220px;
   }
   
-  .btn-table-action {
+  .botao-acao-tabela {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 4px 12px;
     border-radius: 600px;
-    color: var(--text-white);
+    color: var(--branco);
     width: 100%;
   }
-  .btn-table-action.btn-green { background-color: var(--bg-green); }
-  .btn-table-action.btn-red { background-color: var(--bg-red); }
-  .btn-table-action.btn-neutral { background-color: var(--bg-container); }
-  .btn-table-action img { height: 22.5px; }
+  .botao-acao-tabela.botao-verde { background-color: var(--verde); }
+  .botao-acao-tabela.botao-vermelho { background-color: var(--vermelho); }
+  .botao-acao-tabela.botao-neutro { background-color: var(--caixas); }
+  .botao-acao-tabela img { height: 22.5px; }
   
-  .status-row {
+  .linha-status {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
   }
   
-  .status-badge {
+  .emblema-status {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 4px 12px;
     border-radius: 600px;
-    color: var(--text-white);
+    color: var(--branco);
     white-space: nowrap;
   }
-  .status-badge.confirmed { background-color: var(--bg-green); }
-  .status-badge.denied { background-color: var(--bg-red); }
-  .status-badge img { height: 22.5px; }
+  .emblema-status.confirmado { background-color: var(--verde); }
+  .emblema-status.negado { background-color: var(--vermelho); }
+  .emblema-status img { height: 22.5px; }
   
-  .manager-footer {
+  .rodape-lista {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: 14px;
   }
-  
-  .btn-back {
-    background-color: var(--bg-light-blue);
-    padding: 8px 50px;
-    border-radius: 3px;
-    color: #000;
-    font-size: 18px;
-  }
 
-  .select-checkbox {
+  .checkbox-selecionar {
     width: 24px;
     height: 24px;
-    accent-color: var(--bg-dark-blue);
+    accent-color: var(--azul-escuro);
     cursor: pointer;
   }
-  .selected-row {
+  .linha-selecionada {
     background-color: #b3d4fc !important;
+  }
+
+  .botao-voltar {
+    background-color: var(--botao);
+    color: var(--branco);
+    font-weight: 700;
+    padding: 1em 2em;
+    line-height: 1;
+    text-align: center;
+    min-height: 2.25em;
   }
   </style>
 <body>
-  <section id="participants-manager-section">
-    <div class="manager-container">
-      <header class="manager-header">
-        <h1 class="title">Gerenciar Participantes</h1>
+    <div class="container-lista">
+      <header class="cabecalho-lista">
+        <h1 class="titulo">Gerenciar Participantes</h1>
         
-        <div class="management-actions-grid">
-          <button class="botao action-btn">
+        <div class="grade-acoes-gerenciamento">
+          <button class="botao botao-acao">
             <span>Adicionar</span>
             <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
           </button>
-          <button class="action-btn">
+          <button class="botao botao-acao">
             <span>Importar Lista de Presença</span>
-            <img src="importar.svg" alt="Importar icon">
+            <img src="../Imagens/Importar.svg" alt="Importar icon">
           </button>
-          <button class="botao action-btn">
+          <button class="botao botao-acao">
             <span>Exportar Lista de Presença</span>
-            <img src="exportar.svg" alt="Exportar icon">
+            <img src="../Imagens/Exportar.svg" alt="Exportar icon">
           </button>
-          <button class="action-btn">
+          <button class="botao botao-acao">
             <span>Enviar Mensagem</span>
-            <img src="email.svg" alt="Mensagem icon">
+            <img src="../Imagens/Email.svg" alt="Mensagem icon">
           </button>
-          <button class="action-btn">
+          <button class="botao botao-acao">
             <span>Importar Lista de Inscritos</span>
-            <img src="importar lista.svg" alt="Importar icon">
+            <img src="../Imagens/Importar_lista.svg" alt="Importar icon">
           </button>
-          <button class="action-btn">
+          <button class="botao botao-acao">
             <span>Exportar Lista de Inscritos</span>
-            <img src="exportar lista.svg" alt="Exportar icon">
+            <img src="../Imagens/Exportar_lista.svg" alt="Exportar icon">
           </button>
         </div>
   
-        <form class="search-form">
-          <input type="search" class="search-input" id="busca-participantes" name="busca_participantes" placeholder="Procure por nome, RA ou CPF" autocomplete="off">
-          <button type="submit" class="search-btn" aria-label="Procurar">
-            <img src="lupa.svg" alt="Lupa">
-          </button>
-        </form>
+        <div class="barra-pesquisa-container">
+          <div class="barra-pesquisa">
+            <div class="campo-pesquisa-wrapper">
+              <input class="campo-pesquisa" type="text" id="busca-participantes" name="busca_participantes" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
+              <button class="botao-pesquisa" aria-label="Procurar">
+                <div class="icone-pesquisa">
+                  <img src="../Imagens/lupa.png" alt="Lupa">
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
   
-        <div class="bulk-actions">
-          <button class="btn-bulk btn-white">
+        <div class="acoes-em-massa">
+          <button class="botao botao-em-massa botao-branco">
             <span>Desselecionar Todos</span>
-            <img src="grupo de pessoas.svg" alt="">
+            <img src="../Imagens/Grupo_de_pessoas.svg" alt="">
           </button>
-          <button class="btn-bulk btn-green">
+          <button class="botao botao-em-massa botao-verde">
             <span>Confirmar Presenças</span>
             <img src="../Imagens/Certo.svg" alt="">
           </button>
-          <button class="btn-bulk btn-red">
+          <button class="botao botao-em-massa botao-vermelho">
             <span>Excluir Participantes</span>
-            <img src="excluir.svg" alt="">
+            <img src="../Imagens/Excluir.svg" alt="">
           </button>
         </div>
       </header>
   
-      <div class="table-wrapper">
-        <table class="participants-table">
+      <div class="envoltorio-tabela">
+        <table class="tabela-participantes">
           <thead>
             <tr>
               <th>Selecionar</th>
@@ -313,177 +267,176 @@
           </thead>
           <tbody>
             <tr>
-              <td data-label="Selecionar" class="col-select">
-                <input type="checkbox" class="select-checkbox" id="participante-1" name="participantes[]" value="1">
+              <td data-label="Selecionar" class="coluna-selecionar">
+                <input type="checkbox" class="checkbox-selecionar" id="participante-1" name="participantes[]" value="1">
               </td>
-              <td data-label="Dados do Participante" class="col-data">
+              <td data-label="Dados do Participante" class="coluna-dados">
                 <p>Nome: Canimana Ipanema</p>
                 <p>E-mail: cai2132@email.com</p>
                 <p>Registro Acadêmico: 0123456</p>
                 <p>Data de Inscrição: 10/01/25 - 14:36</p>
               </td>
-              <td data-label="Modificar" class="col-modify">
-                <div class="actions-group">
-                  <button class="botao btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
-                  <button class="botao btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
-                  <button class="botao btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+              <td data-label="Modificar" class="coluna-modificar">
+                <div class="grupo-acoes">
+                  <button class="botao botao-acao-tabela botao-verde"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-vermelho"><span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Editar Dados</span><img src="../Imagens/Editar.svg" alt=""></button>
                 </div>
               </td>
-              <td data-label="Status" class="col-status">
-                <div class="status-group">
-                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+              <td data-label="Status" class="coluna-status">
+                <div class="grupo-status">
+                  <div class="linha-status"><span class="etiqueta-status">Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Presença:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Certificado:</span><span class="emblema-status confirmado">Confirmado <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td data-label="Selecionar" class="col-select">
-                <input type="checkbox" class="select-checkbox" id="participante-2" name="participantes[]" value="2">
+              <td data-label="Selecionar" class="coluna-selecionar">
+                <input type="checkbox" class="checkbox-selecionar" id="participante-2" name="participantes[]" value="2">
               </td>
-              <td data-label="Dados do Participante" class="col-data">
+              <td data-label="Dados do Participante" class="coluna-dados">
                 <p>Nome: Gean Brito</p>
                 <p>E-mail: gege@email.com</p>
                 <p>Registro Acadêmico: 0465441</p>
                 <p>Data de Inscrição: 10/01/25 - 14:36</p>
               </td>
-              <td data-label="Modificar" class="col-modify">
-                <div class="actions-group">
-                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
-                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
-                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+              <td data-label="Modificar" class="coluna-modificar">
+                <div class="grupo-acoes">
+                  <button class="botao botao-acao-tabela botao-verde"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-vermelho"><span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Editar Dados</span><img src="../Imagens/Editar.svg" alt=""></button>
                 </div>
               </td>
-              <td data-label="Status" class="col-status">
-                <div class="status-group">
-                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="../Imagens/Certo.svg"></span></div>
-                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+              <td data-label="Status" class="coluna-status">
+                <div class="grupo-status">
+                  <div class="linha-status"><span class="etiqueta-status">Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Presença:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Certificado:</span><span class="emblema-status confirmado">Confirmado <img src="../Imagens/Certo.svg"></span></div>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td data-label="Selecionar" class="col-select">
-                <input type="checkbox" class="select-checkbox" id="participante-3" name="participantes[]" value="3">
+              <td data-label="Selecionar" class="coluna-selecionar">
+                <input type="checkbox" class="checkbox-selecionar" id="participante-3" name="participantes[]" value="3">
               </td>
-              <td data-label="Dados do Participante" class="col-data">
+              <td data-label="Dados do Participante" class="coluna-dados">
                 <p>Nome: Italo Xavier</p>
                 <p>E-mail: capitwice22@email.com</p>
                 <p>Registro Acadêmico: 0979123</p>
                 <p>Data de Inscrição: 10/01/25 - 14:37</p>
               </td>
-              <td data-label="Modificar" class="col-modify">
-                <div class="actions-group">
-                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="certificado].svg" alt=""></button>
-                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
-                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+              <td data-label="Modificar" class="coluna-modificar">
+                <div class="grupo-acoes">
+                  <button class="botao botao-acao-tabela botao-verde"><span>Confirmar Presença</span><img src="../Imagens/Certificado.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-vermelho"><span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Editar Dados</span><img src="../Imagens/Editar.svg" alt=""></button>
                 </div>
               </td>
-              <td data-label="Status" class="col-status">
-                <div class="status-group">
-                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+              <td data-label="Status" class="coluna-status">
+                <div class="grupo-status">
+                  <div class="linha-status"><span class="etiqueta-status">Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Presença:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Certificado:</span><span class="emblema-status confirmado">Confirmado <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td data-label="Selecionar" class="col-select">
-                <input type="checkbox" class="select-checkbox" id="participante-4" name="participantes[]" value="4">
+              <td data-label="Selecionar" class="coluna-selecionar">
+                <input type="checkbox" class="checkbox-selecionar" id="participante-4" name="participantes[]" value="4">
               </td>
-              <td data-label="Dados do Participante" class="col-data">
+              <td data-label="Dados do Participante" class="coluna-dados">
                 <p>Nome: Natasha Figueira</p>
                 <p>E-mail: natashafig16@email.com</p>
                 <p>Registro Acadêmico: 0231463</p>
                 <p>Data de Inscrição: 10/01/25 - 14:37</p>
               </td>
-              <td data-label="Modificar" class="col-modify">
-                <div class="actions-group">
-                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
-                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
-                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+              <td data-label="Modificar" class="coluna-modificar">
+                <div class="grupo-acoes">
+                  <button class="botao botao-acao-tabela botao-verde"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-vermelho"><span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Editar Dados</span><img src="../Imagens/Editar.svg" alt=""></button>
                 </div>
               </td>
-              <td data-label="Status" class="col-status">
-                <div class="status-group">
-                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge denied">Não Confirmada <img src="errado.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge denied">Indisponível <img src="errado.svg " alt=""></span></div>
+              <td data-label="Status" class="coluna-status">
+                <div class="grupo-status">
+                  <div class="linha-status"><span class="etiqueta-status">Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Presença:</span><span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Certificado:</span><span class="emblema-status negado">Indisponível <img src="../Imagens/Errado.svg " alt=""></span></div>
                 </div>
               </td>
             </tr>
             <tr>
-              <td data-label="Selecionar" class="col-select">
-                <input type="checkbox" class="select-checkbox" id="participante-5" name="participantes[]" value="5">
+              <td data-label="Selecionar" class="coluna-selecionar">
+                <input type="checkbox" class="checkbox-selecionar" id="participante-5" name="participantes[]" value="5">
               </td>
-              <td data-label="Dados do Participante" class="col-data">
+              <td data-label="Dados do Participante" class="coluna-dados">
                 <p>Nome: Vinícius Y-piranga</p>
                 <p>E-mail: viny67@email.com</p>
                 <p>Registro Acadêmico: 0254688</p>
                 <p>Data de Inscrição: 10/01/25 - 14:37</p>
               </td>
-              <td data-label="Modificar" class="col-modify">
-                <div class="actions-group">
-                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
-                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
-                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+              <td data-label="Modificar" class="coluna-modificar">
+                <div class="grupo-acoes">
+                  <button class="botao botao-acao-tabela botao-verde"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-vermelho"><span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Editar Dados</span><img src="../Imagens/Editar.svg" alt=""></button>
                 </div>
               </td>
-              <td data-label="Status" class="col-status">
-                <div class="status-group">
-                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge confirmed">Confirmado <img src="certificado].svg" alt=""></span></div>
-                  <button class="btn-table-action btn-neutral"><span>Verificar Certificado</span><img src="certificado].svg" alt=""></button>
+              <td data-label="Status" class="coluna-status">
+                <div class="grupo-status">
+                  <div class="linha-status"><span class="etiqueta-status">Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Presença:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Certificado:</span><span class="emblema-status confirmado">Confirmado <img src="../Imagens/Certificado.svg" alt=""></span></div>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td data-label="Selecionar" class="col-select">
-                <input type="checkbox" class="select-checkbox" id="participante-6" name="participantes[]" value="6">
+              <td data-label="Selecionar" class="coluna-selecionar">
+                <input type="checkbox" class="checkbox-selecionar" id="participante-6" name="participantes[]" value="6">
               </td>
-              <td data-label="Dados do Participante" class="col-data">
+              <td data-label="Dados do Participante" class="coluna-dados">
                 <p>Nome: Virgílio Ouro Preto</p>
                 <p>E-mail: virgilio.ouro@email.com</p>
                 <p>Registro Acadêmico: 0987364</p>
                 <p>Data de Inscrição: 10/01/25 - 14:38</p>
               </td>
-              <td data-label="Modificar" class="col-modify">
-                <div class="actions-group">
-                  <button class="btn-table-action btn-green"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
-                  <button class="btn-table-action btn-red"><span>Excluir Participante</span><img src="excluir.svg" alt=""></button>
-                  <button class="btn-table-action btn-neutral"><span>Editar Dados</span><img src="editar.svg" alt=""></button>
+              <td data-label="Modificar" class="coluna-modificar">
+                <div class="grupo-acoes">
+                  <button class="botao botao-acao-tabela botao-verde"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-vermelho"><span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt=""></button>
+                  <button class="botao botao-acao-tabela botao-neutro"><span>Editar Dados</span><img src="../Imagens/Editar.svg" alt=""></button>
                 </div>
               </td>
-              <td data-label="Status" class="col-status">
-                <div class="status-group">
-                  <div class="status-row"><span class="status-label">Inscrição:</span><span class="status-badge confirmed">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Presença:</span><span class="status-badge denied">Não Confirmada <img src="errado.svg" alt=""></span></div>
-                  <div class="status-row"><span class="status-label">Certificado:</span><span class="status-badge denied">Indisponível <img src="errado.svg" alt=""></span></div>
+              <td data-label="Status" class="coluna-status">
+                <div class="grupo-status">
+                  <div class="linha-status"><span class="etiqueta-status">Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Presença:</span><span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span></div>
+                  <div class="linha-status"><span class="etiqueta-status">Certificado:</span><span class="emblema-status negado">Indisponível <img src="../Imagens/Errado.svg" alt=""></span></div>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <footer class="manager-footer">
-        <a href="#" class="btn-back">Voltar</a>
+      <footer class="rodape-lista">
+        <button type="button" class="botao botao-voltar" onclick="history.back()">Voltar</button>
       </footer>
     </div>
-  </section>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.select-checkbox').forEach(function(checkbox) {
+  document.querySelectorAll('.checkbox-selecionar').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
       var tr = checkbox.closest('tr');
       if (checkbox.checked) {
-        tr.classList.add('selected-row');
+        tr.classList.add('linha-selecionada');
       } else {
-        tr.classList.remove('selected-row');
+        tr.classList.remove('linha-selecionada');
       }
     });
   });

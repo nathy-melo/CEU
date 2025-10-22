@@ -8,9 +8,12 @@
   --cinza-medio: #888888;
   --azul-escuro: #0a1449;
   --azul-claro: #8ad7da;
+  --vermelho: #ff0000;
+  --verde: #2c9533;
   --sombra-padrao: rgba(0, 0, 0, 0.6);
   --sombra-forte: rgba(0, 0, 0, 0.8);
   --sombra-leve: rgba(0, 0, 0, 0.5);
+  --tabela_participantes: #deeaff;
 }
 
 :root[data-theme="dark"] {
