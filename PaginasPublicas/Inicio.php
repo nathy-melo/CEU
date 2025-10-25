@@ -75,6 +75,10 @@
                     }
                     // Certificado: simples sim/nao
                     $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
+                    
+                    // Preparar caminho da imagem
+                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                    $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                 ?>
                     <a class="botao CaixaDoEvento"
                         style="text-decoration:none;color:inherit;display:block;"
@@ -86,6 +90,9 @@
                         data-data="<?= $dataInicioISO ?>"
                         data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
                     >
+                        <div class="EventoImagem">
+                            <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
+                        </div>
                         <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                         <div class="EventoInfo">
                             Categoria: <?= htmlspecialchars($ev['categoria']) ?><br>

@@ -77,6 +77,10 @@
                     // Certificado: simples sim/nao
                     $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
                     $certTexto = ($cert === 'sim') ? 'Sim' : 'Não';
+                    
+                    // Preparar caminho da imagem
+                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                    $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                 ?>
                     <a class="botao CaixaDoEvento" 
                         style="text-decoration:none;color:inherit;display:block;"
@@ -87,10 +91,15 @@
                         data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>"
                         data-data="<?= $dataInicioISO ?>"
                         data-certificado="<?= $cert ?>">
+                        <div class="EventoImagem">
+                            <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
+                        </div>
                         <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                         <div class="EventoInfo">
                             Categoria: <?= htmlspecialchars($ev['categoria']) ?><br>
+                            Modalidade: <?= htmlspecialchars($ev['modalidade'] ?? '') ?><br>
                             Data: <?= $dataFormatada ?><br>
+                            Local: <?= htmlspecialchars($ev['lugar']) ?><br>
                             Certificado: <?= $certTexto ?>
                         </div>
                     </a>

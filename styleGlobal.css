@@ -287,47 +287,116 @@ body.pagina-inicio {
 
 .CaixaDoEvento {
   background-color: var(--branco);
-  border-radius: clamp(8px, 1.5vw, 10px);
-  padding: clamp(10px, 1.5vw, 15px);
-  box-shadow: clamp(1px, 0.3vw, 2px) clamp(1px, 0.3vw, 2px) clamp(12px, 2.5vw, 15px) var(--sombra-forte);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: auto;
+  border-radius: 2cqi;
+  padding: 0;
+  box-shadow: 0.5cqi 0.5cqi 3cqi var(--sombra-forte);
+  display: grid;
   aspect-ratio: 3 / 2;
   position: relative;
   overflow: hidden;
   container-type: inline-size;
   width: 100%;
   min-width: 0;
+  transition: all 0.3s ease;
 }
 
 .CaixaDoEvento:hover {
   cursor: pointer;
-  opacity: 0.9;
+  transform: translateY(-1cqi);
+  box-shadow: 1cqi 1.5cqi 4cqi var(--sombra-forte);
 }
 
-.EventoTitulo {
-  font-size: clamp(0.85rem, 1.1vw, 1rem);
-  font-weight: bold;
-  margin-bottom: clamp(4px, 0.8vw, 8px);
-  color: var(--azul-escuro);
-  line-height: 1.2;
+.EventoImagem {
+  width: 100%;
+  height: 100%;
+  border-radius: 2cqi 2cqi 0 0;
+  aspect-ratio: 3 / 2;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  transform: translateY(0);
   overflow: hidden;
-  text-overflow: ellipsis;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--branco);
+}
+
+.CaixaDoEvento:hover .EventoImagem {
+  transform: translateY(-100%);
+}
+
+.EventoImagem img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
 }
 
-.EventoInfo {
-  color: var(--cinza-escuro);
-  font-size: clamp(0.7rem, 0.9vw, 0.85rem);
-  line-height: 1.35;
-  margin-top: auto;
-  text-align: left;
+.CaixaDoEvento:hover .EventoImagem img {
+  transform: scale(1.15);
+}
+
+.EventoTitulo {
+  font-size: 5cqi;
+  font-weight: 800;
+  padding: 4cqi 3.5cqi 4cqi;
+  color: var(--branco);
+  background: var(--botao);
+  line-height: 1.2;
   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  transform: translateY(0);
+  text-shadow: 0 0.5cqi 1cqi rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.05cqi;
+  grid-row: 2 / 3;
+  position: relative;
+  z-index: 2;
+}
+
+.CaixaDoEvento:hover .EventoTitulo {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  transform: translateY(-50cqi);
+}
+
+.EventoInfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: var(--cinza-escuro);
+  font-size: 3.8cqi;
+  line-height: 1.5;
+  padding: 0 3.5cqi 2.5cqi;
+  text-align: left;
+  overflow: visible;
   word-wrap: break-word;
-  flex-shrink: 1;
   display: block;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  pointer-events: none;
+  font-weight: 500;
+  z-index: 3;
+  transform: translateY(100%);
+}
+
+.EventoInfo br {
+  line-height: 1.8;
+}
+
+.CaixaDoEvento:hover .EventoInfo {
+  opacity: 1;
+  transform: translateY(-10cqi);
+  pointer-events: auto;
 }
 
 .CaixaDoEventoAdicionar {
