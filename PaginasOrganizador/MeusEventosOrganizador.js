@@ -13,7 +13,7 @@ function carregarEventosDoServidor() {
     mensagemCarregando.style.gridColumn = '1/-1';
     mensagemCarregando.style.textAlign = 'center';
     mensagemCarregando.style.padding = '30px 0';
-    mensagemCarregando.style.color = '#0a1449';
+    mensagemCarregando.style.color = 'var(--botao)';
     containerEventos.appendChild(mensagemCarregando);
     
     fetch('BuscarEventosOrganizador.php')
@@ -60,7 +60,7 @@ function carregarEventosDoServidor() {
                 mensagemSemEventos.style.gridColumn = '1/-1';
                 mensagemSemEventos.style.textAlign = 'center';
                 mensagemSemEventos.style.padding = '30px 0';
-                mensagemSemEventos.style.color = '#0a1449';
+                mensagemSemEventos.style.color = 'var(--botao)';
                 mensagemSemEventos.style.fontSize = '1.1rem';
                 containerEventos.appendChild(mensagemSemEventos);
             }
@@ -80,7 +80,7 @@ function inicializarFiltroEventos() {
     // Cria mensagem de "Sem resultados"
     let mensagemSemResultados = document.createElement('div');
     mensagemSemResultados.textContent = 'Sem resultados';
-    mensagemSemResultados.style.color = '#0a1449';
+    mensagemSemResultados.style.color = 'var(--botao)';
     mensagemSemResultados.style.fontWeight = 'bold';
     mensagemSemResultados.style.fontSize = '1.2rem';
     mensagemSemResultados.style.gridColumn = '1/-1';

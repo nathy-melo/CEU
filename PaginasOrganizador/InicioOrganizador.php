@@ -110,8 +110,6 @@
             <?php endif; ?>
         </div>
     </div>
-    <script src="../PaginasGlobais/Filtro.js"></script>
-    <script src="InicioOrganizador.js"></script>
 </body>
 
 </html>

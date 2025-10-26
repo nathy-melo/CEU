@@ -42,8 +42,6 @@
             <!-- Eventos serão carregados via JavaScript -->
         </div>
     </div>
-    <script src="../PaginasGlobais/Filtro.js"></script>
-    <script src="MeusEventosParticipante.js"></script>
 </body>
 
 </html>

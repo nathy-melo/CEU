@@ -6,7 +6,7 @@ function inicializarFiltroEventos() {
     // Mensagem de "Sem resultados"
     let semResultadosMsg = document.createElement('div');
     semResultadosMsg.textContent = 'Sem resultados';
-    semResultadosMsg.style.color = '#0a1449';
+    semResultadosMsg.style.color = 'var(--botao)';
     semResultadosMsg.style.fontWeight = 'bold';
     semResultadosMsg.style.fontSize = '1.2rem';
     semResultadosMsg.style.gridColumn = '1/-1';

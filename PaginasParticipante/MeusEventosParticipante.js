@@ -80,6 +80,12 @@ function carregarEventosDoServidor() {
                 const cert = (parseInt(evento.certificado) === 1) ? 'sim' : 'nao';
                 const certTexto = (cert === 'sim') ? 'Sim' : 'Não';
 
+                // Caminho da imagem do evento, com fallback para imagem padrão
+                const imagemEvento = (evento.imagem && String(evento.imagem).trim() !== '')
+                    ? String(evento.imagem).replace(/^\/+/, '')
+                    : 'ImagensEventos/CEU-Logo.png';
+                const caminhoImagem = `../${imagemEvento}`;
+
                 const div = document.createElement('a');
                 div.className = 'botao CaixaDoEvento';
                 div.href = `ContainerParticipante.php?pagina=eventoInscrito&id=${evento.cod_evento}`;
@@ -93,7 +99,11 @@ function carregarEventosDoServidor() {
                 div.dataset.data = dataISO;
                 div.dataset.certificado = cert;
 
+                // Mantém a mesma estrutura visual dos cards da página de Início
                 div.innerHTML = `
+                    <div class="EventoImagem">
+                        <img src="${caminhoImagem}" alt="${evento.nome}">
+                    </div>
                     <div class="EventoTitulo">${evento.nome}</div>
                     <div class="EventoInfo">${status}<br>Data: ${dataFormatada}<br>Certificado: ${certTexto}</div>
                 `;
@@ -117,22 +127,34 @@ function inicializarFiltroEventos() {
     const searchButton = document.querySelector('.botao-pesquisa');
     const eventosContainer = document.getElementById('eventos-container');
 
-    // Mensagem de "Sem resultados"
-    let semResultadosMsg = document.createElement('div');
-    semResultadosMsg.textContent = 'Sem resultados';
-    semResultadosMsg.style.color = 'var(--branco)';
-    semResultadosMsg.style.fontWeight = 'bold';
-    semResultadosMsg.style.fontSize = '1.2rem';
-    semResultadosMsg.style.gridColumn = '1/-1';
-    semResultadosMsg.style.textAlign = 'center';
-    semResultadosMsg.style.padding = '30px 0';
+    // Mensagem de "Sem resultados" (garante uma única instância)
+    let semResultadosMsg = document.getElementById('sem-resultados-msg');
+    if (!semResultadosMsg) {
+        semResultadosMsg = document.createElement('div');
+        semResultadosMsg.id = 'sem-resultados-msg';
+        semResultadosMsg.textContent = 'Sem resultados';
+        semResultadosMsg.style.color = 'var(--botao)';
+        semResultadosMsg.style.fontWeight = 'bold';
+        semResultadosMsg.style.fontSize = '1.2rem';
+        semResultadosMsg.style.gridColumn = '1/-1';
+        semResultadosMsg.style.textAlign = 'center';
+        semResultadosMsg.style.padding = '30px 0';
+    }
 
     function atualizarMensagemSemResultados(existemVisiveis) {
-        if (eventosContainer && eventosContainer.contains(semResultadosMsg)) {
-            eventosContainer.removeChild(semResultadosMsg);
+        // Remove instâncias repetidas se houver
+        const duplicadas = eventosContainer?.querySelectorAll('#sem-resultados-msg');
+        if (duplicadas && duplicadas.length > 1) {
+            duplicadas.forEach((el, idx) => { if (idx > 0) el.remove(); });
         }
-        if (!existemVisiveis && eventosContainer) {
-            eventosContainer.appendChild(semResultadosMsg);
+        if (existemVisiveis) {
+            if (eventosContainer && eventosContainer.contains(semResultadosMsg)) {
+                eventosContainer.removeChild(semResultadosMsg);
+            }
+        } else {
+            if (eventosContainer && !eventosContainer.contains(semResultadosMsg)) {
+                eventosContainer.appendChild(semResultadosMsg);
+            }
         }
     }
 
@@ -162,16 +184,17 @@ function inicializarFiltroEventos() {
         });
 
         // Só mostra "Sem resultados" se houver caixas carregadas mas nenhuma visível
-        if (caixas.length > 0) {
+        if ((eventosContainer?.querySelectorAll('.CaixaDoEvento') || []).length > 0) {
             atualizarMensagemSemResultados(algumaVisivel);
         }
     }
 
-    if (searchButton) {
+    if (searchButton && !searchButton.dataset.filtroMeusEventosBound) {
         searchButton.onclick = function (e) {
             e.preventDefault();
             filtrarEventos();
         };
+        searchButton.dataset.filtroMeusEventosBound = '1';
     }
     if (searchInput) {
         searchInput.onkeydown = function (e) {
@@ -179,7 +202,10 @@ function inicializarFiltroEventos() {
                 filtrarEventos();
             }
         };
-        searchInput.addEventListener('input', filtrarEventos);
+        if (!searchInput.dataset.filtroMeusEventosInputBound) {
+            searchInput.addEventListener('input', filtrarEventos);
+            searchInput.dataset.filtroMeusEventosInputBound = '1';
+        }
     }
 
     // Inicializa o filtro lateral quando disponível
@@ -191,6 +217,9 @@ function inicializarFiltroEventos() {
     const caixas = eventosContainer?.querySelectorAll('.CaixaDoEvento') || [];
     if (caixas.length > 0) {
         filtrarEventos();
+    } else {
+        // Se não há eventos, garante que a mensagem não fique sobrando
+        atualizarMensagemSemResultados(true);
     }
 }
 
