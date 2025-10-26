@@ -208,10 +208,16 @@
         }
 
         .painel-vazio::before {
-            content: "📭";
+            content: "";
             display: block;
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem auto;
+            background-image: url('../Imagens/notif-vazio.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: brightness(0) invert(1);
         }
 
         /* ==== Botão Voltar ==== */
@@ -287,7 +293,7 @@
                 <!-- Cabeçalho -->
                 <div class="painel-cabecalho">
                     <h1 class="titulo-painel">
-                        🔔 Painel de Notificações
+                        <img src="../Imagens/notif-geral.svg" style="width: 28px; height: 28px; vertical-align: middle;"> Painel de Notificações
                     </h1>
                     <span class="contador-notificacoes" id="contador-notificacoes">
                         0 não lidas
@@ -297,22 +303,22 @@
                 <!-- Filtros -->
                 <div class="painel-filtros">
                     <button class="btn-filtro ativo" data-tipo="todas">
-                        📋 Todas
+                        Todas
                     </button>
                     <button class="btn-filtro" data-tipo="inscricao">
-                        📝 Inscrição
+                        <img src="../Imagens/notif-inscricao.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"> Inscrição
                     </button>
                     <button class="btn-filtro" data-tipo="desinscricao">
-                        ✖️ Desincrição
+                        <img src="../Imagens/notif-desinscricao.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"> Desinscrição
                     </button>
                     <button class="btn-filtro" data-tipo="evento_cancelado">
-                        🚫 Cancelado
+                        <img src="../Imagens/notif-cancelado.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"> Cancelado
                     </button>
                     <button class="btn-filtro" data-tipo="evento_prestes_iniciar">
-                        ⏰ Iniciando
+                        <img src="../Imagens/notif-relogio.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"> Iniciando
                     </button>
                     <button class="btn-filtro" data-tipo="novo_participante">
-                        👤 Novo Participante
+                        <img src="../Imagens/notif-usuario.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"> Novo Participante
                     </button>
                 </div>
 

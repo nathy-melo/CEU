@@ -229,12 +229,12 @@ class GerenciadorNotificacoes {
 
     obterTextoTipo(tipo) {
         const tipos = {
-            'inscricao': '📝 Inscrição',
-            'desinscricao': '✗ Desincrição',
-            'evento_cancelado': '🚫 Evento cancelado',
-            'evento_prestes_iniciar': '⏰ Evento iniciando',
-            'novo_participante': '👤 Novo participante',
-            'outro': '📢 Notificação'
+            'inscricao': '<img src="../Imagens/notif-inscricao.svg" class="notif-icon"> Inscrição',
+            'desinscricao': '<img src="../Imagens/notif-desinscricao.svg" class="notif-icon"> Desincrição',
+            'evento_cancelado': '<img src="../Imagens/notif-cancelado.svg" class="notif-icon"> Evento cancelado',
+            'evento_prestes_iniciar': '<img src="../Imagens/notif-relogio.svg" class="notif-icon"> Evento iniciando',
+            'novo_participante': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Novo participante',
+            'outro': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Notificação'
         };
         return tipos[tipo] || tipos['outro'];
     }

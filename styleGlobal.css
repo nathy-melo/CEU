@@ -686,6 +686,12 @@ body.pagina-inicio {
   height: clamp(16px, 2.5vw, 20px);
 }
 
+.Menu .botao-notificacoes img {
+  width: clamp(16px, 2.5vw, 20px);
+  height: clamp(16px, 2.5vw, 20px);
+  filter: brightness(0) invert(1);
+}
+
 /* Badge de Contador de Notificações */
 .Menu .notificacoes-badge {
   position: absolute;
@@ -822,6 +828,42 @@ body.pagina-inicio {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+/* Ícones SVG nas notificações do dropdown */
+.notif-icon {
+  width: clamp(14px, 1.5vw, 16px);
+  height: clamp(14px, 1.5vw, 16px);
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Ícones SVG nas badges do painel de notificações */
+.notif-icon-badge {
+  width: clamp(16px, 1.8vw, 18px);
+  height: clamp(16px, 1.8vw, 18px);
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Ícones SVG inline no painel de notificações */
+.painel-cabecalho img,
+.btn-filtro img {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Ícones SVG nas badges do painel de notificações */
+.notif-icon-badge {
+  width: clamp(16px, 1.8vw, 18px);
+  height: clamp(16px, 1.8vw, 18px);
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+  filter: brightness(0) invert(1) !important;
 }
 
 .notificacao-item .notificacao-mensagem {

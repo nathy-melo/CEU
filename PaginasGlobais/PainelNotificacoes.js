@@ -258,11 +258,11 @@ function marcarComoLida(id) {
 // Traduz tipo de notificação
 function traduzirTipo(tipo, apenasTexto = false) {
     const tipos = {
-        'inscricao': apenasTexto ? 'Inscrição' : '📝 Inscrição',
-        'desinscricao': apenasTexto ? 'Desincrição' : '✖️ Desincrição',
-        'evento_cancelado': apenasTexto ? 'Cancelado' : '🚫 Cancelado',
-        'evento_prestes_iniciar': apenasTexto ? 'Iniciando' : '⏰ Iniciando',
-        'novo_participante': apenasTexto ? 'Novo Participante' : '👤 Novo Participante'
+        'inscricao': apenasTexto ? 'Inscrição' : '<img src="../Imagens/notif-inscricao.svg" class="notif-icon-badge"> Inscrição',
+        'desinscricao': apenasTexto ? 'Desincrição' : '<img src="../Imagens/notif-desinscricao.svg" class="notif-icon-badge"> Desincrição',
+        'evento_cancelado': apenasTexto ? 'Cancelado' : '<img src="../Imagens/notif-cancelado.svg" class="notif-icon-badge"> Cancelado',
+        'evento_prestes_iniciar': apenasTexto ? 'Iniciando' : '<img src="../Imagens/notif-relogio.svg" class="notif-icon-badge"> Iniciando',
+        'novo_participante': apenasTexto ? 'Novo Participante' : '<img src="../Imagens/notif-usuario.svg" class="notif-icon-badge"> Novo Participante'
     };
     return tipos[tipo] || tipo;
 }
