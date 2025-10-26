@@ -14,11 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   
-    // Mantém funcionalidade existente para ativar botões
+    // Mantém funcionalidade existente para ativar botões - EXCETO O BOTÃO DE NOTIFICAÇÕES
     const botoes = document.querySelectorAll(".conteudo button, .rodape");
     botoes.forEach(botao => {
       botao.addEventListener("click", () => {
-        botoes.forEach(btn => btn.classList.remove("ativo"));
+        // Remove ativo de todos os botões, incluindo notificações
+        document.querySelectorAll(".conteudo button, .rodape, .botao-notificacoes").forEach(btn => btn.classList.remove("ativo"));
         botao.classList.add("ativo");
       });
     });
@@ -37,11 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
         meusEventos: ['meusEventos', 'eventoOrganizado', 'adicionarEvento'],
         certificados: ['certificados'],
         configuracoes: ['configuracoes', 'termos', 'redefinirSenha', 'emailRecuperacao', 'temaDoSite', 'manualDeUso', 'duvidasFrequentes', 'sobreNos'],
-        faleConosco: ['faleconosco']
+        faleConosco: ['faleconosco'],
+        notificacoes: ['painelnotificacoes']
       };
   
-      // Remove a classe 'ativo' de todos os botões
-      botoes.forEach(btn => btn.classList.remove("ativo"));
+      // Remove a classe 'ativo' de todos os botões, incluindo notificações
+      document.querySelectorAll(".conteudo button, .rodape, .botao-notificacoes").forEach(btn => btn.classList.remove("ativo"));
   
       // Verifica qual botão deve ser ativado
       for (const [seletor, paginas] of Object.entries(mapeamentoBotoes)) {

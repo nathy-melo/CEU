@@ -54,13 +54,10 @@ class GerenciadorNotificacoes {
                     console.warn('carregarPagina não disponível');
                 }
                 
-                // Fecha o dropdown após um pequeno delay
+                // Fecha o dropdown (sem remover classe 'ativo' do botão)
                 setTimeout(() => {
                     const caixa = document.getElementById('notificacoes-caixa');
                     caixa.classList.remove('mostrar');
-                    if (this.botaoNotificacoes) {
-                        this.botaoNotificacoes.classList.remove('ativo');
-                    }
                 }, 100);
             });
         }
@@ -74,7 +71,7 @@ class GerenciadorNotificacoes {
         this.botaoNotificacoes.parentNode.replaceChild(botaoNovo, this.botaoNotificacoes);
         this.botaoNotificacoes = botaoNovo;
 
-        // Clique para abrir/fechar
+        // Clique para abrir/fechar - NÃO adiciona classe 'ativo'
         this.botaoNotificacoes.addEventListener('click', (e) => {
             e.stopPropagation();
             const caixa = document.getElementById('notificacoes-caixa');
@@ -82,10 +79,8 @@ class GerenciadorNotificacoes {
             
             if (isOpen) {
                 caixa.classList.remove('mostrar');
-                this.botaoNotificacoes.classList.remove('ativo');
             } else {
                 caixa.classList.add('mostrar');
-                this.botaoNotificacoes.classList.add('ativo');
             }
         });
 
@@ -95,9 +90,6 @@ class GerenciadorNotificacoes {
             if (!e.target.closest('#botao-notificacoes') && 
                 !e.target.closest('#notificacoes-caixa')) {
                 caixa.classList.remove('mostrar');
-                if (this.botaoNotificacoes) {
-                    this.botaoNotificacoes.classList.remove('ativo');
-                }
             }
         });
     }

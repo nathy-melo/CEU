@@ -646,19 +646,19 @@ body.pagina-inicio {
 /* Botão de Notificações (Sino) - ABSOLUTO EM RELAÇÃO AO .Menu */
 .Menu .botao-notificacoes {
   position: absolute;
-  top: clamp(1px, 1vw, 2px);
-  left: clamp(1px, 1vw, 2px);
+  top: clamp(5px, 1vw, 8px);
+  left: clamp(5px, 1vw, 8px);
   background: none;
   border: none;
   cursor: pointer;
-  padding: clamp(8px, 1.5vw, 10px);
+  padding: clamp(6px, 1vw, 8px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--branco);
-  width: clamp(40px, 6vw, 48px);
-  height: clamp(40px, 6vw, 48px);
+  width: clamp(32px, 5vw, 40px);
+  height: clamp(32px, 5vw, 40px);
   flex-shrink: 0;
   transition: all 0.2s ease;
   z-index: 100;
@@ -669,13 +669,21 @@ body.pagina-inicio {
 }
 
 .Menu .botao-notificacoes.ativo {
-  background-color: rgba(255, 255, 255, 0) !important;
-  box-shadow: none !important;
+  background-color: var(--botao) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 1px var(--botao), 0 0 3px 0 var(--azul-escuro) !important;
+  overflow: visible !important;
+}
+
+/* Garante que a sombra do botão de notificações seja sempre menor */
+#botao-notificacoes.ativo {
+  box-shadow: 0 0 0 1px var(--botao), 0 0 3px 0 var(--azul-escuro) !important;
+  border-radius: 50% !important;
 }
 
 .Menu .botao-notificacoes svg {
-  width: clamp(20px, 3vw, 24px);
-  height: clamp(20px, 3vw, 24px);
+  width: clamp(16px, 2.5vw, 20px);
+  height: clamp(16px, 2.5vw, 20px);
 }
 
 /* Badge de Contador de Notificações */
