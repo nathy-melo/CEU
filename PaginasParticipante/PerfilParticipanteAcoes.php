@@ -128,17 +128,36 @@ switch ($acao) {
         
         try {
             // Remove registros relacionados primeiro (devido às chaves estrangeiras)
+            // A ordem é CRÍTICA para evitar erros de constraint
             
-            // Remove da tabela organiza (se for organizador)
-            $sql_organiza = "DELETE FROM organiza WHERE CPF = ?";
-            $stmt_organiza = mysqli_prepare($conexao, $sql_organiza);
-            if ($stmt_organiza) {
-                mysqli_stmt_bind_param($stmt_organiza, "s", $cpf_usuario);
-                mysqli_stmt_execute($stmt_organiza);
-                mysqli_stmt_close($stmt_organiza);
+            // 1. Remove notificações do usuário
+            $sql_notif = "DELETE FROM notificacao WHERE CPF_usuario = ?";
+            $stmt_notif = mysqli_prepare($conexao, $sql_notif);
+            if ($stmt_notif) {
+                mysqli_stmt_bind_param($stmt_notif, "s", $cpf_usuario);
+                mysqli_stmt_execute($stmt_notif);
+                mysqli_stmt_close($stmt_notif);
             }
             
-            // Remove da tabela lista_de_participantes (se existir)
+            // 2. Remove da tabela de presença
+            $sql_presenca = "DELETE FROM presenca WHERE CPF = ?";
+            $stmt_presenca = mysqli_prepare($conexao, $sql_presenca);
+            if ($stmt_presenca) {
+                mysqli_stmt_bind_param($stmt_presenca, "s", $cpf_usuario);
+                mysqli_stmt_execute($stmt_presenca);
+                mysqli_stmt_close($stmt_presenca);
+            }
+            
+            // 3. Remove da lista de espera
+            $sql_espera = "DELETE FROM lista_de_espera WHERE CPF = ?";
+            $stmt_espera = mysqli_prepare($conexao, $sql_espera);
+            if ($stmt_espera) {
+                mysqli_stmt_bind_param($stmt_espera, "s", $cpf_usuario);
+                mysqli_stmt_execute($stmt_espera);
+                mysqli_stmt_close($stmt_espera);
+            }
+            
+            // 4. Remove da tabela lista_de_participantes
             $sql_participantes = "DELETE FROM lista_de_participantes WHERE CPF = ?";
             $stmt_participantes = mysqli_prepare($conexao, $sql_participantes);
             if ($stmt_participantes) {
@@ -147,7 +166,76 @@ switch ($acao) {
                 mysqli_stmt_close($stmt_participantes);
             }
             
-            // Remove o usuário principal
+            // 5. Remove da tabela organiza (se for organizador)
+            $sql_organiza = "DELETE FROM organiza WHERE CPF = ?";
+            $stmt_organiza = mysqli_prepare($conexao, $sql_organiza);
+            if ($stmt_organiza) {
+                mysqli_stmt_bind_param($stmt_organiza, "s", $cpf_usuario);
+                mysqli_stmt_execute($stmt_organiza);
+                mysqli_stmt_close($stmt_organiza);
+            }
+            
+            // 6. Remove eventos criados pelo usuário (se for organizador)
+            // Primeiro busca os IDs dos eventos para limpar tabelas relacionadas
+            $sql_get_eventos = "SELECT ID_evento FROM evento WHERE CPF_organizador = ?";
+            $stmt_get_eventos = mysqli_prepare($conexao, $sql_get_eventos);
+            if ($stmt_get_eventos) {
+                mysqli_stmt_bind_param($stmt_get_eventos, "s", $cpf_usuario);
+                mysqli_stmt_execute($stmt_get_eventos);
+                $result_eventos = mysqli_stmt_get_result($stmt_get_eventos);
+                
+                while ($row = mysqli_fetch_assoc($result_eventos)) {
+                    $id_evento = $row['ID_evento'];
+                    
+                    // Remove registros de presença do evento
+                    $sql_del_presenca_evt = "DELETE FROM presenca WHERE ID_evento = ?";
+                    $stmt_del_presenca = mysqli_prepare($conexao, $sql_del_presenca_evt);
+                    if ($stmt_del_presenca) {
+                        mysqli_stmt_bind_param($stmt_del_presenca, "i", $id_evento);
+                        mysqli_stmt_execute($stmt_del_presenca);
+                        mysqli_stmt_close($stmt_del_presenca);
+                    }
+                    
+                    // Remove lista de espera do evento
+                    $sql_del_espera_evt = "DELETE FROM lista_de_espera WHERE ID_evento = ?";
+                    $stmt_del_espera = mysqli_prepare($conexao, $sql_del_espera_evt);
+                    if ($stmt_del_espera) {
+                        mysqli_stmt_bind_param($stmt_del_espera, "i", $id_evento);
+                        mysqli_stmt_execute($stmt_del_espera);
+                        mysqli_stmt_close($stmt_del_espera);
+                    }
+                    
+                    // Remove participantes do evento
+                    $sql_del_part_evt = "DELETE FROM lista_de_participantes WHERE ID_evento = ?";
+                    $stmt_del_part = mysqli_prepare($conexao, $sql_del_part_evt);
+                    if ($stmt_del_part) {
+                        mysqli_stmt_bind_param($stmt_del_part, "i", $id_evento);
+                        mysqli_stmt_execute($stmt_del_part);
+                        mysqli_stmt_close($stmt_del_part);
+                    }
+                    
+                    // Remove da tabela organiza para este evento
+                    $sql_del_org_evt = "DELETE FROM organiza WHERE ID_evento = ?";
+                    $stmt_del_org = mysqli_prepare($conexao, $sql_del_org_evt);
+                    if ($stmt_del_org) {
+                        mysqli_stmt_bind_param($stmt_del_org, "i", $id_evento);
+                        mysqli_stmt_execute($stmt_del_org);
+                        mysqli_stmt_close($stmt_del_org);
+                    }
+                }
+                mysqli_stmt_close($stmt_get_eventos);
+            }
+            
+            // Remove os eventos do organizador
+            $sql_eventos = "DELETE FROM evento WHERE CPF_organizador = ?";
+            $stmt_eventos = mysqli_prepare($conexao, $sql_eventos);
+            if ($stmt_eventos) {
+                mysqli_stmt_bind_param($stmt_eventos, "s", $cpf_usuario);
+                mysqli_stmt_execute($stmt_eventos);
+                mysqli_stmt_close($stmt_eventos);
+            }
+            
+            // 7. Por último, remove o usuário principal
             $sql_usuario = "DELETE FROM usuario WHERE CPF = ?";
             $stmt_usuario = mysqli_prepare($conexao, $sql_usuario);
             
@@ -178,7 +266,7 @@ switch ($acao) {
         } catch (Exception $e) {
             // Desfaz a transação em caso de erro
             mysqli_rollback($conexao);
-            echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno do servidor']);
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno do servidor: ' . $e->getMessage()]);
         }
         
         // Restaura o comportamento padrão de autocommit

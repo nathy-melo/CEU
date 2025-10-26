@@ -921,7 +921,7 @@ Options -Indexes
 2. **🔄 Atualizar Lista** - Recarrega lista
 3. **📥 Baixar** - Download para o PC (azul #0066cc)
 4. **↻ Restaurar** - Restaura um backup (amarelo #ffc107)
-5. **🗑️ Deletar** - Remove um backup (vermelho #dc3545)
+5. **🗑️ Deletar** - Remove um backup (vermelho var(--vermelho))
 
 #### **Estilos de Botões (Refatorados):**
 ```css

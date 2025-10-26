@@ -409,7 +409,7 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 .clear-search {
     margin: 5px 8px;
     padding: 10px 15px;
-    background-color: #dc3545;
+    background-color: var(--vermelho);
     color: var(--branco);
     border: none;
     border-radius: 6px;
@@ -420,7 +420,7 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 }
 
 .clear-search:hover {
-    background-color: #c82333;
+    background-color: var(--vermelho);
     transform: translateY(-1px);
 }
 

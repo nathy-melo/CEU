@@ -177,12 +177,12 @@ mysqli_close($conexao);
     }
 
     .botao-confirmar {
-        background-color: #0a7a09;
+        background-color: var(--verde);
         width: 8.5rem;
     }
 
     .botao-cancelar {
-        background-color: #dc3545;
+        background-color: var(--vermelho);
         width: 8.5rem;
     }
 
@@ -291,7 +291,7 @@ mysqli_close($conexao);
     }
 
     .botao-cancelar {
-        background-color: #dc3545;
+        background-color: var(--vermelho);
         width: 7.5rem;
         display: flex;
         align-items: center;
@@ -299,7 +299,7 @@ mysqli_close($conexao);
     }
 
     .botao-excluir {
-        background-color: #dc3545;
+        background-color: var(--vermelho-escuro);
         width: 10rem;
         font-size: 1.25rem;
         padding: 0.5rem 0;

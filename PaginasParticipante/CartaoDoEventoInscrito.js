@@ -48,7 +48,7 @@ function mostrarMensagemDesinscricao() {
     btnContinuar.className = 'botao';
     btnContinuar.type = 'button';
     btnContinuar.textContent = 'Continuar';
-    btnContinuar.style.backgroundColor = '#d9534f';
+    btnContinuar.style.backgroundColor = 'var(--vermelho)';
     btnContinuar.style.color = '#fff';
     btnContinuar.style.border = 'none';
     btnContinuar.style.borderRadius = '0.3rem';

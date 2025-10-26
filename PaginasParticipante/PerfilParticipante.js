@@ -258,9 +258,10 @@ function mostrarModalExcluirConta() {
     var botoesWrapper = document.createElement('div');
     botoesWrapper.style.display = 'flex';
     botoesWrapper.style.flexDirection = 'row';
-    botoesWrapper.style.justifyContent = 'center';
+    botoesWrapper.style.justifyContent = 'space-between';
     botoesWrapper.style.alignItems = 'center';
     botoesWrapper.style.gap = '2.5rem';
+    botoesWrapper.style.width = '100%';
     
     var btnCancelar = document.createElement('button');
     btnCancelar.type = 'button';
@@ -280,7 +281,7 @@ function mostrarModalExcluirConta() {
     var btnConfirmar = document.createElement('button');
     btnConfirmar.type = 'button';
     btnConfirmar.textContent = 'Confirmar';
-    btnConfirmar.style.backgroundColor = '#dc3545';
+    btnConfirmar.style.backgroundColor = 'var(--vermelho)';
     btnConfirmar.style.color = '#fff';
     btnConfirmar.style.border = 'none';
     btnConfirmar.style.borderRadius = '0.3rem';

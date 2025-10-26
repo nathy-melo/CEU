@@ -1,9 +1,11 @@
-let conteudoOriginalFaleConosco = null;
+// Usa window para evitar erro de redeclaração ao recarregar o script
+window.conteudoOriginalFaleConosco = window.conteudoOriginalFaleConosco || null;
+
 function mostrarMensagemFaleConosco() {
     var mainContent = document.getElementById('main-content');
     if (!mainContent) return;
-    if (conteudoOriginalFaleConosco === null) {
-        conteudoOriginalFaleConosco = mainContent.innerHTML;
+    if (window.conteudoOriginalFaleConosco === null) {
+        window.conteudoOriginalFaleConosco = mainContent.innerHTML;
     }
     mainContent.innerHTML = '';
     var container = document.createElement('div');
@@ -33,8 +35,8 @@ function mostrarMensagemFaleConosco() {
     btnVoltar.className = 'botao botao-voltar';
     btnVoltar.textContent = 'Voltar';
     btnVoltar.onclick = function() {
-        mainContent.innerHTML = conteudoOriginalFaleConosco;
-        conteudoOriginalFaleConosco = null;
+        mainContent.innerHTML = window.conteudoOriginalFaleConosco;
+        window.conteudoOriginalFaleConosco = null;
         // Limpa o estado de confirmação ao voltar
         sessionStorage.removeItem('faleConoscoEnviado');
         // Reatribui o evento de submit ao formulário restaurado

@@ -277,12 +277,12 @@ mysqli_close($conexao);
     }
 
     .botao-salvar {
-        background-color: #28a745;
+        background-color: var(--verde);
         width: 7.5rem;
     }
 
     .botao-cancelar {
-        background-color: #dc3545;
+        background-color: var(--vermelho);
         width: 7.5rem;
         display: flex;
         align-items: center;
@@ -290,7 +290,7 @@ mysqli_close($conexao);
     }
 
     .botao-tornar-organizador {
-        background-color: var(--tema-site);
+        background-color: var(--botao);
         width: auto;
         padding: 0.5rem 1.5rem;
         font-size: 0.95rem;
@@ -301,7 +301,7 @@ mysqli_close($conexao);
     }
 
     .botao-excluir {
-        background-color: #dc3545;
+        background-color: var(--vermelho-escuro);
         width: 10rem;
         font-size: 1.25rem;
         padding: 0.5rem 0;
@@ -434,8 +434,8 @@ mysqli_close($conexao);
 
     .modal-acoes {
         display: flex;
+        justify-content: space-between;
         gap: 0.75rem;
-        justify-content: center;
         margin-top: 1.5rem;
     }
 
@@ -448,11 +448,11 @@ mysqli_close($conexao);
     }
 
     .modal-acoes .botao-cancelar {
-        background-color: #dc3545;
+        background-color: var(--vermelho);
     }
 
     .modal-acoes .botao-salvar {
-        background-color: #28a745;
+        background-color: var(--verde);
     }
 
     /* Força centralização do texto nos botões do modal */
@@ -461,6 +461,20 @@ mysqli_close($conexao);
         align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
+    }
+
+    /* Botão solicitar código */
+    .modal-solicitar-codigo {
+        display: flex;
+        justify-content: center;
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-solicitar-codigo .botao {
+        width: auto;
+        padding: 0.5rem 1.5rem;
+        font-size: 0.95rem;
     }
 
     /* Centralização específica para o botão solicitar código */
@@ -585,12 +599,12 @@ mysqli_close($conexao);
             <div id="alert-modal"></div>
             <label for="input-codigo" class="sr-only">Código de organizador</label>
             <input type="text" id="input-codigo" name="codigo" class="modal-input" placeholder="Digite o código de organizador" maxlength="8" autocomplete="off">
+            <div class="modal-solicitar-codigo">
+                <button type="button" class="botao" id="btn-solicitar-codigo">Solicitar código de acesso</button>
+            </div>
             <div class="modal-acoes">
                 <button type="button" class="botao botao-cancelar" id="btn-cancelar-modal">Cancelar</button>
                 <button type="button" class="botao botao-salvar" id="btn-confirmar-codigo">Confirmar</button>
-            </div>
-            <div class="modal-solicitar-codigo">
-                <button type="button" class="botao" id="btn-solicitar-codigo" style="background-color: var(--tema-site); font-size: 0.9rem;">Solicitar código de acesso</button>
             </div>
         </div>
     </div>

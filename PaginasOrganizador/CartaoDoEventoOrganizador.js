@@ -37,7 +37,7 @@ function mostrarMensagemInscricaoFeita() {
     btnCancelar.type = 'button';
     btnCancelar.className = 'botao botao-cancelar';
     btnCancelar.textContent = 'Cancelar Solicitação';
-    btnCancelar.style.backgroundColor = '#d9534f';
+    btnCancelar.style.backgroundColor = 'var(--vermelho)';
     btnCancelar.style.color = '#fff';
     btnCancelar.style.border = 'none';
     btnCancelar.style.borderRadius = '0.225rem';

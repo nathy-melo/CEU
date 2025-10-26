@@ -203,11 +203,11 @@
   }
 
   .botao-desinscrever {
-    background-color: #c41e3a;
+    background-color: var(--vermelho);
   }
 
   .botao-desinscrever:hover {
-    background-color: #a01828;
+    background-color: var(--vermelho-escuro);
     opacity: 1;
   }
 

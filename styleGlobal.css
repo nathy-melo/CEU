@@ -10,6 +10,7 @@
   --azul-claro: #8ad7da;
   --vermelho: #ff0000;
   --verde: #2c9533;
+  --vermelho-escuro: #b20000;
   --sombra-padrao: rgba(0, 0, 0, 0.6);
   --sombra-forte: rgba(0, 0, 0, 0.8);
   --sombra-leve: rgba(0, 0, 0, 0.5);
@@ -445,7 +446,7 @@ body.pagina-inicio {
 }
 
 .EventoInfo .evento-info-texto {
-  font-size: 3.5cqi;
+  font-size: 3cqi;
   color: var(--cinza-escuro);
   font-weight: 600;
   display: inline-flex;

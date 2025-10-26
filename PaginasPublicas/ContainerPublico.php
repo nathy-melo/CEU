@@ -43,6 +43,12 @@
     ];
     $pagina = $_GET['pagina'] ?? 'inicio';
     $arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
+    
+    // Se for uma requisição AJAX, retorna apenas o conteúdo
+    if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+        include $arquivo;
+        exit();
+    }
 ?>
 
     <!-- Menu fixo -->
@@ -273,21 +279,21 @@
             if (typeof window.removerFiltroExistente === 'function') {
                 try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
             }
-            fetch('ContainerPublico.php?pagina=' + encodeURIComponent(pagina))
+            
+            // Usa ajax=1 para buscar apenas o conteúdo, sem menu
+            fetch('ContainerPublico.php?pagina=' + encodeURIComponent(pagina) + '&ajax=1')
                 .then(response => response.text())
                 .then(html => {
-                    const temp = document.createElement('div');
-                    temp.innerHTML = html;
-                    const novoConteudo = temp.querySelector('#conteudo-dinamico');
-                    if (novoConteudo) {
-                        document.getElementById('conteudo-dinamico').innerHTML = novoConteudo.innerHTML;
-                        sincronizarMenuComConteudo();
-                        atualizarClasseBody(pagina);
-                        if (typeof window.setMenuAtivoPorPagina === 'function') {
-                            window.setMenuAtivoPorPagina(pagina);
-                        }
-                        executarRota(pagina);
+                    // Como o servidor retorna apenas o conteúdo da página, não precisa extrair
+                    document.getElementById('conteudo-dinamico').innerHTML = html;
+                    sincronizarMenuComConteudo();
+                    atualizarClasseBody(pagina);
+                    
+                    if (typeof window.setMenuAtivoPorPagina === 'function') {
+                        window.setMenuAtivoPorPagina(pagina);
                     }
+                    executarRota(pagina);
+                    
                     window.history.pushState({}, '', '?pagina=' + pagina);
                 });
         }
@@ -315,6 +321,7 @@
         });
     </script>
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
+    <script src="MenuBloqueado.js"></script>
     <script src="ToggleSenha.js"></script>
 </body>
 
