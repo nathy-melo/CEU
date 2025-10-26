@@ -99,13 +99,34 @@ function carregarEventosDoServidor() {
                 div.dataset.data = dataISO;
                 div.dataset.certificado = cert;
 
-                // Mantém a mesma estrutura visual dos cards da página de Início
+                // Mantém a mesma estrutura visual dos cards da página de Início, com lista e ícones
                 div.innerHTML = `
                     <div class="EventoImagem">
                         <img src="${caminhoImagem}" alt="${evento.nome}">
                     </div>
                     <div class="EventoTitulo">${evento.nome}</div>
-                    <div class="EventoInfo">${status}<br>Data: ${dataFormatada}<br>Certificado: ${certTexto}</div>
+                    <div class="EventoInfo">
+                        <ul class="evento-info-list" aria-label="Informações do evento">
+                            <li class="evento-info-item">
+                                <span class="evento-info-icone" aria-hidden="true">
+                                    <img src="../Imagens/info-status.svg" alt="" />
+                                </span>
+                                <span class="evento-info-texto"><span class="evento-info-label">Status:</span> ${status}</span>
+                            </li>
+                            <li class="evento-info-item">
+                                <span class="evento-info-icone" aria-hidden="true">
+                                    <img src="../Imagens/info-data.svg" alt="" />
+                                </span>
+                                <span class="evento-info-texto"><span class="evento-info-label">Data:</span> ${dataFormatada}</span>
+                            </li>
+                            <li class="evento-info-item">
+                                <span class="evento-info-icone" aria-hidden="true">
+                                    <img src="../Imagens/info-certificado.svg" alt="" />
+                                </span>
+                                <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> ${certTexto}</span>
+                            </li>
+                        </ul>
+                    </div>
                 `;
 
                 container.appendChild(div);

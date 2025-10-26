@@ -365,7 +365,7 @@ body.pagina-inicio {
 .CaixaDoEvento:hover .EventoTitulo {
   -webkit-line-clamp: 1;
   line-clamp: 1;
-  transform: translateY(-50cqi);
+  transform: translateY(-380%);
 }
 
 .EventoInfo {
@@ -395,9 +395,69 @@ body.pagina-inicio {
 
 .CaixaDoEvento:hover .EventoInfo {
   opacity: 1;
-  transform: translateY(-10cqi);
+  transform: translateY(0%);
   pointer-events: auto;
 }
+
+/* ====== EventoInfo: lista visual com ícones ====== */
+.EventoInfo .evento-info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8cqi;
+}
+
+.EventoInfo .evento-info-item {
+  display: flex;
+  align-items: center;
+  gap: 2cqi;
+  background: var(--tabela_participantes);
+  border-radius: 1.6cqi;
+  padding: 1.4cqi 1.8cqi;
+  box-shadow: 0 0.4cqi 1.2cqi var(--sombra-leve);
+}
+
+.EventoInfo .evento-info-icone {
+  width: 5cqi;
+  height: 5cqi;
+  min-width: 5cqi;
+  min-height: 5cqi;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--branco);
+  color: var(--botao);
+  box-shadow: 0 0.3cqi 0.8cqi var(--sombra-leve) inset;
+}
+
+.EventoInfo .evento-info-icone svg {
+  width: 100%;
+  height: 100%;
+}
+
+.EventoInfo .evento-info-icone img {
+  width: 70%;
+  height: 70%;
+  display: block;
+}
+
+.EventoInfo .evento-info-texto {
+  font-size: 3.5cqi;
+  color: var(--cinza-escuro);
+  font-weight: 600;
+  display: inline-flex;
+  gap: 1cqi;
+  align-items: baseline;
+}
+
+.EventoInfo .evento-info-label {
+  color: var(--azul-escuro);
+  font-weight: 800;
+}
+
 
 .CaixaDoEventoAdicionar {
   display: flex;

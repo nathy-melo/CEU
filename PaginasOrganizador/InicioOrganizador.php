@@ -97,11 +97,38 @@
                         </div>
                         <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                         <div class="EventoInfo">
-                            Categoria: <?= htmlspecialchars($ev['categoria']) ?><br>
-                            Modalidade: <?= htmlspecialchars($ev['modalidade'] ?? '') ?><br>
-                            Data: <?= $dataFormatada ?><br>
-                            Local: <?= htmlspecialchars($ev['lugar']) ?><br>
-                            Certificado: <?= $certTexto ?>
+                            <ul class="evento-info-list" aria-label="Informações do evento">
+                                <li class="evento-info-item">
+                                    <span class="evento-info-icone" aria-hidden="true">
+                                        <img src="../Imagens/info-categoria.svg" alt="" />
+                                    </span>
+                                    <span class="evento-info-texto"><span class="evento-info-label">Categoria:</span> <?= htmlspecialchars($ev['categoria']) ?></span>
+                                </li>
+                                <li class="evento-info-item">
+                                    <span class="evento-info-icone" aria-hidden="true">
+                                        <img src="../Imagens/info-modalidade.svg" alt="" />
+                                    </span>
+                                    <span class="evento-info-texto"><span class="evento-info-label">Modalidade:</span> <?= htmlspecialchars($ev['modalidade'] ?? '') ?></span>
+                                </li>
+                                <li class="evento-info-item">
+                                    <span class="evento-info-icone" aria-hidden="true">
+                                        <img src="../Imagens/info-data.svg" alt="" />
+                                    </span>
+                                    <span class="evento-info-texto"><span class="evento-info-label">Data:</span> <?= $dataFormatada ?></span>
+                                </li>
+                                <li class="evento-info-item">
+                                    <span class="evento-info-icone" aria-hidden="true">
+                                        <img src="../Imagens/info-local.svg" alt="" />
+                                    </span>
+                                    <span class="evento-info-texto"><span class="evento-info-label">Local:</span> <?= htmlspecialchars($ev['lugar']) ?></span>
+                                </li>
+                                <li class="evento-info-item">
+                                    <span class="evento-info-icone" aria-hidden="true">
+                                        <img src="../Imagens/info-certificado.svg" alt="" />
+                                    </span>
+                                    <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> <?= $certTexto ?></span>
+                                </li>
+                            </ul>
                         </div>
                     </a>
                 <?php endwhile; ?>

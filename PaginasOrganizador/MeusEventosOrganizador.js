@@ -48,7 +48,28 @@ function carregarEventosDoServidor() {
                     
                     const informacoesEvento = document.createElement('div');
                     informacoesEvento.className = 'EventoInfo';
-                    informacoesEvento.innerHTML = `${dadosEvento.status}<br>Data: ${dadosEvento.data_formatada}<br>Certificado: ${dadosEvento.certificado}`;
+                    informacoesEvento.innerHTML = `
+                        <ul class="evento-info-list" aria-label="Informações do evento">
+                            <li class="evento-info-item">
+                                <span class="evento-info-icone" aria-hidden="true">
+                                    <img src="../Imagens/info-status.svg" alt="" />
+                                </span>
+                                <span class="evento-info-texto"><span class="evento-info-label">Status:</span> ${dadosEvento.status}</span>
+                            </li>
+                            <li class="evento-info-item">
+                                <span class="evento-info-icone" aria-hidden="true">
+                                    <img src="../Imagens/info-data.svg" alt="" />
+                                </span>
+                                <span class="evento-info-texto"><span class="evento-info-label">Data:</span> ${dadosEvento.data_formatada}</span>
+                            </li>
+                            <li class="evento-info-item">
+                                <span class="evento-info-icone" aria-hidden="true">
+                                    <img src="../Imagens/info-certificado.svg" alt="" />
+                                </span>
+                                <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> ${dadosEvento.certificado}</span>
+                            </li>
+                        </ul>
+                    `;
                     
                     caixaEventoHTML.appendChild(tituloEvento);
                     caixaEventoHTML.appendChild(informacoesEvento);
