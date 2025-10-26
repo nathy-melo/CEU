@@ -8,11 +8,23 @@
   <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
+  .ocultar-visualmente {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
   /* CSS da seção:solicitar-codigo */
   #solicitar-codigo {
     width: 100%;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
 
   .container-formulario {
@@ -25,6 +37,7 @@
     flex-direction: column;
     gap: 1.53125em;
     box-shadow: 0 0 10px 0 rgb(0, 0, 0);
+    margin: 0 auto;
   }
 
   .cabecalho-formulario {
@@ -41,6 +54,7 @@
   }
 
   .subtitulo-formulario {
+    color: var(--branco);
     font-size: 1.05rem;
     line-height: 1.32;
     letter-spacing: -0.021em;
@@ -63,6 +77,7 @@
     font-size: 0.7rem;
     color: var(--caixas);
     width: 100%;
+    box-sizing: border-box;
     box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.5);
   }
 
@@ -80,11 +95,16 @@
     height: 5.8625em;
     padding-top: 0.65625em;
     resize: vertical;
+    border-radius: 1em;
   }
 
   .linha-formulario {
     display: flex;
     gap: 0.9625em;
+  }
+
+  .linha-formulario .entrada-formulario {
+    flex: 1;
   }
 
   .grupo-termos {
@@ -105,10 +125,10 @@
     align-items: center;
     gap: 0.5em;
     cursor: pointer;
+    user-select: none;
   }
 
   .link-termos {
-    text-decoration: underline;
     color: var(--botao);
     font-weight: 700;
     cursor: pointer;
@@ -136,56 +156,16 @@
     font-size: 1.05rem;
     font-weight: 700;
     cursor: pointer;
-    flex-grow: 0;
-    flex-basis: 7em;
+    flex: 1;
+    max-width: 5em;
     text-align: center;
-    min-height: 2em;
+    min-height: 2.5em;
+    padding: 0.5em 1em;
+    transition: opacity 0.2s ease;
   }
 
-  .botao-voltar {
-    background-color: var(--botao);
-    border-radius: 0.2625em;
-    border: none;
-    color: var(--branco);
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-    flex-grow: 0;
-    flex-basis: 7em;
-    text-align: center;
-    flex-basis: 2em;
-    min-height: 2em;
-    padding: 0.5em;
-  }
-
-  .botao-toggle-termos {
-    background: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 1.056em;
-    height: 1.056em;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .botao-toggle-termos.selected {
-    box-shadow: 0 0 0 2.5px var(--botao);
-  }
-
-  .botao-toggle-termos.selected::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0.22em;
-    left: 0.22em;
-    width: 0.6em;
-    height: 0.6em;
-    background: var(--botao);
-    border-radius: 50%;
-  }
-
-  .botao-toggle-termos {
-    position: relative;
+  .botao:hover {
+    opacity: 0.9;
   }
 
   /* Toggle switch custom */
@@ -194,8 +174,7 @@
     display: inline-block;
     width: 2em;
     height: 1.2em;
-    margin-left: 0.5em;
-    vertical-align: middle;
+    flex-shrink: 0;
   }
 
   .switch-toggle input {
@@ -230,18 +209,17 @@
     width: 0.9em;
     left: 0.15em;
     bottom: 0.15em;
-    background-color: var(--botao);
+    background-color: white;
     transition: .2s;
     border-radius: 50%;
   }
 
-  .switch-toggle input:checked+.slider-toggle {
+  .switch-toggle input:checked + .slider-toggle {
     background-color: var(--botao);
   }
 
-  .switch-toggle input:checked+.slider-toggle:before {
+  .switch-toggle input:checked + .slider-toggle:before {
     transform: translateX(0.8em);
-    background: var(--branco);
   }
 </style>
 
@@ -254,21 +232,29 @@
           <p class="subtitulo-formulario">Receba por e-mail</p>
         </header>
         <form class="corpo-formulario" id="form-solicitar-codigo" name="solicitar_codigo" method="post">
-          <label for="nome-completo" class="visually-hidden">Nome completo</label>
+          <label for="nome-completo" class="ocultar-visualmente">Nome completo</label>
           <input type="text" class="entrada-formulario" id="nome-completo" name="solicitar_codigo[nome_completo]" placeholder="Nome" required autocomplete="name">
-          <label for="email" class="visually-hidden">E-mail</label>
+          
+          <label for="email" class="ocultar-visualmente">E-mail</label>
           <input type="email" class="entrada-formulario" id="email" name="solicitar_codigo[email]" placeholder="E-mail" required
             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Digite um e-mail válido" autocomplete="email">
+          
           <div class="linha-formulario">
-            <label for="cpf" class="visually-hidden">CPF</label>
-            <input type="text" class="entrada-formulario" id="cpf" name="solicitar_codigo[cpf]" placeholder="CPF" required
-              pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00" maxlength="14" autocomplete="off">
-            <label for="data-nascimento" class="visually-hidden">Data de nascimento</label>
-            <input type="text" class="entrada-formulario" id="data-nascimento" name="solicitar_codigo[data_nascimento]" placeholder="Data de Nascimento" required
-              pattern="\d{2}/\d{2}/\d{4}" title="Digite a data no formato dd/mm/aaaa" autocomplete="bday">
+            <div style="flex: 1;">
+              <label for="cpf" class="ocultar-visualmente">CPF</label>
+              <input type="text" class="entrada-formulario" id="cpf" name="solicitar_codigo[cpf]" placeholder="CPF" required
+                pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido no formato 000.000.000-00" maxlength="14" autocomplete="off">
+            </div>
+            <div style="flex: 1;">
+              <label for="data-nascimento" class="ocultar-visualmente">Data de nascimento</label>
+              <input type="text" class="entrada-formulario" id="data-nascimento" name="solicitar_codigo[data_nascimento]" placeholder="Data de Nascimento" required
+                pattern="\d{2}/\d{2}/\d{4}" title="Digite a data no formato dd/mm/aaaa" autocomplete="bday">
+            </div>
           </div>
-          <label for="mensagem" class="visually-hidden">Mensagem</label>
+          
+          <label for="mensagem" class="ocultar-visualmente">Mensagem</label>
           <textarea class="area-texto-formulario" id="mensagem" name="solicitar_codigo[mensagem]" placeholder="Mensagem" required autocomplete="off"></textarea>
+          
           <div class="grupo-termos">
             <label for="aceite-termos" class="rotulo-termos">
               Concordo com os <a onclick="carregarPagina('termos')" class="link-termos">Termos de Condições</a>
@@ -278,6 +264,7 @@
               </span>
             </label>
           </div>
+          
           <div class="acoes-formulario">
             <button type="button" class="botao" onclick="carregarPagina('cadastroO')">Voltar</button>
             <button type="submit" class="botao" id="btnEnviar">Enviar</button>
