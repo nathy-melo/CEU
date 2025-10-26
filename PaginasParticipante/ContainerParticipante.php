@@ -308,7 +308,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: '../PaginasGlobais/PainelNotificacoes.php',
                 js: ['../PaginasGlobais/PainelNotificacoes.js'],
                 init: () => {
-                    console.log('✅ Painel de Notificações carregado (auto-inicializa via DOMContentLoaded)');
+                    console.log('✅ Painel de Notificações carregado');
+                    // Força a inicialização do script mesmo após DOMContentLoaded
+                    if (typeof window.inicializarPainelNotificacoes === 'function') {
+                        window.inicializarPainelNotificacoes();
+                    }
                 }
             }
         };

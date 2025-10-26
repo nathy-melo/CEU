@@ -70,7 +70,10 @@ function inicializarPainel() {
     console.log('✅ Sistema de polling iniciado (15s)');
 }
 
-// Aguarda DOM estar pronto
+// Expõe função globalmente para ser chamada pelos Containers
+window.inicializarPainelNotificacoes = inicializarPainel;
+
+// Aguarda DOM estar pronto (apenas se carregado diretamente)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializarPainel);
 } else {
