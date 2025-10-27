@@ -73,13 +73,13 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         max-width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 0.75rem;
     }
 
     .cartao-dados {
         background-color: var(--caixas);
         border-radius: 0.5rem;
-        padding: 1.25rem 1.25rem 1.5rem 1.25rem;
+        padding: 1rem;
         box-shadow: 0 0.25rem 1rem var(--sombra-padrao);
     }
 
@@ -87,13 +87,13 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
     }
 
     .avatar {
-        width: 112px;
-        height: 112px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         object-fit: cover;
         box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.3);
@@ -106,15 +106,15 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 
     .avatar-botoes {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.4rem;
         align-items: center;
         justify-content: center;
     }
 
     .btn-alterar-foto,
     .btn-remover-foto {
-        padding: .25rem .5rem;
-        font-size: .8rem;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
         border: none;
         border-radius: .3rem;
         color: #fff;
@@ -122,9 +122,9 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         white-space: nowrap;
         box-sizing: border-box;
         text-align: center;
-        width: 6.5rem;
-        min-width: 6.5rem;
-        max-width: 6.5rem;
+        width: 6rem;
+        min-width: 6rem;
+        max-width: 6rem;
     }
 
     .btn-alterar-foto {
@@ -143,17 +143,17 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     .titulo-cartao {
         color: var(--branco);
         font-weight: 700;
-        font-size: 2.25rem;
+        font-size: 1.5rem;
         line-height: 1.1;
         text-align: center;
         letter-spacing: 0;
         text-shadow: 0 0.125rem 0.5rem var(--sombra-padrao);
         margin-top: 0;
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.75rem;
     }
 
     .grupo-formulario {
-        margin-bottom: 1rem;
+        margin-bottom: 0.6rem;
     }
 
     .grupo-formulario:last-of-type {
@@ -164,25 +164,24 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         display: block;
         color: var(--branco);
         font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
         letter-spacing: 0;
     }
 
     .controle-formulario {
         background-color: var(--branco);
         border-radius: 0.1875rem;
-        padding: 0.25rem 0.5rem;
-        font-size: 1rem;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.9rem;
         color: var(--cinza-escuro);
         width: 100%;
-        line-height: 1.5;
+        line-height: 1.4;
         border: none;
         box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.15);
         margin-top: 0;
         margin-bottom: 0;
-
-        min-height: 2rem;
+        min-height: 1.8rem;
         display: flex;
         align-items: center;
     }
@@ -193,7 +192,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         border: none;
         outline: none;
         width: 100%;
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: var(--cinza-escuro);
     }
     
@@ -207,10 +206,10 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     }
 
     .acoes-formulario {
-        margin-top: 1.25rem;
+        margin-top: 0.75rem;
         display: flex;
         justify-content: space-between;
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
 
     .botao {
@@ -219,122 +218,13 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         color: var(--branco);
         font-family: 'Inter', sans-serif;
         font-weight: 700;
-        font-size: 1.125rem;
+        font-size: 0.95rem;
         cursor: pointer;
-        padding: 0.5rem 2rem;
+        padding: 0.4rem 1.5rem;
         text-align: center;
         transition: opacity 0.2s ease;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
         background-color: var(--botao);
-    }
-
-    .botao:hover {
-        opacity: 0.9;
-    }
-
-    .botao-editar {
-        background-color: var(--botao);
-        width: 7.5rem;
-    }
-
-    .botao-confirmar {
-        background-color: var(--verde);
-        width: 8.5rem;
-    }
-
-    .botao-cancelar {
-        background-color: var(--vermelho);
-        width: 8.5rem;
-    }
-
-    .escondido {
-        display: none !important;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
-    .label-formulario {
-        display: block;
-        color: var(--branco);
-        font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-        letter-spacing: 0;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .controle-formulario.campo-nao-editavel {
-        cursor: help;
-        position: relative;
-    }
-    
-    .controle-formulario.campo-nao-editavel:hover {
-        background-color: #f8f9fa;
-    }
-    
-    /* Tooltip customizado */
-    .tooltip-custom {
-        position: fixed;
-        background-color: rgba(0, 0, 0, 0.9);
-        color: white;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.25rem;
-        font-size: 0.875rem;
-        max-width: 200px;
-        z-index: 1000;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        white-space: normal;
-        word-wrap: break-word;
-    }
-
-    .tooltip-custom.show {
-        opacity: 1;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
-    .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        border: 0;
-    }
-
-    .label-formulario {
-        display: block;
-        color: var(--branco);
-        font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-        letter-spacing: 0;
-    }
-
-    .botao {
-        border: none;
-        border-radius: 0.25rem;
-        font-weight: 700;
-        font-size: 1.125rem;
-        cursor: pointer;
-        padding: 0.5rem 2rem;
-        text-align: center;
-        transition: opacity 0.2s ease;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
-        background-color: var(--botao);
-        color: var(--branco);
-        font-family: 'Inter', sans-serif;
-        text-decoration: none;
-        white-space: nowrap;
     }
 
     .botao:hover {
@@ -361,37 +251,88 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 
     .botao-excluir {
         background-color: var(--vermelho-escuro);
+        font-size: 0.95rem;
+        padding: 0.4rem 0.5rem;
         width: 10rem;
-        font-size: 1.25rem;
-        padding: 0.5rem 0;
     }
 
     .botao-sair {
         background-color: var(--botao);
-        width: 8.75rem;
-        font-size: 1.25rem;
-        padding: 0.5rem 0;
+        font-size: 0.95rem;
+        padding: 0.4rem 0.5rem;
+        width: 10rem;
+    }
+
+    .escondido {
+        display: none !important;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .label-formulario {
+        display: block;
+        color: var(--branco);
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+        letter-spacing: 0;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Tooltip customizado */
+    .tooltip-custom {
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        max-width: 200px;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .tooltip-custom.show {
+        opacity: 1;
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
     }
 
     .barra-acoes {
         display: flex;
         justify-content: space-between;
-        gap: 1.25rem;
-        margin-top: 0.5rem;
+        gap: 0.75rem;
         background: var(--caixas);
         border-radius: 0.5rem;
         box-shadow: 0 0.25rem 1rem var(--sombra-padrao);
-        padding: 0.75rem 0.75rem 0.75rem 0.75rem;
+        padding: 0.6rem;
         width: 30rem;
         max-width: 100%;
         box-sizing: border-box;
     }
 
     .alert {
-        padding: 0.75rem 1rem;
-        margin-bottom: 1rem;
+        padding: 0.6rem 0.8rem;
+        margin-bottom: 0.75rem;
         border-radius: 0.25rem;
         font-weight: 600;
+        font-size: 0.85rem;
     }
 
     .alert-success {
@@ -409,13 +350,13 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     /* Ajuste final com maior especificidade para garantir prioridade sobre .botao */
     .botao.btn-alterar-foto,
     .botao.btn-remover-foto {
-        padding: .25rem .5rem;
-        font-size: .8rem;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
         box-sizing: border-box;
         text-align: center;
-        width: 6.5rem;
-        min-width: 6.5rem;
-        max-width: 6.5rem;
+        width: 6rem;
+        min-width: 6rem;
+        max-width: 6rem;
     }
 
     .botao.btn-alterar-foto {
