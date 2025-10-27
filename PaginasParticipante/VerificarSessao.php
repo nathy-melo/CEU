@@ -6,6 +6,10 @@ session_set_cookie_params(360);
 session_start();
 
 header('Content-Type: application/json');
+// Garante que o navegador e proxies não cacheiem esta resposta
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Verifica se foi solicitado forçar expiração
 if (isset($_GET['forcar_expiracao']) && $_GET['forcar_expiracao'] == '1') {

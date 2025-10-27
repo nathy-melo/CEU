@@ -22,8 +22,8 @@ require_once('../BancoDados/conexao.php');
 
 $cpfUsuario = $_SESSION['cpf'];
 
-// Busca todos os dados do usuário no banco
-$consultaSQL = "SELECT Nome, Email, CPF, RA, Codigo, Organizador FROM usuario WHERE CPF = ?";
+// Busca todos os dados do usuário no banco (inclui FotoPerfil)
+$consultaSQL = "SELECT Nome, Email, CPF, RA, Codigo, Organizador, FotoPerfil FROM usuario WHERE CPF = ?";
 $declaracaoPreparada = mysqli_prepare($conexao, $consultaSQL);
 if ($declaracaoPreparada) {
     mysqli_stmt_bind_param($declaracaoPreparada, "s", $cpfUsuario);
@@ -53,6 +53,10 @@ if (strlen($cpf_formatado) == 11) {
 }
 
 mysqli_close($conexao);
+
+// Calcula o caminho base do site (ex: /CEU)
+$siteRoot = rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/\\');
+$defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -77,6 +81,63 @@ mysqli_close($conexao);
         border-radius: 0.5rem;
         padding: 1.25rem 1.25rem 1.5rem 1.25rem;
         box-shadow: 0 0.25rem 1rem var(--sombra-padrao);
+    }
+
+    .avatar-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .avatar {
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.3);
+        background: #fff;
+    }
+
+    .input-foto {
+        display: none;
+    }
+
+    .avatar-botoes {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-alterar-foto,
+    .btn-remover-foto {
+        padding: .25rem .5rem;
+        font-size: .8rem;
+        border: none;
+        border-radius: .3rem;
+        color: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+        box-sizing: border-box;
+        text-align: center;
+        width: 6.5rem;
+        min-width: 6.5rem;
+        max-width: 6.5rem;
+    }
+
+    .btn-alterar-foto {
+        background: var(--botao);
+    }
+
+    .btn-remover-foto {
+        background: var(--vermelho);
+    }
+
+    .btn-alterar-foto.hidden,
+    .btn-remover-foto.hidden {
+        display: none !important;
     }
 
     .titulo-cartao {
@@ -344,6 +405,26 @@ mysqli_close($conexao);
         color: #721c24;
         border: 1px solid #f5c6cb;
     }
+
+    /* Ajuste final com maior especificidade para garantir prioridade sobre .botao */
+    .botao.btn-alterar-foto,
+    .botao.btn-remover-foto {
+        padding: .25rem .5rem;
+        font-size: .8rem;
+        box-sizing: border-box;
+        text-align: center;
+        width: 6.5rem;
+        min-width: 6.5rem;
+        max-width: 6.5rem;
+    }
+
+    .botao.btn-alterar-foto {
+        background: var(--botao);
+    }
+
+    .botao.btn-remover-foto {
+        background: var(--vermelho);
+    }
 </style>
 
 <body>
@@ -353,7 +434,24 @@ mysqli_close($conexao);
             
             <div class="cartao-dados">
                 <h1 class="titulo-cartao">Seus Dados</h1>
-                <form id="form-perfil-organizador" name="perfil_organizador" method="post">
+                <form id="form-perfil-organizador" name="perfil_organizador" method="post" enctype="multipart/form-data">
+                    <div class="avatar-wrapper">
+                        <?php
+                        $fotoPerfil = $dadosUsuario['FotoPerfil'] ?? null;
+                        if ($fotoPerfil && strpos($fotoPerfil, '/') === false) { $fotoPerfil = 'ImagensPerfis/' . $fotoPerfil; }
+                        $caminhoFoto = $fotoPerfil ? ($siteRoot . '/' . htmlspecialchars($fotoPerfil)) : $defaultImg;
+                        ?>
+                        <img id="avatar-visualizacao" class="avatar" src="<?php echo $caminhoFoto; ?>" alt="Foto de perfil"
+                             data-default-src="<?php echo $defaultImg; ?>"
+                             data-site-root="<?php echo $siteRoot; ?>"
+                             data-tem-foto="<?php echo $fotoPerfil ? '1' : '0'; ?>">
+                        <div class="avatar-botoes">
+                            <button type="button" id="btn-remover-foto" class="botao btn-remover-foto hidden">Remover foto</button>
+                            <button type="button" id="btn-alterar-foto" class="botao btn-alterar-foto hidden">Alterar foto</button>
+                        </div>
+                        <input id="foto-perfil-input" class="input-foto" type="file" name="foto_perfil" accept="image/png,image/jpeg,image/webp,image/gif">
+                        <input type="hidden" id="remover-foto-flag" name="remover_foto" value="false">
+                    </div>
                     <div class="grupo-formulario">
                         <span class="label-formulario">Nome Completo:</span>
                         <div class="controle-formulario campo-nao-editavel" data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">

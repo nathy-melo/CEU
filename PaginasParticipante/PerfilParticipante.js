@@ -16,12 +16,16 @@ function aplicarMascaraCodigo(input) {
 
 // Estado dos campos
 var estadoOriginal = {};
+var previewTempUrl = null;
+var removerFotoAtivado = false;
 
 // Função para salvar estado original dos campos
 function salvarEstadoOriginal() {
     estadoOriginal = {
         email: document.getElementById('email-input').value,
-        ra: document.getElementById('ra-input') ? document.getElementById('ra-input').value : null
+        ra: document.getElementById('ra-input') ? document.getElementById('ra-input').value : null,
+        avatarSrc: (document.getElementById('avatar-visualizacao') || {}).src || null,
+        tinhaFotoCustom: (((document.getElementById('avatar-visualizacao') || {}).dataset) || {}).temFoto === '1'
     };
 }
 
@@ -33,6 +37,29 @@ function restaurarEstadoOriginal() {
     if (raInput && estadoOriginal.ra !== null) {
         raInput.value = estadoOriginal.ra;
     }
+
+    const img = document.getElementById('avatar-visualizacao');
+    if (estadoOriginal.avatarSrc && img) {
+        img.src = estadoOriginal.avatarSrc;
+    }
+
+    // Limpa arquivo selecionado
+    const fileInput = document.getElementById('foto-perfil-input');
+    if (fileInput) fileInput.value = '';
+
+    // Reset flags de remoção
+    const flag = document.getElementById('remover-foto-flag');
+    if (flag) flag.value = 'false';
+    removerFotoAtivado = false;
+
+    // Atualiza dataset tem-foto conforme estado original
+    if (img) {
+        img.dataset.temFoto = estadoOriginal.tinhaFotoCustom ? '1' : '0';
+    }
+
+    // Esconde botão remover fora do modo edição
+    const btnRemover = document.getElementById('btn-remover-foto');
+    if (btnRemover) btnRemover.classList.add('hidden');
 }
 
 // Função para mostrar campos editáveis
@@ -58,6 +85,17 @@ function mostrarCamposEditaveis() {
     const btnTornarOrganizador = document.getElementById('btn-tornar-organizador');
     if (btnTornarOrganizador) {
         btnTornarOrganizador.classList.remove('hidden');
+    }
+
+    // Mostrar botão de alterar foto
+    const btnAlterarFoto = document.getElementById('btn-alterar-foto');
+    if (btnAlterarFoto) btnAlterarFoto.classList.remove('hidden');
+    
+    // Mostrar "Remover foto" apenas se houver foto customizada
+    const img = document.getElementById('avatar-visualizacao');
+    const btnRemover = document.getElementById('btn-remover-foto');
+    if (btnRemover && img && img.dataset.temFoto === '1') {
+        btnRemover.classList.remove('hidden');
     }
     
     // Adicionar classe ao formulário
@@ -88,6 +126,13 @@ function esconderCamposEditaveis() {
     if (btnTornarOrganizador) {
         btnTornarOrganizador.classList.add('hidden');
     }
+
+    // Esconde alterar foto
+    const btnAlterarFoto = document.getElementById('btn-alterar-foto');
+    if (btnAlterarFoto) btnAlterarFoto.classList.add('hidden');
+    
+    const btnRemover = document.getElementById('btn-remover-foto');
+    if (btnRemover) btnRemover.classList.add('hidden');
     
     // Remover classe do formulário
     document.getElementById('form-perfil-participante').classList.remove('modo-edicao');
@@ -114,6 +159,15 @@ function validarFormulario() {
     if (raInput && raInput.value.trim() && raInput.value.length < 7) {
         mostrarAlerta('O RA deve ter 7 dígitos.', 'danger');
         return false;
+    }
+
+    // Validar imagem (cliente) opcional
+    const fileInput = document.getElementById('foto-perfil-input');
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        const f = fileInput.files[0];
+        const okType = ['image/jpeg','image/png','image/webp','image/gif'].includes(f.type);
+        if (!okType) { mostrarAlerta('Imagem inválida. Use JPG, PNG, WEBP ou GIF.', 'danger'); return false; }
+        if (f.size > 2*1024*1024) { mostrarAlerta('A imagem deve ter no máximo 2MB.', 'danger'); return false; }
     }
     
     return true;
@@ -157,6 +211,70 @@ function mostrarAlerta(mensagem, tipo = 'success') {
     }, 5000);
 }
 
+// Pré-visualização da imagem
+function configurarUploadFoto() {
+    const btnAlterar = document.getElementById('btn-alterar-foto');
+    const input = document.getElementById('foto-perfil-input');
+    const img = document.getElementById('avatar-visualizacao');
+    const btnRemover = document.getElementById('btn-remover-foto');
+    const flag = document.getElementById('remover-foto-flag');
+    if (!img) return;
+
+    if (btnAlterar && input) {
+        // Remove listeners antigos para evitar duplicação
+        const novoBtn = btnAlterar.cloneNode(true);
+        btnAlterar.parentNode.replaceChild(novoBtn, btnAlterar);
+        
+        const novoInput = input.cloneNode(true);
+        input.parentNode.replaceChild(novoInput, input);
+        
+        // Anexa novos listeners
+        novoBtn.addEventListener('click', () => novoInput.click());
+        novoInput.addEventListener('change', () => {
+            // Ao escolher nova imagem, cancelar remoção se estava ativa
+            if (removerFotoAtivado && flag) {
+                removerFotoAtivado = false;
+                flag.value = 'false';
+            }
+            if (previewTempUrl) URL.revokeObjectURL(previewTempUrl);
+            if (novoInput.files && novoInput.files[0]) {
+                const f = novoInput.files[0];
+                previewTempUrl = URL.createObjectURL(f);
+                img.src = previewTempUrl;
+                // Ao selecionar nova foto, mostra o botão remover para permitir cancelar
+                const btnRemoverAtual = document.getElementById('btn-remover-foto');
+                if (btnRemoverAtual && img.dataset.temFoto === '1') {
+                    btnRemoverAtual.classList.remove('hidden');
+                }
+            }
+        });
+    }
+
+    if (btnRemover && flag) {
+        // Remove listeners antigos para evitar duplicação
+        const novoBtnRemover = btnRemover.cloneNode(true);
+        btnRemover.parentNode.replaceChild(novoBtnRemover, btnRemover);
+        
+        // Anexa novo listener
+        novoBtnRemover.addEventListener('click', () => {
+            const defaultSrc = img.getAttribute('data-default-src');
+            // Toggle remoção
+            removerFotoAtivado = !removerFotoAtivado;
+            flag.value = removerFotoAtivado ? 'true' : 'false';
+            if (removerFotoAtivado) {
+                // Preview da imagem padrão e limpar seleção de arquivo
+                const fileInput = document.getElementById('foto-perfil-input');
+                if (fileInput) fileInput.value = '';
+                if (previewTempUrl) { URL.revokeObjectURL(previewTempUrl); previewTempUrl = null; }
+                img.src = defaultSrc;
+            } else {
+                // Restaurar imagem original
+                if (estadoOriginal.avatarSrc) img.src = estadoOriginal.avatarSrc;
+            }
+        });
+    }
+}
+
 // Função para salvar os dados do perfil
 function salvarPerfil(event) {
     event.preventDefault();
@@ -178,7 +296,25 @@ function salvarPerfil(event) {
             mostrarAlerta('Dados atualizados com sucesso!', 'success');
             atualizarDisplays();
             esconderCamposEditaveis();
-            salvarEstadoOriginal(); // Atualizar estado com os novos valores
+            // Atualiza avatar/menu dependendo do que o backend retornou
+            const img = document.getElementById('avatar-visualizacao');
+            const defaultSrc = img ? img.getAttribute('data-default-src') : null;
+            const siteRoot = img ? img.getAttribute('data-site-root') : '';
+            if (data.dados) {
+                if (data.dados.fotoPerfil) {
+                    const novo = (siteRoot ? siteRoot + '/' : '../') + data.dados.fotoPerfil + '?t=' + Date.now();
+                    if (img) { img.src = novo; img.dataset.temFoto = '1'; }
+                    const imgMenu = document.querySelector('.header-menu .perfil img');
+                    if (imgMenu) imgMenu.src = novo;
+                } else if (data.dados.fotoRemovida && defaultSrc) {
+                    const novoPadrao = defaultSrc + '?t=' + Date.now();
+                    if (img) { img.src = novoPadrao; img.dataset.temFoto = '0'; }
+                    const imgMenu = document.querySelector('.header-menu .perfil img');
+                    if (imgMenu) imgMenu.src = novoPadrao;
+                }
+            }
+            // Salvar novo estado original
+            salvarEstadoOriginal();
         } else {
             mostrarAlerta('Erro ao atualizar dados: ' + data.mensagem, 'danger');
         }
@@ -334,6 +470,9 @@ function inicializarEventosPerfilParticipante() {
     if (formPerfil) {
         formPerfil.addEventListener('submit', salvarPerfil);
     }
+
+    // Upload foto + remover foto
+    configurarUploadFoto();
     
     // Botão de excluir conta
     const btnExcluir = document.getElementById('btn-excluir-conta');

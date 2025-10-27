@@ -7,7 +7,7 @@ function mostrarMensagemDesinscricao() {
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
-    container.style.background = '#4f6c8c';
+    container.style.background = 'var(--caixas)';
     container.style.borderRadius = '1.875rem';
     container.style.padding = '1.875rem';
     container.style.maxWidth = '32rem';
@@ -25,23 +25,22 @@ function mostrarMensagemDesinscricao() {
     var botoesWrapper = document.createElement('div');
     botoesWrapper.style.display = 'flex';
     botoesWrapper.style.flexDirection = 'row';
-    botoesWrapper.style.justifyContent = 'center';
+    botoesWrapper.style.justifyContent = 'space-between';
     botoesWrapper.style.alignItems = 'center';
-    botoesWrapper.style.gap = '2.5rem';
+    botoesWrapper.style.width = '100%';
 
     var btnCancelar = document.createElement('button');
     btnCancelar.className = 'botao';
     btnCancelar.type = 'button';
     btnCancelar.textContent = 'Cancelar';
-    btnCancelar.style.backgroundColor = '#6598d2';
+    btnCancelar.style.backgroundColor = 'var(--botao)';
     btnCancelar.style.color = '#fff';
-    btnCancelar.style.border = 'none';
-    btnCancelar.style.borderRadius = '0.3rem';
-    btnCancelar.style.padding = '0.5rem 2.5rem';
+    btnCancelar.style.padding = '0.5rem 1.5rem';
     btnCancelar.style.fontWeight = '700';
     btnCancelar.style.fontSize = '1.1rem';
     btnCancelar.style.cursor = 'pointer';
     btnCancelar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
+    btnCancelar.style.width = 'auto';
     btnCancelar.onclick = function() { window.location.reload(); };
 
     var btnContinuar = document.createElement('button');
@@ -50,13 +49,12 @@ function mostrarMensagemDesinscricao() {
     btnContinuar.textContent = 'Continuar';
     btnContinuar.style.backgroundColor = 'var(--vermelho)';
     btnContinuar.style.color = '#fff';
-    btnContinuar.style.border = 'none';
-    btnContinuar.style.borderRadius = '0.3rem';
-    btnContinuar.style.padding = '0.5rem 2.5rem';
+    btnContinuar.style.padding = '0.5rem 1.5rem';
     btnContinuar.style.fontWeight = '700';
     btnContinuar.style.fontSize = '1.1rem';
     btnContinuar.style.cursor = 'pointer';
     btnContinuar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
+    btnContinuar.style.width = 'auto';
     btnContinuar.onclick = function() {
         // Pegar código do evento da URL
         var params = new URLSearchParams(window.location.search);
@@ -77,7 +75,6 @@ function mostrarMensagemDesinscricao() {
         .then(response => response.json())
         .then(data => {
             if (data.sucesso) {
-                alert('Inscrição cancelada com sucesso!');
                 carregarPagina('meusEventos');
             } else {
                 alert(data.mensagem || 'Erro ao cancelar inscrição');

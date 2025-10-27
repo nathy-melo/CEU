@@ -32,6 +32,7 @@ RA char(7) null,
 Codigo varchar(8),
 Organizador tinyint(1) not null default 0,
 TemaSite tinyint(1) not null default 0,
+FotoPerfil varchar(255) null,
 constraint chk_codigo_organizador check (
     (Organizador = 0) OR 
     (Organizador = 1 AND Codigo is not null)
@@ -40,6 +41,7 @@ constraint chk_tema_site check (TemaSite in (0,1))
 );
 
 ALTER TABLE usuario ADD COLUMN IF NOT EXISTS TemaSite tinyint(1) NOT NULL DEFAULT 0;
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS FotoPerfil varchar(255) NULL;
 
 ALTER TABLE evento ADD COLUMN IF NOT EXISTS modalidade enum('Presencial','Online','Híbrido') NOT NULL DEFAULT 'Presencial';
 ALTER TABLE evento ADD COLUMN IF NOT EXISTS imagem varchar(255) NULL;

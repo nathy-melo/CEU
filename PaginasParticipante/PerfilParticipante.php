@@ -86,7 +86,7 @@ if (!isset($conexao) || !$conexao) {
 }
 
 // Busca todos os dados do usuário no banco
-$consultaSQL = "SELECT Nome, Email, CPF, RA, Codigo, Organizador FROM usuario WHERE CPF = ?";
+$consultaSQL = "SELECT Nome, Email, CPF, RA, Codigo, Organizador, FotoPerfil FROM usuario WHERE CPF = ?";
 $declaracaoPreparada = mysqli_prepare($conexao, $consultaSQL);
 if ($declaracaoPreparada) {
     mysqli_stmt_bind_param($declaracaoPreparada, "s", $cpfUsuario);
@@ -97,6 +97,10 @@ if ($declaracaoPreparada) {
 }
 
 mysqli_close($conexao);
+
+// Calcula o caminho base do site (ex: /CEU)
+$siteRoot = rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/\\');
+$defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -121,6 +125,63 @@ mysqli_close($conexao);
         border-radius: 0.5rem;
         padding: 1.25rem 1.25rem 1.5rem 1.25rem;
         box-shadow: 0 0.25rem 1rem var(--sombra-padrao);
+    }
+
+    .avatar-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .75rem;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, .3);
+        background: #fff;
+    }
+
+    .input-foto {
+        display: none;
+    }
+
+    .avatar-botoes {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-alterar-foto,
+    .btn-remover-foto {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        white-space: nowrap;
+        box-sizing: border-box;
+        text-align: center;
+        width: 6.5rem;
+        min-width: 6.5rem;
+        max-width: 6.5rem;
+    }
+
+    .btn-alterar-foto {
+        background: var(--botao);
+    }
+
+    .btn-remover-foto {
+        background: var(--vermelho);
+    }
+
+    .btn-alterar-foto.hidden,
+    .btn-remover-foto.hidden {
+        display: none !important;
     }
 
     .titulo-cartao {
@@ -179,16 +240,16 @@ mysqli_close($conexao);
         font-size: 1rem;
         color: var(--cinza-escuro);
     }
-    
+
     .controle-formulario.campo-nao-editavel {
         cursor: help;
         position: relative;
     }
-    
+
     .controle-formulario.campo-nao-editavel:hover {
         background-color: #f8f9fa;
     }
-    
+
     /* Tooltip customizado */
     .tooltip-custom {
         position: fixed;
@@ -206,11 +267,11 @@ mysqli_close($conexao);
         white-space: normal;
         word-wrap: break-word;
     }
-    
+
     .tooltip-custom.show {
         opacity: 1;
     }
-    
+
     .controle-formulario.cpf-readonly {
         background-color: var(--cinza-claro);
         opacity: 0.7;
@@ -219,7 +280,7 @@ mysqli_close($conexao);
         align-items: flex-start;
         padding: 0.5rem;
     }
-    
+
     .controle-formulario small {
         margin-top: 0.25rem;
         font-size: 0.875rem;
@@ -470,7 +531,7 @@ mysqli_close($conexao);
         margin-top: 0;
         margin-bottom: 1.5rem;
     }
-    
+
     .modal-solicitar-codigo .botao {
         width: auto;
         padding: 0.5rem 1.5rem;
@@ -507,78 +568,141 @@ mysqli_close($conexao);
         outline: none;
         box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.3);
     }
+
+    /* Ajuste final com maior especificidade para garantir prioridade sobre .botao */
+    .botao.btn-alterar-foto,
+    .botao.btn-remover-foto {
+        padding: .25rem .5rem;
+        font-size: .8rem;
+        box-sizing: border-box;
+        text-align: center;
+        width: 6.5rem;
+        min-width: 6.5rem;
+        max-width: 6.5rem;
+    }
+
+    .botao.btn-alterar-foto {
+        background: var(--botao);
+    }
+
+    .botao.btn-remover-foto {
+        background: var(--vermelho);
+    }
 </style>
 
 <body>
     <div id="main-content">
         <div class="container-perfil">
             <div id="alert-container"></div>
-            
+
             <div class="cartao-dados">
                 <h1 class="titulo-cartao">Seus Dados</h1>
-                <form id="form-perfil-participante" name="perfil_participante" method="post">
+                <form id="form-perfil-participante" name="perfil_participante" method="post"
+                    enctype="multipart/form-data">
+                    <div class="avatar-wrapper">
+                        <?php
+                        $fotoPerfil = $dadosUsuario['FotoPerfil'] ?? null;
+                        if ($fotoPerfil && strpos($fotoPerfil, '/') === false) { $fotoPerfil = 'ImagensPerfis/' . $fotoPerfil; }
+                        $caminhoFoto = $fotoPerfil ? ($siteRoot . '/' . htmlspecialchars($fotoPerfil)) : $defaultImg;
+                        ?>
+                        <img id="avatar-visualizacao" class="avatar" src="<?php echo $caminhoFoto; ?>"
+                            alt="Foto de perfil"
+                            data-default-src="<?php echo $defaultImg; ?>"
+                            data-site-root="<?php echo $siteRoot; ?>"
+                            data-tem-foto="<?php echo $fotoPerfil ? '1' : '0'; ?>">
+                        <div class="avatar-botoes">
+                            <button type="button" id="btn-remover-foto" class="botao btn-remover-foto hidden">Remover foto</button>
+                            <button type="button" id="btn-alterar-foto" class="botao btn-alterar-foto hidden">Alterar foto</button>
+                        </div>
+                        <input id="foto-perfil-input" class="input-foto" type="file" name="foto_perfil"
+                            accept="image/png,image/jpeg,image/webp,image/gif">
+                        <input type="hidden" id="remover-foto-flag" name="remover_foto" value="false">
+                    </div>
+
                     <div class="grupo-formulario">
                         <span class="label-formulario">Nome Completo:</span>
-                        <div class="controle-formulario campo-nao-editavel" data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">
-                            <span id="name-display"><?php echo htmlspecialchars($dadosUsuario['Nome'] ?? 'Nome não encontrado'); ?></span>
+                        <div class="controle-formulario campo-nao-editavel"
+                            data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">
+                            <span id="name-display">
+                                <?php echo htmlspecialchars($dadosUsuario['Nome'] ?? 'Nome não encontrado'); ?>
+                            </span>
                         </div>
                     </div>
                     <div class="grupo-formulario">
                         <label for="email-input">E-mail:</label>
                         <div class="controle-formulario">
-                            <span id="email-display"><?php echo htmlspecialchars($dadosUsuario['Email'] ?? 'Email não encontrado'); ?></span>
-                            <input type="email" id="email-input" name="email" value="<?php echo htmlspecialchars($dadosUsuario['Email'] ?? ''); ?>" class="hidden" required autocomplete="email">
+                            <span id="email-display">
+                                <?php echo htmlspecialchars($dadosUsuario['Email'] ?? 'Email não encontrado'); ?>
+                            </span>
+                            <input type="email" id="email-input" name="email"
+                                value="<?php echo htmlspecialchars($dadosUsuario['Email'] ?? ''); ?>" class="hidden"
+                                required autocomplete="email">
                         </div>
                     </div>
                     <div class="grupo-formulario">
                         <span class="label-formulario">CPF:</span>
-                        <div class="controle-formulario campo-nao-editavel" data-tooltip="Este campo não pode ser alterado">
-                            <span id="cpf-display"><?php 
+                        <div class="controle-formulario campo-nao-editavel"
+                            data-tooltip="Este campo não pode ser alterado">
+                            <span id="cpf-display">
+                                <?php 
                                 $cpfFormatado = $dadosUsuario['CPF'] ?? '';
                                 if($cpfFormatado) {
                                     echo substr($cpfFormatado, 0, 3) . '.' . substr($cpfFormatado, 3, 3) . '.' . substr($cpfFormatado, 6, 3) . '-' . substr($cpfFormatado, 9, 2);
                                 } else {
                                     echo 'CPF não encontrado';
                                 }
-                            ?></span>
+                            ?>
+                            </span>
                         </div>
                     </div>
-                    
+
                     <?php if (!$dadosUsuario['Organizador']): ?>
                     <div class="grupo-formulario">
                         <label for="ra-input">RA (Registro Acadêmico):</label>
                         <div class="controle-formulario">
-                            <span id="ra-display"><?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?></span>
-                            <input type="text" id="ra-input" name="ra" value="<?php echo htmlspecialchars($dadosUsuario['RA'] ?? ''); ?>" class="hidden" maxlength="7" placeholder="Ex: 1234567" autocomplete="off">
+                            <span id="ra-display">
+                                <?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?>
+                            </span>
+                            <input type="text" id="ra-input" name="ra"
+                                value="<?php echo htmlspecialchars($dadosUsuario['RA'] ?? ''); ?>" class="hidden"
+                                maxlength="7" placeholder="Ex: 1234567" autocomplete="off">
                         </div>
                     </div>
                     <?php endif; ?>
-                    
+
                     <?php if ($dadosUsuario['Organizador']): ?>
                     <div class="grupo-formulario">
                         <span class="label-formulario">Código de Organizador:</span>
-                        <div class="controle-formulario campo-nao-editavel" data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">
-                            <span id="codigo-display"><?php echo htmlspecialchars($dadosUsuario['Codigo'] ?? 'Código não encontrado'); ?></span>
+                        <div class="controle-formulario campo-nao-editavel"
+                            data-tooltip="Para alterar este campo, entre em contato conosco através do Fale Conosco">
+                            <span id="codigo-display">
+                                <?php echo htmlspecialchars($dadosUsuario['Codigo'] ?? 'Código não encontrado'); ?>
+                            </span>
                         </div>
                     </div>
                     <?php endif; ?>
-                    
+
                     <div class="grupo-formulario">
                         <span class="label-formulario">Tipo de Conta:</span>
-                        <div class="controle-formulario campo-nao-editavel" data-tooltip="Este campo não pode ser alterado">
-                            <span id="tipo-conta-display"><?php echo ($dadosUsuario['Organizador'] == 1) ? 'Organizador' : 'Participante'; ?></span>
+                        <div class="controle-formulario campo-nao-editavel"
+                            data-tooltip="Este campo não pode ser alterado">
+                            <span id="tipo-conta-display">
+                                <?php echo ($dadosUsuario['Organizador'] == 1) ? 'Organizador' : 'Participante'; ?>
+                            </span>
                         </div>
                     </div>
-                    
+
                     <div class="acoes-formulario">
                         <?php if (!$dadosUsuario['Organizador']): ?>
                         <div class="linha-botao-organizador">
-                            <button type="button" class="botao botao-tornar-organizador hidden" id="btn-tornar-organizador">Deseja se tornar um organizador?</button>
+                            <button type="button" class="botao botao-tornar-organizador hidden"
+                                id="btn-tornar-organizador">Deseja se tornar um organizador?</button>
                         </div>
                         <?php endif; ?>
                         <div class="linha-botoes-principais">
                             <button type="button" class="botao botao-editar" id="btn-editar">Editar</button>
-                            <button type="button" class="botao botao-cancelar hidden" id="btn-cancelar">Cancelar</button>
+                            <button type="button" class="botao botao-cancelar hidden"
+                                id="btn-cancelar">Cancelar</button>
                             <button type="submit" class="botao botao-salvar hidden" id="btn-salvar">Salvar</button>
                         </div>
                     </div>
@@ -586,7 +710,8 @@ mysqli_close($conexao);
             </div>
             <div class="barra-acoes">
                 <button type="button" class="botao botao-excluir" id="btn-excluir-conta">Excluir Conta</button>
-                <button type="button" class="botao botao-sair" onclick="window.location.href='../PaginasPublicas/Logout.php'">Sair</button>
+                <button type="button" class="botao botao-sair"
+                    onclick="window.location.href='../PaginasPublicas/Logout.php'">Sair</button>
             </div>
         </div>
     </div>
@@ -595,10 +720,12 @@ mysqli_close($conexao);
     <div id="modal-codigo" class="modal-codigo hidden">
         <div class="modal-content">
             <h2 class="modal-titulo">Tornar-se Organizador</h2>
-            <p class="modal-texto">Para se tornar um organizador, você precisa de um código de acesso fornecido pela administração.</p>
+            <p class="modal-texto">Para se tornar um organizador, você precisa de um código de acesso fornecido pela
+                administração.</p>
             <div id="alert-modal"></div>
             <label for="input-codigo" class="sr-only">Código de organizador</label>
-            <input type="text" id="input-codigo" name="codigo" class="modal-input" placeholder="Digite o código de organizador" maxlength="8" autocomplete="off">
+            <input type="text" id="input-codigo" name="codigo" class="modal-input"
+                placeholder="Digite o código de organizador" maxlength="8" autocomplete="off">
             <div class="modal-solicitar-codigo">
                 <button type="button" class="botao" id="btn-solicitar-codigo">Solicitar código de acesso</button>
             </div>

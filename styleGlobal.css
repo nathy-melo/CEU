@@ -375,7 +375,6 @@ body.pagina-inicio {
   left: 0;
   right: 0;
   color: var(--cinza-escuro);
-  font-size: 3.8cqi;
   line-height: 1.5;
   padding: 0 3.5cqi 2.5cqi;
   text-align: left;
@@ -407,7 +406,7 @@ body.pagina-inicio {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.8cqi;
+  gap: 1.5cqi;
 }
 
 .EventoInfo .evento-info-item {
@@ -415,16 +414,14 @@ body.pagina-inicio {
   align-items: center;
   gap: 2cqi;
   background: var(--tabela_participantes);
-  border-radius: 1.6cqi;
-  padding: 1.4cqi 1.8cqi;
+  border-radius: 2cqi;
+  padding: 1cqi 1cqi;
   box-shadow: 0 0.4cqi 1.2cqi var(--sombra-leve);
 }
 
 .EventoInfo .evento-info-icone {
-  width: 5cqi;
-  height: 5cqi;
-  min-width: 5cqi;
-  min-height: 5cqi;
+  width: 6cqi;
+  height: 6cqi;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -440,13 +437,13 @@ body.pagina-inicio {
 }
 
 .EventoInfo .evento-info-icone img {
-  width: 70%;
-  height: 70%;
+  width: 80%;
+  height: 80%;
   display: block;
 }
 
 .EventoInfo .evento-info-texto {
-  font-size: 3cqi;
+  font-size: 4cqi;
   color: var(--cinza-escuro);
   font-weight: 600;
   display: inline-flex;

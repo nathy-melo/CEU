@@ -38,10 +38,15 @@ function mostrarMensagemInscricaoFeita() {
     btnVoltar.textContent = 'Voltar';
     btnVoltar.style.backgroundColor = 'var(--botao)';
     btnVoltar.style.color = 'var(--branco)';
-    btnVoltar.style.padding = '0.75rem 2rem';
+    btnVoltar.style.padding = '0.75rem 1.5rem';
     btnVoltar.style.fontSize = '1rem';
     btnVoltar.style.fontWeight = '700';
-    btnVoltar.style.flex = '1';
+    btnVoltar.style.width = '180px';
+    btnVoltar.style.whiteSpace = 'nowrap';
+    btnVoltar.style.textAlign = 'center';
+    btnVoltar.style.display = 'flex';
+    btnVoltar.style.alignItems = 'center';
+    btnVoltar.style.justifyContent = 'center';
     btnVoltar.onclick = function() { carregarPagina('inicio'); };
     
     var btnCancelar = document.createElement('button');
@@ -50,10 +55,15 @@ function mostrarMensagemInscricaoFeita() {
     btnCancelar.textContent = 'Cancelar Inscrição';
     btnCancelar.style.backgroundColor = 'var(--vermelho)';
     btnCancelar.style.color = 'var(--branco)';
-    btnCancelar.style.padding = '0.75rem 2rem';
+    btnCancelar.style.padding = '0.75rem 1.5rem';
     btnCancelar.style.fontSize = '1rem';
     btnCancelar.style.fontWeight = '700';
-    btnCancelar.style.flex = '1';
+    btnCancelar.style.width = '180px';
+    btnCancelar.style.whiteSpace = 'nowrap';
+    btnCancelar.style.textAlign = 'center';
+    btnCancelar.style.display = 'flex';
+    btnCancelar.style.alignItems = 'center';
+    btnCancelar.style.justifyContent = 'center';
     btnCancelar.onclick = function() { 
         // Pegar código do evento da URL
         var params = new URLSearchParams(window.location.search);
@@ -64,14 +74,12 @@ function mostrarMensagemInscricaoFeita() {
             return;
         }
         
-        // Confirmar cancelamento
-        if (confirm('Deseja realmente cancelar sua inscrição neste evento?')) {
-            desinscreverDoEvento(codEvento);
-        }
+        // Cancelar inscrição diretamente sem confirmação
+        desinscreverDoEvento(codEvento);
     };
     
-    botoesWrapper.appendChild(btnVoltar);
     botoesWrapper.appendChild(btnCancelar);
+    botoesWrapper.appendChild(btnVoltar);
     container.appendChild(titulo);
     container.appendChild(botoesWrapper);
     mainContent.appendChild(container);
@@ -126,7 +134,6 @@ function desinscreverDoEvento(codEvento) {
     .then(response => response.json())
     .then(data => {
         if (data.sucesso) {
-            alert('Inscrição cancelada com sucesso!');
             // Disparar evento personalizado para atualizar outras páginas
             if (typeof window.dispatchEvent === 'function') {
                 window.dispatchEvent(new CustomEvent('inscricaoAtualizada'));
@@ -193,4 +200,4 @@ function inicializarEventosCartaoEvento() {
 window.addEventListener('DOMContentLoaded', inicializarEventosCartaoEvento);
 
 // Permite que outros scripts chamem a inicialização após AJAX
-window.inicializarEventosCartaoEvento = inicializarEventosCartaoEvento; 
+window.inicializarEventosCartaoEvento = inicializarEventosCartaoEvento;

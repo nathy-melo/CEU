@@ -87,7 +87,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 ?>
 
     <!-- Menu fixo -->
-    <?php include 'MenuP.html'; ?>
+    <?php include 'MenuP.php'; ?>
 
     <!-- Conteúdo dinâmico -->
     <div id="conteudo-dinamico">

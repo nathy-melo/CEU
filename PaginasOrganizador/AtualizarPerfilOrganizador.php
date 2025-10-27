@@ -39,6 +39,10 @@ require_once('../BancoDados/conexao.php');
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $telefone = isset($_POST['telefone']) ? trim($_POST['telefone']) : null;
 $ra = isset($_POST['ra']) ? trim($_POST['ra']) : null;
+$novoCaminhoFoto = null;
+$apagarAntiga = false;
+$removerSolicitado = isset($_POST['remover_foto']) && $_POST['remover_foto'] === 'true';
+$fotoRemovida = false;
 
 // Valida os campos obrigatórios
 if (empty($email)) {
@@ -87,32 +91,115 @@ if (mysqli_num_rows($resultado_verifica) > 0) {
 }
 mysqli_stmt_close($stmt_verifica);
 
-// Atualiza os dados do usuário
-$sql_atualiza = "UPDATE usuario SET Email = ?, RA = ? WHERE CPF = ?";
-$stmt_atualiza = mysqli_prepare($conexao, $sql_atualiza);
+// Busca foto atual para possível remoção depois
+$fotoAtual = null;
+if ($stmt_atual = mysqli_prepare($conexao, 'SELECT FotoPerfil FROM usuario WHERE CPF = ?')) {
+    mysqli_stmt_bind_param($stmt_atual, 's', $cpf);
+    mysqli_stmt_execute($stmt_atual);
+    $res_atual = mysqli_stmt_get_result($stmt_atual);
+    if ($row = mysqli_fetch_assoc($res_atual)) { $fotoAtual = $row['FotoPerfil'] ?? null; }
+    mysqli_stmt_close($stmt_atual);
+}
 
-// Se RA estiver vazio, define como NULL
-$ra_value = empty($ra) ? null : $ra;
-mysqli_stmt_bind_param($stmt_atualiza, "sss", $email, $ra_value, $cpf);
+// Guarda o caminho da foto antiga antes de qualquer atualização
+$fotoAntigaParaRemover = $fotoAtual;
+
+// Upload opcional da foto de perfil
+if (isset($_FILES['foto_perfil']) && is_array($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] !== UPLOAD_ERR_NO_FILE) {
+    if ($_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+        // Se houve upload, ignora solicitação de remoção explícita
+        $removerSolicitado = false;
+        $arquivo = $_FILES['foto_perfil'];
+        if ($arquivo['size'] > 2 * 1024 * 1024) {
+            echo json_encode(['sucesso' => false, 'mensagem' => 'A imagem deve ter no máximo 2MB']);
+            mysqli_close($conexao);
+            exit;
+        }
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($arquivo['tmp_name']);
+        $map = [ 'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif' ];
+        if (!isset($map[$mime])) {
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Formato de imagem não suportado. Use JPG, PNG, WEBP ou GIF.']);
+            mysqli_close($conexao);
+            exit;
+        }
+        $ext = $map[$mime];
+        $destDir = realpath(__DIR__ . '/../Imagens');
+        if ($destDir === false) {
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Diretório de imagens não encontrado.']);
+            mysqli_close($conexao);
+            exit;
+        }
+        $perfisDir = $destDir . DIRECTORY_SEPARATOR . 'Perfis';
+        if (!is_dir($perfisDir)) { @mkdir($perfisDir, 0777, true); }
+        $nomeArquivo = $cpf . '_' . time() . '.' . $ext;
+        $caminhoCompleto = $perfisDir . DIRECTORY_SEPARATOR . $nomeArquivo;
+        if (!@move_uploaded_file($arquivo['tmp_name'], $caminhoCompleto)) {
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Falha ao salvar a imagem.']);
+            mysqli_close($conexao);
+            exit;
+        }
+        $novoCaminhoFoto = 'Imagens/Perfis/' . $nomeArquivo;
+        $apagarAntiga = !empty($fotoAtual);
+    } else {
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Erro no upload da imagem (código ' . (int)$_FILES['foto_perfil']['error'] . ').']);
+        mysqli_close($conexao);
+        exit;
+    }
+}
+
+// Atualiza os dados do usuário
+if ($removerSolicitado && !$novoCaminhoFoto) {
+    $sql_atualiza = "UPDATE usuario SET Email = ?, RA = ?, FotoPerfil = NULL WHERE CPF = ?";
+    $stmt_atualiza = mysqli_prepare($conexao, $sql_atualiza);
+    $ra_value = empty($ra) ? null : $ra;
+    mysqli_stmt_bind_param($stmt_atualiza, "sss", $email, $ra_value, $cpf);
+} elseif ($novoCaminhoFoto) {
+    $sql_atualiza = "UPDATE usuario SET Email = ?, RA = ?, FotoPerfil = ? WHERE CPF = ?";
+    $stmt_atualiza = mysqli_prepare($conexao, $sql_atualiza);
+    $ra_value = empty($ra) ? null : $ra;
+    mysqli_stmt_bind_param($stmt_atualiza, "ssss", $email, $ra_value, $novoCaminhoFoto, $cpf);
+} else {
+    $sql_atualiza = "UPDATE usuario SET Email = ?, RA = ? WHERE CPF = ?";
+    $stmt_atualiza = mysqli_prepare($conexao, $sql_atualiza);
+    $ra_value = empty($ra) ? null : $ra;
+    mysqli_stmt_bind_param($stmt_atualiza, "sss", $email, $ra_value, $cpf);
+}
 
 if (mysqli_stmt_execute($stmt_atualiza)) {
     // Atualiza os dados na sessão (mantém o nome como estava)
     $_SESSION['email'] = $email;
-    
+    if ($novoCaminhoFoto) {
+        $_SESSION['foto_perfil'] = $novoCaminhoFoto;
+        // Remove antiga se existir
+        if ($apagarAntiga) {
+            $antigo = realpath(__DIR__ . '/../' . $fotoAtual);
+            if ($antigo && is_file($antigo)) { @unlink($antigo); }
+        }
+    }
+    if ($removerSolicitado && !empty($fotoAtual)) {
+        // Apaga antiga e limpa sessão
+        $antigo = realpath(__DIR__ . '/../' . $fotoAtual);
+        if ($antigo && is_file($antigo)) { @unlink($antigo); }
+        unset($_SESSION['foto_perfil']);
+        $fotoRemovida = true;
+    }
     mysqli_stmt_close($stmt_atualiza);
     mysqli_close($conexao);
     
     echo json_encode([
         'sucesso' => true,
-        'mensagem' => 'Perfil atualizado com sucesso.'
+        'mensagem' => 'Perfil atualizado com sucesso.',
+        'dados' => [ 'fotoPerfil' => $novoCaminhoFoto, 'fotoRemovida' => $fotoRemovida ]
     ]);
 } else {
+    $erro = mysqli_error($conexao);
     mysqli_stmt_close($stmt_atualiza);
     mysqli_close($conexao);
     
     echo json_encode([
         'sucesso' => false,
-        'mensagem' => 'Erro ao atualizar o perfil: ' . mysqli_error($conexao)
+        'mensagem' => 'Erro ao atualizar o perfil: ' . $erro
     ]);
 }
 ?>
