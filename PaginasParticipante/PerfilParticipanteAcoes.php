@@ -130,7 +130,8 @@ switch ($acao) {
                 @mkdir($destDir, 0777, true);
             }
 
-            $nomeArquivo = $cpf_usuario . '_' . time() . '.' . $ext;
+            // Gera nome único com timestamp e microsegundos para evitar sobrescrever
+            $nomeArquivo = $cpf_usuario . '_' . time() . '_' . uniqid() . '.' . $ext;
             $caminhoCompleto = $destDir . DIRECTORY_SEPARATOR . $nomeArquivo;
             
             if (!@move_uploaded_file($arquivo['tmp_name'], $caminhoCompleto)) {

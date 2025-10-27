@@ -1,15 +1,21 @@
 <?php
-// Inicia a sessão apenas se não houver uma ativa
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'secure' => false,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    session_start();
+// Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
+ini_set('session.gc_maxlifetime', 360);
+session_set_cookie_params(360);
+
+session_start();
+
+// Verifica se a sessão expirou (permite 5 minutos de inatividade)
+if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 300)) {
+    session_unset();
+    session_destroy();
+    http_response_code(401);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Sessão expirada']);
+    exit;
 }
+
+// Atualiza o timestamp da última atividade
+$_SESSION['ultima_atividade'] = time();
 
 // Define o cabeçalho para JSON
 header('Content-Type: application/json');
@@ -91,13 +97,15 @@ if (mysqli_num_rows($resultado_verifica) > 0) {
 }
 mysqli_stmt_close($stmt_verifica);
 
-// Busca foto atual para possível remoção depois
+// Busca foto atual ANTES de fazer qualquer upload
 $fotoAtual = null;
 if ($stmt_atual = mysqli_prepare($conexao, 'SELECT FotoPerfil FROM usuario WHERE CPF = ?')) {
     mysqli_stmt_bind_param($stmt_atual, 's', $cpf);
     mysqli_stmt_execute($stmt_atual);
     $res_atual = mysqli_stmt_get_result($stmt_atual);
-    if ($row = mysqli_fetch_assoc($res_atual)) { $fotoAtual = $row['FotoPerfil'] ?? null; }
+    if ($row = mysqli_fetch_assoc($res_atual)) { 
+        $fotoAtual = $row['FotoPerfil'] ?? null; 
+    }
     mysqli_stmt_close($stmt_atual);
 }
 
@@ -110,6 +118,7 @@ if (isset($_FILES['foto_perfil']) && is_array($_FILES['foto_perfil']) && $_FILES
         // Se houve upload, ignora solicitação de remoção explícita
         $removerSolicitado = false;
         $arquivo = $_FILES['foto_perfil'];
+        
         if ($arquivo['size'] > 2 * 1024 * 1024) {
             echo json_encode(['sucesso' => false, 'mensagem' => 'A imagem deve ter no máximo 2MB']);
             mysqli_close($conexao);
@@ -124,22 +133,29 @@ if (isset($_FILES['foto_perfil']) && is_array($_FILES['foto_perfil']) && $_FILES
             exit;
         }
         $ext = $map[$mime];
-        $destDir = realpath(__DIR__ . '/../Imagens');
+        $destDir = realpath(__DIR__ . '/../ImagensPerfis');
+        
         if ($destDir === false) {
             echo json_encode(['sucesso' => false, 'mensagem' => 'Diretório de imagens não encontrado.']);
             mysqli_close($conexao);
             exit;
         }
-        $perfisDir = $destDir . DIRECTORY_SEPARATOR . 'Perfis';
-        if (!is_dir($perfisDir)) { @mkdir($perfisDir, 0777, true); }
-        $nomeArquivo = $cpf . '_' . time() . '.' . $ext;
-        $caminhoCompleto = $perfisDir . DIRECTORY_SEPARATOR . $nomeArquivo;
+        
+        if (!is_dir($destDir)) {
+            @mkdir($destDir, 0777, true);
+        }
+        
+        // Gera nome único com timestamp e microsegundos para evitar sobrescrever
+        $nomeArquivo = $cpf . '_' . time() . '_' . uniqid() . '.' . $ext;
+        $caminhoCompleto = $destDir . DIRECTORY_SEPARATOR . $nomeArquivo;
+        
         if (!@move_uploaded_file($arquivo['tmp_name'], $caminhoCompleto)) {
             echo json_encode(['sucesso' => false, 'mensagem' => 'Falha ao salvar a imagem.']);
             mysqli_close($conexao);
             exit;
         }
-        $novoCaminhoFoto = 'Imagens/Perfis/' . $nomeArquivo;
+        
+        $novoCaminhoFoto = 'ImagensPerfis/' . $nomeArquivo;
         $apagarAntiga = !empty($fotoAtual);
     } else {
         echo json_encode(['sucesso' => false, 'mensagem' => 'Erro no upload da imagem (código ' . (int)$_FILES['foto_perfil']['error'] . ').']);
@@ -171,10 +187,12 @@ if (mysqli_stmt_execute($stmt_atualiza)) {
     $_SESSION['email'] = $email;
     if ($novoCaminhoFoto) {
         $_SESSION['foto_perfil'] = $novoCaminhoFoto;
-        // Remove antiga se existir
-        if ($apagarAntiga) {
+        // Remove antiga se existir e for diferente
+        if ($apagarAntiga && $fotoAtual !== $novoCaminhoFoto) {
             $antigo = realpath(__DIR__ . '/../' . $fotoAtual);
-            if ($antigo && is_file($antigo)) { @unlink($antigo); }
+            if ($antigo && is_file($antigo)) {
+                @unlink($antigo);
+            }
         }
     }
     if ($removerSolicitado && !empty($fotoAtual)) {
