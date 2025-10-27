@@ -6,6 +6,16 @@ function carregarEventosDoServidor() {
     const eventosAntigos = containerEventos.querySelectorAll('.CaixaDoEvento');
     eventosAntigos.forEach(eventoAntigo => eventoAntigo.remove());
     
+    // Remove mensagens antigas de carregamento e "sem eventos"
+    const mensagensAntigas = containerEventos.querySelectorAll('.loading-eventos, div:not(.CaixaDoEventoAdicionar):not(.CaixaDoEvento)');
+    mensagensAntigas.forEach(msg => {
+        if (msg.textContent.includes('Carregando eventos') || 
+            msg.textContent.includes('Você ainda não criou nenhum evento') ||
+            msg.textContent.includes('Sem resultados')) {
+            msg.remove();
+        }
+    });
+    
     // Mostra mensagem de carregamento
     const mensagemCarregando = document.createElement('div');
     mensagemCarregando.className = 'loading-eventos';
