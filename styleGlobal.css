@@ -639,6 +639,14 @@ body.pagina-inicio {
   width: 0;
 }
 
+.item-checkbox input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
 .item-checkbox .checkbox-personalizado {
   height: clamp(14px, 2.5vw, 18px);
   width: clamp(14px, 2.5vw, 18px);

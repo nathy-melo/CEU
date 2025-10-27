@@ -5,17 +5,32 @@ function createFilterElement() {
 
             <fieldset class="filtro-grupo">
             <legend class="grupo-titulo">
+                Ordenar
+                <span class="titulo-icone"></span>
+            </legend>
+            <div class="lista-checkbox" style="flex-direction: row; gap: 15px;">
+                <label class="item-checkbox"><input type="radio" name="ordenacao" value="az"><span class="checkbox-personalizado"></span><span>A - Z</span></label>
+                <label class="item-checkbox"><input type="radio" name="ordenacao" value="za"><span class="checkbox-personalizado"></span><span>Z - A</span></label>
+            </div>
+            </fieldset>
+
+            <div class="divisor">
+            <div class="divisor-linha"></div>
+            </div>
+
+            <fieldset class="filtro-grupo">
+            <legend class="grupo-titulo">
                 Período
                 <span class="titulo-icone"></span>
             </legend>
-            <div class="entradas-data">
-                <div class="entrada-data">
+            <div class="entradas-data" style="flex-direction: row; gap: 4px; align-items: flex-end;">
+                <div class="entrada-data" style="flex: 1; min-width: 0;">
                 <label for="data-inicio" class="texto-data">De</label>
-                <input type="date" id="data-inicio" name="data-inicio" class="input-data">
+                <input type="date" id="data-inicio" name="data-inicio" class="input-data" style="font-size: 0.8rem; padding: 0.2rem 0.1rem; width: 90%; min-width: 0;">
                 </div>
-                <div class="entrada-data">
+                <div class="entrada-data" style="flex: 1; min-width: 0;">
                 <label for="data-fim" class="texto-data">Até</label>
-                <input type="date" id="data-fim" name="data-fim" class="input-data">
+                <input type="date" id="data-fim" name="data-fim" class="input-data" style="font-size: 0.8rem; padding: 0.2rem 0.1rem; width: 80%; min-width: 0;">
                 </div>
             </div>
             </fieldset>
@@ -139,6 +154,37 @@ function createFilterElement() {
         }
     }
 
+    // Adiciona funcionalidade para desmarcar radio buttons ao clicar novamente
+    const radioButtons = form.querySelectorAll('input[type="radio"][name="ordenacao"]');
+    let ultimoRadioSelecionado = null;
+    
+    radioButtons.forEach(radio => {
+        radio.addEventListener('click', (e) => {
+            if (ultimoRadioSelecionado === e.target) {
+                e.target.checked = false;
+                ultimoRadioSelecionado = null;
+                
+                // Atualizar o ícone de status do grupo de ordenação
+                const grupoOrdenacao = e.target.closest('.filtro-grupo');
+                const tituloIcone = grupoOrdenacao?.querySelector('.titulo-icone');
+                if (tituloIcone) {
+                    tituloIcone.classList.remove('ativo');
+                }
+                
+                applyFiltersParticipante();
+            } else {
+                ultimoRadioSelecionado = e.target;
+                
+                // Atualizar o ícone de status do grupo de ordenação
+                const grupoOrdenacao = e.target.closest('.filtro-grupo');
+                const tituloIcone = grupoOrdenacao?.querySelector('.titulo-icone');
+                if (tituloIcone) {
+                    tituloIcone.classList.add('ativo');
+                }
+            }
+        });
+    });
+
     return form;
 }
 
@@ -154,19 +200,28 @@ function applyFiltersParticipante() {
     const tipos = getChecked('tipo_evento');
     const locais = getChecked('localizacao');
     const duracoes = getChecked('duracao');
-    const certificados = getChecked('certificado'); // novo: tipo de certificado
-    const modalidades = getChecked('modalidade'); // novo: modalidade
+    const certificados = getChecked('certificado');
+    const modalidades = getChecked('modalidade');
 
     const dataInicio = form.querySelector('input[name="data-inicio"]').value || '';
     const dataFim = form.querySelector('input[name="data-fim"]').value || '';
+    
+    // Obter a ordenação selecionada
+    const ordenacaoSelecionada = form.querySelector('input[name="ordenacao"]:checked')?.value || 'nenhuma';
 
-    const cards = container.querySelectorAll('.CaixaDoEvento');
+    // Armazenar ordem original se ainda não foi armazenada
+    if (!window.ordemOriginalCards) {
+        window.ordemOriginalCards = Array.from(container.querySelectorAll('.CaixaDoEvento'));
+    }
+
+    const cards = Array.from(container.querySelectorAll('.CaixaDoEvento'));
+    
     cards.forEach(card => {
         const tipo = (card.dataset.tipo || '').toLowerCase();
         const local = (card.dataset.localizacao || '').toLowerCase();
         const duracao = (card.dataset.duracao || '').toLowerCase();
         const certificado = (card.dataset.certificado || '').toLowerCase();
-        const modalidade = (card.dataset.modalidade || '').toLowerCase(); // novo
+        const modalidade = (card.dataset.modalidade || '').toLowerCase();
         const data = card.dataset.data || '';
 
         let ok = true;
@@ -192,12 +247,39 @@ function applyFiltersParticipante() {
         const deveOcultar = hiddenByFilter || hiddenBySearch;
         card.style.display = deveOcultar ? 'none' : '';
     });
+    
+    // Aplicar ordenação alfabética ou restaurar ordem original
+    if (ordenacaoSelecionada !== 'nenhuma') {
+        cards.sort((a, b) => {
+            const nomeA = (a.querySelector('.EventoTitulo')?.textContent || '').toLowerCase();
+            const nomeB = (b.querySelector('.EventoTitulo')?.textContent || '').toLowerCase();
+            
+            if (ordenacaoSelecionada === 'az') {
+                return nomeA.localeCompare(nomeB);
+            } else if (ordenacaoSelecionada === 'za') {
+                return nomeB.localeCompare(nomeA);
+            }
+            return 0;
+        });
+        
+        // Reorganizar os cards no DOM
+        cards.forEach(card => container.appendChild(card));
+    } else {
+        // Restaurar ordem original
+        if (window.ordemOriginalCards) {
+            window.ordemOriginalCards.forEach(card => {
+                if (container.contains(card)) {
+                    container.appendChild(card);
+                }
+            });
+        }
+    }
 }
 
 function wireFilterInputsParticipante() {
     const form = document.getElementById('filtro-container');
     if (!form) return;
-    const inputs = form.querySelectorAll('input[type="checkbox"], input[type="date"]');
+    const inputs = form.querySelectorAll('input[type="checkbox"], input[type="date"], input[type="radio"]');
     inputs.forEach(inp => inp.addEventListener('change', applyFiltersParticipante));
 }
 
@@ -252,17 +334,20 @@ function inicializarFiltro() {
     filtroGrupos.forEach(grupo => {
         const checkboxes = grupo.querySelectorAll('input[type="checkbox"]');
         const dateInputs = grupo.querySelectorAll('input[type="date"]');
+        const radioButtons = grupo.querySelectorAll('input[type="radio"]');
         const tituloIcone = grupo.querySelector('.titulo-icone');
 
-        if ((checkboxes.length > 0 || dateInputs.length > 0) && tituloIcone) {
+        if ((checkboxes.length > 0 || dateInputs.length > 0 || radioButtons.length > 0) && tituloIcone) {
             const atualizarStatusIcone = () => {
                 let algumSelecionado = false;
                 checkboxes.forEach(checkbox => { if (checkbox.checked) algumSelecionado = true; });
                 dateInputs.forEach(dateInput => { if (dateInput.value) algumSelecionado = true; });
+                radioButtons.forEach(radio => { if (radio.checked) algumSelecionado = true; });
                 tituloIcone.classList.toggle('ativo', algumSelecionado);
             };
             checkboxes.forEach(checkbox => checkbox.addEventListener('change', atualizarStatusIcone));
             dateInputs.forEach(dateInput => dateInput.addEventListener('change', atualizarStatusIcone));
+            radioButtons.forEach(radio => radio.addEventListener('change', atualizarStatusIcone));
             atualizarStatusIcone();
         }
     });
