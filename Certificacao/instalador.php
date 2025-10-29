@@ -36,7 +36,9 @@ if (!isset($_POST['action'])) {
 }
 
 $action = $_POST['action'];
-$projectRoot = dirname(__DIR__); // Pasta CEU
+// Alvo agora é a pasta de bibliotecas dentro de Certificacao
+$libsRoot = __DIR__ . '/bibliotecas';
+if (!is_dir($libsRoot)) { @mkdir($libsRoot, 0775, true); }
 $logPath = __DIR__ . '/instalador.log';
 
 function logMsg($msg) {
@@ -221,18 +223,85 @@ function habilitarExtensaoNoIni($iniPath, $ext) {
     return ['success' => true, 'message' => 'Extensão ' . $ext . ' habilitada no php.ini', 'backup' => $backup];
 }
 
+// ---------------------------- NOVAS FUNÇÕES (Git/Logs/Testes) ---------------------------------
+
+function caminhoGitExe() {
+    $candidatos = ['git', 'C:\\Program Files\\Git\\bin\\git.exe', 'C:\\Program Files\\Git\\cmd\\git.exe'];
+    foreach ($candidatos as $g) {
+        if ($g === 'git') {
+            if (funcDisponivel('exec')) {
+                @exec($g . ' --version', $o, $c);
+                if ($c === 0) return $g;
+            }
+        } else if (@file_exists($g)) {
+            return $g;
+        }
+    }
+    return null;
+}
+
+function rmrf($path) {
+    if (!file_exists($path)) return true;
+    if (is_file($path) || is_link($path)) return @unlink($path);
+    $ok = true;
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+    foreach ($it as $file) {
+        $ok = $ok && ( $file->isDir() ? @rmdir($file->getRealPath()) : @unlink($file->getRealPath()) );
+    }
+    return $ok && @rmdir($path);
+}
+
+function limpezaInstaladorDir($dir) {
+    $res = [ 'success' => true, 'steps' => [] ];
+    // 1) Remover vendor/
+    if (is_dir($dir . '/vendor')) {
+        $ok = rmrf($dir . '/vendor');
+        $res['steps'][] = ['acao' => 'remover vendor', 'path' => $dir . '/vendor', 'success' => $ok];
+        $res['success'] = $res['success'] && $ok;
+    }
+    // 2) Remover composer.phar local
+    if (file_exists($dir . '/composer.phar')) {
+        $ok = @unlink($dir . '/composer.phar');
+        $res['steps'][] = ['acao' => 'remover composer.phar', 'path' => $dir . '/composer.phar', 'success' => $ok];
+        $res['success'] = $res['success'] && $ok;
+    }
+    // 3) Reverter composer.lock (se estiver versionado)
+    $git = caminhoGitExe();
+    if ($git && funcDisponivel('exec') && file_exists($dir . '/composer.lock')) {
+        $gitCmd = (strpos($git, ' ') !== false ? '"' . $git . '"' : $git);
+        $resetLock = executarComando($gitCmd . ' checkout -- composer.lock', $dir);
+        if (!$resetLock['success']) {
+            // fallback para reset scoped
+            $resetLock = executarComando($gitCmd . ' reset --hard HEAD -- composer.lock', $dir);
+        }
+        $res['steps'][] = ['acao' => 'reverter composer.lock', 'success' => $resetLock['success'], 'detalhes' => $resetLock];
+        $res['success'] = $res['success'] && $resetLock['success'];
+    }
+    logMsg('Limpeza (escopo bibliotecas): ' . ($res['success'] ? 'OK' : 'FALHOU'));
+    return $res;
+}
+
+function tailFile($path, $lines = 200) {
+    if (!file_exists($path)) return '';
+    $data = @file($path);
+    if ($data === false) return '';
+    $slice = array_slice($data, -max(1, (int)$lines));
+    return implode('', $slice);
+}
+
 // Ações --------------------------------------------------------------------
 
 switch ($action) {
     case 'verificar_composer':
         try {
             $composerGlobal = verificarComposer();
-            $composerLocal = file_exists($projectRoot . '/composer.phar');
+            $composerLocal = file_exists($libsRoot . '/composer.phar');
             echo json_encode([
                 'success' => true,
                 'composer_global' => $composerGlobal,
                 'composer_local' => $composerLocal,
                 'composer_disponivel' => $composerGlobal || $composerLocal,
+                'libs_root' => $libsRoot,
                 'message' => ($composerGlobal || $composerLocal) ? 'Composer encontrado' : 'Composer não encontrado'
             ]);
         } catch (Exception $e) {
@@ -242,9 +311,9 @@ switch ($action) {
 
     case 'instalar_composer':
         try {
-            $res = baixarComposerPhar($projectRoot);
+            $res = baixarComposerPhar($libsRoot);
             if (!$res['success']) {
-                $res = instalarComposerLocal($projectRoot);
+                $res = instalarComposerLocal($libsRoot);
             }
             echo json_encode($res);
         } catch (Exception $e) {
@@ -254,22 +323,21 @@ switch ($action) {
 
     case 'instalar_dependencias':
         try {
-            $composerLocal = file_exists($projectRoot . '/composer.phar');
+            $composerLocal = file_exists($libsRoot . '/composer.phar');
             if (!$composerLocal) {
                 echo json_encode([
                     'success' => false,
-                    'message' => 'composer.phar não encontrado. Use a ação instalar_composer primeiro.'
+                    'message' => 'composer.phar não encontrado em bibliotecas. Use a ação instalar_composer primeiro.'
                 ]);
                 break;
             }
-            if (!file_exists($projectRoot . '/composer.json')) {
-                echo json_encode(['success' => false, 'message' => 'Arquivo composer.json não encontrado']);
+            if (!file_exists($libsRoot . '/composer.json')) {
+                echo json_encode(['success' => false, 'message' => 'Arquivo composer.json não encontrado em bibliotecas']);
                 break;
             }
-
-            // Executa Composer dentro do mesmo processo PHP
+            // Executa Composer dentro do mesmo processo PHP, no diretório de bibliotecas
             $cwd = getcwd();
-            chdir($projectRoot);
+            chdir($libsRoot);
             $bufferOutput = '';
             $exitCode = 1;
             $faltandoGd = !extension_loaded('gd');
@@ -285,59 +353,29 @@ switch ($action) {
                 }
                 $app = new $appClass();
                 $app->setAutoExit(false);
-                $args = [
-                    'command' => 'install',
-                    '--no-interaction' => true,
-                    '--prefer-dist' => true,
-                ];
+                $args = [ 'command' => 'install', '--no-interaction' => true, '--prefer-dist' => true ];
                 if ($ignoreAll) { $args['--ignore-platform-reqs'] = true; }
                 $input = new $inputClass($args);
                 $buffer = new $outputClass();
                 $exitCode = $app->run($input, $buffer);
                 $bufferOutput = $buffer->fetch();
-            } catch (
-                Throwable $t
-            ) {
-                $exitCode = 1;
-                $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage();
+            } catch (Throwable $t) {
+                $exitCode = 1; $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage();
             }
             chdir($cwd);
 
-            if ($exitCode === 0) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Dependências instaladas com sucesso! (em processo)',
-                    'output' => $bufferOutput,
-                    'ignored_platform_reqs' => $ignoreAll,
-                    'extensoes_carregadas' => [
-                        'gd' => extension_loaded('gd'),
-                        'mbstring' => extension_loaded('mbstring'),
-                    ],
-                ]);
-            } else {
-                $notes = [];
-                if ($ignoreAll) {
-                    $notes[] = 'Composer foi executado com --ignore-platform-reqs porque gd/mbstring não estão carregadas neste processo do PHP.';
-                }
-                $iniCli = detectarPhpIniCli();
-                if ($faltandoGd) {
-                    $r = habilitarExtensaoNoIni($iniCli, 'gd');
-                    if (!empty($r['message'])) $notes[] = $r['message'];
-                }
-                if ($faltandoMb) {
-                    $r = habilitarExtensaoNoIni($iniCli, 'mbstring');
-                    if (!empty($r['message'])) $notes[] = $r['message'];
-                }
-                $notes[] = 'Após habilitar extensões no php.ini, reinicie o Apache para carregá-las.';
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Erro ao instalar dependências (execução em processo).',
-                    'output' => $bufferOutput,
-                    'ignored_platform_reqs' => $ignoreAll,
-                    'php_ini_cli' => $iniCli,
-                    'notas' => $notes
-                ]);
-            }
+            // Limpeza alvo somente na pasta bibliotecas
+            $cleanup = limpezaInstaladorDir($libsRoot);
+
+            echo json_encode([
+                'success' => ($exitCode === 0),
+                'message' => $exitCode === 0 ? 'Dependências instaladas. Limpando artefatos do instalador.' : 'Falha ao instalar dependências. Mesmo assim, limpeza executada.',
+                'output' => $bufferOutput,
+                'ignored_platform_reqs' => $ignoreAll,
+                'extensoes_carregadas' => [ 'gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring') ],
+                'cleanup' => $cleanup,
+                'libs_root' => $libsRoot
+            ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
         }
@@ -345,19 +383,118 @@ switch ($action) {
 
     case 'verificar_instalacao':
         try {
-            $vendorPath = $projectRoot . '/vendor/autoload.php';
+            $vendorPath = $libsRoot . '/vendor/autoload.php';
             if (!file_exists($vendorPath)) {
-                echo json_encode(['success' => false, 'message' => 'Vendor não encontrado']);
+                echo json_encode(['success' => false, 'message' => 'Vendor não encontrado em bibliotecas']);
                 break;
             }
             require_once $vendorPath;
-            $classesOk = class_exists('PhpOffice\PhpPresentation\PhpPresentation') && class_exists('Mpdf\Mpdf');
+            $classesOk = class_exists('PhpOffice\\PhpPresentation\\PhpPresentation') && class_exists('Mpdf\\Mpdf');
             echo json_encode([
                 'success' => $classesOk,
-                'message' => $classesOk ? 'Todas as dependências estão instaladas!' : 'Algumas classes não foram encontradas'
+                'message' => $classesOk ? 'Todas as dependências estão instaladas!' : 'Algumas classes não foram encontradas',
+                'libs_root' => $libsRoot
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao verificar instalação: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'status_git':
+        try {
+            $git = caminhoGitExe();
+            if (!$git || !funcDisponivel('exec')) {
+                echo json_encode(['success' => false, 'message' => 'git não disponível no servidor ou exec() desabilitado.']);
+                break;
+            }
+            $gitCmd = (strpos($git, ' ') !== false ? '"' . $git . '"' : $git);
+            $version = executarComando($gitCmd . ' --version', $libsRoot);
+            $status = executarComando($gitCmd . ' --no-pager status --porcelain', $libsRoot);
+            echo json_encode(['success' => true, 'version' => $version, 'status' => $status, 'dir' => $libsRoot]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro status_git: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'limpar_instalador':
+        try {
+            $removerArtefatos = isset($_POST['remover_artefatos']) && ($_POST['remover_artefatos'] === '1' || $_POST['remover_artefatos'] === 'true');
+            $res = limpezaInstaladorDir($libsRoot);
+            $removidos = [];
+            if ($removerArtefatos) {
+                $artefatos = [$logPath];
+                foreach ($artefatos as $a) {
+                    if (file_exists($a)) { if (@unlink($a)) { $removidos[] = $a; } }
+                }
+            }
+            echo json_encode(['success' => $res['success'], 'message' => 'Limpeza executada', 'detalhes' => $res, 'removidos' => $removidos, 'libs_root' => $libsRoot]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro limpar_instalador: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'criar_log':
+        try {
+            $mensagem = isset($_POST['mensagem']) ? (string)$_POST['mensagem'] : '';
+            if ($mensagem === '') { echo json_encode(['success' => false, 'message' => 'mensagem obrigatória']); break; }
+            logMsg('[MANUAL] ' . $mensagem);
+            echo json_encode(['success' => true, 'message' => 'Log gravado']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro criar_log: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'ler_log':
+        try {
+            $linhas = isset($_POST['linhas']) ? (int)$_POST['linhas'] : 200;
+            $conteudo = tailFile($logPath, $linhas);
+            echo json_encode(['success' => true, 'linhas' => $linhas, 'conteudo' => $conteudo]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro ler_log: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'limpar_log':
+        try {
+            @file_put_contents($logPath, '');
+            echo json_encode(['success' => true, 'message' => 'Log limpo']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro limpar_log: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'auto_test':
+        try {
+            $composerGlobal = verificarComposer();
+            $composerLocal = file_exists($libsRoot . '/composer.phar');
+            $r1 = ['success' => true, 'composer_global' => $composerGlobal, 'composer_local' => $composerLocal, 'composer_disponivel' => $composerGlobal || $composerLocal];
+            $r2 = $composerLocal ? ['success' => true, 'message' => 'composer.phar já presente'] : baixarComposerPhar($libsRoot);
+            if (!$r2['success']) { $r2 = instalarComposerLocal($libsRoot); }
+            // instalar_dependencias resumido
+            $cwd = getcwd(); chdir($libsRoot);
+            $bufferOutput = ''; $exitCode = 1; $faltandoGd = !extension_loaded('gd'); $faltandoMb = !extension_loaded('mbstring'); $ignoreAll = ($faltandoGd || $faltandoMb);
+            try {
+                require_once 'phar://composer.phar/src/bootstrap.php';
+                $appClass = '\\Composer\\Console\\Application';
+                $inputClass = '\\Symfony\\Component\\Console\\Input\\ArrayInput';
+                $outputClass = '\\Symfony\\Component\\Console\\Output\\BufferedOutput';
+                if (!class_exists($appClass) || !class_exists($inputClass) || !class_exists($outputClass)) {
+                    throw new Exception('Composer classes indisponíveis');
+                }
+                $app = new $appClass();
+                $app->setAutoExit(false);
+                $args = ['command' => 'install', '--no-interaction' => true, '--prefer-dist' => true];
+                if ($ignoreAll) { $args['--ignore-platform-reqs'] = true; }
+                $input = new $inputClass($args);
+                $buffer = new $outputClass();
+                $exitCode = $app->run($input, $buffer); $bufferOutput = $buffer->fetch();
+            } catch (Throwable $t) { $exitCode = 1; $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage(); }
+            chdir($cwd);
+            $cleanup = limpezaInstaladorDir($libsRoot);
+            $r3 = ['success' => ($exitCode === 0), 'output' => $bufferOutput, 'ignored_platform_reqs' => $ignoreAll, 'cleanup' => $cleanup];
+            echo json_encode(['success' => true, 'etapas' => ['verificar_composer' => $r1, 'instalar_composer' => $r2, 'instalar_dependencias' => $r3], 'libs_root' => $libsRoot]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro auto_test: ' . $e->getMessage()]);
         }
         break;
 

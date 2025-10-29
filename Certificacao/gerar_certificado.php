@@ -25,28 +25,39 @@ if ($result->num_rows === 0) {
 
 $dados = $result->fetch_assoc();
 
-// Inclui a biblioteca FPDF
-require_once '../vendor/autoload.php';
-use Fpdf\Fpdf;
+// Inclui o autoloader do Composer da nova pasta de bibliotecas
+require_once __DIR__ . '/bibliotecas/vendor/autoload.php';
 
-$pdf = new Fpdf();
-$pdf->AddPage();
-$pdf->SetFont('Arial', 'B', 16);
+$mpdfClass = '\\Mpdf\\Mpdf';
+if (!class_exists($mpdfClass)) {
+    die('Biblioteca mPDF não instalada. Acesse Certificacao/index.php e clique em "Instalar Automaticamente".');
+}
 
-// Adiciona o modelo do certificado
-$pdf->Image('../Imagens/Certificado.svg', 0, 0, 210, 297);
+$mpdf = new $mpdfClass(['format' => 'A4']);
+$mpdf->SetTitle('Certificado');
 
-// Adiciona o nome do participante
-$pdf->SetXY(30, 120);
-$pdf->Cell(150, 10, utf8_decode($dados['nome_participante']), 0, 1, 'C');
+$bgPath = realpath(__DIR__ . '/../Imagens/Certificado.svg');
+$bgUrl = $bgPath ? $bgPath : (__DIR__ . '/../Imagens/Certificado.svg');
 
-// Adiciona o nome do evento e a data
-$pdf->SetXY(30, 140);
-$pdf->SetFont('Arial', '', 12);
-$pdf->Cell(150, 10, utf8_decode("Evento: " . $dados['nome_evento']), 0, 1, 'C');
-$pdf->SetXY(30, 150);
-$pdf->Cell(150, 10, utf8_decode("Data: " . date('d/m/Y', strtotime($dados['data_evento']))), 0, 1, 'C');
+$html = '<html><head><style>
+    body { font-family: Arial, sans-serif; }
+    .container { position: relative; width: 100%; height: 100%; }
+    .bg { position: absolute; top: -10mm; left: -10mm; right: -10mm; bottom: -10mm; z-index: 0; }
+    .content { position: relative; z-index: 1; text-align: center; padding-top: 70mm; }
+    .nome { font-size: 20pt; font-weight: bold; }
+    .detalhes { margin-top: 8mm; font-size: 12pt; }
+    .data { margin-top: 12mm; font-size: 12pt; }
+</style></head><body>
+<div class="container">
+  <div class="bg"><img src="' . $bgUrl . '" style="width:100%;"></div>
+  <div class="content">
+    <div class="nome">' . htmlspecialchars($dados['nome_participante']) . '</div>
+    <div class="detalhes">Evento: ' . htmlspecialchars($dados['nome_evento']) . '</div>
+    <div class="data">Data: ' . date('d/m/Y', strtotime($dados['data_evento'])) . '</div>
+  </div>
+</div>
+</body></html>';
 
-// Gera o PDF para download
-$pdf->Output('D', 'certificado.pdf');
+$mpdf->WriteHTML($html);
+$mpdf->Output('certificado.pdf', 'D');
 exit();

@@ -1,0 +1,8 @@
+# Bibliotecas de Certificacao
+Certificacao/bibliotecas/vendor/
+Certificacao/bibliotecas/composer.phar
+Certificacao/instalador.log
+
+# Composer local (caso exista na raiz)
+/vendor/
+/composer.phar

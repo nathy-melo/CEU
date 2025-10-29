@@ -1,0 +1,10 @@
+{
+  "name": "ceu/certificacao-bibliotecas",
+  "description": "Dependências da área de certificação do CEU",
+  "type": "project",
+  "require": {
+    "php": ">=7.4",
+    "phpoffice/phppresentation": "^1.0",
+    "mpdf/mpdf": "^8.2"
+  }
+}
