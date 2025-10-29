@@ -5,493 +5,1134 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CEU - Controle de Eventos Unificado</title>
-  <link rel="stylesheet" href="../styleGlobal.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <style>
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
+    :root {
+      --branco: #FFFFFF;
+      --preto: #000000;
+      --botao: #6598D2;
+      --caixas: #4F6C8C;
+      --fundo: #D1EAFF;
+      --cinza-escuro: #333333;
+      --cinza-medio: #888888;
+      --azul-escuro: #0a1449;
+      --azul-claro: #8ad7da;
+      --vermelho: #ff0000;
+      --verde: #2c9533;
+      --vermelho-escuro: #b20000;
+      --sombra-padrao: rgba(0, 0, 0, 0.6);
+      --sombra-forte: rgba(0, 0, 0, 0.8);
+      --sombra-leve: rgba(0, 0, 0, 0.5);
+      --tabela_participantes: #deeaff;
+      --botao-escuro: #154d8d;
+      --botao-escuro-dark: #1e40af;
+      --secondary: #3b82f6;
+      --accent: #60a5fa;
+      --dark: #1e293b;
+      --light: #f1f5f9;
+      --white: #ffffff;
+      --text: #334155;
+      --text-light: #64748b;
     }
 
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
+    html {
+      scroll-behavior: smooth;
     }
 
-    @keyframes shimmer {
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      overflow-x: hidden;
+      background: var(--branco);
+    }
+
+    /* Hero Section - TEMA CLARO ELEGANTE */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #bfdbfe 100%);
+      overflow: hidden;
+      padding: 2rem;
+    }
+
+    /* Padrão geométrico de losangos */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        linear-gradient(30deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
+        linear-gradient(150deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
+        linear-gradient(30deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
+        linear-gradient(150deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05));
+      background-size: 80px 140px;
+      opacity: 0.5;
+    }
+
+    @keyframes moveClouds {
       0% {
-        background-position: -1000px 0;
+        background-position: 0 0;
       }
       100% {
         background-position: 1000px 0;
       }
     }
 
-    @keyframes rotate {
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 5rem;
+      max-width: 1600px;
+      width: 100%;
+      align-items: center;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
       from {
-        transform: rotate(0deg);
+        opacity: 0;
+        transform: translateY(30px);
       }
+
       to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
-    body {
-      padding: 2rem 1rem;
-      min-height: 100vh;
+    .hero-text {
+      text-align: left;
+      padding-right: 2rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      position: relative;
-      overflow-x: hidden;
+      justify-content: center;
+      align-items: flex-start;
     }
 
-    /* Efeito de partículas de fundo */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
+    .logo {
+      width: 200px;
+      height: auto;
+      margin-bottom: 2.5rem;
+      filter: drop-shadow(0 10px 30px rgba(59, 130, 246, 0.2));
+      animation: logoFloat 3s ease-in-out infinite;
+      align-self: center;
+    }
+
+    @keyframes logoFloat {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5.5vw, 4rem);
+      font-weight: 800;
+      color: #1e3a8a;
+      margin-bottom: 1.8rem;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      text-align: center;
+      width: 100%;
+    }
+
+    .subtitulo {
+      font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+      color: #475569;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+      font-weight: 400;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Carrossel GRANDE e IMPACTANTE */
+    .hero-carousel {
+      position: relative;
+      height: 700px;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow:
+        0 25px 70px rgba(59, 130, 246, 0.15),
+        0 10px 30px rgba(59, 130, 246, 0.1);
+    }
+
+    .carousel-container {
+      position: relative;
       width: 100%;
       height: 100%;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(100, 150, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(150, 100, 255, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+      transition: transform 0.3s ease;
     }
 
-    .container-principal {
-      position: relative;
-      width: clamp(280px, 90vw, 1200px);
-      background: linear-gradient(135deg, var(--caixas) 0%, rgba(79, 108, 140, 0.95) 100%);
-      border-radius: 2rem;
-      overflow: hidden;
+    .carousel-track {
       display: flex;
-      flex-direction: column;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease;
+    }
+
+    .carousel-slide.active img {
+      transform: scale(1.02);
+    }
+
+    /* Overlay profissional */
+    .carousel-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(255, 255, 255, 0.7) 50%,
+          transparent 100%);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      color: #1e3a8a;
+    }
+
+    .carousel-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: #1e3a8a;
+    }
+
+    .carousel-description {
+      font-size: 1.1rem;
+      color: #475569;
+      font-weight: 400;
+    }
+
+    /* Botões de navegação elegantes */
+    .carousel-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4rem 2.5rem;
-      box-sizing: border-box;
-      gap: 2rem;
-      box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-      z-index: 1;
-      animation: fadeInUp 0.8s ease-out;
+      font-size: 1.5rem;
+      color: #3b82f6;
+      transition: all 0.3s ease;
+      z-index: 20;
     }
 
-    /* Efeito de brilho no topo do container */
-    .container-principal::before {
-      content: '';
+    .carousel-nav:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .carousel-prev {
+      left: 2rem;
+    }
+
+    .carousel-next {
+      right: 2rem;
+    }
+
+    /* Indicadores minimalistas */
+    .carousel-indicators {
       position: absolute;
-      top: 0;
-      left: -100%;
-      width: 200%;
-      height: 4px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.6),
-        transparent
-      );
-      animation: shimmer 3s infinite;
-    }
-
-    .secao-hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.2rem;
-      width: 100%;
-      max-width: 900px;
-      animation: fadeInUp 1s ease-out 0.2s backwards;
-    }
-
-    .imagem {
-      width: 100%;
-      max-width: 220px;
-      min-width: 120px;
-      margin: 0 auto;
-      display: block;
-      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .subtexto {
-      text-align: center;
-      color: var(--branco);
-      font-size: clamp(1rem, 2.5vw, 1.5rem);
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      line-height: 1.3;
-      word-wrap: break-word;
-      text-shadow: 0px 2px 10px rgba(0, 0, 0, 0.6);
-      opacity: 0.95;
-      letter-spacing: 0.5px;
-      position: relative;
-    }
-
-    .subtexto::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
+      bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, var(--botao), transparent);
-      border-radius: 2px;
+      display: flex;
+      gap: 0.7rem;
+      z-index: 20;
     }
 
-    .texto-principal {
+    .carousel-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .carousel-indicator:hover {
+      background: rgba(59, 130, 246, 0.6);
+      transform: scale(1.2);
+    }
+
+    .carousel-indicator.active {
+      background: #3b82f6;
+      width: 30px;
+      border-radius: 5px;
+    }
+
+    /* Botões CTA profissionais */
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #3b82f6;
+      border: 2px solid #3b82f6;
+    }
+
+    .btn-secondary:hover {
+      background: #3b82f6;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Seção de Features */
+    .features {
+      padding: 6rem 2rem;
+      background: white;
+    }
+
+    .section-header {
       text-align: center;
-      color: var(--branco);
-      font-size: clamp(1.4rem, 4vw, 2.8rem);
+      max-width: 800px;
+      margin: 0 auto 4rem;
+    }
+
+    .section-header h2 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
       font-weight: 700;
-      line-height: 1.3;
-      text-shadow: 
-        0px 4px 20px rgba(0, 0, 0, 0.7),
-        0px 2px 4px rgba(0, 0, 0, 0.5);
-      margin: 0.8rem 0;
-      background: linear-gradient(135deg, #ffffff 0%, #e0e8ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #1e3a8a;
+      margin-bottom: 1rem;
     }
 
-    .descricao {
-      text-align: center;
-      color: var(--branco);
-      font-size: clamp(1rem, 2.2vw, 1.3rem);
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
+    .section-header p {
+      font-size: 1.1rem;
+      color: #64748b;
       line-height: 1.7;
-      opacity: 0.95;
-      max-width: 750px;
-      margin: 0.5rem 0 2rem 0;
-      text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.4);
     }
 
-    .container-recursos {
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      padding: 2.5rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+      border-color: #3b82f6;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    /* Seção de Benefits */
+    .benefits {
+      padding: 6rem 2rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    }
+
+    .benefits-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
-      width: 100%;
-      max-width: 1100px;
-      margin: 1.5rem 0;
-      animation: fadeInUp 1.2s ease-out 0.4s backwards;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .card-recurso {
-      background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.15) 0%, 
-        rgba(255, 255, 255, 0.05) 100%);
-      backdrop-filter: blur(15px);
-      border-radius: 1.5rem;
-      padding: 2rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    }
-
-    .card-recurso::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-      );
-      transition: left 0.5s;
-    }
-
-    .card-recurso:hover::before {
-      left: 100%;
-    }
-
-    .card-recurso:hover {
-      transform: translateY(-10px) scale(1.03);
-      box-shadow: 
-        0 20px 50px rgba(0, 0, 0, 0.3),
-        0 0 0 2px var(--botao) inset;
-      border-color: var(--botao);
-    }
-
-    .card-icon {
-      font-size: 3.5rem;
+    .benefit-card {
       text-align: center;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
-      transition: transform 0.4s;
-      animation: pulse 2s ease-in-out infinite;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid rgba(59, 130, 246, 0.1);
+      transition: all 0.3s ease;
     }
 
-    .card-recurso:hover .card-icon {
-      transform: scale(1.2) rotate(5deg);
-      animation: none;
+    .benefit-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
     }
 
-    .card-titulo {
-      color: var(--branco);
-      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    .benefit-number {
+      font-size: 3rem;
       font-weight: 700;
-      text-align: center;
-      line-height: 1.3;
-      text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.5);
-    }
-
-    .card-descricao {
-      color: var(--branco);
-      font-size: clamp(0.9rem, 1.6vw, 1.05rem);
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
-      text-align: center;
-      line-height: 1.6;
-      opacity: 0.95;
-      text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .botao-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      margin-top: 1.5rem;
-      animation: fadeInUp 1.4s ease-out 0.6s backwards;
-    }
-
-    .botao {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: var(--branco);
-      font-size: clamp(1.1rem, 2.8vw, 1.6rem);
-      font-family: 'Istok Web', sans-serif;
-      font-weight: 700;
-      word-wrap: break-word;
-      background: linear-gradient(135deg, var(--botao) 0%, #2d5a8f 100%);
-      border-radius: 1.5rem;
-      border: none;
-      cursor: pointer;
-      min-width: 200px;
-      min-height: 60px;
-      max-width: 400px;
-      padding: 1rem 3rem;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 8px 24px rgba(0, 0, 0, 0.3),
-        0 0 0 0 rgba(101, 152, 210, 0.5);
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 0.5px;
-    }
-
-    .botao::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-
-    .botao:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .botao:hover {
-      transform: translateY(-3px) scale(1.08);
-      box-shadow: 
-        0 15px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(101, 152, 210, 0.6);
-    }
-
-    .botao:active {
-      transform: translateY(-1px) scale(1.05);
-    }
-
-    .destaque {
-      background: linear-gradient(135deg, #fff 0%, #a8c5ff 100%);
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      font-weight: 800;
-      text-shadow: none;
-      position: relative;
+      margin-bottom: 0.5rem;
     }
 
-    /* Badges decorativas */
-    .badge-novo {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    .benefit-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 0.5rem;
+    }
+
+    .benefit-card p {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    /* Seção CTA Final */
+    .cta-section {
+      padding: 6rem 2rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      text-align: center;
       color: white;
-      padding: 0.4rem 0.8rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
-      letter-spacing: 0.5px;
     }
 
-    /* Separador decorativo */
-    .separador {
-      width: 80%;
-      max-width: 600px;
-      height: 2px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-      );
-      margin: 1rem 0;
+    .cta-section h2 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.95;
+    }
+
+    .cta-section .btn {
+      background: white;
+      color: #3b82f6;
+      font-size: 1.1rem;
+      padding: 1.2rem 3rem;
+    }
+
+    .cta-section .btn:hover {
+      background: #f8fafc;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        text-align: center;
+      }
+
+      .hero-text {
+        text-align: center;
+        padding-right: 0;
+        order: 2;
+      }
+
+      .hero-carousel {
+        order: 1;
+        height: 500px;
+      }
     }
 
     @media (max-width: 768px) {
-      body {
-        padding: 1rem 0.5rem;
+      .hero {
+        min-height: auto;
+        padding: 1.5rem 1rem;
       }
 
-      .container-principal {
-        padding: 3rem 2rem;
-        border-radius: 1.5rem;
+      .hero-content {
+        gap: 2rem;
       }
 
-      .container-recursos {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+      .hero-carousel {
+        height: 400px;
       }
 
-      .card-recurso {
-        padding: 1.8rem 1.3rem;
+      .carousel-nav {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
       }
 
-      .botao {
-        min-width: 180px;
-        min-height: 55px;
-        padding: 0.9rem 2.5rem;
+      .carousel-prev {
+        left: 1rem;
+      }
+
+      .carousel-next {
+        right: 1rem;
+      }
+
+      .carousel-overlay {
+        padding: 2rem;
+      }
+
+      .carousel-title {
+        font-size: 1.3rem;
+      }
+
+      .carousel-description {
+        font-size: 0.95rem;
+      }
+
+      .cta-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        justify-content: center;
       }
     }
 
     @media (max-width: 480px) {
-      .container-principal {
-        padding: 2.5rem 1.5rem;
+      .hero-carousel {
+        height: 300px;
+        border-radius: 12px;
       }
 
-      .imagem {
-        max-width: 160px;
+      .carousel-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .carousel-prev {
+        left: 0.5rem;
+      }
+
+      .carousel-next {
+        right: 0.5rem;
+      }
+
+      .carousel-overlay {
+        padding: 1.5rem;
+      }
+
+      .carousel-title {
+        font-size: 1.1rem;
+      }
+
+      .carousel-description {
+        font-size: 0.85rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="container-principal">
-    <div class="secao-hero">
-      <img class="imagem" src="../Imagens/CEU-Logo.png" alt="Logo CEU" />
-      <div class="subtexto">Controle de Eventos Unificado</div>
-      <h1 class="texto-principal">Organize eventos acadêmicos de forma <span class="destaque">simples e eficiente</span></h1>
-      <div class="separador"></div>
-      <p class="descricao">
-        A plataforma completa para criar, gerenciar e participar de eventos educacionais. 
-        Conecte organizadores e participantes em um só lugar com tecnologia moderna e intuitiva.
-      </p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <img src="../Imagens/CEU-Logo.png" alt="CEU Logo" class="logo">
+        <h1>Controle de Eventos Unificado</h1>
+        <p class="subtitulo">
+          Gerencie seus eventos de forma inteligente e eficiente.
+          Inscrições, certificados e controle total em uma única plataforma.
+        </p>
+        <div class="cta-buttons">
+          <a href="#" class="btn btn-primary">Começar Agora</a>
+          <a href="#" class="btn btn-secondary">Saiba Mais</a>
+        </div>
+      </div>
+
+      <div class="hero-carousel">
+        <div class="carousel-container">
+          <div class="carousel-track">
+            <div class="carousel-slide">
+              <img src="../ImagensEventos/Hackathon_CEU.png" alt="Hackathon CEU">
+              <div class="carousel-overlay">
+                <div class="carousel-title">Hackathon CEU</div>
+                <div class="carousel-description">Evento de programação e inovação</div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <img src="../ImagensEventos/Machine_Learning.png" alt="Machine Learning">
+              <div class="carousel-overlay">
+                <div class="carousel-title">Machine Learning Workshop</div>
+                <div class="carousel-description">Aprenda os fundamentos da inteligência artificial</div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <img src="../ImagensEventos/JavaScript_Workshop.png" alt="JavaScript Workshop">
+              <div class="carousel-overlay">
+                <div class="carousel-title">JavaScript Workshop</div>
+                <div class="carousel-description">Domine a linguagem da web</div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <img src="../ImagensEventos/Semana_de_Inovacao.png" alt="Semana de Inovação">
+              <div class="carousel-overlay">
+                <div class="carousel-title">Semana de Inovação</div>
+                <div class="carousel-description">Tecnologia e futuro em foco</div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <img src="../ImagensEventos/CyberSecurity.png" alt="CyberSecurity">
+              <div class="carousel-overlay">
+                <div class="carousel-title">Segurança Cibernética</div>
+                <div class="carousel-description">Proteja-se no mundo digital</div>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-nav carousel-prev">‹</button>
+          <button class="carousel-nav carousel-next">›</button>
+          <div class="carousel-indicators">
+            <div class="carousel-indicator active"></div>
+            <div class="carousel-indicator"></div>
+            <div class="carousel-indicator"></div>
+            <div class="carousel-indicator"></div>
+            <div class="carousel-indicator"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="container-recursos">
-      <div class="card-recurso">
-        <div class="card-icon">🎯</div>
-        <h3 class="card-titulo">Crie Eventos</h3>
-        <p class="card-descricao">
-          Cadastre palestras, workshops, oficinas e muito mais com poucos cliques
-        </p>
-      </div>
+    <div class="scroll-indicator"></div>
+  </section>
 
-      <div class="card-recurso">
-        <div class="card-icon">👥</div>
-        <h3 class="card-titulo">Gerencie Participantes</h3>
-        <p class="card-descricao">
-          Controle inscrições, confirme presenças e organize listas facilmente
-        </p>
+  <!-- Seção de Features -->
+  <section class="features">
+    <div class="section-header">
+      <h2>Recursos Poderosos para Seus Eventos</h2>
+      <p>Tudo que você precisa para gerenciar eventos de sucesso em uma única plataforma moderna e intuitiva.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Gestão de Inscrições</h3>
+        <p>Sistema completo para gerenciar inscrições de participantes com validação automática e controle de vagas.</p>
       </div>
-
-      <div class="card-recurso">
-        <div class="card-icon">📜</div>
-        <h3 class="card-titulo">Emita Certificados</h3>
-        <p class="card-descricao">
-          Gere certificados automáticos de participação, extensão e muito mais
-        </p>
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <h3>Certificados Automáticos</h3>
+        <p>Gere certificados personalizados automaticamente com QR Code para validação de autenticidade.</p>
       </div>
-
-      <div class="card-recurso">
-        <div class="card-icon">🔍</div>
-        <h3 class="card-titulo">Encontre Eventos</h3>
-        <p class="card-descricao">
-          Busque e filtre eventos por categoria, data, localização e tipo
-        </p>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Relatórios Detalhados</h3>
+        <p>Acompanhe métricas e gere relatórios completos sobre participação, presença e engajamento.</p>
       </div>
-
-      <div class="card-recurso">
-        <div class="card-icon">⏰</div>
-        <h3 class="card-titulo">Acompanhe em Tempo Real</h3>
-        <p class="card-descricao">
-          Veja seus eventos inscritos, baixe certificados e acompanhe novidades
-        </p>
+      <div class="feature-card">
+        <div class="feature-icon">✉️</div>
+        <h3>Notificações Inteligentes</h3>
+        <p>Sistema de notificações automáticas para manter participantes e organizadores sempre informados.</p>
       </div>
-
-      <div class="card-recurso">
-        <div class="card-icon">✨</div>
-        <h3 class="card-titulo">Interface Intuitiva</h3>
-        <p class="card-descricao">
-          Design moderno e responsivo que funciona em qualquer dispositivo
-        </p>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Segurança Avançada</h3>
+        <p>Proteção de dados com criptografia e controles de acesso diferenciados por perfil de usuário.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>100% Responsivo</h3>
+        <p>Acesse de qualquer dispositivo - desktop, tablet ou smartphone com experiência otimizada.</p>
       </div>
     </div>
+  </section>
 
-    <div class="botao-wrapper">
-      <a href="ContainerPublico.php" style="text-decoration: none;">
-        <button class="botao">Comece Agora!</button>
-      </a>
+  <!-- Seção de Benefits -->
+  <section class="benefits">
+    <div class="section-header">
+      <h2>Por Que Escolher o CEU?</h2>
+      <p>Números que comprovam a eficiência da nossa plataforma.</p>
     </div>
-  </div>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-number">10x</div>
+        <h3>Mais Rápido</h3>
+        <p>Reduza o tempo de gestão de eventos em até 10 vezes</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">100%</div>
+        <h3>Automatizado</h3>
+        <p>Certificados e notificações gerados automaticamente</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">24/7</div>
+        <h3>Disponibilidade</h3>
+        <p>Acesso à plataforma a qualquer hora, de qualquer lugar</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">0</div>
+        <h3>Papel</h3>
+        <p>Gestão completamente digital e sustentável</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção CTA Final -->
+  <section class="cta-section">
+    <h2>Pronto para Transformar Seus Eventos?</h2>
+    <p>Junte-se a centenas de organizadores que já confiam no CEU para gerenciar seus eventos.</p>
+    <a href="#" class="btn">Comece Gratuitamente</a>
+  </section>
+
 </body>
+
+<script>
+  // Carousel functionality com efeitos avançados
+  class SpectacularCarousel {
+    constructor() {
+      this.track = document.querySelector('.carousel-track');
+      this.slides = document.querySelectorAll('.carousel-slide');
+      this.prevButton = document.querySelector('.carousel-prev');
+      this.nextButton = document.querySelector('.carousel-next');
+      this.indicators = document.querySelectorAll('.carousel-indicator');
+
+      this.currentSlide = 0;
+      this.totalSlides = this.slides.length;
+      this.autoPlayInterval = null;
+      this.isTransitioning = false;
+
+      this.init();
+    }
+
+    init() {
+      // Add event listeners com debounce
+      this.prevButton.addEventListener('click', () => this.debounce(() => this.prevSlide(), 300));
+      this.nextButton.addEventListener('click', () => this.debounce(() => this.nextSlide(), 300));
+
+      // Add click listeners to indicators
+      this.indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => this.goToSlide(index));
+      });
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') this.prevSlide();
+        if (e.key === 'ArrowRight') this.nextSlide();
+      });
+
+      // Touch/swipe support
+      this.addTouchSupport();
+
+      // Start autoplay
+      this.startAutoPlay();
+
+      // Pause on hover with smooth transition
+      const carousel = document.querySelector('.hero-carousel');
+      carousel.addEventListener('mouseenter', () => {
+        this.stopAutoPlay();
+        carousel.style.transform = 'scale(1.02)';
+      });
+      carousel.addEventListener('mouseleave', () => {
+        this.startAutoPlay();
+        carousel.style.transform = 'scale(1)';
+      });
+
+      // Intersection Observer para performance
+      this.setupIntersectionObserver();
+
+      // Marcar primeiro slide como ativo
+      this.slides[0].classList.add('active');
+    }
+
+    debounce(func, wait) {
+      if (this.isTransitioning) return;
+      this.isTransitioning = true;
+      func();
+      setTimeout(() => { this.isTransitioning = false; }, wait);
+    }
+
+    addTouchSupport() {
+      let startX = 0;
+      let endX = 0;
+
+      this.track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+
+      this.track.addEventListener('touchend', (e) => {
+        endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+
+        if (Math.abs(diff) > 50) { // Minimum swipe distance
+          if (diff > 0) {
+            this.nextSlide();
+          } else {
+            this.prevSlide();
+          }
+        }
+      });
+    }
+
+    setupIntersectionObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            this.startAutoPlay();
+          } else {
+            this.stopAutoPlay();
+          }
+        });
+      });
+
+      observer.observe(document.querySelector('.hero-carousel'));
+    }
+
+    updateCarousel() {
+      // Remove active class from all slides
+      this.slides.forEach(slide => slide.classList.remove('active'));
+
+      // Add active class to current slide
+      this.slides[this.currentSlide].classList.add('active');
+
+      // Move track with 3D effect
+      const translateX = -this.currentSlide * 100;
+      this.track.style.transform = `translateX(${translateX}%)`;
+
+      // Update indicators with stagger animation
+      this.indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === this.currentSlide);
+        if (index === this.currentSlide) {
+          // Add pulse effect to active indicator
+          indicator.style.animation = 'pulse 2s ease-in-out infinite';
+        } else {
+          indicator.style.animation = 'none';
+        }
+      });
+
+      // Trigger overlay animations
+      this.animateOverlay();
+    }
+
+    animateOverlay() {
+      const currentOverlay = this.slides[this.currentSlide].querySelector('.carousel-overlay');
+      const title = currentOverlay.querySelector('.carousel-title');
+      const description = currentOverlay.querySelector('.carousel-description');
+
+      // Reset animations
+      title.style.animation = 'none';
+      description.style.animation = 'none';
+
+      // Trigger reflow
+      title.offsetHeight;
+      description.offsetHeight;
+
+      // Apply animations
+      title.style.animation = 'titleSlideIn 0.6s ease-out';
+      description.style.animation = 'descSlideIn 0.6s ease-out 0.2s both';
+    }
+
+    nextSlide() {
+      this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+      this.updateCarousel();
+      this.addNavigationEffect('next');
+    }
+
+    prevSlide() {
+      this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+      this.updateCarousel();
+      this.addNavigationEffect('prev');
+    }
+
+    goToSlide(index) {
+      if (index !== this.currentSlide) {
+        this.currentSlide = index;
+        this.updateCarousel();
+      }
+    }
+
+    addNavigationEffect(direction) {
+      const button = direction === 'next' ? this.nextButton : this.prevButton;
+      button.style.transform = 'translateY(-50%) scale(0.9) rotateZ(10deg)';
+      setTimeout(() => {
+        button.style.transform = 'translateY(-50%) scale(1) rotateZ(0deg)';
+      }, 150);
+    }
+
+    startAutoPlay() {
+      this.stopAutoPlay();
+      this.autoPlayInterval = setInterval(() => {
+        this.nextSlide();
+      }, 4000); // Change slide every 4 seconds
+    }
+
+    stopAutoPlay() {
+      if (this.autoPlayInterval) {
+        clearInterval(this.autoPlayInterval);
+        this.autoPlayInterval = null;
+      }
+    }
+  }
+
+  // Parallax and scroll effects
+  class ScrollEffects {
+    constructor() {
+      this.ticking = false;
+      this.init();
+    }
+
+    init() {
+      window.addEventListener('scroll', () => {
+        if (!this.ticking) {
+          requestAnimationFrame(() => {
+            this.updateParallax();
+            this.ticking = false;
+          });
+          this.ticking = true;
+        }
+      });
+    }
+
+    updateParallax() {
+      const scrolled = window.pageYOffset;
+      const hero = document.querySelector('.hero');
+      const parallaxElements = hero.querySelectorAll('.hero-content, .hero-carousel');
+
+      parallaxElements.forEach(element => {
+        const speed = 0.5;
+        const yPos = -(scrolled * speed);
+        element.style.transform = `translateY(${yPos}px)`;
+      });
+    }
+  }
+
+  // Performance-optimized animations
+  class AnimationController {
+    constructor() {
+      this.observers = [];
+      this.init();
+    }
+
+    init() {
+      this.setupAnimationObservers();
+      this.optimizeAnimations();
+    }
+
+    setupAnimationObservers() {
+      const animatedElements = document.querySelectorAll('.hero-text, .cta-buttons, .logo');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      animatedElements.forEach(element => {
+        observer.observe(element);
+      });
+    }
+
+    optimizeAnimations() {
+      // Reduce motion for users who prefer it
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.style.setProperty('--animation-duration', '0.01s');
+        document.querySelectorAll('*').forEach(element => {
+          element.style.animationDuration = '0.01s !important';
+          element.style.transitionDuration = '0.01s !important';
+        });
+      }
+    }
+  }
+
+  // Enhanced button effects
+  class ButtonEffects {
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      const buttons = document.querySelectorAll('.btn');
+
+      buttons.forEach(button => {
+        // Ripple effect
+        button.addEventListener('click', (e) => {
+          const ripple = document.createElement('span');
+          const rect = button.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+
+          ripple.style.cssText = `
+              position: absolute;
+              width: ${size}px;
+              height: ${size}px;
+              left: ${x}px;
+              top: ${y}px;
+              background: rgba(255, 255, 255, 0.3);
+              border-radius: 50%;
+              transform: scale(0);
+              animation: ripple 0.6s ease-out;
+              pointer-events: none;
+            `;
+
+          button.appendChild(ripple);
+
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        });
+
+        // Magnetic effect
+        button.addEventListener('mousemove', (e) => {
+          const rect = button.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          button.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) scale(1.05)`;
+        });
+
+        button.addEventListener('mouseleave', () => {
+          button.style.transform = 'translate(0, 0)';
+        });
+      });
+    }
+  }
+
+  // Add ripple animation CSS
+  const rippleStyle = document.createElement('style');
+  rippleStyle.textContent = `
+      @keyframes ripple {
+        from {
+          transform: scale(0);
+          opacity: 1;
+        }
+        to {
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+    `;
+  document.head.appendChild(rippleStyle);
+
+  // Initialize everything when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new SpectacularCarousel();
+    new ScrollEffects();
+    new AnimationController();
+    new ButtonEffects();
+
+    // Add scroll indicator functionality
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    if (scrollIndicator) {
+      scrollIndicator.addEventListener('click', () => {
+        window.scrollTo({
+          top: window.innerHeight,
+          behavior: 'smooth'
+        });
+      });
+    }
+
+    // Performance monitoring
+    if ('performance' in window) {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const perfData = performance.getEntriesByType('navigation')[0];
+          console.log(`Página carregada em ${perfData.loadEventEnd - perfData.loadEventStart}ms`);
+        }, 0);
+      });
+    }
+  });
+
+  // Preload next images for better performance
+  window.addEventListener('load', () => {
+    const images = [
+      '../ImagensEventos/React.png',
+      '../ImagensEventos/Python.png',
+      '../ImagensEventos/Palestra_sobre_IA.png'
+    ];
+
+    images.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  });
+</script>
 
 </html>
