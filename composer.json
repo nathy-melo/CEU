@@ -1,0 +1,15 @@
+{
+    "name": "ceu/sistema-certificados",
+    "description": "Sistema de geração de certificados a partir de templates PPTX - CEU",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "phpoffice/phppresentation": "^1.0",
+        "mpdf/mpdf": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "CEU\\": "Certificacao/"
+        }
+    }
+}

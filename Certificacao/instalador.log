@@ -1,0 +1,8 @@
+[2025-10-29 13:41:40] Baixando instalador de https://getcomposer.org/installer
+[2025-10-29 13:41:41] Instalador salvo com 59524 bytes.
+[2025-10-29 13:41:41] composer-setup.php retornou c√≥digo 1 Output: 'php' n∆o Ç reconhecido como um comando interno | ou externo, um programa oper†vel ou um arquivo em lotes.
+[2025-10-29 13:51:07] Baixando instalador de https://getcomposer.org/installer
+[2025-10-29 13:51:09] Instalador salvo com 59524 bytes.
+[2025-10-29 13:51:10] composer-setup.php retornou c√≥digo 3 Output: [Wed Oct 29 09:51:10.167796 2025] [mpm_winnt:crit] [pid 22208:tid 448] AH02965: Child: Unable to retrieve my generation from the parent
+[2025-10-29 14:21:50] Tentando baixar composer.phar de https://getcomposer.org/download/latest-stable/composer.phar
+[2025-10-29 14:21:53] composer.phar salvo com 3125332 bytes.

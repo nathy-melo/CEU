@@ -1,217 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generated Page</title>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
-<title>Certificate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <title>Certificate</title>
   <link rel="stylesheet" href="global.css">
   <style id="sections-styles">
-/* CSS for section section:certificate */
-.certificate-container {
-    max-width: 1920px;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .decorative-bg {
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .top-left {
-    width: 694px;
-    height: 468px;
-    top: -100px;
-    left: -100px;
-  }
-
-  .bottom-right {
-    width: 694px;
-    height: 468px;
-    bottom: -100px;
-    right: -100px;
-  }
-  
-  .decorative-bg img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-  
-  .deco-img-3, .deco-img-4 {
-    transform: rotate(180deg);
-  }
-
-  .certificate-card {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: var(--card-bg-color);
-    border-radius: 50px;
-    width: clamp(90%, 76.25vw, 1464px);
-    max-width: 1464px;
-    margin: 0 auto;
-    padding: 60px 80px;
-    box-sizing: border-box;
-    text-align: center;
-  }
-
-  .title-wrapper {
-    margin-bottom: 180px;
-  }
-
-  .certificate-title {
-    font-size: clamp(2.5rem, 5vw, 70.55px);
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: 7.06px;
-    text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
-    margin: 0;
-  }
-
-  .certificate-body {
-    font-size: clamp(1rem, 2.2vw, 32px);
-    font-weight: 500;
-    line-height: 1.32;
-    letter-spacing: -0.64px;
-    text-align: left;
-    max-width: 1285px;
-    margin: 0 0 179px 0;
-  }
-
-  .certificate-body strong {
-    font-weight: 700;
-  }
-
-  .certificate-date {
-    font-size: clamp(1rem, 2.2vw, 32px);
-    font-weight: 500;
-    line-height: 1.32;
-    letter-spacing: -0.64px;
-    margin: 0 0 24px 0;
-  }
-
-  .certificate-verification {
-    font-size: clamp(0.75rem, 1.1vw, 16px);
-    font-weight: 500;
-    line-height: 1.32;
-    letter-spacing: -0.32px;
-    max-width: 930px;
-    margin: 0 0 24px 0;
-  }
-
-  .logo {
-    width: 325px;
-    height: 162px;
-    object-fit: contain;
-    margin-bottom: 24px;
-    max-width: 80%;
-  }
-
-  .button-wrapper {
-    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.6);
-    border-radius: 6px;
-    transition: transform 0.2s ease;
-  }
-  
-  .button-wrapper:hover {
-      transform: translateY(-2px);
-  }
-
-  .btn-back {
-    display: inline-block;
-    background-color: var(--button-bg-color);
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: clamp(1rem, 1.7vw, 24px);
-    font-weight: 500;
-    padding: 18px 111px;
-    border-radius: 6px;
-  }
-
-  @media (max-width: 1200px) {
-    .certificate-card {
-      padding: 40px 50px;
+    /* CSS for section section:certificate */
+    .certificate-container {
+      position: relative;
+      width: 100%;
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 60px) 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .title-wrapper {
-      margin-bottom: 100px;
-    }
-    .certificate-body {
-      margin-bottom: 100px;
-    }
-  }
 
-  @media (max-width: 768px) {
-    body {
-      padding: 1rem;
-    }
-    .certificate-card {
-      padding: 30px 20px;
-      border-radius: 30px;
-    }
-    .title-wrapper {
-      margin-bottom: 50px;
-    }
-    .certificate-title {
-      letter-spacing: 4px;
-    }
-    .certificate-body {
-      text-align: center;
-      margin-bottom: 50px;
-    }
     .decorative-bg {
-      display: none;
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
     }
+
+    .decorative-bg img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .top-left {
+      top: clamp(-30px, -2.6vw, -50px);
+      left: clamp(-30px, -2.6vw, -50px);
+      width: clamp(200px, 36vw, 694px);
+    }
+
+    .bottom-right {
+      right: clamp(-30px, -2.6vw, -50px);
+      bottom: clamp(-30px, -2.6vw, -50px);
+      width: clamp(200px, 36vw, 694px);
+      transform: rotate(180deg);
+    }
+
+    .certificate-card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--card-bg-color);
+      border-radius: clamp(25px, 2.6vw, 50px);
+      width: clamp(85%, 90%, 1464px);
+      max-width: 1464px;
+      margin: 0 auto;
+      padding: clamp(30px, 3.125vw, 60px) clamp(40px, 4.167vw, 80px);
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .title-wrapper {
+      margin-bottom: clamp(40px, 6.25vw, 120px);
+    }
+
+    .certificate-title {
+      font-size: clamp(2rem, 3.67vw, 70.55px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: clamp(3px, 0.37vw, 7.06px);
+      text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
+      margin: 0;
+    }
+
+    .certificate-body {
+      font-size: clamp(0.875rem, 1.67vw, 32px);
+      font-weight: 500;
+      line-height: 1.32;
+      letter-spacing: -0.64px;
+      text-align: left;
+      max-width: 1285px;
+      margin: 0 0 clamp(40px, 6.25vw, 120px) 0;
+    }
+
+    .certificate-body strong {
+      font-weight: 700;
+    }
+
+    .certificate-date {
+      font-size: clamp(0.875rem, 1.67vw, 32px);
+      font-weight: 500;
+      line-height: 1.32;
+      letter-spacing: -0.64px;
+      margin: 0 0 clamp(12px, 1.25vw, 24px) 0;
+    }
+
+    .certificate-verification {
+      font-size: clamp(0.75rem, 0.83vw, 16px);
+      font-weight: 500;
+      line-height: 1.32;
+      letter-spacing: -0.32px;
+      max-width: 930px;
+      margin: 0 0 clamp(12px, 1.25vw, 24px) 0;
+    }
+
+    .logo {
+      width: clamp(120px, 16.93vw, 325px);
+      height: auto;
+      object-fit: contain;
+      margin-bottom: clamp(12px, 1.25vw, 24px);
+      max-width: 80%;
+    }
+
+    .button-wrapper {
+      box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
+      transition: transform 0.2s ease;
+    }
+
+    .button-wrapper:hover {
+      transform: translateY(-2px);
+    }
+
     .btn-back {
-      padding: 15px 60px;
+      display: inline-block;
+      background-color: var(--button-bg-color);
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: clamp(0.875rem, 1.25vw, 24px);
+      font-weight: 500;
+      padding: clamp(12px, 0.94vw, 18px) clamp(50px, 5.78vw, 111px);
+      border-radius: 6px;
     }
-  }
+
+    @media (max-width: 1200px) {
+      .certificate-card {
+        padding: 40px 50px;
+      }
+
+      .title-wrapper {
+        margin-bottom: 80px;
+      }
+
+      .certificate-body {
+        margin-bottom: 80px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .certificate-container {
+        padding: 1rem;
+      }
+
+      .certificate-card {
+        padding: 30px 20px;
+        border-radius: 30px;
+      }
+
+      .title-wrapper {
+        margin-bottom: 50px;
+      }
+
+      .certificate-title {
+        letter-spacing: 4px;
+      }
+
+      .certificate-body {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .top-left,
+      .bottom-right {
+        display: none;
+      }
+
+      .btn-back {
+        padding: 15px 60px;
+      }
+    }
   </style>
   <script src="global.js" defer></script>
 </head>
-<body>
-<section id="certificate">
-  <main class="certificate-container">
-    <!--merged image-->
-    <div class="decorative-bg top-left">
-      <img src="images/733_4080.svg" alt="Decorative element" class="deco-img-1">
-      <img src="images/733_4082.svg" alt="Decorative element" class="deco-img-2">
-    </div>
-    <!--merged image-->
-    <div class="decorative-bg bottom-right">
-      <img src="images/733_4084.svg" alt="Decorative element" class="deco-img-3">
-      <img src="images/733_4086.svg" alt="Decorative element" class="deco-img-4">
-    </div>
 
-    <div class="certificate-card">
-      <div class="title-wrapper">
-        <h1 class="certificate-title">Certificado</h1>
+<body>
+  <section id="certificate">
+    <main class="certificate-container">
+      <div class="decorative-bg top-left">
+        <img src="images/733_4080.svg" alt="decor-top-left">
       </div>
-      <p class="certificate-body">
-        Certificamos que <strong>{Nome do Participante}</strong>, participou do(a) <strong>{Nome do Evento}</strong>, evento organizado por {Nome do Organizador}, realizado no {Local do Evento} no dia {Data}, com carga horária de {X horas}.
-      </p>
-      <p class="certificate-date">Sabará, {Data}.</p>
-      <p class="certificate-verification">
-        Este certificado é concedido como comprovação da participação no referido evento, tendo sido registrado na plataforma CEU. <br>Sua autenticidade pode ser verificada por meio do código {Código Autenticador} em [domínio do site].
-      </p>
-      <img class="logo" src="images/ac6b1d75b31a5bceb4921444f5111cc5bf3f3370.png" alt="CEU Logo">
-      <div class="button-wrapper">
-        <a href="#" class="btn-back">Voltar</a>
+      <div class="decorative-bg bottom-right">
+        <img src="images/733_4084.svg" alt="decor-bottom-right">
       </div>
-    </div>
-  </main>
-</section>
+
+      <div class="certificate-card">
+        <div class="title-wrapper">
+          <h1 class="certificate-title">Certificado</h1>
+        </div>
+        <p class="certificate-body">
+          Certificamos que <strong>{Nome do Participante}</strong>,participou do(a) <strong>{Nome do Evento}</strong>,
+          evento organizado por {Nome do Organizador}, realizado no {Local do Evento} no dia {Data}, com carga horária
+          de {X horas}.
+        </p>
+        <p class="certificate-date">Sabará, {Data}.</p>
+        <p class="certificate-verification">
+          Este certificado é concedido como comprovação da participação no referido evento, tendo sido registrado na
+          plataforma CEU. <br>Sua autenticidade pode ser verificada por meio do código {Código Autenticador} em [domínio
+          do site].
+        </p>
+        <img class="logo" src="images/ac6b1d75b31a5bceb4921444f5111cc5bf3f3370.png" alt="CEU Logo">
+        <div class="button-wrapper">
+          <a href="#" class="btn-back">Voltar</a>
+        </div>
+      </div>
+    </main>
+  </section>
 </body>
+
 </html>

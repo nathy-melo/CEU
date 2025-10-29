@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Instalador</title>
+    <style>
+        button { margin: 10px; padding: 10px 20px; font-size: 14px; }
+        pre { background: #f5f5f5; padding: 15px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Teste do Instalador</h1>
+    <button onclick="testarVerificar()">1. Testar verificar_composer</button>
+    <button onclick="testarInstalarComposer()">2. Testar instalar_composer</button>
+    <button onclick="testarInstalarDeps()">3. Testar instalar_dependencias</button>
+    <pre id="resultado"></pre>
+    
+    <script>
+        async function testarAcao(acao) {
+            const resultado = document.getElementById('resultado');
+            resultado.textContent = 'Testando ação: ' + acao + '...\n';
+            
+            try {
+                const resp = await fetch('instalador.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=' + acao
+                });
+                
+                resultado.textContent += 'Status HTTP: ' + resp.status + '\n';
+                resultado.textContent += 'Content-Type: ' + resp.headers.get('content-type') + '\n\n';
+                
+                const text = await resp.text();
+                resultado.textContent += 'Resposta raw (' + text.length + ' caracteres):\n' + text + '\n\n';
+                
+                if (text.trim() === '') {
+                    resultado.textContent += 'ERRO: Resposta vazia!\n';
+                    return;
+                }
+                
+                try {
+                    const json = JSON.parse(text);
+                    resultado.textContent += 'JSON parseado:\n' + JSON.stringify(json, null, 2);
+                } catch(e) {
+                    resultado.textContent += 'ERRO ao parsear JSON: ' + e.message + '\n';
+                    resultado.textContent += 'Primeiros 200 caracteres: ' + text.substring(0, 200);
+                }
+            } catch(e) {
+                resultado.textContent += 'ERRO na requisição: ' + e.message;
+            }
+        }
+        
+        function testarVerificar() {
+            testarAcao('verificar_composer');
+        }
+        
+        function testarInstalarComposer() {
+            testarAcao('instalar_composer');
+        }
+        
+        function testarInstalarDeps() {
+            testarAcao('instalar_dependencias');
+        }
+    </script>
+</body>
+</html>
