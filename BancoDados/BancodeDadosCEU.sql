@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS solicitacoes_redefinicao_senha (
     status ENUM('pendente', 'resolvida', 'cancelada') NOT NULL DEFAULT 'pendente',
     data_resolucao TIMESTAMP NULL,
     resolvido_por VARCHAR(100) NULL COMMENT 'Admin que resolveu',
-    observacoes TEXT NULL,
+    observacoes TEXT NULL
 );
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
