@@ -104,6 +104,18 @@ CREATE TABLE IF NOT EXISTS notificacoes (
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS solicitacoes_redefinicao_senha (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    CPF char(11) NULL COMMENT 'CPF do usuário se encontrado',
+    nome_usuario VARCHAR(100) NULL COMMENT 'Nome do usuário',
+    data_solicitacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pendente', 'resolvida', 'cancelada') NOT NULL DEFAULT 'pendente',
+    data_resolucao TIMESTAMP NULL,
+    resolvido_por VARCHAR(100) NULL COMMENT 'Admin que resolveu',
+    observacoes TEXT NULL,
+);
+
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
 ('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CAIKE123', 1, 0);
 

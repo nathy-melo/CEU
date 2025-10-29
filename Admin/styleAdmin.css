@@ -388,6 +388,58 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
     box-shadow: 0rem 0.1rem 0.4rem var(--sombra-leve);
 }
 
+/* Variações de botões pequenos */
+.btn-edit {
+    background-color: #007bff;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+}
+
+.btn-toggle {
+    background-color: #6c757d;
+}
+
+.btn-download {
+    background-color: #28a745;
+}
+
+.btn-restore {
+    background-color: #17a2b8;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-badge.ativo,
+.status-badge.resolvida {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.inativo,
+.status-badge.cancelada {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-badge.pendente {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
 /* Campos de busca */
 .search-input {
     margin: 5px 8px;
@@ -404,6 +456,34 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
     outline: none;
     border-color: var(--azul-escuro);
     box-shadow: 0 0 0 2px rgba(106, 152, 210, 0.3);
+}
+
+/* Container para controles de busca */
+.search-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Wrapper para grupo de botões de ação */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+/* Informações de resultados de busca */
+.search-results-info {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: rgba(79, 108, 140, 0.1);
+    border-radius: 5px;
+    font-size: 14px;
+    color: var(--preto);
+    text-align: center;
 }
 
 .clear-search {
@@ -457,6 +537,32 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 
 .admin-table tr:hover {
     background-color: rgba(79, 108, 140, 0.1);
+}
+
+/* Wrapper para scroll horizontal em tabelas */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 15px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--botao);
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--azul-escuro);
 }
 
 /* Cards de estatísticas */
@@ -586,4 +692,478 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 
 .evento-item strong {
     color: var(--azul-escuro);
+}
+
+/* =======================================
+   ÍCONES SVG INLINE
+   ======================================= */
+
+/* Classe base para ícones SVG */
+.icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 6px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* Tamanhos de ícones */
+.icon-small {
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+}
+
+.icon-medium {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.icon-large {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+/* Garantir que SVGs herdam a cor do botão/elemento pai */
+button .icon,
+.btn-secondary .icon,
+.btn-generate .icon,
+.btn-small .icon,
+.btn-edit .icon,
+.btn-delete .icon,
+.btn-toggle .icon,
+.btn-download .icon,
+.btn-restore .icon,
+.btn-test .icon,
+.clear-search .icon {
+    fill: currentColor;
+}
+
+/* Cor branca para botões escuros */
+.btn-secondary .icon,
+.btn-generate .icon,
+.btn-edit .icon,
+.btn-delete .icon,
+.btn-toggle .icon,
+.btn-download .icon,
+.btn-restore .icon,
+.btn-test .icon {
+    fill: white;
+}
+
+/* Cor para elementos em h3 e h4 */
+h3 .icon,
+h4 .icon {
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* =======================================
+   RESPONSIVIDADE
+   ======================================= */
+
+/* Tablets e telas médias (até 1024px) */
+@media screen and (max-width: 1024px) {
+    .admin-container {
+        max-width: 100%;
+        padding: 12px;
+    }
+
+    .admin-header h1 {
+        font-size: 22px;
+    }
+
+    .admin-header .subtitle {
+        font-size: 14px;
+    }
+
+    .admin-section h3 {
+        font-size: 20px;
+    }
+
+    .stats-card p {
+        font-size: 26px;
+    }
+
+    /* Navegação empilhada em telas menores */
+    .admin-nav {
+        gap: 8px;
+    }
+
+    .admin-nav .btn-secondary {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    /* Tabelas com scroll horizontal */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 12px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    /* Botões menores */
+    .btn-small {
+        padding: 8px 12px;
+        font-size: 14px;
+        min-width: 80px;
+    }
+
+    /* Grid de categorias */
+    .categoria-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+}
+
+/* Smartphones e telas pequenas (até 768px) */
+@media screen and (max-width: 768px) {
+    .admin-page-container {
+        padding: 10px;
+    }
+
+    .admin-header {
+        padding: 12px 15px;
+        margin-bottom: 12px;
+    }
+
+    .admin-header h1 {
+        font-size: 20px;
+    }
+
+    .admin-header .subtitle {
+        font-size: 13px;
+    }
+
+    .admin-section {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+
+    .admin-section h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    /* Navegação em coluna única */
+    .admin-nav {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .admin-nav .btn-secondary {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        justify-content: flex-start;
+    }
+
+    /* Cards de estatísticas empilhados */
+    .stats-card {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .stats-card h4 {
+        font-size: 15px;
+    }
+
+    .stats-card p {
+        font-size: 24px;
+    }
+
+    .stats-card small {
+        font-size: 11px;
+    }
+
+    /* Controles de busca empilhados */
+    .search-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-input {
+        width: 100% !important;
+        margin: 0;
+    }
+
+    /* Tabelas responsivas */
+    .admin-table {
+        font-size: 14px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+
+    /* Botões da tabela empilhados */
+    .admin-table td {
+        white-space: normal;
+    }
+
+    .btn-small {
+        padding: 8px 10px;
+        font-size: 13px;
+        min-width: auto;
+        margin: 2px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Ícones menores em mobile */
+    .icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+    }
+
+    .icon-small {
+        width: 12px;
+        height: 12px;
+        margin-right: 3px;
+    }
+
+    /* Grid de categorias em 2 colunas */
+    .categoria-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .categoria-item {
+        padding: 10px;
+    }
+
+    .categoria-item h5 {
+        font-size: 13px;
+    }
+
+    .categoria-item span {
+        font-size: 20px;
+    }
+
+    /* Botões de ação principais */
+    .btn-generate,
+    .btn-secondary,
+    .btn-test {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        margin: 5px 0;
+    }
+
+    /* Login responsivo */
+    .admin-login-box {
+        padding: 30px 20px;
+        max-width: 100%;
+    }
+
+    .admin-title {
+        font-size: 24px;
+    }
+
+    .admin-subtitle {
+        font-size: 14px;
+    }
+
+    .admin-logo {
+        width: 70px;
+        height: 70px;
+        font-size: 26px;
+    }
+
+    /* Modal responsivo */
+    .modal-content {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .modal-content h3 {
+        font-size: 18px;
+    }
+
+    /* Formulários */
+    .form-group input,
+    .form-group select {
+        padding: 12px 15px;
+        font-size: 16px;
+    }
+}
+
+/* Smartphones muito pequenos (até 480px) */
+@media screen and (max-width: 480px) {
+    .admin-container {
+        padding: 8px;
+    }
+
+    .admin-header {
+        padding: 10px;
+    }
+
+    .admin-header h1 {
+        font-size: 18px;
+    }
+
+    .admin-header .subtitle {
+        font-size: 12px;
+    }
+
+    .admin-section {
+        padding: 12px;
+    }
+
+    .admin-section h3 {
+        font-size: 16px;
+    }
+
+    /* Navegação com ícones mais visíveis */
+    .admin-nav .btn-secondary {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Tabelas ainda mais compactas */
+    .admin-table th,
+    .admin-table td {
+        padding: 8px 5px;
+        font-size: 12px;
+    }
+
+    .btn-small {
+        padding: 6px 8px;
+        font-size: 12px;
+        min-width: auto;
+    }
+
+    /* Grid de categorias em 1 coluna */
+    .categoria-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Cards de estatísticas mais compactos */
+    .stats-card {
+        padding: 10px;
+    }
+
+    .stats-card p {
+        font-size: 20px;
+    }
+
+    /* Login ainda mais compacto */
+    .admin-login-box {
+        padding: 25px 15px;
+    }
+
+    .admin-title {
+        font-size: 20px;
+    }
+
+    .admin-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 22px;
+    }
+
+    /* Inputs menores */
+    .form-group input,
+    .form-group select,
+    .search-input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+}
+
+/* Melhorias para telas touch */
+@media (hover: none) and (pointer: coarse) {
+    /* Aumentar área de toque dos botões */
+    .btn-small,
+    .admin-nav .btn-secondary,
+    .btn-generate,
+    .btn-secondary,
+    .btn-test {
+        min-height: 44px; /* Tamanho mínimo recomendado para touch */
+    }
+
+    /* Remover hover effects em telas touch */
+    .btn:hover,
+    .btn-small:hover,
+    .admin-nav .btn-secondary:hover {
+        transform: none;
+    }
+
+    /* Feedback visual ao tocar */
+    .btn:active,
+    .btn-small:active,
+    .admin-nav .btn-secondary:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Modo paisagem em smartphones */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .admin-page-container {
+        padding: 8px;
+    }
+
+    .admin-header {
+        padding: 8px 12px;
+    }
+
+    .admin-section {
+        padding: 12px;
+    }
+
+    /* Navegação em duas colunas no modo paisagem */
+    .admin-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .admin-nav .btn-secondary {
+        flex: 1 1 calc(50% - 8px);
+        font-size: 13px;
+        padding: 8px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .admin-nav,
+    .btn-generate,
+    .btn-secondary,
+    .btn-test,
+    .btn-small,
+    .search-controls,
+    .back-link {
+        display: none !important;
+    }
+
+    .admin-section {
+        display: block !important;
+        page-break-inside: avoid;
+    }
+
+    .admin-table {
+        border: 1px solid #000;
+    }
+
+    body {
+        background-color: white;
+    }
 }

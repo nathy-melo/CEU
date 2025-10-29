@@ -62,6 +62,8 @@ try {
         case 'usuarios':
             if ($method === 'GET') {
                 getUsuarios($conexao);
+            } elseif ($method === 'POST') {
+                createUsuario($conexao);
             } elseif ($method === 'PUT') {
                 updateUsuario($conexao);
             } elseif ($method === 'DELETE') {
@@ -83,6 +85,16 @@ try {
             
         case 'certificados':
             getCertificados($conexao);
+            break;
+            
+        case 'senhas':
+            if ($method === 'GET') {
+                getSolicitacoesSenha($conexao);
+            } elseif ($method === 'POST') {
+                resolverSolicitacaoSenha($conexao);
+            } elseif ($method === 'DELETE') {
+                deleteSolicitacaoSenha($conexao);
+            }
             break;
             
         default:
@@ -297,6 +309,128 @@ function getUsuarios($conexao) {
     ]);
 }
 
+function createUsuario($conexao) {
+    $dadosEntrada = json_decode(file_get_contents('php://input'), true);
+    
+    // Validar campos obrigatórios
+    $cpf = $dadosEntrada['cpf'] ?? '';
+    $nome = $dadosEntrada['nome'] ?? '';
+    $email = $dadosEntrada['email'] ?? '';
+    $senha = $dadosEntrada['senha'] ?? '';
+    $ra = $dadosEntrada['ra'] ?? null;
+    $organizador = intval($dadosEntrada['organizador'] ?? 0);
+    $codigo = $dadosEntrada['codigo'] ?? null;
+    
+    // Validações
+    if (empty($cpf) || empty($nome) || empty($email) || empty($senha)) {
+        echo json_encode(['success' => false, 'message' => 'Campos obrigatórios faltando: CPF, Nome, Email e Senha são obrigatórios']);
+        return;
+    }
+    
+    // Validar CPF (11 dígitos)
+    if (!preg_match('/^\d{11}$/', $cpf)) {
+        echo json_encode(['success' => false, 'message' => 'CPF deve conter exatamente 11 dígitos numéricos']);
+        return;
+    }
+    
+    // Validar RA (7 dígitos ou vazio)
+    if (!empty($ra) && !preg_match('/^\d{7}$/', $ra)) {
+        echo json_encode(['success' => false, 'message' => 'RA deve conter exatamente 7 dígitos numéricos ou ser deixado em branco']);
+        return;
+    }
+    
+    // Validar email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'Email inválido']);
+        return;
+    }
+    
+    // Verificar se CPF já existe
+    $stmtCheck = mysqli_prepare($conexao, "SELECT CPF FROM usuario WHERE CPF = ?");
+    mysqli_stmt_bind_param($stmtCheck, "s", $cpf);
+    mysqli_stmt_execute($stmtCheck);
+    $resultCheck = mysqli_stmt_get_result($stmtCheck);
+    if (mysqli_num_rows($resultCheck) > 0) {
+        echo json_encode(['success' => false, 'message' => 'CPF já cadastrado no sistema']);
+        return;
+    }
+    mysqli_stmt_close($stmtCheck);
+    
+    // Verificar se Email já existe
+    $stmtCheck = mysqli_prepare($conexao, "SELECT Email FROM usuario WHERE Email = ?");
+    mysqli_stmt_bind_param($stmtCheck, "s", $email);
+    mysqli_stmt_execute($stmtCheck);
+    $resultCheck = mysqli_stmt_get_result($stmtCheck);
+    if (mysqli_num_rows($resultCheck) > 0) {
+        echo json_encode(['success' => false, 'message' => 'Email já cadastrado no sistema']);
+        return;
+    }
+    mysqli_stmt_close($stmtCheck);
+    
+    // Se é organizador, validar código
+    if ($organizador === 1) {
+        if (empty($codigo)) {
+            echo json_encode(['success' => false, 'message' => 'Código de organizador é obrigatório para usuários organizadores']);
+            return;
+        }
+        
+        // Verificar se código existe e está disponível
+        $stmtCodigo = mysqli_prepare($conexao, "SELECT id, usado FROM codigos_organizador WHERE codigo = ? AND ativo = 1");
+        mysqli_stmt_bind_param($stmtCodigo, "s", $codigo);
+        mysqli_stmt_execute($stmtCodigo);
+        $resultCodigo = mysqli_stmt_get_result($stmtCodigo);
+        
+        if (mysqli_num_rows($resultCodigo) === 0) {
+            echo json_encode(['success' => false, 'message' => 'Código de organizador inválido ou inativo']);
+            return;
+        }
+        
+        $codigoData = mysqli_fetch_assoc($resultCodigo);
+        if ($codigoData['usado'] == 1) {
+            echo json_encode(['success' => false, 'message' => 'Código de organizador já foi utilizado']);
+            return;
+        }
+        mysqli_stmt_close($stmtCodigo);
+    }
+    
+    // Hash da senha
+    $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+    
+    // Inserir usuário
+    $sql = "INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "ssssssi", $cpf, $nome, $email, $senhaHash, $ra, $codigo, $organizador);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        // Se é organizador, marcar código como usado
+        if ($organizador === 1 && !empty($codigo)) {
+            $sqlUpdate = "UPDATE codigos_organizador SET usado = 1, data_uso = NOW(), usado_por = ? WHERE codigo = ?";
+            $stmtUpdate = mysqli_prepare($conexao, $sqlUpdate);
+            mysqli_stmt_bind_param($stmtUpdate, "ss", $cpf, $codigo);
+            mysqli_stmt_execute($stmtUpdate);
+            mysqli_stmt_close($stmtUpdate);
+        }
+        
+        logAdminAction('USUARIO_CREATE', "CPF: $cpf, Nome: $nome, Email: $email, Organizador: $organizador");
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Usuário criado com sucesso',
+            'data' => [
+                'cpf' => $cpf,
+                'nome' => $nome,
+                'email' => $email,
+                'organizador' => $organizador
+            ]
+        ]);
+    } else {
+        $erro = mysqli_error($conexao);
+        logAdminAction('USUARIO_CREATE_ERROR', "CPF: $cpf, Erro: $erro");
+        echo json_encode(['success' => false, 'message' => 'Erro ao criar usuário: ' . $erro]);
+    }
+    
+    mysqli_stmt_close($stmt);
+}
+
 function updateUsuario($conexao) {
     $dadosEntrada = json_decode(file_get_contents('php://input'), true);
     
@@ -499,6 +633,143 @@ function getCertificados($conexao) {
     
     logAdminAction('CERTIFICADOS_LIST', 'Total: ' . count($certificados));
     echo json_encode(['success' => true, 'data' => $certificados]);
+}
+
+// ============================================
+// FUNÇÕES DE SOLICITAÇÕES DE SENHA
+// ============================================
+
+function getSolicitacoesSenha($conexao) {
+    // Parâmetros de busca
+    $status = $_GET['status'] ?? 'all';
+    $limite = intval($_GET['limit'] ?? 1000);
+    $offset = intval($_GET['offset'] ?? 0);
+    
+    $sql = "SELECT * FROM solicitacoes_redefinicao_senha";
+    $parametros = [];
+    $tipos = '';
+    
+    // Adicionar filtro de status se fornecido
+    if ($status !== 'all') {
+        $sql .= " WHERE status = ?";
+        $parametros[] = $status;
+        $tipos = 's';
+    }
+    
+    $sql .= " ORDER BY data_solicitacao DESC LIMIT ? OFFSET ?";
+    $parametros[] = $limite;
+    $parametros[] = $offset;
+    $tipos .= 'ii';
+    
+    $stmt = mysqli_prepare($conexao, $sql);
+    if ($tipos) {
+        mysqli_stmt_bind_param($stmt, $tipos, ...$parametros);
+    }
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    
+    $solicitacoes = [];
+    while ($linha = mysqli_fetch_assoc($resultado)) {
+        $solicitacoes[] = $linha;
+    }
+    
+    // Contar totais por status
+    $sqlTotais = "SELECT status, COUNT(*) as total FROM solicitacoes_redefinicao_senha GROUP BY status";
+    $resultadoTotais = mysqli_query($conexao, $sqlTotais);
+    $totaisPorStatus = [];
+    while ($linha = mysqli_fetch_assoc($resultadoTotais)) {
+        $totaisPorStatus[$linha['status']] = $linha['total'];
+    }
+    
+    logAdminAction('SENHAS_LIST', "Total: " . count($solicitacoes) . " | Status: '$status'");
+    echo json_encode([
+        'success' => true, 
+        'data' => $solicitacoes,
+        'meta' => [
+            'total' => count($solicitacoes),
+            'limit' => $limite,
+            'offset' => $offset,
+            'status' => $status,
+            'totais_por_status' => $totaisPorStatus
+        ]
+    ]);
+}
+
+function resolverSolicitacaoSenha($conexao) {
+    $dadosEntrada = json_decode(file_get_contents('php://input'), true);
+    
+    $id = intval($dadosEntrada['id'] ?? 0);
+    $cpf = $dadosEntrada['cpf'] ?? '';
+    $novaSenha = $dadosEntrada['nova_senha'] ?? '';
+    $observacoes = $dadosEntrada['observacoes'] ?? '';
+    
+    if (empty($id) || empty($cpf) || empty($novaSenha)) {
+        echo json_encode(['success' => false, 'message' => 'Dados incompletos. ID, CPF e nova senha são obrigatórios.']);
+        return;
+    }
+    
+    // Hash da nova senha
+    $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
+    
+    // Iniciar transação
+    mysqli_begin_transaction($conexao);
+    
+    try {
+        // Atualizar senha do usuário
+        $sqlUsuario = "UPDATE usuario SET Senha = ? WHERE CPF = ?";
+        $stmtUsuario = mysqli_prepare($conexao, $sqlUsuario);
+        mysqli_stmt_bind_param($stmtUsuario, "ss", $senhaHash, $cpf);
+        
+        if (!mysqli_stmt_execute($stmtUsuario)) {
+            throw new Exception('Erro ao atualizar senha do usuário');
+        }
+        
+        // Marcar solicitação como resolvida
+        $sqlSolicitacao = "UPDATE solicitacoes_redefinicao_senha 
+                          SET status = 'resolvida', 
+                              data_resolucao = NOW(), 
+                              resolvido_por = 'ADMIN',
+                              observacoes = ? 
+                          WHERE id = ?";
+        $stmtSolicitacao = mysqli_prepare($conexao, $sqlSolicitacao);
+        mysqli_stmt_bind_param($stmtSolicitacao, "si", $observacoes, $id);
+        
+        if (!mysqli_stmt_execute($stmtSolicitacao)) {
+            throw new Exception('Erro ao atualizar status da solicitação');
+        }
+        
+        // Confirmar transação
+        mysqli_commit($conexao);
+        
+        logAdminAction('SENHA_RESOLVIDA', "ID: $id | CPF: $cpf");
+        echo json_encode(['success' => true, 'message' => 'Senha redefinida com sucesso']);
+        
+    } catch (Exception $e) {
+        // Reverter transação em caso de erro
+        mysqli_rollback($conexao);
+        echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
+    }
+}
+
+function deleteSolicitacaoSenha($conexao) {
+    $id = intval($_GET['id'] ?? 0);
+    
+    if (empty($id)) {
+        echo json_encode(['success' => false, 'message' => 'ID inválido']);
+        return;
+    }
+    
+    // Pode-se optar por marcar como cancelada ao invés de deletar
+    $sql = "UPDATE solicitacoes_redefinicao_senha SET status = 'cancelada' WHERE id = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        logAdminAction('SENHA_CANCELADA', "ID: $id");
+        echo json_encode(['success' => true, 'message' => 'Solicitação cancelada com sucesso']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Erro ao cancelar solicitação: ' . mysqli_error($conexao)]);
+    }
 }
 
 mysqli_close($conexao);
