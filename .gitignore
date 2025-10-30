@@ -2,6 +2,7 @@
 Certificacao/bibliotecas/vendor/
 Certificacao/bibliotecas/composer.phar
 Certificacao/instalador.log
+Certificacao/bibliotecas/instalador.log
 
 # Composer local (caso exista na raiz)
 /vendor/

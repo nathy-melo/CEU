@@ -39,7 +39,8 @@ $action = $_POST['action'];
 // Alvo agora é a pasta de bibliotecas dentro de Certificacao
 $libsRoot = __DIR__ . '/bibliotecas';
 if (!is_dir($libsRoot)) { @mkdir($libsRoot, 0775, true); }
-$logPath = __DIR__ . '/instalador.log';
+// Registrar logs dentro da pasta de bibliotecas
+$logPath = $libsRoot . '/instalador.log';
 
 function logMsg($msg) {
     global $logPath;
@@ -296,13 +297,19 @@ switch ($action) {
         try {
             $composerGlobal = verificarComposer();
             $composerLocal = file_exists($libsRoot . '/composer.phar');
+            $msg = 'Composer não encontrado';
+            if ($composerGlobal) {
+                $msg = 'Composer global encontrado';
+            } elseif ($composerLocal) {
+                $msg = 'Composer local encontrado em bibliotecas';
+            }
             echo json_encode([
                 'success' => true,
                 'composer_global' => $composerGlobal,
                 'composer_local' => $composerLocal,
                 'composer_disponivel' => $composerGlobal || $composerLocal,
                 'libs_root' => $libsRoot,
-                'message' => ($composerGlobal || $composerLocal) ? 'Composer encontrado' : 'Composer não encontrado'
+                'message' => $msg
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao verificar Composer: ' . $e->getMessage()]);
