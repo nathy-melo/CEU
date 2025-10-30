@@ -209,12 +209,24 @@ function applyFiltersParticipante() {
     // Obter a ordenação selecionada
     const ordenacaoSelecionada = form.querySelector('input[name="ordenacao"]:checked')?.value || 'nenhuma';
 
-    // Armazenar ordem original se ainda não foi armazenada
-    if (!window.ordemOriginalCards) {
-        window.ordemOriginalCards = Array.from(container.querySelectorAll('.CaixaDoEvento'));
-    }
-
     const cards = Array.from(container.querySelectorAll('.CaixaDoEvento'));
+    
+    // Armazenar ordem original se ainda não foi armazenada ou se os cards mudaram
+    if (!window.ordemOriginalHrefs) {
+        // Primeira vez: armazena a ordem atual
+        window.ordemOriginalHrefs = cards.map(card => card.href || card.getAttribute('href') || '');
+    } else {
+        // Verificar se os cards mudaram (comparando conjuntos, não ordem)
+        const hrefsAtuais = cards.map(card => card.href || card.getAttribute('href') || '');
+        const conjuntoOriginal = new Set(window.ordemOriginalHrefs);
+        const conjuntoAtual = new Set(hrefsAtuais);
+        
+        // Se os conjuntos são diferentes (card novo ou removido), os cards mudaram - resetar ordem original
+        if (conjuntoOriginal.size !== conjuntoAtual.size || 
+            Array.from(conjuntoAtual).some(href => !conjuntoOriginal.has(href))) {
+            window.ordemOriginalHrefs = [...hrefsAtuais];
+        }
+    }
     
     cards.forEach(card => {
         const tipo = (card.dataset.tipo || '').toLowerCase();
@@ -250,7 +262,8 @@ function applyFiltersParticipante() {
     
     // Aplicar ordenação alfabética ou restaurar ordem original
     if (ordenacaoSelecionada !== 'nenhuma') {
-        cards.sort((a, b) => {
+        // Aplicar ordenação alfabética
+        const cardsOrdenados = [...cards].sort((a, b) => {
             const nomeA = (a.querySelector('.EventoTitulo')?.textContent || '').toLowerCase();
             const nomeB = (b.querySelector('.EventoTitulo')?.textContent || '').toLowerCase();
             
@@ -263,12 +276,21 @@ function applyFiltersParticipante() {
         });
         
         // Reorganizar os cards no DOM
-        cards.forEach(card => container.appendChild(card));
+        cardsOrdenados.forEach(card => container.appendChild(card));
     } else {
-        // Restaurar ordem original
-        if (window.ordemOriginalCards) {
-            window.ordemOriginalCards.forEach(card => {
-                if (container.contains(card)) {
+        // Restaurar ordem original baseada nos hrefs armazenados
+        if (window.ordemOriginalHrefs && window.ordemOriginalHrefs.length > 0) {
+            // Criar um Map para acesso rápido aos cards por href
+            const cardsPorHref = new Map();
+            cards.forEach(card => {
+                const href = card.href || card.getAttribute('href') || '';
+                cardsPorHref.set(href, card);
+            });
+            
+            // Reorganizar na ordem original
+            window.ordemOriginalHrefs.forEach(href => {
+                const card = cardsPorHref.get(href);
+                if (card && container.contains(card)) {
                     container.appendChild(card);
                 }
             });
