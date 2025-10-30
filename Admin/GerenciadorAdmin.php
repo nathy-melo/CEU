@@ -703,8 +703,42 @@ function resolverSolicitacaoSenha($conexao) {
     $novaSenha = $dadosEntrada['nova_senha'] ?? '';
     $observacoes = $dadosEntrada['observacoes'] ?? '';
     
-    if (empty($id) || empty($cpf) || empty($novaSenha)) {
-        echo json_encode(['success' => false, 'message' => 'Dados incompletos. ID, CPF e nova senha são obrigatórios.']);
+    if (empty($id) || empty($novaSenha)) {
+        echo json_encode(['success' => false, 'message' => 'Dados incompletos. ID e nova senha são obrigatórios.']);
+        return;
+    }
+
+    // Se CPF não foi enviado pelo frontend, tentar obter pelo ID da solicitação (via email)
+    if (empty($cpf)) {
+        $sqlSolic = "SELECT email, CPF FROM solicitacoes_redefinicao_senha WHERE id = ?";
+        $stmtSolic = mysqli_prepare($conexao, $sqlSolic);
+        mysqli_stmt_bind_param($stmtSolic, "i", $id);
+        mysqli_stmt_execute($stmtSolic);
+        $resSolic = mysqli_stmt_get_result($stmtSolic);
+        $rowSolic = mysqli_fetch_assoc($resSolic);
+        mysqli_stmt_close($stmtSolic);
+
+        if ($rowSolic) {
+            if (!empty($rowSolic['CPF'])) {
+                $cpf = $rowSolic['CPF'];
+            } else if (!empty($rowSolic['email'])) {
+                // Buscar CPF pelo email do usuário
+                $sqlUserByEmail = "SELECT CPF FROM usuario WHERE Email = ?";
+                $stmtUserByEmail = mysqli_prepare($conexao, $sqlUserByEmail);
+                mysqli_stmt_bind_param($stmtUserByEmail, "s", $rowSolic['email']);
+                mysqli_stmt_execute($stmtUserByEmail);
+                $resUserByEmail = mysqli_stmt_get_result($stmtUserByEmail);
+                $rowUser = mysqli_fetch_assoc($resUserByEmail);
+                mysqli_stmt_close($stmtUserByEmail);
+                if ($rowUser && !empty($rowUser['CPF'])) {
+                    $cpf = $rowUser['CPF'];
+                }
+            }
+        }
+    }
+
+    if (empty($cpf)) {
+        echo json_encode(['success' => false, 'message' => 'Não foi possível identificar o usuário (CPF não encontrado).']);
         return;
     }
     
@@ -722,6 +756,9 @@ function resolverSolicitacaoSenha($conexao) {
         
         if (!mysqli_stmt_execute($stmtUsuario)) {
             throw new Exception('Erro ao atualizar senha do usuário');
+        }
+        if (mysqli_stmt_affected_rows($stmtUsuario) === 0) {
+            throw new Exception('Nenhum usuário encontrado com o CPF informado.');
         }
         
         // Marcar solicitação como resolvida
