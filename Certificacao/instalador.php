@@ -252,33 +252,40 @@ function rmrf($path) {
     return $ok && @rmdir($path);
 }
 
-function limpezaInstaladorDir($dir) {
+function limpezaInstaladorDir($dir, $removerPesados = false) {
     $res = [ 'success' => true, 'steps' => [] ];
-    // 1) Remover vendor/
-    if (is_dir($dir . '/vendor')) {
-        $ok = rmrf($dir . '/vendor');
-        $res['steps'][] = ['acao' => 'remover vendor', 'path' => $dir . '/vendor', 'success' => $ok];
-        $res['success'] = $res['success'] && $ok;
-    }
-    // 2) Remover composer.phar local
-    if (file_exists($dir . '/composer.phar')) {
-        $ok = @unlink($dir . '/composer.phar');
-        $res['steps'][] = ['acao' => 'remover composer.phar', 'path' => $dir . '/composer.phar', 'success' => $ok];
-        $res['success'] = $res['success'] && $ok;
-    }
-    // 3) Reverter composer.lock (se estiver versionado)
-    $git = caminhoGitExe();
-    if ($git && funcDisponivel('exec') && file_exists($dir . '/composer.lock')) {
-        $gitCmd = (strpos($git, ' ') !== false ? '"' . $git . '"' : $git);
-        $resetLock = executarComando($gitCmd . ' checkout -- composer.lock', $dir);
-        if (!$resetLock['success']) {
-            // fallback para reset scoped
-            $resetLock = executarComando($gitCmd . ' reset --hard HEAD -- composer.lock', $dir);
+    // Limpeza leve (por padrão): NUNCA remover vendor automaticamente após instalar
+    // Apenas quando $removerPesados = true (opção explícita) é que removemos artefatos pesados.
+
+    if ($removerPesados) {
+        // 1) Remover vendor/
+        if (is_dir($dir . '/vendor')) {
+            $ok = rmrf($dir . '/vendor');
+            $res['steps'][] = ['acao' => 'remover vendor', 'path' => $dir . '/vendor', 'success' => $ok];
+            $res['success'] = $res['success'] && $ok;
         }
-        $res['steps'][] = ['acao' => 'reverter composer.lock', 'success' => $resetLock['success'], 'detalhes' => $resetLock];
-        $res['success'] = $res['success'] && $resetLock['success'];
+        // 2) Remover composer.phar local
+        if (file_exists($dir . '/composer.phar')) {
+            $ok = @unlink($dir . '/composer.phar');
+            $res['steps'][] = ['acao' => 'remover composer.phar', 'path' => $dir . '/composer.phar', 'success' => $ok];
+            $res['success'] = $res['success'] && $ok;
+        }
+        // 3) Reverter composer.lock (se estiver versionado) — opcional e arriscado; evitar por padrão
+        $git = caminhoGitExe();
+        if ($git && funcDisponivel('exec') && file_exists($dir . '/composer.lock')) {
+            $gitCmd = (strpos($git, ' ') !== false ? '"' . $git . '"' : $git);
+            $resetLock = executarComando($gitCmd . ' checkout -- composer.lock', $dir);
+            if (!$resetLock['success']) {
+                $resetLock = executarComando($gitCmd . ' reset --hard HEAD -- composer.lock', $dir);
+            }
+            $res['steps'][] = ['acao' => 'reverter composer.lock', 'success' => $resetLock['success'], 'detalhes' => $resetLock];
+            $res['success'] = $res['success'] && $resetLock['success'];
+        }
+    } else {
+        $res['steps'][] = ['acao' => 'limpeza_leve', 'detalhe' => 'sem remoção de vendor/composer.phar'];
     }
-    logMsg('Limpeza (escopo bibliotecas): ' . ($res['success'] ? 'OK' : 'FALHOU'));
+
+    logMsg('Limpeza (escopo bibliotecas, pesada=' . ($removerPesados ? 'sim' : 'nao') . '): ' . ($res['success'] ? 'OK' : 'FALHOU'));
     return $res;
 }
 
@@ -342,6 +349,34 @@ switch ($action) {
                 echo json_encode(['success' => false, 'message' => 'Arquivo composer.json não encontrado em bibliotecas']);
                 break;
             }
+            // Detecta conflito composer.json x composer.lock
+            $composerJson = @json_decode(@file_get_contents($libsRoot . '/composer.json'), true);
+            $composerLock = @json_decode(@file_get_contents($libsRoot . '/composer.lock'), true);
+            $requires = array_keys(($composerJson['require'] ?? []));
+            $requires = array_values(array_filter($requires, function($p){ return strtolower($p) !== 'php'; }));
+            $locked = [];
+            if (is_array($composerLock)) {
+                foreach (['packages','packages-dev'] as $k) {
+                    if (!empty($composerLock[$k]) && is_array($composerLock[$k])) {
+                        foreach ($composerLock[$k] as $pkg) { if (!empty($pkg['name'])) { $locked[] = $pkg['name']; } }
+                    }
+                }
+            }
+            $missingPkgs = [];
+            foreach ($requires as $pkg) { if (!in_array($pkg, $locked, true)) { $missingPkgs[] = $pkg; } }
+
+            // Opções do usuário
+            $forceReset = isset($_POST['force_reset']) && ($_POST['force_reset'] === '1' || $_POST['force_reset'] === 'true');
+            if ($forceReset) {
+                // Remove vendor e composer.lock para reinstalar limpo
+                if (is_dir($libsRoot . '/vendor')) { rmrf($libsRoot . '/vendor'); }
+                if (file_exists($libsRoot . '/composer.lock')) { @unlink($libsRoot . '/composer.lock'); }
+                logMsg('[instalar_dependencias] force_reset: removeu vendor/ e composer.lock');
+            } elseif (!empty($missingPkgs) && file_exists($libsRoot . '/composer.lock')) {
+                // Força regenerar lock quando há divergência
+                @unlink($libsRoot . '/composer.lock');
+                logMsg('[instalar_dependencias] composer.lock removido (mismatch com composer.json): faltando ' . implode(', ', $missingPkgs));
+            }
             // Executa Composer dentro do mesmo processo PHP, no diretório de bibliotecas
             $cwd = getcwd();
             chdir($libsRoot);
@@ -349,6 +384,7 @@ switch ($action) {
             $exitCode = 1;
             $faltandoGd = !extension_loaded('gd');
             $faltandoMb = !extension_loaded('mbstring');
+            $faltandoZip = !extension_loaded('zip');
             $ignoreAll = ($faltandoGd || $faltandoMb);
             try {
                 require_once 'phar://composer.phar/src/bootstrap.php';
@@ -360,26 +396,64 @@ switch ($action) {
                 }
                 $app = new $appClass();
                 $app->setAutoExit(false);
-                $args = [ 'command' => 'install', '--no-interaction' => true, '--prefer-dist' => true ];
+                // Se havia mismatch ou force_reset, roda update (regenera lock); caso contrário, install
+                $cmd = (!empty($missingPkgs) || $forceReset) ? 'update' : 'install';
+                $args = [ 'command' => $cmd, '--no-interaction' => true, '--prefer-dist' => true ];
                 if ($ignoreAll) { $args['--ignore-platform-reqs'] = true; }
                 $input = new $inputClass($args);
                 $buffer = new $outputClass();
                 $exitCode = $app->run($input, $buffer);
                 $bufferOutput = $buffer->fetch();
+                logMsg('[composer interno] exit=' . $exitCode);
+                logMsg($bufferOutput);
             } catch (Throwable $t) {
                 $exitCode = 1; $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage();
+                logMsg('[composer interno] exceção: ' . $t->getMessage());
             }
             chdir($cwd);
 
-            // Limpeza alvo somente na pasta bibliotecas
-            $cleanup = limpezaInstaladorDir($libsRoot);
+            // Verificação: vendor/autoload.php foi gerado?
+            $autoload = $libsRoot . '/vendor/autoload.php';
+            $vendorExists = file_exists($autoload);
+
+            // Fallback: tentar rodar composer via CLI se vendor não existir
+            $fallback = null; $fallbackExit = null;
+            if (!$vendorExists && funcDisponivel('exec')) {
+                $phpExe = caminhoPhpExe();
+                $cmd = '"' . $phpExe . '" composer.phar install --no-interaction --prefer-dist' . ($ignoreAll ? ' --ignore-platform-reqs' : '');
+                $fallback = executarComando($cmd, $libsRoot);
+                $fallbackExit = $fallback['code'];
+                logMsg('[composer cli] exit=' . $fallbackExit);
+                logMsg($fallback['output']);
+                $vendorExists = file_exists($autoload);
+            }
+
+            // Checagem de classes após instalação
+            $classesOk = false;
+            if ($vendorExists) {
+                require_once $autoload;
+                $classesOk = class_exists('PhpOffice\\PhpPresentation\\PhpPresentation') && class_exists('Mpdf\\Mpdf');
+            }
+
+            // Limpeza leve: não remover vendor/composer.phar após instalar
+            $cleanup = limpezaInstaladorDir($libsRoot, false);
+
+            $succ = ($exitCode === 0 || $fallbackExit === 0) && $vendorExists;
+            $msg = $succ ? 'Dependências instaladas com sucesso.' : 'Falha ao instalar dependências.';
+            if ($faltandoZip) { $msg .= ' Observação: extensão PHP zip ausente; ative-a no php.ini.'; }
 
             echo json_encode([
-                'success' => ($exitCode === 0),
-                'message' => $exitCode === 0 ? 'Dependências instaladas. Limpando artefatos do instalador.' : 'Falha ao instalar dependências. Mesmo assim, limpeza executada.',
+                'success' => $succ,
+                'message' => $msg,
                 'output' => $bufferOutput,
+                'fallback' => $fallback,
+                'exit_code' => $exitCode,
+                'fallback_exit' => $fallbackExit,
+                'vendor_exists' => $vendorExists,
+                'autoload' => $autoload,
+                'classes_ok' => $classesOk,
                 'ignored_platform_reqs' => $ignoreAll,
-                'extensoes_carregadas' => [ 'gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring') ],
+                'extensoes_carregadas' => [ 'gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring'), 'zip' => extension_loaded('zip') ],
                 'cleanup' => $cleanup,
                 'libs_root' => $libsRoot
             ]);
@@ -426,7 +500,7 @@ switch ($action) {
     case 'limpar_instalador':
         try {
             $removerArtefatos = isset($_POST['remover_artefatos']) && ($_POST['remover_artefatos'] === '1' || $_POST['remover_artefatos'] === 'true');
-            $res = limpezaInstaladorDir($libsRoot);
+            $res = limpezaInstaladorDir($libsRoot, $removerArtefatos);
             $removidos = [];
             if ($removerArtefatos) {
                 $artefatos = [$logPath];
@@ -479,7 +553,7 @@ switch ($action) {
             if (!$r2['success']) { $r2 = instalarComposerLocal($libsRoot); }
             // instalar_dependencias resumido
             $cwd = getcwd(); chdir($libsRoot);
-            $bufferOutput = ''; $exitCode = 1; $faltandoGd = !extension_loaded('gd'); $faltandoMb = !extension_loaded('mbstring'); $ignoreAll = ($faltandoGd || $faltandoMb);
+            $bufferOutput = ''; $exitCode = 1; $faltandoGd = !extension_loaded('gd'); $faltandoMb = !extension_loaded('mbstring'); $faltandoZip = !extension_loaded('zip'); $ignoreAll = ($faltandoGd || $faltandoMb);
             try {
                 require_once 'phar://composer.phar/src/bootstrap.php';
                 $appClass = '\\Composer\\Console\\Application';
@@ -497,8 +571,24 @@ switch ($action) {
                 $exitCode = $app->run($input, $buffer); $bufferOutput = $buffer->fetch();
             } catch (Throwable $t) { $exitCode = 1; $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage(); }
             chdir($cwd);
-            $cleanup = limpezaInstaladorDir($libsRoot);
-            $r3 = ['success' => ($exitCode === 0), 'output' => $bufferOutput, 'ignored_platform_reqs' => $ignoreAll, 'cleanup' => $cleanup];
+            $autoload = $libsRoot . '/vendor/autoload.php';
+            $vendorExists = file_exists($autoload);
+            if (!$vendorExists && funcDisponivel('exec')) {
+                $phpExe = caminhoPhpExe();
+                $cmd = '"' . $phpExe . '" composer.phar install --no-interaction --prefer-dist' . ($ignoreAll ? ' --ignore-platform-reqs' : '');
+                $fallback = executarComando($cmd, $libsRoot);
+                $vendorExists = file_exists($autoload);
+            } else { $fallback = null; }
+            $cleanup = limpezaInstaladorDir($libsRoot, false);
+            $r3 = [
+                'success' => (($exitCode === 0) && $vendorExists),
+                'output' => $bufferOutput,
+                'vendor_exists' => $vendorExists,
+                'fallback' => $fallback,
+                'ignored_platform_reqs' => $ignoreAll,
+                'cleanup' => $cleanup,
+                'extensoes' => [ 'gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring'), 'zip' => extension_loaded('zip') ]
+            ];
             echo json_encode(['success' => true, 'etapas' => ['verificar_composer' => $r1, 'instalar_composer' => $r2, 'instalar_dependencias' => $r3], 'libs_root' => $libsRoot]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro auto_test: ' . $e->getMessage()]);

@@ -5,6 +5,7 @@
   "require": {
     "php": ">=7.4",
     "phpoffice/phppresentation": "^1.0",
+    "phpoffice/phpword": "^1.2",
     "mpdf/mpdf": "^8.2"
   }
 }

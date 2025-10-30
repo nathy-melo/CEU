@@ -1,0 +1,5 @@
+# Ignora todos os arquivos gerados de certificados
+*
+
+# Mas mantém este próprio .gitignore versionado
+!.gitignore
