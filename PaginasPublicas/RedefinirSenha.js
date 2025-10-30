@@ -56,7 +56,7 @@ function atribuirEventoRedefinirSenha() {
                 container.style.justifyContent = 'center';
                 var btnVoltar = document.createElement('button');
                 btnVoltar.type = 'button';
-                btnVoltar.className = 'botao-login';
+                btnVoltar.className = 'botao-login botao';
                 btnVoltar.textContent = 'Voltar';
                 btnVoltar.onclick = function() { carregarPagina('login'); };
                 container.appendChild(btnVoltar);

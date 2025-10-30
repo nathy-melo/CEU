@@ -31,7 +31,7 @@ function mostrarMensagemSenhaRedefinida() {
 
     var btnVoltar = document.createElement('button');
     btnVoltar.type = 'button';
-    btnVoltar.className = ' botao';
+    btnVoltar.className = 'botao';
     btnVoltar.textContent = 'Voltar';
     btnVoltar.onclick = function() {
         // Restaura o conteúdo original da página
