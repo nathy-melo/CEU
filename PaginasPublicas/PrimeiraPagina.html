@@ -32,30 +32,18 @@
       --sombra-leve: rgba(0, 0, 0, 0.5);
       --tabela_participantes: #deeaff;
       --botao-escuro: #154d8d;
-      --botao-escuro-dark: #1e40af;
-      --secondary: #3b82f6;
-      --accent: #60a5fa;
-      --dark: #1e293b;
-      --light: #f1f5f9;
-      --white: #ffffff;
-      --text: #334155;
-      --text-light: #64748b;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
 
     body {
       font-family: 'Inter', sans-serif;
       line-height: 1.6;
       color: var(--text);
       overflow-x: hidden;
-      background: var(--branco);
     }
 
-    /* Hero Section - TEMA CLARO ELEGANTE */
-    .hero {
+    /* Seção Principal de Boas-Vindas */
+    .secao-principal {
       position: relative;
       min-height: 100vh;
       display: flex;
@@ -67,7 +55,7 @@
     }
 
     /* Padrão geométrico de losangos */
-    .hero::before {
+    .secao-principal::before {
       content: '';
       position: absolute;
       top: 0;
@@ -83,16 +71,7 @@
       opacity: 0.5;
     }
 
-    @keyframes moveClouds {
-      0% {
-        background-position: 0 0;
-      }
-      100% {
-        background-position: 1000px 0;
-      }
-    }
-
-    .hero-content {
+    .conteudo-boas-vindas {
       position: relative;
       z-index: 10;
       display: grid;
@@ -101,22 +80,10 @@
       max-width: 1600px;
       width: 100%;
       align-items: center;
-      animation: fadeInUp 1s ease-out;
+      animation: surgirDeBaixo 1s ease-out;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .hero-text {
+    .texto-apresentacao {
       text-align: left;
       padding-right: 2rem;
       display: flex;
@@ -125,25 +92,11 @@
       align-items: flex-start;
     }
 
-    .logo {
+    .logotipo-ceu {
       width: 200px;
       height: auto;
       margin-bottom: 2.5rem;
-      filter: drop-shadow(0 10px 30px rgba(59, 130, 246, 0.2));
-      animation: logoFloat 3s ease-in-out infinite;
       align-self: center;
-    }
-
-    @keyframes logoFloat {
-
-      0%,
-      100% {
-        transform: translateY(0px);
-      }
-
-      50% {
-        transform: translateY(-10px);
-      }
     }
 
     h1 {
@@ -157,7 +110,7 @@
       width: 100%;
     }
 
-    .subtitulo {
+    .texto-subtitulo {
       font-size: clamp(1.05rem, 2.2vw, 1.35rem);
       color: #475569;
       margin-bottom: 3rem;
@@ -167,11 +120,11 @@
       width: 100%;
     }
 
-    /* Carrossel GRANDE e IMPACTANTE */
-    .hero-carousel {
+    /* Carrossel de Imagens em Destaque - Proporção 16:9 */
+    .carrossel-imagens-destaque {
       position: relative;
-      height: 700px;
       width: 100%;
+      aspect-ratio: 16 / 9;
       border-radius: 16px;
       overflow: hidden;
       box-shadow:
@@ -179,39 +132,45 @@
         0 10px 30px rgba(59, 130, 246, 0.1);
     }
 
-    .carousel-container {
+    .container-carrossel {
       position: relative;
       width: 100%;
       height: 100%;
-      transition: transform 0.3s ease;
-    }
-
-    .carousel-track {
-      display: flex;
-      height: 100%;
-      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .carousel-slide {
-      min-width: 100%;
-      height: 100%;
-      position: relative;
       overflow: hidden;
     }
 
-    .carousel-slide img {
+    .trilha-slides {
+      display: flex;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .slide-imagem {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .slide-imagem img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.7s ease;
     }
 
-    .carousel-slide.active img {
+    .slide-imagem.ativo img {
       transform: scale(1.02);
     }
 
-    /* Overlay profissional */
-    .carousel-overlay {
+    /* Slides clonados para efeito infinito */
+    .slide-imagem.clonado {
+      pointer-events: none;
+    }
+
+    /* Sobreposição com informações do slide */
+    .info-slide {
       position: absolute;
       bottom: 0;
       left: 0;
@@ -225,30 +184,28 @@
       color: #1e3a8a;
     }
 
-    .carousel-title {
+    .titulo-slide {
       font-size: 1.8rem;
       font-weight: 700;
       margin-bottom: 0.8rem;
       color: #1e3a8a;
     }
 
-    .carousel-description {
+    .descricao-slide {
       font-size: 1.1rem;
       color: #475569;
       font-weight: 400;
     }
 
-    /* Botões de navegação elegantes */
-    .carousel-nav {
+    /* Botões de navegação do carrossel */
+    .botao-navegacao-carrossel {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      background: none;
+      border: none;
       width: 55px;
       height: 55px;
-      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -259,23 +216,21 @@
       z-index: 20;
     }
 
-    .carousel-nav:hover {
-      background: #3b82f6;
-      border-color: #3b82f6;
+    .botao-navegacao-carrossel:hover {
       color: white;
       transform: translateY(-50%) scale(1.1);
     }
 
-    .carousel-prev {
+    .botao-anterior {
       left: 2rem;
     }
 
-    .carousel-next {
+    .botao-proximo {
       right: 2rem;
     }
 
-    /* Indicadores minimalistas */
-    .carousel-indicators {
+    /* Indicadores de posição do carrossel */
+    .indicadores-carrossel {
       position: absolute;
       bottom: 2rem;
       left: 50%;
@@ -285,7 +240,7 @@
       z-index: 20;
     }
 
-    .carousel-indicator {
+    .ponto-indicador {
       width: 10px;
       height: 10px;
       border-radius: 50%;
@@ -294,19 +249,19 @@
       transition: all 0.3s ease;
     }
 
-    .carousel-indicator:hover {
+    .ponto-indicador:hover {
       background: rgba(59, 130, 246, 0.6);
       transform: scale(1.2);
     }
 
-    .carousel-indicator.active {
+    .ponto-indicador.ativo {
       background: #3b82f6;
       width: 30px;
       border-radius: 5px;
     }
 
-    /* Botões CTA profissionais */
-    .cta-buttons {
+    /* Botões de Chamada para Ação */
+    .grupo-botoes-acao {
       display: flex;
       gap: 1rem;
       flex-wrap: nowrap;
@@ -314,7 +269,7 @@
       align-items: center;
     }
 
-    .btn {
+    .botao-acao {
       padding: 1rem 2.5rem;
       font-size: 1rem;
       font-weight: 600;
@@ -328,56 +283,56 @@
       white-space: nowrap;
     }
 
-    .btn-primary {
+    .botao-primario {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: white;
       box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
     }
 
-    .btn-primary:hover {
+    .botao-primario:hover {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
       transform: translateY(-2px);
     }
 
-    .btn-secondary {
+    .botao-secundario {
       background: white;
       color: #3b82f6;
       border: 2px solid #3b82f6;
     }
 
-    .btn-secondary:hover {
+    .botao-secundario:hover {
       background: #3b82f6;
       color: white;
       transform: translateY(-2px);
     }
 
-    /* Seção de Features */
-    .features {
+    /* Seção de Recursos da Plataforma */
+    .secao-recursos {
       padding: 6rem 2rem;
       background: white;
     }
 
-    .section-header {
+    .cabecalho-secao {
       text-align: center;
       max-width: 800px;
       margin: 0 auto 4rem;
     }
 
-    .section-header h2 {
+    .cabecalho-secao h2 {
       font-size: clamp(2rem, 4vw, 2.5rem);
       font-weight: 700;
       color: #1e3a8a;
       margin-bottom: 1rem;
     }
 
-    .section-header p {
+    .cabecalho-secao p {
       font-size: 1.1rem;
       color: #64748b;
       line-height: 1.7;
     }
 
-    .features-grid {
+    .grade-recursos {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 2rem;
@@ -385,7 +340,7 @@
       margin: 0 auto;
     }
 
-    .feature-card {
+    .cartao-recurso {
       padding: 2.5rem;
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
       border-radius: 16px;
@@ -393,13 +348,13 @@
       transition: all 0.3s ease;
     }
 
-    .feature-card:hover {
+    .cartao-recurso:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
       border-color: #3b82f6;
     }
 
-    .feature-icon {
+    .icone-recurso {
       width: 60px;
       height: 60px;
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -411,25 +366,25 @@
       font-size: 1.8rem;
     }
 
-    .feature-card h3 {
+    .cartao-recurso h3 {
       font-size: 1.3rem;
       font-weight: 600;
       color: #1e3a8a;
       margin-bottom: 1rem;
     }
 
-    .feature-card p {
+    .cartao-recurso p {
       color: #64748b;
       line-height: 1.6;
     }
 
-    /* Seção de Benefits */
-    .benefits {
+    /* Seção de Vantagens da Plataforma */
+    .secao-vantagens {
       padding: 6rem 2rem;
       background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     }
 
-    .benefits-grid {
+    .grade-vantagens {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
@@ -437,7 +392,7 @@
       margin: 0 auto;
     }
 
-    .benefit-card {
+    .cartao-vantagem {
       text-align: center;
       padding: 2rem;
       background: white;
@@ -446,12 +401,12 @@
       transition: all 0.3s ease;
     }
 
-    .benefit-card:hover {
+    .cartao-vantagem:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
     }
 
-    .benefit-number {
+    .numero-destaque {
       font-size: 3rem;
       font-weight: 700;
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -461,220 +416,109 @@
       margin-bottom: 0.5rem;
     }
 
-    .benefit-card h3 {
+    .cartao-vantagem h3 {
       font-size: 1.1rem;
       font-weight: 600;
       color: #1e3a8a;
       margin-bottom: 0.5rem;
     }
 
-    .benefit-card p {
+    .cartao-vantagem p {
       color: #64748b;
       font-size: 0.95rem;
     }
 
-    /* Seção CTA Final */
-    .cta-section {
+    /* Seção Final de Conversão */
+    .secao-conversao-final {
       padding: 6rem 2rem;
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       text-align: center;
       color: white;
     }
 
-    .cta-section h2 {
+    .secao-conversao-final h2 {
       font-size: clamp(2rem, 4vw, 2.5rem);
       font-weight: 700;
       margin-bottom: 1rem;
     }
 
-    .cta-section p {
+    .secao-conversao-final p {
       font-size: 1.1rem;
       margin-bottom: 2.5rem;
       opacity: 0.95;
     }
 
-    .cta-section .btn {
+    .secao-conversao-final .botao-acao {
       background: white;
       color: #3b82f6;
       font-size: 1.1rem;
       padding: 1.2rem 3rem;
     }
 
-    .cta-section .btn:hover {
+    .secao-conversao-final .botao-acao:hover {
       background: #f8fafc;
       transform: translateY(-3px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .hero-content {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
-      }
-
-      .hero-text {
-        text-align: center;
-        padding-right: 0;
-        order: 2;
-      }
-
-      .hero-carousel {
-        order: 1;
-        height: 500px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .hero {
-        min-height: auto;
-        padding: 1.5rem 1rem;
-      }
-
-      .hero-content {
-        gap: 2rem;
-      }
-
-      .hero-carousel {
-        height: 400px;
-      }
-
-      .carousel-nav {
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
-      }
-
-      .carousel-prev {
-        left: 1rem;
-      }
-
-      .carousel-next {
-        right: 1rem;
-      }
-
-      .carousel-overlay {
-        padding: 2rem;
-      }
-
-      .carousel-title {
-        font-size: 1.3rem;
-      }
-
-      .carousel-description {
-        font-size: 0.95rem;
-      }
-
-      .cta-buttons {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .btn {
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .hero-carousel {
-        height: 300px;
-        border-radius: 12px;
-      }
-
-      .carousel-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-      }
-
-      .carousel-prev {
-        left: 0.5rem;
-      }
-
-      .carousel-next {
-        right: 0.5rem;
-      }
-
-      .carousel-overlay {
-        padding: 1.5rem;
-      }
-
-      .carousel-title {
-        font-size: 1.1rem;
-      }
-
-      .carousel-description {
-        font-size: 0.85rem;
-      }
     }
   </style>
 </head>
 
 <body>
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-text">
-        <img src="../Imagens/CEU-Logo.png" alt="CEU Logo" class="logo">
+  <section class="secao-principal">
+    <div class="conteudo-boas-vindas">
+      <div class="texto-apresentacao">
+        <img src="../Imagens/CEU-Logo.png" alt="CEU Logo" class="logotipo-ceu">
         <h1>Controle de Eventos Unificado</h1>
-        <p class="subtitulo">
+        <p class="texto-subtitulo">
           Gerencie seus eventos de forma inteligente e eficiente.
           Inscrições, certificados e controle total em uma única plataforma.
         </p>
-        <div class="cta-buttons">
-          <a href="#" class="btn btn-primary">Começar Agora</a>
-          <a href="#" class="btn btn-secondary">Saiba Mais</a>
+        <div class="grupo-botoes-acao">
+          <a href="#" class="botao-acao botao-primario">Começar Agora</a>
+          <a href="#" class="botao-acao botao-secundario">Saiba Mais</a>
         </div>
       </div>
 
-      <div class="hero-carousel">
-        <div class="carousel-container">
-          <div class="carousel-track">
-            <div class="carousel-slide">
-              <img src="../ImagensEventos/Hackathon_CEU.png" alt="Hackathon CEU">
-              <div class="carousel-overlay">
-                <div class="carousel-title">Hackathon CEU</div>
-                <div class="carousel-description">Evento de programação e inovação</div>
+      <div class="carrossel-imagens-destaque">
+        <div class="container-carrossel">
+          <div class="trilha-slides">
+            <div class="slide-imagem">
+              <img src="../Imagens/Imagem_1-Carrossel_Inicial.png" alt="CEU - Slide 1">
+              <div class="info-slide">
+                <div class="titulo-slide">Bem-vindo ao CEU</div>
+                <div class="descricao-slide">Sua plataforma completa de gestão de eventos</div>
               </div>
             </div>
-            <div class="carousel-slide">
-              <img src="../ImagensEventos/Machine_Learning.png" alt="Machine Learning">
-              <div class="carousel-overlay">
-                <div class="carousel-title">Machine Learning Workshop</div>
-                <div class="carousel-description">Aprenda os fundamentos da inteligência artificial</div>
+            <div class="slide-imagem">
+              <img src="../Imagens/Imagem_2-Carrossel_Inicial.png" alt="CEU - Slide 2">
+              <div class="info-slide">
+                <div class="titulo-slide">Organize seus Eventos</div>
+                <div class="descricao-slide">Controle total em uma única plataforma</div>
               </div>
             </div>
-            <div class="carousel-slide">
-              <img src="../ImagensEventos/JavaScript_Workshop.png" alt="JavaScript Workshop">
-              <div class="carousel-overlay">
-                <div class="carousel-title">JavaScript Workshop</div>
-                <div class="carousel-description">Domine a linguagem da web</div>
+            <div class="slide-imagem">
+              <img src="../Imagens/Imagem_3-Carrossel_Inicial.png" alt="CEU - Slide 3">
+              <div class="info-slide">
+                <div class="titulo-slide">Certificados Automáticos</div>
+                <div class="descricao-slide">Gere e envie certificados com facilidade</div>
               </div>
             </div>
-            <div class="carousel-slide">
-              <img src="../ImagensEventos/Semana_de_Inovacao.png" alt="Semana de Inovação">
-              <div class="carousel-overlay">
-                <div class="carousel-title">Semana de Inovação</div>
-                <div class="carousel-description">Tecnologia e futuro em foco</div>
-              </div>
-            </div>
-            <div class="carousel-slide">
-              <img src="../ImagensEventos/CyberSecurity.png" alt="CyberSecurity">
-              <div class="carousel-overlay">
-                <div class="carousel-title">Segurança Cibernética</div>
-                <div class="carousel-description">Proteja-se no mundo digital</div>
+            <div class="slide-imagem">
+              <img src="../Imagens/Imagem_4-Carrossel_Inicial.png" alt="CEU - Slide 4">
+              <div class="info-slide">
+                <div class="titulo-slide">Gestão Inteligente</div>
+                <div class="descricao-slide">Relatórios e análises em tempo real</div>
               </div>
             </div>
           </div>
-          <button class="carousel-nav carousel-prev">‹</button>
-          <button class="carousel-nav carousel-next">›</button>
-          <div class="carousel-indicators">
-            <div class="carousel-indicator active"></div>
-            <div class="carousel-indicator"></div>
-            <div class="carousel-indicator"></div>
-            <div class="carousel-indicator"></div>
-            <div class="carousel-indicator"></div>
+          <button class="botao-navegacao-carrossel botao-anterior">‹</button>
+          <button class="botao-navegacao-carrossel botao-proximo">›</button>
+          <div class="indicadores-carrossel">
+            <div class="ponto-indicador ativo"></div>
+            <div class="ponto-indicador"></div>
+            <div class="ponto-indicador"></div>
+            <div class="ponto-indicador"></div>
           </div>
         </div>
       </div>
@@ -683,402 +527,430 @@
     <div class="scroll-indicator"></div>
   </section>
 
-  <!-- Seção de Features -->
-  <section class="features">
-    <div class="section-header">
+  <!-- Seção de Recursos da Plataforma -->
+  <section class="secao-recursos">
+    <div class="cabecalho-secao">
       <h2>Recursos Poderosos para Seus Eventos</h2>
       <p>Tudo que você precisa para gerenciar eventos de sucesso em uma única plataforma moderna e intuitiva.</p>
     </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">📋</div>
+    <div class="grade-recursos">
+      <div class="cartao-recurso">
+        <div class="icone-recurso">📋</div>
         <h3>Gestão de Inscrições</h3>
         <p>Sistema completo para gerenciar inscrições de participantes com validação automática e controle de vagas.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🎓</div>
+      <div class="cartao-recurso">
+        <div class="icone-recurso">🎓</div>
         <h3>Certificados Automáticos</h3>
         <p>Gere certificados personalizados automaticamente com QR Code para validação de autenticidade.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
+      <div class="cartao-recurso">
+        <div class="icone-recurso">📊</div>
         <h3>Relatórios Detalhados</h3>
         <p>Acompanhe métricas e gere relatórios completos sobre participação, presença e engajamento.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">✉️</div>
+      <div class="cartao-recurso">
+        <div class="icone-recurso">✉️</div>
         <h3>Notificações Inteligentes</h3>
         <p>Sistema de notificações automáticas para manter participantes e organizadores sempre informados.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔒</div>
+      <div class="cartao-recurso">
+        <div class="icone-recurso">🔒</div>
         <h3>Segurança Avançada</h3>
         <p>Proteção de dados com criptografia e controles de acesso diferenciados por perfil de usuário.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📱</div>
+      <div class="cartao-recurso">
+        <div class="icone-recurso">📱</div>
         <h3>100% Responsivo</h3>
         <p>Acesse de qualquer dispositivo - desktop, tablet ou smartphone com experiência otimizada.</p>
       </div>
     </div>
   </section>
 
-  <!-- Seção de Benefits -->
-  <section class="benefits">
-    <div class="section-header">
+  <!-- Seção de Vantagens da Plataforma -->
+  <section class="secao-vantagens">
+    <div class="cabecalho-secao">
       <h2>Por Que Escolher o CEU?</h2>
       <p>Números que comprovam a eficiência da nossa plataforma.</p>
     </div>
-    <div class="benefits-grid">
-      <div class="benefit-card">
-        <div class="benefit-number">10x</div>
+    <div class="grade-vantagens">
+      <div class="cartao-vantagem">
+        <div class="numero-destaque">10x</div>
         <h3>Mais Rápido</h3>
         <p>Reduza o tempo de gestão de eventos em até 10 vezes</p>
       </div>
-      <div class="benefit-card">
-        <div class="benefit-number">100%</div>
+      <div class="cartao-vantagem">
+        <div class="numero-destaque">100%</div>
         <h3>Automatizado</h3>
         <p>Certificados e notificações gerados automaticamente</p>
       </div>
-      <div class="benefit-card">
-        <div class="benefit-number">24/7</div>
+      <div class="cartao-vantagem">
+        <div class="numero-destaque">24/7</div>
         <h3>Disponibilidade</h3>
         <p>Acesso à plataforma a qualquer hora, de qualquer lugar</p>
       </div>
-      <div class="benefit-card">
-        <div class="benefit-number">0</div>
+      <div class="cartao-vantagem">
+        <div class="numero-destaque">0</div>
         <h3>Papel</h3>
         <p>Gestão completamente digital e sustentável</p>
       </div>
     </div>
   </section>
 
-  <!-- Seção CTA Final -->
-  <section class="cta-section">
+  <!-- Seção Final de Conversão -->
+  <section class="secao-conversao-final">
     <h2>Pronto para Transformar Seus Eventos?</h2>
     <p>Junte-se a centenas de organizadores que já confiam no CEU para gerenciar seus eventos.</p>
-    <a href="#" class="btn">Comece Gratuitamente</a>
+    <a href="#" class="botao-acao">Comece Gratuitamente</a>
   </section>
 
 </body>
 
 <script>
-  // Carousel functionality com efeitos avançados
-  class SpectacularCarousel {
+  // Gerenciador do Carrossel de Imagens com efeito infinito
+  class GerenciadorCarrosselImagens {
     constructor() {
-      this.track = document.querySelector('.carousel-track');
-      this.slides = document.querySelectorAll('.carousel-slide');
-      this.prevButton = document.querySelector('.carousel-prev');
-      this.nextButton = document.querySelector('.carousel-next');
-      this.indicators = document.querySelectorAll('.carousel-indicator');
+      this.trilha = document.querySelector('.trilha-slides');
+      this.containerSlides = document.querySelector('.trilha-slides');
+      this.slidesOriginais = Array.from(document.querySelectorAll('.slide-imagem'));
+      this.botaoAnterior = document.querySelector('.botao-anterior');
+      this.botaoProximo = document.querySelector('.botao-proximo');
+      this.indicadores = document.querySelectorAll('.ponto-indicador');
 
-      this.currentSlide = 0;
-      this.totalSlides = this.slides.length;
-      this.autoPlayInterval = null;
-      this.isTransitioning = false;
+      this.indiceAtual = 0;
+      this.totalSlides = this.slidesOriginais.length;
+      this.intervaloReproducaoAutomatica = null;
+      this.estaEmTransicao = false;
 
-      this.init();
+      this.inicializar();
     }
 
-    init() {
-      // Add event listeners com debounce
-      this.prevButton.addEventListener('click', () => this.debounce(() => this.prevSlide(), 300));
-      this.nextButton.addEventListener('click', () => this.debounce(() => this.nextSlide(), 300));
+    inicializar() {
+      // Clonar primeiro e último slide para efeito infinito
+      this.criarLoopInfinito();
 
-      // Add click listeners to indicators
-      this.indicators.forEach((indicator, index) => {
-        indicator.addEventListener('click', () => this.goToSlide(index));
+      // Iniciar na posição correta (após o clone do último)
+      this.indiceAtual = 1;
+      this.trilha.style.transition = 'none';
+      this.trilha.style.transform = `translateX(-${this.indiceAtual * 100}%)`;
+      
+      // Forçar reflow
+      this.trilha.offsetHeight;
+      
+      // Reativar transição
+      setTimeout(() => {
+        this.trilha.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+      }, 50);
+
+      // Ouvintes de eventos
+      this.botaoAnterior.addEventListener('click', () => this.slideAnterior());
+      this.botaoProximo.addEventListener('click', () => this.proximoSlide());
+
+      // Indicadores
+      this.indicadores.forEach((indicador, indice) => {
+        indicador.addEventListener('click', () => this.irParaSlide(indice));
       });
 
-      // Keyboard navigation
+      // Navegação por teclado
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') this.prevSlide();
-        if (e.key === 'ArrowRight') this.nextSlide();
+        if (e.key === 'ArrowLeft') this.slideAnterior();
+        if (e.key === 'ArrowRight') this.proximoSlide();
       });
 
-      // Touch/swipe support
-      this.addTouchSupport();
+      // Suporte a toque/deslizar
+      this.adicionarSuporteToque();
 
-      // Start autoplay
-      this.startAutoPlay();
+      // Reprodução automática
+      this.iniciarReproducaoAutomatica();
 
-      // Pause on hover with smooth transition
-      const carousel = document.querySelector('.hero-carousel');
-      carousel.addEventListener('mouseenter', () => {
-        this.stopAutoPlay();
-        carousel.style.transform = 'scale(1.02)';
+      // Pausar ao passar o mouse
+      const carrossel = document.querySelector('.carrossel-imagens-destaque');
+      carrossel.addEventListener('mouseenter', () => {
+        this.pararReproducaoAutomatica();
       });
-      carousel.addEventListener('mouseleave', () => {
-        this.startAutoPlay();
-        carousel.style.transform = 'scale(1)';
+      carrossel.addEventListener('mouseleave', () => {
+        this.iniciarReproducaoAutomatica();
       });
 
-      // Intersection Observer para performance
-      this.setupIntersectionObserver();
+      // Observador de Interseção
+      this.configurarObservadorIntersecao();
 
-      // Marcar primeiro slide como ativo
-      this.slides[0].classList.add('active');
+      // Marcar primeiro slide real como ativo
+      this.atualizarIndicadores();
     }
 
-    debounce(func, wait) {
-      if (this.isTransitioning) return;
-      this.isTransitioning = true;
-      func();
-      setTimeout(() => { this.isTransitioning = false; }, wait);
+    criarLoopInfinito() {
+      // Clonar último slide e adicionar no início
+      const cloneUltimo = this.slidesOriginais[this.totalSlides - 1].cloneNode(true);
+      cloneUltimo.classList.add('clonado');
+      this.trilha.insertBefore(cloneUltimo, this.trilha.firstChild);
+
+      // Clonar primeiro slide e adicionar no final
+      const clonePrimeiro = this.slidesOriginais[0].cloneNode(true);
+      clonePrimeiro.classList.add('clonado');
+      this.trilha.appendChild(clonePrimeiro);
+
+      // Atualizar referência dos slides
+      this.slides = Array.from(document.querySelectorAll('.slide-imagem'));
     }
 
-    addTouchSupport() {
-      let startX = 0;
-      let endX = 0;
+    adicionarSuporteToque() {
+      let inicioX = 0;
+      let fimX = 0;
 
-      this.track.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
+      this.trilha.addEventListener('touchstart', (e) => {
+        inicioX = e.touches[0].clientX;
       });
 
-      this.track.addEventListener('touchend', (e) => {
-        endX = e.changedTouches[0].clientX;
-        const diff = startX - endX;
+      this.trilha.addEventListener('touchend', (e) => {
+        fimX = e.changedTouches[0].clientX;
+        const diferenca = inicioX - fimX;
 
-        if (Math.abs(diff) > 50) { // Minimum swipe distance
-          if (diff > 0) {
-            this.nextSlide();
+        if (Math.abs(diferenca) > 50) {
+          if (diferenca > 0) {
+            this.proximoSlide();
           } else {
-            this.prevSlide();
+            this.slideAnterior();
           }
         }
       });
     }
 
-    setupIntersectionObserver() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.startAutoPlay();
+    configurarObservadorIntersecao() {
+      const observador = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+          if (entrada.isIntersecting) {
+            this.iniciarReproducaoAutomatica();
           } else {
-            this.stopAutoPlay();
+            this.pararReproducaoAutomatica();
           }
         });
       });
 
-      observer.observe(document.querySelector('.hero-carousel'));
+      observador.observe(document.querySelector('.carrossel-imagens-destaque'));
     }
 
-    updateCarousel() {
-      // Remove active class from all slides
-      this.slides.forEach(slide => slide.classList.remove('active'));
+    atualizarIndicadores() {
+      // Calcular índice real (sem contar clones)
+      let indiceReal = this.indiceAtual - 1;
+      if (indiceReal < 0) indiceReal = this.totalSlides - 1;
+      if (indiceReal >= this.totalSlides) indiceReal = 0;
 
-      // Add active class to current slide
-      this.slides[this.currentSlide].classList.add('active');
-
-      // Move track with 3D effect
-      const translateX = -this.currentSlide * 100;
-      this.track.style.transform = `translateX(${translateX}%)`;
-
-      // Update indicators with stagger animation
-      this.indicators.forEach((indicator, index) => {
-        indicator.classList.toggle('active', index === this.currentSlide);
-        if (index === this.currentSlide) {
-          // Add pulse effect to active indicator
-          indicator.style.animation = 'pulse 2s ease-in-out infinite';
-        } else {
-          indicator.style.animation = 'none';
-        }
+      this.indicadores.forEach((indicador, indice) => {
+        indicador.classList.toggle('ativo', indice === indiceReal);
       });
-
-      // Trigger overlay animations
-      this.animateOverlay();
     }
 
-    animateOverlay() {
-      const currentOverlay = this.slides[this.currentSlide].querySelector('.carousel-overlay');
-      const title = currentOverlay.querySelector('.carousel-title');
-      const description = currentOverlay.querySelector('.carousel-description');
+    proximoSlide() {
+      if (this.estaEmTransicao) return;
+      this.estaEmTransicao = true;
 
-      // Reset animations
-      title.style.animation = 'none';
-      description.style.animation = 'none';
+      this.indiceAtual++;
+      this.trilha.style.transform = `translateX(-${this.indiceAtual * 100}%)`;
+      this.atualizarIndicadores();
+      this.adicionarEfeitoNavegacao('proximo');
 
-      // Trigger reflow
-      title.offsetHeight;
-      description.offsetHeight;
-
-      // Apply animations
-      title.style.animation = 'titleSlideIn 0.6s ease-out';
-      description.style.animation = 'descSlideIn 0.6s ease-out 0.2s both';
+      // Detectar se chegou no clone do primeiro slide
+      this.trilha.addEventListener('transitionend', () => {
+        if (this.indiceAtual >= this.slides.length - 1) {
+          this.trilha.style.transition = 'none';
+          this.indiceAtual = 1;
+          this.trilha.style.transform = `translateX(-${this.indiceAtual * 100}%)`;
+          
+          setTimeout(() => {
+            this.trilha.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+          }, 50);
+        }
+        this.estaEmTransicao = false;
+      }, { once: true });
     }
 
-    nextSlide() {
-      this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
-      this.updateCarousel();
-      this.addNavigationEffect('next');
+    slideAnterior() {
+      if (this.estaEmTransicao) return;
+      this.estaEmTransicao = true;
+
+      this.indiceAtual--;
+      this.trilha.style.transform = `translateX(-${this.indiceAtual * 100}%)`;
+      this.atualizarIndicadores();
+      this.adicionarEfeitoNavegacao('anterior');
+
+      // Detectar se chegou no clone do último slide
+      this.trilha.addEventListener('transitionend', () => {
+        if (this.indiceAtual <= 0) {
+          this.trilha.style.transition = 'none';
+          this.indiceAtual = this.totalSlides;
+          this.trilha.style.transform = `translateX(-${this.indiceAtual * 100}%)`;
+          
+          setTimeout(() => {
+            this.trilha.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+          }, 50);
+        }
+        this.estaEmTransicao = false;
+      }, { once: true });
     }
 
-    prevSlide() {
-      this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
-      this.updateCarousel();
-      this.addNavigationEffect('prev');
+    irParaSlide(indice) {
+      if (this.estaEmTransicao) return;
+      
+      // Ajustar índice para contar o clone inicial
+      this.indiceAtual = indice + 1;
+      this.trilha.style.transform = `translateX(-${this.indiceAtual * 100}%)`;
+      this.atualizarIndicadores();
     }
 
-    goToSlide(index) {
-      if (index !== this.currentSlide) {
-        this.currentSlide = index;
-        this.updateCarousel();
-      }
-    }
-
-    addNavigationEffect(direction) {
-      const button = direction === 'next' ? this.nextButton : this.prevButton;
-      button.style.transform = 'translateY(-50%) scale(0.9) rotateZ(10deg)';
+    adicionarEfeitoNavegacao(direcao) {
+      const botao = direcao === 'proximo' ? this.botaoProximo : this.botaoAnterior;
+      botao.style.transform = 'translateY(-50%) scale(0.9)';
       setTimeout(() => {
-        button.style.transform = 'translateY(-50%) scale(1) rotateZ(0deg)';
+        botao.style.transform = 'translateY(-50%) scale(1)';
       }, 150);
     }
 
-    startAutoPlay() {
-      this.stopAutoPlay();
-      this.autoPlayInterval = setInterval(() => {
-        this.nextSlide();
-      }, 4000); // Change slide every 4 seconds
+    iniciarReproducaoAutomatica() {
+      this.pararReproducaoAutomatica();
+      this.intervaloReproducaoAutomatica = setInterval(() => {
+        this.proximoSlide();
+      }, 4000);
     }
 
-    stopAutoPlay() {
-      if (this.autoPlayInterval) {
-        clearInterval(this.autoPlayInterval);
-        this.autoPlayInterval = null;
+    pararReproducaoAutomatica() {
+      if (this.intervaloReproducaoAutomatica) {
+        clearInterval(this.intervaloReproducaoAutomatica);
+        this.intervaloReproducaoAutomatica = null;
       }
     }
   }
 
-  // Parallax and scroll effects
-  class ScrollEffects {
+  // Efeitos de Rolagem e Parallax
+  class GerenciadorEfeitosRolagem {
     constructor() {
-      this.ticking = false;
-      this.init();
+      this.processandoAnimacao = false;
+      this.inicializar();
     }
 
-    init() {
+    inicializar() {
       window.addEventListener('scroll', () => {
-        if (!this.ticking) {
+        if (!this.processandoAnimacao) {
           requestAnimationFrame(() => {
-            this.updateParallax();
-            this.ticking = false;
+            this.atualizarParallax();
+            this.processandoAnimacao = false;
           });
-          this.ticking = true;
+          this.processandoAnimacao = true;
         }
       });
     }
 
-    updateParallax() {
-      const scrolled = window.pageYOffset;
-      const hero = document.querySelector('.hero');
-      const parallaxElements = hero.querySelectorAll('.hero-content, .hero-carousel');
+    atualizarParallax() {
+      const quantidadeRolada = window.pageYOffset;
+      const secaoPrincipal = document.querySelector('.secao-principal');
+      const elementosParallax = secaoPrincipal.querySelectorAll('.conteudo-boas-vindas, .carrossel-imagens-destaque');
 
-      parallaxElements.forEach(element => {
-        const speed = 0.5;
-        const yPos = -(scrolled * speed);
-        element.style.transform = `translateY(${yPos}px)`;
+      elementosParallax.forEach(elemento => {
+        const velocidade = 0.5;
+        const posicaoY = -(quantidadeRolada * velocidade);
+        elemento.style.transform = `translateY(${posicaoY}px)`;
       });
     }
   }
 
-  // Performance-optimized animations
-  class AnimationController {
+  // Controlador de Animações Otimizadas
+  class ControladorAnimacoes {
     constructor() {
-      this.observers = [];
-      this.init();
+      this.observadores = [];
+      this.inicializar();
     }
 
-    init() {
-      this.setupAnimationObservers();
-      this.optimizeAnimations();
+    inicializar() {
+      this.configurarObservadoresAnimacao();
+      this.otimizarAnimacoes();
     }
 
-    setupAnimationObservers() {
-      const animatedElements = document.querySelectorAll('.hero-text, .cta-buttons, .logo');
+    configurarObservadoresAnimacao() {
+      const elementosAnimados = document.querySelectorAll('.texto-apresentacao, .grupo-botoes-acao, .logotipo-ceu');
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
+      const observador = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+          if (entrada.isIntersecting) {
+            entrada.target.classList.add('animado');
           }
         });
       }, { threshold: 0.1 });
 
-      animatedElements.forEach(element => {
-        observer.observe(element);
+      elementosAnimados.forEach(elemento => {
+        observador.observe(elemento);
       });
     }
 
-    optimizeAnimations() {
-      // Reduce motion for users who prefer it
+    otimizarAnimacoes() {
+      // Reduzir movimento para usuários que preferem
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.style.setProperty('--animation-duration', '0.01s');
-        document.querySelectorAll('*').forEach(element => {
-          element.style.animationDuration = '0.01s !important';
-          element.style.transitionDuration = '0.01s !important';
+        document.documentElement.style.setProperty('--duracao-animacao', '0.01s');
+        document.querySelectorAll('*').forEach(elemento => {
+          elemento.style.animationDuration = '0.01s !important';
+          elemento.style.transitionDuration = '0.01s !important';
         });
       }
     }
   }
 
-  // Enhanced button effects
-  class ButtonEffects {
+  // Efeitos Interativos dos Botões
+  class GerenciadorEfeitosBotoes {
     constructor() {
-      this.init();
+      this.inicializar();
     }
 
-    init() {
-      const buttons = document.querySelectorAll('.btn');
+    inicializar() {
+      const botoes = document.querySelectorAll('.botao-acao');
 
-      buttons.forEach(button => {
-        // Ripple effect
-        button.addEventListener('click', (e) => {
-          const ripple = document.createElement('span');
-          const rect = button.getBoundingClientRect();
-          const size = Math.max(rect.width, rect.height);
-          const x = e.clientX - rect.left - size / 2;
-          const y = e.clientY - rect.top - size / 2;
+      botoes.forEach(botao => {
+        // Efeito de ondulação (ripple)
+        botao.addEventListener('click', (e) => {
+          const ondulacao = document.createElement('span');
+          const retangulo = botao.getBoundingClientRect();
+          const tamanho = Math.max(retangulo.width, retangulo.height);
+          const x = e.clientX - retangulo.left - tamanho / 2;
+          const y = e.clientY - retangulo.top - tamanho / 2;
 
-          ripple.style.cssText = `
+          ondulacao.style.cssText = `
               position: absolute;
-              width: ${size}px;
-              height: ${size}px;
+              width: ${tamanho}px;
+              height: ${tamanho}px;
               left: ${x}px;
               top: ${y}px;
               background: rgba(255, 255, 255, 0.3);
               border-radius: 50%;
               transform: scale(0);
-              animation: ripple 0.6s ease-out;
+              animation: ondulacao 0.6s ease-out;
               pointer-events: none;
             `;
 
-          button.appendChild(ripple);
+          botao.appendChild(ondulacao);
 
           setTimeout(() => {
-            ripple.remove();
+            ondulacao.remove();
           }, 600);
         });
 
-        // Magnetic effect
-        button.addEventListener('mousemove', (e) => {
-          const rect = button.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
+        // Efeito magnético
+        botao.addEventListener('mousemove', (e) => {
+          const retangulo = botao.getBoundingClientRect();
+          const x = e.clientX - retangulo.left - retangulo.width / 2;
+          const y = e.clientY - retangulo.top - retangulo.height / 2;
 
-          button.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) scale(1.05)`;
+          botao.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) scale(1.05)`;
         });
 
-        button.addEventListener('mouseleave', () => {
-          button.style.transform = 'translate(0, 0)';
+        botao.addEventListener('mouseleave', () => {
+          botao.style.transform = 'translate(0, 0)';
         });
       });
     }
   }
 
-  // Add ripple animation CSS
-  const rippleStyle = document.createElement('style');
-  rippleStyle.textContent = `
-      @keyframes ripple {
+  // Adicionar animação de ondulação ao CSS
+  const estiloOndulacao = document.createElement('style');
+  estiloOndulacao.textContent = `
+      @keyframes ondulacao {
         from {
           transform: scale(0);
           opacity: 1;
@@ -1089,19 +961,19 @@
         }
       }
     `;
-  document.head.appendChild(rippleStyle);
+  document.head.appendChild(estiloOndulacao);
 
-  // Initialize everything when DOM is loaded
+  // Inicializar tudo quando o DOM estiver carregado
   document.addEventListener('DOMContentLoaded', () => {
-    new SpectacularCarousel();
-    new ScrollEffects();
-    new AnimationController();
-    new ButtonEffects();
+    new GerenciadorCarrosselImagens();
+    new GerenciadorEfeitosRolagem();
+    new ControladorAnimacoes();
+    new GerenciadorEfeitosBotoes();
 
-    // Add scroll indicator functionality
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    if (scrollIndicator) {
-      scrollIndicator.addEventListener('click', () => {
+    // Funcionalidade do indicador de rolagem
+    const indicadorRolagem = document.querySelector('.scroll-indicator');
+    if (indicadorRolagem) {
+      indicadorRolagem.addEventListener('click', () => {
         window.scrollTo({
           top: window.innerHeight,
           behavior: 'smooth'
@@ -1109,28 +981,28 @@
       });
     }
 
-    // Performance monitoring
+    // Monitoramento de desempenho
     if ('performance' in window) {
       window.addEventListener('load', () => {
         setTimeout(() => {
-          const perfData = performance.getEntriesByType('navigation')[0];
-          console.log(`Página carregada em ${perfData.loadEventEnd - perfData.loadEventStart}ms`);
+          const dadosPerformance = performance.getEntriesByType('navigation')[0];
+          console.log(`Página carregada em ${dadosPerformance.loadEventEnd - dadosPerformance.loadEventStart}ms`);
         }, 0);
       });
     }
   });
 
-  // Preload next images for better performance
+  // Pré-carregar próximas imagens para melhor desempenho
   window.addEventListener('load', () => {
-    const images = [
+    const imagens = [
       '../ImagensEventos/React.png',
       '../ImagensEventos/Python.png',
       '../ImagensEventos/Palestra_sobre_IA.png'
     ];
 
-    images.forEach(src => {
+    imagens.forEach(caminho => {
       const img = new Image();
-      img.src = src;
+      img.src = caminho;
     });
   });
 </script>

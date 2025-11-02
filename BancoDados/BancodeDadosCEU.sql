@@ -161,6 +161,12 @@ INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (16, '/ImagensEventos/CyberSecurity.png', 0, 1),
 (17, '/ImagensEventos/Cloud_Computing.png', 0, 1);
 
+-- Adiciona imagem CEU-ImagemEvento.png como segunda imagem para testar carrossel
+INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
+(1, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0),
+(12, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0),
+(13, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0);
+
 INSERT INTO organiza (cod_evento, CPF) VALUES
 (1, '12345678901'),
 (2, '12345678901'),
