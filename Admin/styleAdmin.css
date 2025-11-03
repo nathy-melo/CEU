@@ -842,6 +842,30 @@ select::-ms-expand { display: inline; }
     line-height: 1;
 }
 
+/* Ajustes visuais específicos da seção PWA/Rede */
+#pwarede .stats-card p {
+    /* Reduzir o tamanho da fonte nos cards para evitar "texto grande" */
+    font-size: clamp(14px, 3.2vw, 18px);
+    font-weight: 600;
+}
+
+#pwarede .admin-container {
+    /* Nesta seção, usamos container claro para melhor contraste com conteúdo detalhado */
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    color: var(--preto) !important;
+    border: 1px solid #dee2e6;
+}
+
+#pwarede .admin-container h4 {
+    color: var(--azul-escuro);
+}
+
+#pwarede #pwaDetalhes {
+    /* Garantir contraste de texto sobre fundo claro */
+    color: var(--preto) !important;
+    background: #f8f9fa !important;
+}
+
 .stats-card small {
     color: var(--cinza-medio);
     font-size: clamp(11px, 2vw, 12px);

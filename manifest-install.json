@@ -1,0 +1,28 @@
+{
+  "name": "CEU - Sistema de Eventos Unificados",
+  "short_name": "CEU",
+  "description": "Sistema de gerenciamento de eventos",
+  "start_url": "/CEU/",
+  "display": "standalone",
+  "background_color": "#6598D2",
+  "theme_color": "#6598D2",
+  "orientation": "portrait-primary",
+  "scope": "/CEU/",
+  "icons": [
+    {
+      "src": "Imagens/Logo_APP_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "Imagens/Logo_APP_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}

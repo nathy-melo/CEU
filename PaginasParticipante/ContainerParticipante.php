@@ -10,7 +10,7 @@ if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividad
     // Sessão expirou - mostra página especial
     session_unset();
     session_destroy();
-    
+
     // Mostra página de sessão expirada ao invés de redirecionamento direto
     echo '<!DOCTYPE html>
     <html lang="pt-br">
@@ -50,17 +50,26 @@ if (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1) {
 $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 ?>
 <!DOCTYPE html>
-<html lang="pt-br" <?php if ($tema_site === 1) { echo 'data-theme="dark"'; } ?> >
+<html lang="pt-br" <?php if ($tema_site === 1) {
+                        echo 'data-theme="dark"';
+                    } ?>>
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CEU</title>
+    <meta name="theme-color" content="#6598D2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/CEU/manifest.json" />
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
+    <script src="/CEU/pwa-config.js" defer></script>
 </head>
 
-<body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) { echo 'class="pagina-inicio"'; } ?>>
+<body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) {
+            echo 'class="pagina-inicio"';
+        } ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
@@ -84,7 +93,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     ];
     $pagina = $_GET['pagina'] ?? 'inicio';
     $arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
-?>
+    ?>
 
     <!-- Menu fixo -->
     <?php include 'MenuP.php'; ?>
@@ -107,6 +116,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         function carregarScripts(lista, callback) {
             const alvo = document.getElementById('conteudo-dinamico') || document.body;
             let index = 0;
+
             function proximo() {
                 if (index < lista.length) {
                     const script = document.createElement('script');
@@ -148,7 +158,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     }
                 });
             });
-            menuContentObserver.observe(menu, { attributes: true });
+            menuContentObserver.observe(menu, {
+                attributes: true
+            });
         }
 
         function removerFiltroExistente() {
@@ -174,7 +186,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             const script = document.createElement('script');
             script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
             script.setAttribute('data-faleconosco', '1');
-            script.onload = function () {
+            script.onload = function() {
                 if (typeof window.inicializarFaleConosco === 'function') window.inicializarFaleConosco();
             };
             conteudo.appendChild(script);
@@ -260,17 +272,19 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'certificados': {
                 html: 'CerticadosParticipante.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'configuracoes': {
                 html: 'ConfiguracoesParticipante.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'faleconosco': {
                 html: '../PaginasGlobais/FaleConosco.html',
                 js: [],
-                init: () => { carregarFaleConoscoScript(); }
+                init: () => {
+                    carregarFaleConoscoScript();
+                }
             },
             'redefinirSenha': {
                 html: '../PaginasGlobais/RedefinirSenhaConta.html',
@@ -282,27 +296,27 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'emailRecuperacao': {
                 html: '../PaginasGlobais/EmailDeRecuperacao.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'temaDoSite': {
                 html: '../PaginasGlobais/TemaDoSite.php',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'manualDeUso': {
                 html: '../PaginasGlobais/ManualDeUso.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'duvidasFrequentes': {
                 html: '../PaginasGlobais/DuvidasFrequentes.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'sobreNos': {
                 html: '../PaginasGlobais/SobreNos.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'painelnotificacoes': {
                 html: '../PaginasGlobais/PainelNotificacoes.php',
@@ -326,7 +340,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             if (!rota) return;
             const scripts = Array.isArray(rota.js) ? rota.js : [];
             if (scripts.length) {
-                carregarScripts(scripts, () => { if (typeof rota.init === 'function') rota.init(); });
+                carregarScripts(scripts, () => {
+                    if (typeof rota.init === 'function') rota.init();
+                });
             } else {
                 if (typeof rota.init === 'function') rota.init();
             }
@@ -337,7 +353,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             if (typeof window.limpezaCompleta === 'function') {
                 window.limpezaCompleta();
             }
-            
+
             removerFiltroExistente();
             fetch('ContainerParticipante.php?pagina=' + encodeURIComponent(pagina))
                 .then(response => response.text())
@@ -354,12 +370,12 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         atualizarClasseBody(pagina);
                         if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);
                         executarRota(pagina);
-                        
+
                         // Reinicializa o gerenciador de notificações
                         if (typeof window.gerenciadorNotificacoes !== 'undefined' && window.gerenciadorNotificacoes) {
                             window.gerenciadorNotificacoes.reinicializar();
                         }
-                        
+
                         // Reinicia verificação de sessão para nova página (5 minutos)
                         if (typeof window.reiniciarVerificacaoSessao === 'function') {
                             window.reiniciarVerificacaoSessao(300);
@@ -372,13 +388,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // =========================
         // Eventos de inicialização
         // =========================
-        window.onpopstate = function () {
+        window.onpopstate = function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             carregarPagina(pagina);
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);
@@ -390,6 +406,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
     <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
+    <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>
 
 </html>

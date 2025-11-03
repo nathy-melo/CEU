@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEU PWA - Verificação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .check {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+        .warning { border-left: 4px solid #ff9800; }
+        .info { border-left: 4px solid #2196F3; }
+        button {
+            background: #6598D2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #4F6C8C; }
+        #results { margin-top: 20px; }
+        .status { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 CEU PWA - Verificação de Configuração</h1>
+    
+    <div class="check info">
+        <h3>📱 Teste de Configuração PWA</h3>
+        <p>Esta página verifica se a PWA está configurada corretamente.</p>
+        <button onclick="runAllChecks()">🔍 Executar Todos os Testes</button>
+        <button onclick="testInstallability()">📱 Testar Instalação</button>
+        <button onclick="clearData()">🗑️ Limpar Cache</button>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="check info">
+        <h3>📋 Instruções de Teste Manual</h3>
+        <ol>
+            <li><strong>Desktop:</strong> Acesse <code>http://localhost/CEU/</code></li>
+            <li><strong>Mobile (mesma rede):</strong> Descubra seu IP com <code>ipconfig</code> e acesse <code>http://SEU-IP/CEU/</code></li>
+            <li><strong>Verificar PWA:</strong> F12 → Application → Manifest</li>
+            <li><strong>Instalar:</strong> Clicar no ícone de instalação ou botão "📱 Instalar App"</li>
+        </ol>
+    </div>
+
+    <script>
+        function addResult(type, title, message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `check ${type}`;
+            div.innerHTML = `<h3>${title}</h3><p>${message}</p>`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function runAllChecks() {
+            clearResults();
+            
+            // 1. Verificar Service Worker
+            if ('serviceWorker' in navigator) {
+                addResult('success', '✅ Service Worker Suportado', 'O navegador suporta Service Workers.');
+                
+                try {
+                    const registration = await navigator.serviceWorker.register('/CEU/sw.js');
+                    addResult('success', '✅ Service Worker Registrado', `SW registrado em: ${registration.scope}`);
+                } catch (error) {
+                    addResult('error', '❌ Erro no Service Worker', `Erro: ${error.message}`);
+                }
+            } else {
+                addResult('error', '❌ Service Worker Não Suportado', 'Este navegador não suporta Service Workers.');
+            }
+
+            // 2. Verificar Manifest
+            try {
+                const response = await fetch('/CEU/manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    addResult('success', '✅ Manifest Carregado', `Nome: ${manifest.name || manifest.short_name}`);
+                } else {
+                    addResult('error', '❌ Manifest Não Found', 'Arquivo manifest.json não foi encontrado.');
+                }
+            } catch (error) {
+                addResult('error', '❌ Erro no Manifest', `Erro ao carregar manifest: ${error.message}`);
+            }
+
+            // 3. Verificar HTTPS/Localhost
+            const protocol = window.location.protocol;
+            if (protocol === 'https:' || window.location.hostname === 'localhost') {
+                addResult('success', '✅ Protocolo Seguro', `Usando ${protocol} - PWA pode ser instalada.`);
+            } else {
+                addResult('warning', '⚠️ Protocolo Inseguro', 'PWA funciona melhor com HTTPS. Para teste local, use localhost.');
+            }
+
+            // 4. Verificar se é mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                addResult('info', '📱 Dispositivo Mobile Detectado', 'Teste de instalação disponível.');
+            } else {
+                addResult('info', '🖥️ Desktop Detectado', 'Para testar no mobile, use o IP da máquina.');
+            }
+
+            // 5. Verificar recursos PWA
+            checkPWAFeatures();
+        }
+
+        function checkPWAFeatures() {
+            const features = [
+                { name: 'Cache API', supported: 'caches' in window },
+                { name: 'Notifications', supported: 'Notification' in window },
+                { name: 'Push Manager', supported: 'PushManager' in window },
+                { name: 'Background Sync', supported: 'sync' in window.ServiceWorkerRegistration.prototype },
+                { name: 'Install Prompt', supported: 'BeforeInstallPromptEvent' in window }
+            ];
+
+            features.forEach(feature => {
+                const type = feature.supported ? 'success' : 'warning';
+                const icon = feature.supported ? '✅' : '⚠️';
+                addResult(type, `${icon} ${feature.name}`, 
+                    feature.supported ? 'Suportado' : 'Não suportado neste navegador');
+            });
+        }
+
+        async function testInstallability() {
+            clearResults();
+            
+            // Verificar se evento de instalação está disponível
+            if (window.deferredPrompt) {
+                addResult('success', '✅ App Pode Ser Instalado', 'Prompt de instalação disponível.');
+                
+                try {
+                    await window.deferredPrompt.prompt();
+                    const choiceResult = await window.deferredPrompt.userChoice;
+                    
+                    if (choiceResult.outcome === 'accepted') {
+                        addResult('success', '✅ Usuário Aceitou Instalação', 'App foi instalado com sucesso!');
+                    } else {
+                        addResult('info', 'ℹ️ Usuário Recusou Instalação', 'Usuário optou por não instalar.');
+                    }
+                } catch (error) {
+                    addResult('error', '❌ Erro na Instalação', `Erro: ${error.message}`);
+                }
+            } else {
+                addResult('warning', '⚠️ Instalação Não Disponível', 
+                    'App já pode estar instalado ou critérios de PWA não foram atendidos.');
+            }
+        }
+
+        async function clearData() {
+            try {
+                // Limpar cache
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                }
+                
+                // Desregistrar service workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                }
+                
+                addResult('success', '✅ Dados Limpos', 'Cache e Service Workers removidos. Recarregue a página.');
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+                
+            } catch (error) {
+                addResult('error', '❌ Erro ao Limpar', `Erro: ${error.message}`);
+            }
+        }
+
+        // Detectar evento de instalação
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredPrompt = e;
+            addResult('info', '🎯 Prompt de Instalação Detectado', 'App está pronto para ser instalado.');
+        });
+
+        // Detectar quando app foi instalado
+        window.addEventListener('appinstalled', (evt) => {
+            addResult('success', '🎉 App Instalado!', 'PWA foi instalada com sucesso no dispositivo.');
+        });
+
+        // Executar verificação automática ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runAllChecks, 1000);
+        });
+    </script>
+</body>
+</html>

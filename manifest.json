@@ -1,0 +1,14 @@
+{
+  "name": "CEU - Sistema de Eventos Unificados",
+  "short_name": "CEU",
+  "description": "Sistema de gerenciamento de eventos",
+  "start_url": "/CEU/",
+  "display": "standalone",
+  "background_color": "#D1EAFF",
+  "theme_color": "#6598D2",
+  "orientation": "portrait-primary",
+  "scope": "/CEU/",
+  "categories": ["education", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}

@@ -3,22 +3,29 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CEU</title>
+    <meta name="theme-color" content="#6598D2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/CEU/manifest.json" />
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
+    <script src="/CEU/pwa-config.js" defer></script>
 </head>
 
-<body <?php if (($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio') { echo 'class="pagina-inicio"'; } ?>>
+<body <?php if (($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio') {
+            echo 'class="pagina-inicio"';
+        } ?>>
     <?php
     // Inicia sessão para verificar se usuário está logado
     session_start();
-    
+
     // Se usuário já está logado, redireciona para a área apropriada
     if (isset($_SESSION['cpf']) && !empty($_SESSION['cpf'])) {
         // Atualiza timestamp de atividade
         $_SESSION['ultima_atividade'] = time();
-        
+
         // Determina para onde redirecionar baseado no tipo de usuário
         if (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1) {
             header('Location: ../PaginasOrganizador/ContainerOrganizador.php?pagina=inicio');
@@ -27,7 +34,7 @@
         }
         exit();
     }
-    
+
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
         'inicio' => 'Inicio.php',
@@ -43,13 +50,13 @@
     ];
     $pagina = $_GET['pagina'] ?? 'inicio';
     $arquivo = $paginasPermitidas[$pagina] ?? $paginasPermitidas['inicio'];
-    
+
     // Se for uma requisição AJAX, retorna apenas o conteúdo
     if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
         include $arquivo;
         exit();
     }
-?>
+    ?>
 
     <!-- Menu fixo -->
     <?php include 'MenuBloqueado.html'; ?>
@@ -81,7 +88,7 @@
                 }
 
                 const caminho = lista[index++];
-                const jaCarregado = Array.from(document.getElementsByTagName('script')).some(function (scriptExistente) {
+                const jaCarregado = Array.from(document.getElementsByTagName('script')).some(function(scriptExistente) {
                     const idDinamico = scriptExistente.getAttribute('data-dynamic-id');
                     if (idDinamico && idDinamico === caminho) {
                         return true;
@@ -101,7 +108,7 @@
                 script.setAttribute('data-dynamic-id', caminho);
                 script.src = caminho + (caminho.indexOf('?') === -1 ? '?t=' : '&t=') + new Date().getTime();
                 script.onload = proximo;
-                script.onerror = function () {
+                script.onerror = function() {
                     console.error('Falha ao carregar o script:', script.src);
                     proximo();
                 };
@@ -139,7 +146,9 @@
                     }
                 });
             });
-            menuContentObserver.observe(menu, { attributes: true });
+            menuContentObserver.observe(menu, {
+                attributes: true
+            });
         }
 
         function carregarFaleConoscoScript() {
@@ -151,7 +160,7 @@
             const script = document.createElement('script');
             script.src = '../PaginasGlobais/FaleConosco.js?t=' + new Date().getTime();
             script.setAttribute('data-faleconosco', '1');
-            script.onload = function () {
+            script.onload = function() {
                 if (typeof window.inicializarFaleConosco === 'function') {
                     window.inicializarFaleConosco();
                 }
@@ -219,7 +228,7 @@
             'evento': {
                 html: 'CartaodoEvento.php',
                 js: [],
-                init: () => { }
+                init: () => {}
             },
             'solicitarCodigo': {
                 html: 'SolicitarCodigo.html',
@@ -230,7 +239,7 @@
                     if (form && typeof window.mostrarMensagemSolicitacaoEnviada === 'function') {
                         const btnEnviar = form.querySelector('button[type="submit"]');
                         if (btnEnviar) {
-                            btnEnviar.onclick = function (e) {
+                            btnEnviar.onclick = function(e) {
                                 e.preventDefault();
                                 if (!form.checkValidity()) {
                                     form.reportValidity();
@@ -245,12 +254,14 @@
             'faleConosco': {
                 html: '../PaginasGlobais/FaleConosco.html',
                 js: [],
-                init: () => { carregarFaleConoscoScript(); }
+                init: () => {
+                    carregarFaleConoscoScript();
+                }
             },
             'termos': {
                 html: '../PaginasGlobais/TermosDeCondicoes.html',
                 js: [],
-                init: () => { }
+                init: () => {}
             }
         };
         globalThis.rotas = rotas;
@@ -263,7 +274,9 @@
             if (!rota) return;
             const scripts = Array.isArray(rota.js) ? rota.js : [];
             if (scripts.length) {
-                carregarScripts(scripts, () => { if (typeof rota.init === 'function') rota.init(); });
+                carregarScripts(scripts, () => {
+                    if (typeof rota.init === 'function') rota.init();
+                });
             } else {
                 if (typeof rota.init === 'function') rota.init();
             }
@@ -274,12 +287,15 @@
             if (typeof window.limpezaCompleta === 'function') {
                 window.limpezaCompleta();
             }
-            
+
             // Remove o filtro lateral (se existir) antes de trocar de página (versão pública)
             if (typeof window.removerFiltroExistente === 'function') {
-                try { window.removerFiltroExistente(); } catch (e) { /* noop */ }
+                try {
+                    window.removerFiltroExistente();
+                } catch (e) {
+                    /* noop */ }
             }
-            
+
             // Usa ajax=1 para buscar apenas o conteúdo, sem menu
             fetch('ContainerPublico.php?pagina=' + encodeURIComponent(pagina) + '&ajax=1')
                 .then(response => response.text())
@@ -288,12 +304,12 @@
                     document.getElementById('conteudo-dinamico').innerHTML = html;
                     sincronizarMenuComConteudo();
                     atualizarClasseBody(pagina);
-                    
+
                     if (typeof window.setMenuAtivoPorPagina === 'function') {
                         window.setMenuAtivoPorPagina(pagina);
                     }
                     executarRota(pagina);
-                    
+
                     window.history.pushState({}, '', '?pagina=' + pagina);
                 });
         }
@@ -301,13 +317,13 @@
         // =========================
         // Eventos de inicialização
         // =========================
-        window.onpopstate = function () {
+        window.onpopstate = function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             carregarPagina(pagina);
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') {
@@ -317,12 +333,16 @@
             atualizarClasseBody(pagina);
             executarRota(pagina);
             // Garante aplicação dos botões de senha após primeira carga
-            if (typeof window.aplicarToggleSenhas === 'function') { window.aplicarToggleSenhas(); }
+            if (typeof window.aplicarToggleSenhas === 'function') {
+                window.aplicarToggleSenhas();
+            }
         });
     </script>
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="MenuBloqueado.js"></script>
     <script src="ToggleSenha.js"></script>
+    <!-- Responsividade Mobile - Overlay e Prevenção de Scroll -->
+    <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>
 
 </html>

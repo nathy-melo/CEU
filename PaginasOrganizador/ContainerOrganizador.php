@@ -56,10 +56,15 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CEU</title>
+    <meta name="theme-color" content="#6598D2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/CEU/manifest.json" />
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
+    <script src="/CEU/pwa-config.js" defer></script>
 </head>
 
 <body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) {
@@ -347,7 +352,8 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 try {
                     window.removerFiltroExistente();
                 } catch (e) {
-                    /* noop */ }
+                    /* noop */
+                }
             }
 
             let url = 'ContainerOrganizador.php?pagina=' + encodeURIComponent(pagina);
@@ -422,6 +428,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
     <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
+    <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>
 
 </html>

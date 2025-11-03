@@ -46,6 +46,10 @@ try {
         case 'dashboard':
             getDashboardStats($conexao);
             break;
+        
+        case 'pwa':
+            getPwaServerInfo();
+            break;
             
         case 'eventos':
             if ($method === 'GET') {
@@ -810,4 +814,54 @@ function deleteSolicitacaoSenha($conexao) {
 }
 
 mysqli_close($conexao);
+
+// ============================================
+// INFO DE PWA/REDE (SEM DEPENDER DO BD)
+// ============================================
+
+function getPwaServerInfo() {
+    // Dados de ambiente/servidor
+    $serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
+    // SERVER_ADDR pode vir vazio/127.0.0.1 em ambientes locais; tentar alternativas
+    if (!$serverAddr || $serverAddr === '127.0.0.1' || $serverAddr === '::1') {
+        $hostname = gethostname();
+        if ($hostname) {
+            $resolved = gethostbyname($hostname);
+            if ($resolved && $resolved !== $hostname) {
+                $serverAddr = $resolved;
+            }
+        }
+    }
+
+    $serverName = $_SERVER['SERVER_NAME'] ?? '';
+    $httpHost = $_SERVER['HTTP_HOST'] ?? '';
+    $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
+
+    // Calcular base path do app (ex.: /CEU)
+    $rootDirName = basename(dirname(__DIR__)); // nome da pasta pai de Admin => CEU
+    $basePath = '/' . $rootDirName;
+
+    // Arquivos PWA no root do CEU
+    $swPath = realpath(__DIR__ . '/../sw.js');
+    $manifestPath = realpath(__DIR__ . '/../manifest.json');
+    $manifestInstallPath = realpath(__DIR__ . '/../manifest-install.json');
+
+    $data = [
+        'server_addr' => $serverAddr,
+        'server_name' => $serverName,
+        'http_host' => $httpHost,
+        'document_root' => $documentRoot,
+        'base_path' => '/' . $rootDirName,
+        'paths' => [
+            'sw_exists' => file_exists($swPath ?? ''),
+            'manifest_exists' => file_exists($manifestPath ?? ''),
+            'manifest_install_exists' => file_exists($manifestInstallPath ?? ''),
+            'sw_url' => '/' . $rootDirName . '/sw.js',
+            'manifest_url' => '/' . $rootDirName . '/manifest.json',
+            'manifest_install_url' => '/' . $rootDirName . '/manifest-install.json'
+        ]
+    ];
+
+    echo json_encode(['success' => true, 'data' => $data]);
+}
 ?>

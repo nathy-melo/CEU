@@ -98,6 +98,7 @@
                             <path
                                 d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
                         </svg> Backups</button>
+                    <button id="btnPwarede" class="btn-secondary" onclick="showSection('pwarede')"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v2H4V4zm0 4h10v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2zm14 0h2v6h-2v-6zM18 18l2-2 2 2h-4z"/></svg> Rede/PWA</button>
                     <button id="btnSair" class="btn-secondary" onclick="logout()"
                         style="margin-left: auto; background: var(--vermelho);"><svg class="icon" viewBox="0 0 24 24"
                             fill="currentColor">
@@ -362,6 +363,55 @@
 
                     <div class="admin-container" id="backupsContainer">
                         <p>Carregando backups...</p>
+                    </div>
+                </div>
+
+                <!-- PWA / Rede Diagnóstico -->
+                <div id="pwarede" class="admin-section">
+                    <h3><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4a8 8 0 100 16 8 8 0 000-16zm1 9h5a6 6 0 01-5 5v-5zm-2 0v5a6 6 0 01-5-5h5zm0-2H6a6 6 0 015-5v5zm2 0V6a6 6 0 015 5h-5z"/></svg> Diagnóstico de Rede e PWA</h3>
+
+                    <div class="responsive-card-grid" id="pwaInfoGrid">
+                        <div class="stats-card" style="border-left-color: var(--botao);">
+                            <h4 style="color: var(--botao);"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.534 15.534 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.85 22 2 13.15 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg> Acesso local</h4>
+                            <p id="pwaLocalUrl">-</p>
+                            <small>Use este endereço no celular para testar</small>
+                        </div>
+                        <div class="stats-card" style="border-left-color: #28a745;">
+                            <h4 style="color: #28a745;"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1 15l-5-5 1.41-1.41L11 13.17l6.59-6.59L19 8l-8 9z"/></svg> Service Worker</h4>
+                            <p id="pwaSwStatus">-</p>
+                            <small id="pwaSwScope">escopo: -</small>
+                        </div>
+                        <div class="stats-card" style="border-left-color: #ffc107;">
+                            <h4 style="color: #ffc107;"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h12v2H3v-2z"/></svg> Manifesto</h4>
+                            <p id="pwaManifestStatus">-</p>
+                            <small id="pwaManifestHref">manifest: -</small>
+                        </div>
+                    </div>
+
+                    <div class="admin-container" style="margin-top: 20px;">
+                        <h4><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7a2 2 0 110-4 2 2 0 010 4zm1 3h-2v7h2v-7z"/></svg> Ações</h4>
+                        <div class="action-buttons" style="display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0;">
+                            <button class="btn-secondary" onclick="desregistrarServiceWorkers()"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> Desregistrar SW</button>
+                            <button class="btn-secondary" onclick="limparCaches()"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6H4l-2 4v2h2v6a2 2 0 002 2h12a2 2 0 002-2v-6h2v-2l-2-4zm-4 12H8v-6h8v6zm-9-8l1-2h6l1 2H7z"/></svg> Limpar Caches</button>
+                            <button class="btn-secondary" onclick="verificarManifestos()"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3L7 8l5 5V9c3.31 0 6 2.69 6 6 0 1.1-.3 2.13-.82 3.02l1.46 1.46A7.932 7.932 0 0020 15c0-4.42-3.58-8-8-8z"/></svg> Revalidar Status</button>
+                            <a class="btn-secondary" href="/CEU/Admin/teste-pwa.html" target="_blank" rel="noopener"><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3v2H5v14h14v-9h2v11H3V3h11zm7 0h-6v2h2.59L10 12.59 11.41 14 19 6.41V9h2V3z"/></svg> Abrir Teste PWA</a>
+                        </div>
+
+                        <div id="pwaDetalhes" style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:8px; padding:12px; font-family:monospace; white-space:pre-wrap;">
+                            Coletando informações...
+                        </div>
+                    </div>
+
+                    <div class="admin-container" style="margin-top: 20px;">
+                        <h4><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-9 5.5L5 9a8 8 0 111 8l-2 1.5A10 10 0 1012 2z"/></svg> Ajuda de Firewall e Rede</h4>
+                        <p>
+                            Para acessar no celular, conecte ao mesmo Wi‑Fi e use o endereço local acima.
+                            Se não abrir, verifique o Firewall do Windows e libere o Apache (porta 80). Consulte:
+                        </p>
+                        <ul>
+                            <li><a href="/CEU/Admin/FIREWALL-SOLUCAO.md" target="_blank" rel="noopener">Guia: FIREWALL-SOLUCAO.md</a></li>
+                            <li><a href="/CEU/Admin/firewall-control.bat" download>Script .bat para abrir regras (download)</a></li>
+                        </ul>
                     </div>
                 </div>
 
@@ -885,6 +935,9 @@
                 case 'backups':
                     carregarInfoBackups();
                     carregarListaBackups();
+                    break;
+                case 'pwarede':
+                    carregarPwaRede();
                     break;
             }
         }
@@ -2144,6 +2197,115 @@
             } catch (e) {
                 alert('Erro ao deletar: ' + e.message);
             }
+        }
+        
+        // =======================================
+        // PWA / REDE - DIAGNÓSTICO E AÇÕES
+        // =======================================
+        async function carregarPwaRede() {
+            // Reset UI
+            document.getElementById('pwaLocalUrl').textContent = '-';
+            document.getElementById('pwaSwStatus').textContent = 'checando...';
+            document.getElementById('pwaSwScope').textContent = 'escopo: -';
+            document.getElementById('pwaManifestStatus').textContent = 'checando...';
+            document.getElementById('pwaManifestHref').textContent = 'manifest: -';
+            document.getElementById('pwaDetalhes').textContent = 'Coletando informações...';
+
+            const detalhes = [];
+            try {
+                const result = await apiCall('pwa');
+                const info = result.data || {};
+                const basePath = info.base_path || '/CEU';
+                const hostPref = info.server_addr && !['127.0.0.1','::1','localhost'].includes(String(info.server_addr).toLowerCase())
+                    ? info.server_addr
+                    : (info.http_host || location.host);
+                const localUrl = 'http://' + hostPref + basePath + '/';
+                document.getElementById('pwaLocalUrl').textContent = localUrl;
+                detalhes.push('Servidor: ' + (info.server_name || '-') + ' | IP: ' + (info.server_addr || '-') + ' | Host: ' + (info.http_host || '-'));
+                detalhes.push('Base: ' + basePath + ' | DOC_ROOT: ' + (info.document_root || '-'));
+                detalhes.push('Arquivos PWA: sw=' + (info.paths?.sw_exists ? 'ok' : 'faltando') + ', manifest=' + (info.paths?.manifest_exists ? 'ok' : 'faltando') + ', manifest-install=' + (info.paths?.manifest_install_exists ? 'ok' : 'faltando'));
+
+                // Service Worker
+                let regs = [];
+                try {
+                    regs = await (navigator.serviceWorker?.getRegistrations?.() || Promise.resolve([]));
+                } catch (e) { /* ignore */ }
+                if (regs && regs.length) {
+                    const active = navigator.serviceWorker.controller ? 'controlando esta página' : 'registrado (sem controlar)';
+                    document.getElementById('pwaSwStatus').textContent = 'registrado (' + regs.length + '), ' + active;
+                    const r0 = regs[0];
+                    document.getElementById('pwaSwScope').textContent = 'escopo: ' + (r0.scope || '-');
+                    detalhes.push('SW: ' + (r0.active?.scriptURL || r0.installing?.scriptURL || r0.waiting?.scriptURL || '-') + ' | scope=' + (r0.scope || '-'));
+                } else {
+                    document.getElementById('pwaSwStatus').textContent = 'não registrado';
+                    document.getElementById('pwaSwScope').textContent = 'escopo: -';
+                    detalhes.push('SW: não registrado');
+                }
+
+                // Manifestos
+                let manifestHref = (document.querySelector('link[rel="manifest"]')?.href) || '';
+                if (manifestHref) {
+                    document.getElementById('pwaManifestHref').textContent = 'manifest: ' + manifestHref;
+                } else {
+                    document.getElementById('pwaManifestHref').textContent = 'manifest: (nenhum <link> na página Admin)';
+                }
+
+                const iconsCount = async (url) => {
+                    try {
+                        const res = await fetch(url, { cache: 'no-store' });
+                        if (!res.ok) return 0;
+                        const json = await res.json();
+                        return Array.isArray(json.icons) ? json.icons.length : 0;
+                    } catch { return 0; }
+                };
+
+                const defIcons = await iconsCount(info.paths?.manifest_url || (basePath + '/manifest.json'));
+                const instIcons = await iconsCount(info.paths?.manifest_install_url || (basePath + '/manifest-install.json'));
+                const statusTxt = `Padrão: ${defIcons > 0 ? 'instalável' : 'não instalável'} | manifest-install: ${instIcons > 0 ? 'instalável' : 'não instalável'}`;
+                document.getElementById('pwaManifestStatus').textContent = statusTxt;
+                detalhes.push('Manifest: icons padrão=' + defIcons + ', icons install=' + instIcons);
+
+                // Caches
+                try {
+                    const keys = await (caches?.keys?.() || Promise.resolve([]));
+                    detalhes.push('Caches: ' + (keys.length ? keys.join(', ') : '(nenhum)'));
+                } catch (e) {
+                    detalhes.push('Caches: indisponível (' + e.message + ')');
+                }
+
+            } catch (e) {
+                detalhes.push('Erro ao carregar info de PWA/rede: ' + e.message);
+            }
+
+            document.getElementById('pwaDetalhes').textContent = detalhes.join('\n');
+        }
+
+        async function limparCaches() {
+            try {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+                alert('Caches limpos com sucesso.');
+            } catch (e) {
+                alert('Falha ao limpar caches: ' + e.message);
+            } finally {
+                carregarPwaRede();
+            }
+        }
+
+        async function desregistrarServiceWorkers() {
+            try {
+                const regs = await (navigator.serviceWorker?.getRegistrations?.() || []);
+                await Promise.all(regs.map(r => r.unregister()));
+                alert('Service Workers desregistrados. Recarregue páginas do app para registrar novamente.');
+            } catch (e) {
+                alert('Falha ao desregistrar SW: ' + e.message);
+            } finally {
+                carregarPwaRede();
+            }
+        }
+
+        function verificarManifestos() {
+            carregarPwaRede();
         }
     </script>
     <script>

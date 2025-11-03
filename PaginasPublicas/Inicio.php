@@ -135,6 +135,9 @@
             <?php endif; ?>
         </div>
     </div>
+    
+    <!-- Script de Responsividade Mobile -->
+    <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>
 
 </html>
