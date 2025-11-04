@@ -8,13 +8,27 @@ if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
     exit;
 }
 
-// Verifica se é organizador tentando se inscrever
-if (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1) {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Organizadores não podem se inscrever em eventos']);
-    exit;
-}
-
 include_once '../BancoDados/conexao.php';
+
+// Se for organizador, apenas impede inscrição caso seja organizador deste evento específico
+if (isset($_SESSION['organizador']) && $_SESSION['organizador'] == 1) {
+    $cod_evento_teste = isset($_POST['cod_evento']) ? (int)$_POST['cod_evento'] : 0;
+    if ($cod_evento_teste > 0) {
+        $sql_org = "SELECT 1 FROM organiza WHERE CPF = ? AND cod_evento = ? LIMIT 1";
+        $stmt_org = mysqli_prepare($conexao, $sql_org);
+        if ($stmt_org) {
+            mysqli_stmt_bind_param($stmt_org, 'si', $_SESSION['cpf'], $cod_evento_teste);
+            mysqli_stmt_execute($stmt_org);
+            $res_org = mysqli_stmt_get_result($stmt_org);
+            if ($res_org && mysqli_num_rows($res_org) > 0) {
+                echo json_encode(['sucesso' => false, 'mensagem' => 'Você já é organizador deste evento']);
+                mysqli_stmt_close($stmt_org);
+                exit;
+            }
+            mysqli_stmt_close($stmt_org);
+        }
+    }
+}
 
 $cpf_usuario = $_SESSION['cpf'];
 $cod_evento = isset($_POST['cod_evento']) ? (int)$_POST['cod_evento'] : 0;

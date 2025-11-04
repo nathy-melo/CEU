@@ -234,6 +234,11 @@ class GerenciadorNotificacoes {
             'evento_cancelado': '<img src="../Imagens/notif-cancelado.svg" class="notif-icon"> Evento cancelado',
             'evento_prestes_iniciar': '<img src="../Imagens/notif-relogio.svg" class="notif-icon"> Evento iniciando',
             'novo_participante': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Novo participante',
+            'solicitacao_colaborador': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Solicitação de colaboração',
+            'colaboracao_aprovada': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Colaboração aprovada',
+            'colaboracao_recusada': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Colaboração recusada',
+            'colaborador_adicionado': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Adicionado como colaborador',
+            'colaborador_removido': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Removido de colaboração',
             'outro': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Notificação'
         };
         return tipos[tipo] || tipos['outro'];

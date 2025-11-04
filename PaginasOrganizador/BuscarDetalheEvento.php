@@ -25,7 +25,34 @@ require_once('../BancoDados/conexao.php');
 $cpfOrganizadorLogado = $_SESSION['cpf'];
 $codigoEventoBuscado = intval($_GET['cod_evento']);
 
-// Consulta SQL para buscar o evento e verificar se o organizador tem permissão
+// Primeiro, verifica se o usuário tem permissão (organizador OU colaborador)
+$consultaPermissao = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?
+                      UNION
+                      SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?
+                      LIMIT 1";
+
+$stmtPermissao = mysqli_prepare($conexao, $consultaPermissao);
+
+if (!$stmtPermissao) {
+    echo json_encode(['erro' => 'Erro ao verificar permissão: ' . mysqli_error($conexao)]);
+    mysqli_close($conexao);
+    exit;
+}
+
+mysqli_stmt_bind_param($stmtPermissao, "isis", $codigoEventoBuscado, $cpfOrganizadorLogado, $codigoEventoBuscado, $cpfOrganizadorLogado);
+mysqli_stmt_execute($stmtPermissao);
+$resultadoPermissao = mysqli_stmt_get_result($stmtPermissao);
+
+if (!mysqli_fetch_assoc($resultadoPermissao)) {
+    mysqli_stmt_close($stmtPermissao);
+    mysqli_close($conexao);
+    echo json_encode(['erro' => 'Evento não encontrado ou você não tem permissão para visualizá-lo']);
+    exit;
+}
+
+mysqli_stmt_close($stmtPermissao);
+
+// Se tem permissão, busca os dados do evento
 $consultaSQL = "SELECT 
             evento.cod_evento,
             evento.categoria,
@@ -43,7 +70,7 @@ $consultaSQL = "SELECT
         FROM evento
         INNER JOIN organiza ON evento.cod_evento = organiza.cod_evento
         INNER JOIN usuario ON organiza.CPF = usuario.CPF
-        WHERE evento.cod_evento = ? AND organiza.CPF = ?
+        WHERE evento.cod_evento = ?
         LIMIT 1";
 
 $declaracaoPreparada = mysqli_prepare($conexao, $consultaSQL);
@@ -54,7 +81,7 @@ if (!$declaracaoPreparada) {
     exit;
 }
 
-mysqli_stmt_bind_param($declaracaoPreparada, "is", $codigoEventoBuscado, $cpfOrganizadorLogado);
+mysqli_stmt_bind_param($declaracaoPreparada, "i", $codigoEventoBuscado);
 mysqli_stmt_execute($declaracaoPreparada);
 $resultadoConsulta = mysqli_stmt_get_result($declaracaoPreparada);
 

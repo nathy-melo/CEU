@@ -29,7 +29,7 @@
     margin: 1rem auto;
   }
 
-  .cartao-evento > div {
+  .cartao-evento>div {
     background: none;
     border: none;
     display: flex;
@@ -237,8 +237,14 @@
     padding-top: 1em;
   }
 
-  .Nome { grid-column: span 4 / span 4; }
-  .Organizador { grid-column: span 4 / span 4; grid-column-start: 5; }
+  .Nome {
+    grid-column: span 4 / span 4;
+  }
+
+  .Organizador {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
+  }
 
   /* Container para o campo organizador com botão */
   .campo-organizador-wrapper {
@@ -296,15 +302,56 @@
     transform: scale(0.95);
   }
 
-  .Local { grid-column: span 8 / span 8; grid-row-start: 2; }
-  .DataDeInicio { grid-column: span 2 / span 2; grid-row-start: 3; }
-  .DataDeFim { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
-  .HorarioDeInicio { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
-  .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
-  .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 4; }
-  .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 4; }
-  .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 4; }
-  .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 4; }
+  .Local {
+    grid-column: span 8 / span 8;
+    grid-row-start: 2;
+  }
+
+  .DataDeInicio {
+    grid-column: span 2 / span 2;
+    grid-row-start: 3;
+  }
+
+  .DataDeFim {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 3;
+  }
+
+  .HorarioDeInicio {
+    grid-column: span 2 / span 2;
+    grid-column-start: 5;
+    grid-row-start: 3;
+  }
+
+  .HorarioDeFim {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 3;
+  }
+
+  .PublicoAlvo {
+    grid-column: span 2 / span 2;
+    grid-row-start: 4;
+  }
+
+  .Categoria {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 4;
+  }
+
+  .Modalidade {
+    grid-column: span 2 / span 2;
+    grid-column-start: 5;
+    grid-row-start: 4;
+  }
+
+  .Certificado {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 4;
+  }
 
   .Imagem {
     grid-column: span 4 / span 4;
@@ -324,9 +371,22 @@
     grid-row-start: 5;
   }
 
-  .BotaoVoltar { grid-column: span 2 / span 2; grid-row-start: 8; }
-  .BotaoParticipantes { grid-column: span 2 / span 2; grid-column-start: 4; grid-row-start: 8; }
-  .BotaoEditar { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 8; }
+  .BotaoVoltar {
+    grid-column: span 2 / span 2;
+    grid-row-start: 8;
+  }
+
+  .BotaoParticipantes {
+    grid-column: span 2 / span 2;
+    grid-column-start: 4;
+    grid-row-start: 8;
+  }
+
+  .BotaoEditar {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 8;
+  }
 
   .campo-imagem {
     background: var(--branco, #fff);
@@ -454,9 +514,17 @@
     justify-content: center;
   }
 
-  .carrossel-btn:hover { color: var(--botao); }
-  .carrossel-anterior { left: 0.5rem; }
-  .carrossel-proxima { right: 0.5rem; }
+  .carrossel-btn:hover {
+    color: var(--botao);
+  }
+
+  .carrossel-anterior {
+    left: 0.5rem;
+  }
+
+  .carrossel-proxima {
+    right: 0.5rem;
+  }
 
   .btn-remover-imagem {
     position: absolute;
@@ -539,14 +607,200 @@
     z-index: 10001;
   }
 
-  .modal-imagem-btn-anterior { left: 2rem; top: 50%; position: absolute; }
-  .modal-imagem-btn-proxima { right: 2rem; top: 50%; position: absolute; }
+  .modal-imagem-btn-anterior {
+    left: 2rem;
+    top: 50%;
+    position: absolute;
+  }
+
+  .modal-imagem-btn-proxima {
+    right: 2rem;
+    top: 50%;
+    position: absolute;
+  }
 
   .modal-imagem-img {
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 2rem;
     box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
+  }
+
+  /* Modal de Colaboradores */
+  .modal-colaboradores {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-colaboradores .conteudo {
+    background: var(--caixas);
+    color: #fff;
+    width: 100%;
+    max-width: 42rem;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
+  }
+
+  .modal-colaboradores .cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+  }
+
+  .modal-colaboradores button.fechar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #fff;
+    transition: opacity 0.2s;
+  }
+
+  .modal-colaboradores button.fechar:hover {
+    opacity: 0.7;
+  }
+
+  .linha-form {
+    display: flex;
+    gap: .75rem;
+    margin: .5rem 0 1.25rem;
+    align-items: stretch;
+  }
+
+  .linha-form input {
+    flex: 1;
+    border-radius: 1rem;
+    padding: .7rem 1rem;
+    border: 2px solid transparent;
+    box-shadow: 0 0.15rem 0.75rem rgba(0, 0, 0, .2);
+    font-size: 0.95rem;
+  }
+
+  .linha-form .btn-adicionar {
+    background-color: var(--botao);
+    color: var(--branco);
+    border: none;
+    border-radius: .5rem;
+    padding: .7rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .linha-form .btn-adicionar:hover {
+    opacity: 0.9;
+  }
+
+  .secao-titulo {
+    margin: 1.25rem 0 .5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--branco);
+  }
+
+  .lista-colabs,
+  .lista-solic {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+  }
+
+  .item-colab,
+  .item-solic {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    background: var(--branco);
+    color: var(--preto);
+    border-radius: .75rem;
+    padding: .75rem 1rem;
+    box-shadow: 0 0.15rem 0.75rem rgba(0, 0, 0, .15);
+  }
+
+  .item-colab .info-colab,
+  .item-solic .info-solic {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+  }
+
+  .item-colab .nome-colab,
+  .item-solic .nome-solic {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--preto);
+  }
+
+  .item-colab .email-colab,
+  .item-solic .email-solic {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .acoes {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+  }
+
+  .acoes .btn-aprovar {
+    background-color: #28a745;
+    color: var(--branco);
+    border: none;
+    border-radius: .4rem;
+    padding: .5rem .9rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .acoes .btn-aprovar:hover {
+    opacity: 0.9;
+  }
+
+  .acoes .btn-recusar,
+  .acoes .btn-remover {
+    background-color: var(--vermelho);
+    color: var(--branco);
+    border: none;
+    border-radius: .4rem;
+    padding: .5rem .9rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .acoes .btn-recusar:hover,
+  .acoes .btn-remover:hover {
+    opacity: 0.9;
+  }
+
+  .mensagem-vazio {
+    text-align: center;
+    padding: 1rem;
+    color: #d6d6d6;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: .5rem;
   }
 </style>
 
@@ -557,19 +811,22 @@
         <div class="Nome grupo-campo">
           <span class="rotulo-campo">Nome:</span>
           <div id="event-name" class="caixa-valor">Evento X</div>
-          <input type="text" id="input-nome" class="campo-input" placeholder="Digite o nome do evento" autocomplete="off">
+          <input type="text" id="input-nome" class="campo-input" placeholder="Digite o nome do evento"
+            autocomplete="off">
         </div>
         <div class="Organizador grupo-campo">
           <span class="rotulo-campo">Organizado por:</span>
           <div class="campo-organizador-wrapper">
             <div class="campo-organizador">Nome do Organizador</div>
-            <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()" title="Adicionar colaborador">+</button>
+            <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()"
+              title="Adicionar colaborador">+</button>
           </div>
         </div>
         <div class="Local grupo-campo">
           <span class="rotulo-campo">Local:</span>
           <div id="event-local" class="caixa-valor">Auditório</div>
-          <input type="text" id="input-local" class="campo-input" placeholder="Digite o local do evento" autocomplete="off">
+          <input type="text" id="input-local" class="campo-input" placeholder="Digite o local do evento"
+            autocomplete="off">
         </div>
         <div class="DataDeInicio grupo-campo">
           <span class="rotulo-campo">Data de início:</span>
@@ -594,7 +851,8 @@
         <div class="PublicoAlvo grupo-campo">
           <span class="rotulo-campo">Público alvo:</span>
           <div id="audience" class="caixa-valor">Estudantes</div>
-          <input type="text" id="input-publico-alvo" class="campo-input" placeholder="Ex: Estudantes" autocomplete="off">
+          <input type="text" id="input-publico-alvo" class="campo-input" placeholder="Ex: Estudantes"
+            autocomplete="off">
         </div>
         <div class="Categoria grupo-campo">
           <span class="rotulo-campo">Categoria:</span>
@@ -640,22 +898,28 @@
               <span>Clique para adicionar imagens</span>
             </div>
             <div class="carrossel-imagens" id="carrossel-imagens">
-              <button type="button" class="btn-remover-imagem" id="btn-remover-imagem" onclick="event.stopPropagation(); removerImagemAtual();">&times;</button>
-              <button type="button" class="carrossel-btn carrossel-anterior" onclick="event.stopPropagation(); mudarImagem(-1)">⮜</button>
+              <button type="button" class="btn-remover-imagem" id="btn-remover-imagem"
+                onclick="event.stopPropagation(); removerImagemAtual();">&times;</button>
+              <button type="button" class="carrossel-btn carrossel-anterior"
+                onclick="event.stopPropagation(); mudarImagem(-1)">⮜</button>
               <img id="imagem-carrossel" src="../ImagensEventos/CEU-Logo.png" alt="Imagem do evento" />
-              <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
-              <button type="button" class="btn-adicionar-mais" onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
+              <button type="button" class="carrossel-btn carrossel-proxima"
+                onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
+              <button type="button" class="btn-adicionar-mais"
+                onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
                 <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                 Adicionar mais imagens
               </button>
             </div>
           </div>
-          <input type="file" id="input-imagem" name="imagens_evento" accept="image/*" multiple onchange="adicionarImagens(event)" autocomplete="off">
+          <input type="file" id="input-imagem" name="imagens_evento" accept="image/*" multiple
+            onchange="adicionarImagens(event)" autocomplete="off">
         </div>
         <div class="Descricao grupo-campo">
           <span class="rotulo-campo">Descrição:</span>
           <div id="description" class="caixa-valor caixa-descricao">Descrição do evento</div>
-          <textarea id="input-descricao" class="campo-textarea" placeholder="Descreva o evento..." autocomplete="off"></textarea>
+          <textarea id="input-descricao" class="campo-textarea" placeholder="Descreva o evento..."
+            autocomplete="off"></textarea>
         </div>
         <div class="BotaoVoltar">
           <button id="btn-voltar" class="botao-voltar">Voltar</button>
@@ -671,9 +935,31 @@
 
     <div id="modal-imagem" class="modal-imagem">
       <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
-      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">⮜</button>
+      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior"
+        onclick="mudarImagemModal(-1)">⮜</button>
       <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img" />
       <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">⮞</button>
+    </div>
+  </div>
+
+  <!-- Modal Colaboradores -->
+  <div id="modal-colaboradores" class="modal-colaboradores" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="conteudo">
+      <div class="cabecalho">
+        <span>Colaboradores do Evento</span>
+        <button type="button" class="fechar" onclick="fecharModalColaboradores()" aria-label="Fechar">×</button>
+      </div>
+
+      <div class="linha-form">
+        <input id="input-identificador-colab" type="text" placeholder="CPF (11 dígitos) ou Email" autocomplete="off" />
+        <button class="btn-adicionar" onclick="adicionarColaboradorEvento()">Adicionar</button>
+      </div>
+
+      <div class="secao-titulo">Solicitações pendentes</div>
+      <div id="lista-solicitacoes" class="lista-solic"></div>
+
+      <div class="secao-titulo">Colaboradores</div>
+      <div id="lista-colaboradores" class="lista-colabs"></div>
     </div>
   </div>
 

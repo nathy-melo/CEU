@@ -1,0 +1,5 @@
+# Ignora todas as fontes baixadas em runtime
+*
+
+# Mantém arquivos de controle
+!.gitignore

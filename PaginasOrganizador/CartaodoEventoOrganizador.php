@@ -20,30 +20,30 @@
 
   // Verificar se encontrou o evento
   if ($resultado && mysqli_num_rows($resultado) > 0) {
-      $evento = mysqli_fetch_assoc($resultado);
+    $evento = mysqli_fetch_assoc($resultado);
 
-      $data_inicio = date('d/m/y', strtotime($evento['inicio']));
-      $data_fim = date('d/m/y', strtotime($evento['conclusao']));
-      $hora_inicio = date('H:i', strtotime($evento['inicio']));
-      $hora_fim = date('H:i', strtotime($evento['conclusao']));
-      $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
+    $data_inicio = date('d/m/y', strtotime($evento['inicio']));
+    $data_fim = date('d/m/y', strtotime($evento['conclusao']));
+    $hora_inicio = date('H:i', strtotime($evento['inicio']));
+    $hora_fim = date('H:i', strtotime($evento['conclusao']));
+    $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
   } else {
-      // Se não encontrou o evento, usar dados padrão
-      $evento = array(
-          'nome' => 'Evento não encontrado',
-          'lugar' => 'Local não informado',
-          'descricao' => 'Descrição não disponível',
-          'categoria' => 'Não informado',
-          'publico_alvo' => 'Não informado',
-          'certificado' => 0,
-          'modalidade' => 'Presencial',
-          'imagem' => 'ImagensEventos/CEU-Logo.png'
-      );
-      $data_inicio = '00/00/00';
-      $data_fim = '00/00/00';
-      $hora_inicio = '00:00';
-      $hora_fim = '00:00';
-      $nome_organizador = 'Não informado';
+    // Se não encontrou o evento, usar dados padrão
+    $evento = array(
+      'nome' => 'Evento não encontrado',
+      'lugar' => 'Local não informado',
+      'descricao' => 'Descrição não disponível',
+      'categoria' => 'Não informado',
+      'publico_alvo' => 'Não informado',
+      'certificado' => 0,
+      'modalidade' => 'Presencial',
+      'imagem' => 'ImagensEventos/CEU-Logo.png'
+    );
+    $data_inicio = '00/00/00';
+    $data_fim = '00/00/00';
+    $hora_inicio = '00:00';
+    $hora_fim = '00:00';
+    $nome_organizador = 'Não informado';
   }
 
   $certificado = (isset($evento['certificado']) && (int)$evento['certificado'] === 1) ? 'Sim' : 'Não';
@@ -77,7 +77,7 @@
   }
 
   /* Campos seguem grid original adaptado */
-  .cartao-evento > div {
+  .cartao-evento>div {
     background: none;
     border: none;
     display: flex;
@@ -126,17 +126,65 @@
     padding-top: 1em;
   }
 
-  .Nome { grid-column: span 4 / span 4; }
-  .Organizador { grid-column: span 4 / span 4; grid-column-start: 5; }
-  .Local { grid-column: span 8 / span 8; grid-row-start: 2; }
-  .DataDeInicio { grid-column: span 2 / span 2; grid-row-start: 3; }
-  .DataDeFim { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
-  .HorarioDeInicio { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
-  .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
-  .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 4; }
-  .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 4; }
-  .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 4; }
-  .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 4; }
+  .Nome {
+    grid-column: span 4 / span 4;
+  }
+
+  .Organizador {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
+  }
+
+  .Local {
+    grid-column: span 8 / span 8;
+    grid-row-start: 2;
+  }
+
+  .DataDeInicio {
+    grid-column: span 2 / span 2;
+    grid-row-start: 3;
+  }
+
+  .DataDeFim {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 3;
+  }
+
+  .HorarioDeInicio {
+    grid-column: span 2 / span 2;
+    grid-column-start: 5;
+    grid-row-start: 3;
+  }
+
+  .HorarioDeFim {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 3;
+  }
+
+  .PublicoAlvo {
+    grid-column: span 2 / span 2;
+    grid-row-start: 4;
+  }
+
+  .Categoria {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 4;
+  }
+
+  .Modalidade {
+    grid-column: span 2 / span 2;
+    grid-column-start: 5;
+    grid-row-start: 4;
+  }
+
+  .Certificado {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 4;
+  }
 
   .Imagem {
     grid-column: span 4 / span 4;
@@ -151,13 +199,29 @@
     min-width: 0;
   }
 
-  .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 5; }
+  .Descricao {
+    grid-column: span 4 / span 4;
+    grid-row: span 3 / span 3;
+    grid-column-start: 5;
+    grid-row-start: 5;
+  }
 
-  .BotaoVoltar { grid-column: span 2 / span 2; grid-row-start: 8; }
+  .BotaoVoltar {
+    grid-column: span 2 / span 2;
+    grid-row-start: 8;
+  }
 
-  .BotaoColaborador { grid-column: span 2 / span 2; grid-column-start: 4; grid-row-start: 8; }
+  .BotaoColaborador {
+    grid-column: span 2 / span 2;
+    grid-column-start: 4;
+    grid-row-start: 8;
+  }
 
-  .BotaoInscrever { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 8; }
+  .BotaoInscrever {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 8;
+  }
 
   /* Imagem */
   .campo-imagem {
@@ -211,7 +275,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0, 0, 0, 0.85);
     z-index: 9999;
     justify-content: center;
     align-items: center;
@@ -233,7 +297,7 @@
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 2rem;
-    box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.5);
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
   }
 
   .campo-imagem {
@@ -328,13 +392,13 @@
       try {
         const response = await fetch(`BuscarImagensEvento.php?cod_evento=${codEvento}`);
         const dados = await response.json();
-        
+
         if (dados.sucesso && dados.imagens && dados.imagens.length > 0) {
           imagens = dados.imagens.map(img => '../' + img.caminho);
         } else {
           imagens = ['<?= htmlspecialchars($imagem_src) ?>'];
         }
-        
+
         // Atualiza a imagem inicial
         if (imagens.length > 0) {
           document.getElementById('event-image').src = imagens[0];
@@ -346,7 +410,7 @@
     }
 
     // Configura o onclick da imagem
-    document.getElementById('event-image').onclick = function (e) {
+    document.getElementById('event-image').onclick = function(e) {
       e.stopPropagation();
       if (imagens.length > 0) {
         document.getElementById('imagem-ampliada').src = imagens[0];
@@ -374,6 +438,72 @@
 
     // Carrega as imagens quando a página é carregada
     carregarImagensEvento();
+
+    // Handler do botão "Ser Colaborador"
+    (function() {
+      const btn = document.querySelector('.BotaoColaborador .botao');
+      if (!btn) return;
+      btn.addEventListener('click', async function() {
+        try {
+          const form = new FormData();
+          form.append('cod_evento', String(codEvento));
+          const resp = await fetch('SolicitarSerColaborador.php', {
+            method: 'POST',
+            body: form
+          });
+          let data = null;
+          try { data = await resp.json(); } catch (parseErr) {
+            console.error('Resposta inválida do servidor ao solicitar colaboração', parseErr);
+            alert('Não foi possível processar a resposta do servidor. Tente novamente.');
+            return;
+          }
+
+          if (!data || data.sucesso === false) {
+            // Mensagens específicas primeiro
+            if (data && data.erro === 'ja_organizador') {
+              alert('Você já é organizador deste evento.');
+              return;
+            }
+            if (data && data.erro === 'ja_colaborador') {
+              alert('Você já é colaborador deste evento.');
+              return;
+            }
+            if (data && data.erro === 'nao_autenticado') {
+              alert('Você precisa estar logado para solicitar colaboração.');
+              window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login';
+              return;
+            }
+            // Demais códigos conhecidos
+            if (data && data.erro === 'cod_evento_invalido') {
+              alert('Código do evento inválido. Recarregue a página e tente novamente.');
+              return;
+            }
+            if (data && data.erro === 'metodo_invalido') {
+              alert('Método inválido. Atualize a página e tente novamente.');
+              return;
+            }
+            if (data && data.erro === 'falha_solicitacao') {
+              alert('Não foi possível registrar sua solicitação agora. Tente novamente em instantes.');
+              return;
+            }
+            if (data && data.erro === 'erro_interno') {
+              console.error('Erro interno ao solicitar colaboração:', data.detalhe);
+              alert('Ocorreu um erro interno ao registrar a solicitação. Tente novamente.');
+              return;
+            }
+            // Genérico com código de erro (se houver)
+            const codigo = data && data.erro ? ` (código: ${data.erro})` : '';
+            alert('Não foi possível enviar a solicitação. Verifique sua conexão e tente novamente.' + codigo);
+            return;
+          }
+
+          alert(data.mensagem || 'Solicitação enviada com sucesso! Aguarde aprovação.');
+        } catch (e) {
+          console.error('Falha ao solicitar colaboração', e);
+          alert('Falha ao enviar solicitação. Verifique sua conexão e tente novamente.');
+        }
+      });
+    })();
   </script>
   <script src="CartaoDoEventoOrganizador.js"></script>
 </body>

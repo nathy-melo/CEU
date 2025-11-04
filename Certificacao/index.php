@@ -424,6 +424,8 @@ if ($vendorExists) {
           <button onclick="acao('instalar_composer')">instalar_composer</button>
           <button onclick="acao('instalar_dependencias')">instalar_dependencias</button>
           <button onclick="acao('verificar_instalacao')">verificar_instalacao</button>
+          <button onclick="acao('verificar_fonte_inter')">verificar_fonte_inter</button>
+          <button onclick="acao('instalar_fonte_inter')">instalar_fonte_inter</button>
         </div>
         <div class="row">
           <button onclick="acao('status_git')">status_git</button>

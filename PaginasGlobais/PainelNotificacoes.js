@@ -262,7 +262,12 @@ function traduzirTipo(tipo, apenasTexto = false) {
         'desinscricao': apenasTexto ? 'Desincrição' : '<img src="../Imagens/notif-desinscricao.svg" class="notif-icon-badge"> Desincrição',
         'evento_cancelado': apenasTexto ? 'Cancelado' : '<img src="../Imagens/notif-cancelado.svg" class="notif-icon-badge"> Cancelado',
         'evento_prestes_iniciar': apenasTexto ? 'Iniciando' : '<img src="../Imagens/notif-relogio.svg" class="notif-icon-badge"> Iniciando',
-        'novo_participante': apenasTexto ? 'Novo Participante' : '<img src="../Imagens/notif-usuario.svg" class="notif-icon-badge"> Novo Participante'
+        'novo_participante': apenasTexto ? 'Novo Participante' : '<img src="../Imagens/notif-usuario.svg" class="notif-icon-badge"> Novo Participante',
+        'solicitacao_colaborador': apenasTexto ? 'Solicitação de colaboração' : '<img src="../Imagens/notif-geral.svg" class="notif-icon-badge"> Solicitação de colaboração',
+        'colaboracao_aprovada': apenasTexto ? 'Colaboração aprovada' : '<img src="../Imagens/notif-geral.svg" class="notif-icon-badge"> Colaboração aprovada',
+        'colaboracao_recusada': apenasTexto ? 'Colaboração recusada' : '<img src="../Imagens/notif-geral.svg" class="notif-icon-badge"> Colaboração recusada',
+        'colaborador_adicionado': apenasTexto ? 'Adicionado como colaborador' : '<img src="../Imagens/notif-geral.svg" class="notif-icon-badge"> Adicionado como colaborador',
+        'colaborador_removido': apenasTexto ? 'Removido de colaboração' : '<img src="../Imagens/notif-geral.svg" class="notif-icon-badge"> Removido de colaboração'
     };
     return tipos[tipo] || tipo;
 }

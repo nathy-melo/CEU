@@ -302,6 +302,10 @@
                 .then(html => {
                     // Como o servidor retorna apenas o conteúdo da página, não precisa extrair
                     document.getElementById('conteudo-dinamico').innerHTML = html;
+                    
+                    // Força scroll para o topo ao trocar de página
+                    window.scrollTo(0, 0);
+                    
                     sincronizarMenuComConteudo();
                     atualizarClasseBody(pagina);
 
@@ -317,6 +321,12 @@
         // =========================
         // Eventos de inicialização
         // =========================
+        
+        // Desabilita restauração automática de scroll do navegador
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
         window.onpopstate = function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
@@ -324,6 +334,9 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Força scroll para o topo ao carregar/recarregar a página
+            window.scrollTo(0, 0);
+            
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') {

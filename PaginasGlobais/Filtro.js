@@ -189,8 +189,10 @@ function createFilterElement() {
 }
 
 function applyFiltersParticipante() {
-    const container = document.getElementById('eventos-container');
-    if (!container) return;
+    const containerEventos = document.getElementById('eventos-container');
+    const containerColaboracao = document.getElementById('colaboracao-container');
+    
+    if (!containerEventos) return;
 
     const form = document.getElementById('filtro-container');
     if (!form) return;
@@ -209,7 +211,10 @@ function applyFiltersParticipante() {
     // Obter a ordenação selecionada
     const ordenacaoSelecionada = form.querySelector('input[name="ordenacao"]:checked')?.value || 'nenhuma';
 
-    const cards = Array.from(container.querySelectorAll('.CaixaDoEvento'));
+    // Buscar eventos em ambos os containers
+    const cardsEventos = Array.from(containerEventos.querySelectorAll('.CaixaDoEvento'));
+    const cardsColaboracao = containerColaboracao ? Array.from(containerColaboracao.querySelectorAll('.CaixaDoEvento')) : [];
+    const cards = [...cardsEventos, ...cardsColaboracao];
     
     // Armazenar ordem original se ainda não foi armazenada ou se os cards mudaram
     if (!window.ordemOriginalHrefs) {
@@ -275,8 +280,13 @@ function applyFiltersParticipante() {
             return 0;
         });
         
-        // Reorganizar os cards no DOM
-        cardsOrdenados.forEach(card => container.appendChild(card));
+        // Reorganizar os cards nos seus respectivos containers
+        cardsOrdenados.forEach(card => {
+            const parentContainer = card.parentElement;
+            if (parentContainer) {
+                parentContainer.appendChild(card);
+            }
+        });
     } else {
         // Restaurar ordem original baseada nos hrefs armazenados
         if (window.ordemOriginalHrefs && window.ordemOriginalHrefs.length > 0) {
@@ -287,11 +297,14 @@ function applyFiltersParticipante() {
                 cardsPorHref.set(href, card);
             });
             
-            // Reorganizar na ordem original
+            // Reorganizar na ordem original em seus respectivos containers
             window.ordemOriginalHrefs.forEach(href => {
                 const card = cardsPorHref.get(href);
-                if (card && container.contains(card)) {
-                    container.appendChild(card);
+                if (card) {
+                    const parentContainer = card.parentElement;
+                    if (parentContainer && (parentContainer === containerEventos || parentContainer === containerColaboracao)) {
+                        parentContainer.appendChild(card);
+                    }
                 }
             });
         }

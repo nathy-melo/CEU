@@ -20,6 +20,9 @@ $sessionCookieName = session_name();
 // Apaga o cookie da sessão especificamente (path '/')
 setcookie($sessionCookieName, '', time() - 3600, '/');
 
+// Limpa especificamente o cookie do último email de login
+setcookie('ultimo_email_login', '', time() - 3600, '/', '', false, false);
+
 // Apaga todos os cookies conhecidos no domínio atual (path '/')
 if (!empty($_SERVER['HTTP_COOKIE'])) {
     $cookies = explode(';', $_SERVER['HTTP_COOKIE']);

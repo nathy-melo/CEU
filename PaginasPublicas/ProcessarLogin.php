@@ -116,6 +116,15 @@ if ($senhaHash && password_verify($senha, $senhaHash)) {
     $_SESSION['ultima_atividade'] = time(); // Timestamp para controle de expiração
     $_SESSION['tema_site'] = (int)$usuario['TemaSite']; // 0=claro, 1=escuro
 
+    // Salva o email em cookie para lembrar no próximo login (30 dias)
+    setcookie('ultimo_email_login', $email, [
+        'expires' => time() + (30 * 24 * 60 * 60), // 30 dias
+        'path' => '/',
+        'secure' => false, // mude para true se usar HTTPS
+        'httponly' => false, // permite acesso via JavaScript
+        'samesite' => 'Lax'
+    ]);
+
     mysqli_close($conexao);
 
     // Redireciona baseado no tipo de usuário

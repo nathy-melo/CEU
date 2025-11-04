@@ -595,6 +595,72 @@ switch ($action) {
         }
         break;
 
+    // ===================== FONTES (Inter) =====================
+    case 'verificar_fonte_inter':
+        try {
+            $dirFontes = __DIR__ . '/fonts';
+            $arquivos = [
+                'Inter-Regular.ttf',
+                'Inter-Bold.ttf',
+                'Inter-Italic.ttf',
+                'Inter-BoldItalic.ttf',
+            ];
+            $existentes = [];
+            foreach ($arquivos as $a) {
+                $existentes[$a] = file_exists($dirFontes . '/' . $a);
+            }
+            $ok = array_reduce($existentes, fn($c, $v) => $c && $v, true);
+            echo json_encode(['success' => true, 'instalada' => $ok, 'arquivos' => $existentes, 'diretorio' => $dirFontes]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro verificar_fonte_inter: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'instalar_fonte_inter':
+        try {
+            $dirFontes = __DIR__ . '/fonts';
+            if (!is_dir($dirFontes)) { @mkdir($dirFontes, 0775, true); }
+            $urls = [
+                'Inter-Regular.ttf'     => 'https://github.com/rsms/inter/releases/latest/download/Inter-Regular.ttf',
+                'Inter-Bold.ttf'        => 'https://github.com/rsms/inter/releases/latest/download/Inter-Bold.ttf',
+                'Inter-Italic.ttf'      => 'https://github.com/rsms/inter/releases/latest/download/Inter-Italic.ttf',
+                'Inter-BoldItalic.ttf'  => 'https://github.com/rsms/inter/releases/latest/download/Inter-BoldItalic.ttf',
+            ];
+            $baixados = [];
+            foreach ($urls as $nome => $url) {
+                $dest = $dirFontes . '/' . $nome;
+                // Download com curl se possível
+                $data = false; $http = 0;
+                if (function_exists('curl_init')) {
+                    $ch = curl_init($url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+                    $data = curl_exec($ch);
+                    $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    if ($http !== 200 || $data === false) { $data = false; }
+                }
+                if ($data === false) {
+                    $data = @file_get_contents($url);
+                }
+                if ($data === false) {
+                    $baixados[$nome] = ['success' => false, 'message' => 'Falha ao baixar'];
+                    continue;
+                }
+                if (@file_put_contents($dest, $data) === false) {
+                    $baixados[$nome] = ['success' => false, 'message' => 'Falha ao salvar'];
+                    continue;
+                }
+                $baixados[$nome] = ['success' => true, 'bytes' => strlen($data), 'destino' => $dest];
+            }
+            $instalada = (file_exists($dirFontes . '/Inter-Regular.ttf') && file_exists($dirFontes . '/Inter-Bold.ttf'));
+            echo json_encode(['success' => $instalada, 'resultado' => $baixados, 'diretorio' => $dirFontes]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro instalar_fonte_inter: ' . $e->getMessage()]);
+        }
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Ação não reconhecida']);
 }

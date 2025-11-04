@@ -7,7 +7,8 @@
     <title>Cartão do Evento</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
     <?php
-    // Integração com o banco
+    // Sessão e banco
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
     include_once('../BancoDados/conexao.php');
 
     $id_evento = isset($_GET['id']) ? (int)$_GET['id'] : 1;
@@ -329,9 +330,13 @@
         <div class="BotaoVoltar">
             <button class="botao" onclick="history.back()">Voltar</button>
         </div>
-        <div class="MensagemLogin">
-            <h4 class="MensagemLogin">Acesse uma conta para se inscrever!</h4>
-        </div>
+                <div class="MensagemLogin">
+                        <?php if (isset($_SESSION['cpf']) && !empty($_SESSION['cpf'])): ?>
+                            <button id="btn-ser-colaborador" class="botao">Ser Colaborador</button>
+                        <?php else: ?>
+                            <h4 class="MensagemLogin">Acesse uma conta para interagir com o evento!</h4>
+                        <?php endif; ?>
+                </div>
     </div>
 
     <div id="modal-imagem" class="modal-imagem">
@@ -343,7 +348,7 @@
     </div>
 
     <script>
-        let imagens = [];
+    let imagens = [];
         let indiceAtual = 0;
         const codEvento = <?php echo $id_evento; ?>;
 
@@ -425,8 +430,33 @@
             }
         });
 
-        // Carrega as imagens quando a página é carregada
+                // Carrega as imagens quando a página é carregada
         carregarImagensEvento();
+
+                // Botão Ser Colaborador (se logado)
+                (function(){
+                    const btn = document.getElementById('btn-ser-colaborador');
+                    if (!btn) return;
+                    btn.addEventListener('click', async function(){
+                        try {
+                            const form = new FormData();
+                            form.append('cod_evento', String(codEvento));
+                            const resp = await fetch('../PaginasOrganizador/SolicitarSerColaborador.php', { method: 'POST', body: form });
+                            const data = await resp.json();
+                            if (!data.sucesso) {
+                                let msg = 'Não foi possível enviar a solicitação.';
+                                if (data.erro === 'ja_organizador') msg = 'Você já é organizador deste evento.';
+                                if (data.erro === 'ja_colaborador') msg = 'Você já é colaborador deste evento.';
+                                alert(msg);
+                                return;
+                            }
+                            alert(data.mensagem || 'Solicitação enviada com sucesso!');
+                        } catch (e) {
+                            console.error('Falha ao solicitar colaboração', e);
+                            alert('Falha ao enviar solicitação.');
+                        }
+                    });
+                })();
     </script>
 </body>
 

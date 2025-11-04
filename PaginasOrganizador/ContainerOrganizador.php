@@ -3,7 +3,9 @@
 ini_set('session.gc_maxlifetime', 360);
 session_set_cookie_params(360);
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 // Verifica se a sessão expirou (5 minutos de inatividade)
 if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividade'] > 300)) {
@@ -74,7 +76,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
         'inicio' => 'InicioOrganizador.php',
+        'eventosInscritos' => 'EventosInscritosOrganizador.php',
         'evento' => 'CartaodoEventoOrganizador.php',
+        'eventoInscrito' => 'CartaoDoEventoInscrito.php',
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
         'meusEventos' => 'MeusEventosOrganizador.html',
         'adicionarEvento' => 'AdicionarEvento.php',
@@ -217,6 +221,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
                 }
             },
+            'eventosInscritos': {
+                html: 'EventosInscritosOrganizador.php',
+                js: ['../PaginasGlobais/Filtro.js', 'EventosInscritosOrganizador.js'],
+                init: () => {
+                    if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                }
+            },
             'meusEventos': {
                 html: 'MeusEventosOrganizador.html',
                 js: ['../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
@@ -229,16 +240,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 js: ['CartaoDoEventoOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoEvento === 'function') window.inicializarEventosCartaoEvento();
-                    setTimeout(function() {
-                        var btnInscrever = document.querySelector('.botao-inscrever');
-                        if (btnInscrever) {
-                            btnInscrever.onclick = function() {
-                                if (typeof window.mostrarMensagemInscricaoFeita === 'function') {
-                                    window.mostrarMensagemInscricaoFeita();
-                                }
-                            };
-                        }
-                    }, 0);
+                }
+            },
+            'eventoInscrito': {
+                html: 'CartaoDoEventoInscrito.php',
+                js: ['CartaoDoEventoInscrito.js'],
+                init: () => {
+                    if (typeof window.inicializarEventosCartaoDoEventoInscrito === 'function') window.inicializarEventosCartaoDoEventoInscrito();
                 }
             },
             'eventoOrganizado': {
@@ -370,6 +378,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (novoConteudo) {
                         const alvo = document.getElementById('conteudo-dinamico');
                         alvo.innerHTML = novoConteudo.innerHTML;
+
+                        // Força scroll para o topo ao trocar de página
+                        window.scrollTo(0, 0);
+
                         // Executa scripts embutidos na página carregada (ex.: TemaDoSite.php)
                         executarScriptsNoConteudo(alvo);
                         sincronizarMenuComConteudo();
@@ -405,6 +417,12 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // =========================
         // Eventos de inicialização
         // =========================
+
+        // Desabilita restauração automática de scroll do navegador
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
         window.carregarPagina = carregarPagina;
 
         window.onpopstate = function() {
@@ -415,6 +433,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         };
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Força scroll para o topo ao carregar/recarregar a página
+            window.scrollTo(0, 0);
+
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') {

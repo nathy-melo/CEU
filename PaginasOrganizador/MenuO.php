@@ -60,7 +60,8 @@ try {
         </div>
       </div>
 
-      <button class="botao-inicio" onclick="carregarPagina('inicio')">Início</button>
+    <button class="botao-inicio" onclick="carregarPagina('inicio')">Início</button>
+    <button class="botao-eventosInscritos" onclick="carregarPagina('eventosInscritos')">Eventos inscritos</button>
       <button class="botao-meusEventos" onclick="carregarPagina('meusEventos')">Meus eventos</button>
       <button class="botao-certificados" onclick="carregarPagina('certificados')">Certificados</button>
       <button class="botao-configuracoes" onclick="carregarPagina('configuracoes')">Configurações</button>

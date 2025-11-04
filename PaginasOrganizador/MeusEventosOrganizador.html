@@ -12,15 +12,19 @@
         align-items: flex-start;
         padding-top: 1rem;
     }
+    #padding-menor {
+        padding: 25px;
+    }
 </style>
 
 <body>
     <div id="main-content">
-        <div class="section-title-wrapper">
+        <div class="section-title-wrapper" id="padding-menor">
             <div class="barra-pesquisa-container">
                 <div class="barra-pesquisa">
                     <div class="campo-pesquisa-wrapper">
-                        <input class="campo-pesquisa" type="text" id="busca-meus-eventos-org" name="busca_meus_eventos_org" placeholder="Procurar eventos" autocomplete="off" />
+                        <input class="campo-pesquisa" type="text" id="busca-meus-eventos-org"
+                            name="busca_meus_eventos_org" placeholder="Procurar eventos" autocomplete="off" />
                         <button class="botao-pesquisa" aria-label="Procurar">
                             <div class="icone-pesquisa">
                                 <img src="../Imagens/lupa.png" alt="Lupa">
@@ -45,9 +49,21 @@
             </div>
             <!-- Eventos serão carregados dinamicamente via JavaScript -->
         </div>
+
+        <!-- Divisória entre seções -->
+        <div class="divisoria-secoes" style="width: 100%; height: 1px; background: linear-gradient(to right, transparent, var(--botao) 20%, var(--botao) 80%, transparent); margin: 0 0 0 0;"></div>
+
+        <div class="section-title-wrapper secao-colaboracao" id="padding-menor">
+            <div class="div-section-title">
+                <h1 class="section-title">Colaboração</h1>
+            </div>
+        </div>
+
+        <div class="container" id="colaboracao-container">
+            <!-- Eventos onde sou colaborador serão carregados via JavaScript -->
+        </div>
     </div>
-    <script src="../PaginasGlobais/Filtro.js"></script>
-    <script src="MeusEventosOrganizador.js"></script>
+    <!-- Scripts são carregados pelo ContainerOrganizador.php -->
 </body>
 
 </html>

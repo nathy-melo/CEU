@@ -7,6 +7,12 @@
   let indiceImagemAtual = 0;
   let dadosOriginaisEvento = {};
   let codigoEventoAtual = null;
+  let ultimoFocoAntesModal = null;
+
+  function elementoContem(parent, child) {
+    if (!parent || !child) return false;
+    return parent === child || parent.contains(child);
+  }
 
   function carregarDadosEventoDoServidor(codigoEvento) {
     if (!codigoEvento) {
@@ -82,8 +88,215 @@
     };
   }
 
-  function abrirModalColaboradores() {
-    alert('Funcionalidade de adicionar colaboradores em desenvolvimento!\n\nEm breve você poderá adicionar outros organizadores para colaborar com este evento.');
+  async function abrirModalColaboradores() {
+    const modal = document.getElementById('modal-colaboradores');
+    if (!modal) {
+      alert('Interface de colaboradores não encontrada. Atualize a página.');
+      return;
+    }
+    // Guardar foco atual para restaurar ao fechar
+    ultimoFocoAntesModal = document.activeElement;
+
+    // Exibir modal e ajustar acessibilidade
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Tenta focar o campo de entrada dentro do modal
+    setTimeout(() => {
+      const input = document.getElementById('input-identificador-colab');
+      if (input && elementoContem(modal, input)) {
+        try { input.focus(); } catch (e) { /* noop */ }
+      }
+    }, 0);
+
+    await carregarListasColaboradoresESolicitacoes();
+  }
+
+  function fecharModalColaboradores() {
+    const modal = document.getElementById('modal-colaboradores');
+    if (modal) {
+      // Se o foco estiver dentro do modal, remova-o antes de esconder/aria-hidden
+      if (elementoContem(modal, document.activeElement)) {
+        try { document.activeElement.blur(); } catch (e) { /* noop */ }
+      }
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+
+      // Restaurar foco para o elemento que abriu o modal, se ainda estiver no DOM
+      if (ultimoFocoAntesModal && document.contains(ultimoFocoAntesModal)) {
+        try { ultimoFocoAntesModal.focus(); } catch (e) { /* noop */ }
+      }
+      ultimoFocoAntesModal = null;
+    }
+  }
+
+  async function carregarListasColaboradoresESolicitacoes() {
+    try {
+      const url = `ListarColaboradores.php?cod_evento=${encodeURIComponent(codigoEventoAtual)}`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      if (!data.sucesso) {
+        alert('Erro ao carregar colaboradores: ' + (data.erro || 'desconhecido'));
+        return;
+      }
+      renderizarColaboradores(data.colaboradores || []);
+      renderizarSolicitacoes(data.solicitacoes || []);
+    } catch (e) {
+      console.error('Falha ao carregar listas de colaboradores/solicitações', e);
+      alert('Falha ao carregar colaboradores');
+    }
+  }
+
+  function renderizarColaboradores(lista) {
+    const container = document.getElementById('lista-colaboradores');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!lista.length) {
+      container.innerHTML = '<div class="mensagem-vazio">Nenhum colaborador adicionado ainda.</div>';
+      return;
+    }
+    lista.forEach(item => {
+      const linha = document.createElement('div');
+      linha.className = 'item-colab';
+
+      const info = document.createElement('div');
+      info.className = 'info-colab';
+
+      const nome = document.createElement('div');
+      nome.className = 'nome-colab';
+      nome.textContent = item.nome;
+
+      const email = document.createElement('div');
+      email.className = 'email-colab';
+      email.textContent = item.email;
+
+      info.appendChild(nome);
+      info.appendChild(email);
+
+      const acoes = document.createElement('div');
+      acoes.className = 'acoes';
+      const btnRem = document.createElement('button');
+      btnRem.className = 'btn-remover';
+      btnRem.textContent = 'Remover';
+      btnRem.onclick = () => removerColaboradorEvento(item.CPF);
+      acoes.appendChild(btnRem);
+
+      linha.appendChild(info);
+      linha.appendChild(acoes);
+      container.appendChild(linha);
+    });
+  }
+
+  function renderizarSolicitacoes(lista) {
+    const container = document.getElementById('lista-solicitacoes');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!lista.length) {
+      container.innerHTML = '<div class="mensagem-vazio">Nenhuma solicitação pendente.</div>';
+      return;
+    }
+    lista.forEach(item => {
+      const linha = document.createElement('div');
+      linha.className = 'item-solic';
+
+      const info = document.createElement('div');
+      info.className = 'info-solic';
+
+      const nome = document.createElement('div');
+      nome.className = 'nome-solic';
+      nome.textContent = item.nome;
+
+      const email = document.createElement('div');
+      email.className = 'email-solic';
+      email.textContent = item.email;
+
+      info.appendChild(nome);
+      info.appendChild(email);
+
+      const acoes = document.createElement('div');
+      acoes.className = 'acoes';
+
+      const btnOk = document.createElement('button');
+      btnOk.className = 'btn-aprovar';
+      btnOk.textContent = 'Aprovar';
+      btnOk.onclick = () => atualizarSolicitacao(item.id, 'aprovar');
+
+      const btnNo = document.createElement('button');
+      btnNo.className = 'btn-recusar';
+      btnNo.textContent = 'Recusar';
+      btnNo.onclick = () => atualizarSolicitacao(item.id, 'recusar');
+
+      acoes.appendChild(btnOk);
+      acoes.appendChild(btnNo);
+
+      linha.appendChild(info);
+      linha.appendChild(acoes);
+      container.appendChild(linha);
+    });
+  }
+
+  async function adicionarColaboradorEvento() {
+    const inp = document.getElementById('input-identificador-colab');
+    if (!inp) return;
+    const identificador = (inp.value || '').trim();
+    if (!identificador) {
+      alert('Informe o CPF (11 dígitos) ou Email do usuário');
+      return;
+    }
+    try {
+      const form = new FormData();
+      form.append('cod_evento', String(codigoEventoAtual));
+      form.append('identificador', identificador);
+      form.append('papel', 'colaborador'); // Sempre colaborador
+      const resp = await fetch('AdicionarColaborador.php', { method: 'POST', body: form });
+      const data = await resp.json();
+      if (!data.sucesso) {
+        alert('Erro ao adicionar colaborador: ' + (data.erro || 'desconhecido'));
+        return;
+      }
+      inp.value = '';
+      await carregarListasColaboradoresESolicitacoes();
+    } catch (e) {
+      console.error('Falha ao adicionar colaborador', e);
+      alert('Falha ao adicionar colaborador');
+    }
+  }
+
+  async function removerColaboradorEvento(cpf) {
+    if (!confirm('Remover este colaborador do evento?')) return;
+    try {
+      const form = new FormData();
+      form.append('cod_evento', String(codigoEventoAtual));
+      form.append('cpf', String(cpf));
+      const resp = await fetch('RemoverColaborador.php', { method: 'POST', body: form });
+      const data = await resp.json();
+      if (!data.sucesso) {
+        alert('Erro ao remover colaborador: ' + (data.erro || 'desconhecido'));
+        return;
+      }
+      await carregarListasColaboradoresESolicitacoes();
+    } catch (e) {
+      console.error('Falha ao remover colaborador', e);
+      alert('Falha ao remover colaborador');
+    }
+  }
+
+  async function atualizarSolicitacao(id, acao) {
+    try {
+      const form = new FormData();
+      form.append('id', String(id));
+      form.append('acao', String(acao));
+      const resp = await fetch('AtualizarSolicitacaoColaboracao.php', { method: 'POST', body: form });
+      const data = await resp.json();
+      if (!data.sucesso) {
+        alert('Erro ao atualizar solicitação: ' + (data.erro || 'desconhecido'));
+        return;
+      }
+      await carregarListasColaboradoresESolicitacoes();
+    } catch (e) {
+      console.error('Falha ao atualizar solicitação', e);
+      alert('Falha ao atualizar solicitação');
+    }
   }
 
   function irParaParticipantes() {
@@ -500,21 +713,21 @@
   function adicionarImagens(event) {
     const files = Array.from(event.target.files);
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB em bytes
-    
+
     files.forEach(file => {
       // Validar tamanho do arquivo
       if (file.size > MAX_FILE_SIZE) {
         alert(`Erro: A imagem "${file.name}" excede o limite de 10MB.\nTamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
         return; // Pula este arquivo
       }
-      
+
       // Validar tipo de arquivo
       const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!tiposPermitidos.includes(file.type)) {
         alert(`Erro: O arquivo "${file.name}" não é uma imagem válida.\nFormatos aceitos: JPG, JPEG, PNG, GIF, WEBP`);
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = function (e) {
         listaImagensEvento.push(e.target.result);
@@ -526,7 +739,7 @@
       };
       reader.readAsDataURL(file);
     });
-    
+
     // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
     event.target.value = '';
   }
@@ -630,6 +843,9 @@
     window.fecharModalImagem = fecharModalImagem;
     window.removerImagemAtual = removerImagemAtual;
     window.carregarDadosEvento = carregarDadosEventoDoServidor;
+    // Expor helpers colaboradores
+    window.fecharModalColaboradores = fecharModalColaboradores;
+    window.adicionarColaboradorEvento = adicionarColaboradorEvento;
 
     // Inicialização das setas
     atualizarVisibilidadeSetas();

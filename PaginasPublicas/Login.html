@@ -17,6 +17,20 @@
     </style>
     <script src="ValidacoesComuns.js" defer></script>
     <script src="ValidacoesLogin.js" defer></script>
+    <script>
+        // Força o scroll para o topo ao carregar a página
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.addEventListener('beforeunload', function() {
+            window.scrollTo(0, 0);
+        });
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 0);
+        });
+    </script>
     <style>
         .container-pagina-login {
             display: flex;
@@ -248,6 +262,20 @@
                         <input type="password" id="password" name="senha" placeholder="Senha"
                             class="input-formulario password-input" required autocomplete="current-password">
                     </div>
+                    <script>
+                        // Preenche o campo email com o último email salvo em cookie
+                        (function() {
+                            const ultimoEmail = document.cookie.split('; ')
+                                .find(row => row.startsWith('ultimo_email_login='))
+                                ?.split('=')[1];
+                            if (ultimoEmail) {
+                                const campoEmail = document.getElementById('email');
+                                if (campoEmail) {
+                                    campoEmail.value = decodeURIComponent(ultimoEmail);
+                                }
+                            }
+                        })();
+                    </script>
                     <div class="acoes-formulario">
                         <a onclick="carregarPagina('redefinirSenha')"
                             class="link-esqueci-senha sombra-texto-comum">Esqueci minha senha </a>

@@ -4,6 +4,12 @@ Certificacao/bibliotecas/composer.phar
 Certificacao/instalador.log
 Certificacao/bibliotecas/instalador.log
 
+# Certificados gerados (reforço; já há .gitignore na pasta)
+Certificacao/certificados/
+
+# Backups de banco (usar .gitignore local também)
+Admin/Backups/
+
 # Composer local (caso exista na raiz)
 /vendor/
 /composer.phar

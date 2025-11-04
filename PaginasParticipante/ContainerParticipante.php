@@ -364,6 +364,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (novoConteudo) {
                         const alvo = document.getElementById('conteudo-dinamico');
                         alvo.innerHTML = novoConteudo.innerHTML;
+                        
+                        // Força scroll para o topo ao trocar de página
+                        window.scrollTo(0, 0);
+                        
                         // Executa scripts embutidos na página carregada (ex.: TemaDoSite.php)
                         executarScriptsNoConteudo(alvo);
                         sincronizarMenuComConteudo();
@@ -388,6 +392,12 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // =========================
         // Eventos de inicialização
         // =========================
+        
+        // Desabilita restauração automática de scroll do navegador
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
         window.onpopstate = function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
@@ -395,6 +405,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         };
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Força scroll para o topo ao carregar/recarregar a página
+            window.scrollTo(0, 0);
+            
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);

@@ -56,7 +56,31 @@ class ProcessadorTemplate
         if ($html === false) {
             throw new Exception('Não foi possível ler HTML: ' . $htmlPath);
         }
-        $mpdf = new \Mpdf\Mpdf([ 'mode' => 'utf-8', 'format' => 'A4-L' ]); // Paisagem
+        // Tenta usar a fonte Inter se instalada em Certificacao/fonts
+        $fontDirExtra = __DIR__ . '/fonts';
+        $usarInter = (file_exists($fontDirExtra . '/Inter-Regular.ttf'));
+        if ($usarInter && class_exists('Mpdf\\Config\\ConfigVariables') && class_exists('Mpdf\\Config\\FontVariables')) {
+            $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+            $fontDirs = $defaultConfig['fontDir'];
+            $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+            $fontData = $defaultFontConfig['fontdata'];
+            $mpdf = new \Mpdf\Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4-L',
+                'fontDir' => array_merge($fontDirs, [$fontDirExtra]),
+                'fontdata' => $fontData + [
+                    'inter' => [
+                        'R' => 'Inter-Regular.ttf',
+                        'B' => file_exists($fontDirExtra . '/Inter-Bold.ttf') ? 'Inter-Bold.ttf' : 'Inter-Regular.ttf',
+                        'I' => file_exists($fontDirExtra . '/Inter-Italic.ttf') ? 'Inter-Italic.ttf' : 'Inter-Regular.ttf',
+                        'BI' => file_exists($fontDirExtra . '/Inter-BoldItalic.ttf') ? 'Inter-BoldItalic.ttf' : 'Inter-Regular.ttf',
+                    ],
+                ],
+                'default_font' => 'inter',
+            ]);
+        } else {
+            $mpdf = new \Mpdf\Mpdf([ 'mode' => 'utf-8', 'format' => 'A4-L' ]); // Paisagem
+        }
         $mpdf->WriteHTML($html);
         // Usa destino em string para evitar dependência do tipo em análise estática
         $mpdf->Output($saidaPdf, 'F');

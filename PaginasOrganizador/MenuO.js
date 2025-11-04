@@ -23,6 +23,17 @@ document.addEventListener("DOMContentLoaded", () => {
         botao.classList.add("ativo");
       });
     });
+
+    // Fallback: garante que os botões chamem a rota correta
+    const btnEventosInscritos = document.querySelector('.botao-eventosInscritos');
+    if (btnEventosInscritos && !btnEventosInscritos.dataset.boundRota) {
+      btnEventosInscritos.addEventListener('click', (e) => {
+        if (typeof globalThis.carregarPagina === 'function') {
+          globalThis.carregarPagina('eventosInscritos');
+        }
+      });
+      btnEventosInscritos.dataset.boundRota = '1';
+    }
   
     /**
      * Ativa o botão do menu de acordo com a página aberta.
@@ -34,7 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Mapeamento: cada array contém as páginas que ativam o respectivo botão
       const mapeamentoBotoes = {
         perfil: ['perfil', 'editarPerfil'],
-        inicio: ['inicio', 'evento'],
+        inicio: ['inicio'],
+        eventosInscritos: ['eventosInscritos'],
         meusEventos: ['meusEventos', 'eventoOrganizado', 'adicionarEvento'],
         certificados: ['certificados'],
         configuracoes: ['configuracoes', 'termos', 'redefinirSenha', 'emailRecuperacao', 'temaDoSite', 'manualDeUso', 'duvidasFrequentes', 'sobreNos'],
