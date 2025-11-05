@@ -195,8 +195,6 @@
                         </div>
                     </a>
                 <?php endwhile; ?>
-            <?php else: ?>
-                <p style="grid-column:1/-1;text-align:center;padding:20px;">Você não possui inscrições ativas.</p>
             <?php endif; ?>
         </div>
     </div>

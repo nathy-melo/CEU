@@ -228,4 +228,8 @@ INSERT IGNORE INTO organiza (cod_evento, CPF) VALUES
 (16, '12345678901'),
 (17, '12345678901');
 
+INSERT IGNORE INTO colaboradores_evento (cod_evento, CPF, papel, criado_em) VALUES
+(1, '123', 'colaborador', CURRENT_TIMESTAMP),
+(7, '123', 'colaborador', CURRENT_TIMESTAMP);
+
 show tables;

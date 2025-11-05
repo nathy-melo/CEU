@@ -5,9 +5,8 @@ function inicializarFiltroEventos() {
     const eventosContainer = document.getElementById('eventos-container');
 
     let semResultadosMsg = document.createElement('div');
-    semResultadosMsg.textContent = 'Sem resultados';
+    semResultadosMsg.innerHTML = 'Sem resultados. <br>Você não possui inscrições ativas.';
     semResultadosMsg.style.color = 'var(--botao)';
-    semResultadosMsg.style.fontWeight = 'bold';
     semResultadosMsg.style.fontSize = '1.2rem';
     semResultadosMsg.style.gridColumn = '1/-1';
     semResultadosMsg.style.textAlign = 'center';
