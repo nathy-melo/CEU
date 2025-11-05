@@ -1,9 +1,14 @@
-let carregandoEventos = false; // Flag para evitar carregamentos duplicados
-let carregandoColaboracao = false; // Flag para evitar carregamentos duplicados de colaboração
+// Usa variáveis globais para evitar redeclaração
+if (typeof window.carregandoEventos === 'undefined') {
+    window.carregandoEventos = false;
+}
+if (typeof window.carregandoColaboracao === 'undefined') {
+    window.carregandoColaboracao = false;
+}
 
 function carregarEventosDoServidor() {
-    if (carregandoEventos) return; // Evita execução duplicada
-    carregandoEventos = true;
+    if (window.carregandoEventos) return; // Evita execução duplicada
+    window.carregandoEventos = true;
 
     const containerEventos = document.getElementById('eventos-container');
     const botaoAdicionarEvento = containerEventos.querySelector('.CaixaDoEventoAdicionar');
@@ -33,7 +38,7 @@ function carregarEventosDoServidor() {
         .then(respostaServidor => respostaServidor.json())
         .then(dadosRecebidos => {
             mensagemCarregando.remove();
-            carregandoEventos = false; // Libera para próxima chamada
+            window.carregandoEventos = false; // Libera para próxima chamada
 
             if (dadosRecebidos.erro) {
                 console.error('Erro ao buscar eventos:', dadosRecebidos.erro);
@@ -102,7 +107,7 @@ function carregarEventosDoServidor() {
         })
         .catch(erroRequisicao => {
             mensagemCarregando.remove();
-            carregandoEventos = false; // Libera para próxima chamada
+            window.carregandoEventos = false; // Libera para próxima chamada
             console.error('Erro ao carregar eventos:', erroRequisicao);
             alert('Erro ao carregar eventos. Por favor, tente novamente.');
         });
@@ -249,12 +254,12 @@ function inicializarFiltroEventos() {
 }
 
 function carregarEventosColaboracao() {
-    if (carregandoColaboracao) return; // Evita execução duplicada
-    carregandoColaboracao = true;
+    if (window.carregandoColaboracao) return; // Evita execução duplicada
+    window.carregandoColaboracao = true;
 
     const containerColaboracao = document.getElementById('colaboracao-container');
     if (!containerColaboracao) {
-        carregandoColaboracao = false;
+        window.carregandoColaboracao = false;
         return;
     }
 
@@ -282,7 +287,7 @@ function carregarEventosColaboracao() {
         .then(respostaServidor => respostaServidor.json())
         .then(dadosRecebidos => {
             mensagemCarregando.remove();
-            carregandoColaboracao = false; // Libera para próxima chamada
+            window.carregandoColaboracao = false; // Libera para próxima chamada
 
             if (dadosRecebidos.erro) {
                 console.error('Erro ao buscar eventos de colaboração:', dadosRecebidos.erro);
@@ -357,7 +362,7 @@ function carregarEventosColaboracao() {
         })
         .catch(erroRequisicao => {
             mensagemCarregando.remove();
-            carregandoColaboracao = false; // Libera para próxima chamada
+            window.carregandoColaboracao = false; // Libera para próxima chamada
             console.error('Erro ao carregar eventos de colaboração:', erroRequisicao);
             const mensagemErro = document.createElement('div');
             mensagemErro.textContent = 'Erro ao carregar eventos de colaboração';

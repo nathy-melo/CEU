@@ -4,19 +4,26 @@ function inicializarFiltroEventos() {
     const searchButton = document.querySelector('.botao-pesquisa');
     const eventosContainer = document.getElementById('eventos-container');
 
-    let semResultadosMsg = document.createElement('div');
-    semResultadosMsg.innerHTML = 'Sem resultados. <br>Você não possui inscrições ativas.';
-    semResultadosMsg.style.color = 'var(--botao)';
-    semResultadosMsg.style.fontSize = '1.2rem';
-    semResultadosMsg.style.gridColumn = '1/-1';
-    semResultadosMsg.style.textAlign = 'center';
-    semResultadosMsg.style.padding = '30px 0';
-
+    // Usa um ID único para garantir que só exista uma mensagem
+    const MSG_ID = 'mensagem-sem-resultados-eventos';
+    
     function atualizarMensagemSemResultados(existemVisiveis) {
-        if (eventosContainer && eventosContainer.contains(semResultadosMsg)) {
-            eventosContainer.removeChild(semResultadosMsg);
+        // Remove mensagem existente primeiro
+        const mensagemExistente = document.getElementById(MSG_ID);
+        if (mensagemExistente) {
+            mensagemExistente.remove();
         }
+        
+        // Adiciona nova mensagem se necessário
         if (!existemVisiveis && eventosContainer) {
+            const semResultadosMsg = document.createElement('div');
+            semResultadosMsg.id = MSG_ID;
+            semResultadosMsg.innerHTML = 'Sem resultados. <br>Você não possui inscrições ativas.';
+            semResultadosMsg.style.color = 'var(--botao)';
+            semResultadosMsg.style.fontSize = '1.2rem';
+            semResultadosMsg.style.gridColumn = '1/-1';
+            semResultadosMsg.style.textAlign = 'center';
+            semResultadosMsg.style.padding = '30px 0';
             eventosContainer.appendChild(semResultadosMsg);
         }
     }
