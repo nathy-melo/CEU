@@ -91,12 +91,21 @@ function parseSqlSchema($caminhoArquivo) {
     }
 
     // Captura blocos de CREATE TABLE ... ( ... );
-    if (preg_match_all('/create\s+table\s+if\s+not\s+exists\s+`?([a-zA-Z0-9_]+)`?\s*\((.*?)\)\s*;/is', $sql, $matches, PREG_SET_ORDER)) {
+    if (preg_match_all('/create\s+table\s+if\s+not\s+exists\s+`?([a-zA-Z0-9_]+)`?\s*\((.*?)\)\s*(?:ENGINE|;)/is', $sql, $matches, PREG_SET_ORDER)) {
         foreach ($matches as $mt) {
             $tabela = $mt[1];
             $conteudo = $mt[2];
             $schema['tables'][$tabela] = $schema['tables'][$tabela] ?? ['create' => '', 'columns' => []];
-            $schema['tables'][$tabela]['create'] = $mt[0]; // bloco completo do CREATE
+            // Reconstrói o bloco CREATE completo (pega até o próximo ; após o fecha parênteses)
+            $posInicio = strpos($sql, $mt[0]);
+            $posDepois = $posInicio + strlen($mt[0]);
+            $proximoPontoVirgula = strpos($sql, ';', $posDepois);
+            if ($proximoPontoVirgula !== false) {
+                $blocoCompleto = substr($sql, $posInicio, ($proximoPontoVirgula - $posInicio + 1));
+            } else {
+                $blocoCompleto = $mt[0] . ';';
+            }
+            $schema['tables'][$tabela]['create'] = $blocoCompleto;
             // Percorre linhas internas do create
             $linhas = preg_split('/\n/', $conteudo);
             foreach ($linhas as $linha) {

@@ -29,7 +29,7 @@ function carregarEventosDoServidor() {
     mensagemCarregando.style.color = 'var(--botao)';
     containerEventos.appendChild(mensagemCarregando);
 
-    fetch('BuscarEventosOrganizador.php')
+    fetch('GerenciadorEventos.php?action=listar_organizador')
         .then(respostaServidor => respostaServidor.json())
         .then(dadosRecebidos => {
             mensagemCarregando.remove();
@@ -278,7 +278,7 @@ function carregarEventosColaboracao() {
     mensagemCarregando.style.color = 'var(--botao)';
     containerColaboracao.appendChild(mensagemCarregando);
 
-    fetch('BuscarEventosColaboracao.php')
+    fetch('GerenciadorEventos.php?action=listar_colaboracao')
         .then(respostaServidor => respostaServidor.json())
         .then(dadosRecebidos => {
             mensagemCarregando.remove();

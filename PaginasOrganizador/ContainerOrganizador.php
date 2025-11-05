@@ -82,6 +82,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
         'meusEventos' => 'MeusEventosOrganizador.html',
         'adicionarEvento' => 'AdicionarEvento.php',
+        'listaParticipantes' => 'ListadeParticipantes.php',
         'perfil' => 'PerfilOrganizador.php',
         'certificados' => 'CertificadosOrganizador.html',
         'configuracoes' => 'ConfiguracoesOrganizador.html',
@@ -252,6 +253,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'eventoOrganizado': {
                 html: 'CartaoDoEventoOrganizando.html',
                 js: ['CartaoDoEventoOrganizando.js'],
+                init: () => {}
+            },
+            'listaParticipantes': {
+                html: 'ListadeParticipantes.php',
+                js: [],
                 init: () => {}
             },
             'perfil': {

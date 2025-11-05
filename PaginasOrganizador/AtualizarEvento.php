@@ -31,6 +31,10 @@ $dataInicio = $_POST['data_inicio'] ?? '';
 $dataFim = $_POST['data_fim'] ?? '';
 $horarioInicio = $_POST['horario_inicio'] ?? '';
 $horarioFim = $_POST['horario_fim'] ?? '';
+$dataInicioInscricao = $_POST['data_inicio_inscricao'] ?? '';
+$dataFimInscricao = $_POST['data_fim_inscricao'] ?? '';
+$horarioInicioInscricao = $_POST['horario_inicio_inscricao'] ?? '';
+$horarioFimInscricao = $_POST['horario_fim_inscricao'] ?? '';
 $publicoAlvo = $_POST['publico_alvo'] ?? '';
 $categoriaEvento = $_POST['categoria'] ?? '';
 $modalidadeEvento = $_POST['modalidade'] ?? '';
@@ -70,6 +74,16 @@ if ($linhaVerificacao['total'] == 0) {
 // Combina data e hora para criar timestamps completos
 $dataHoraInicio = $dataInicio . ' ' . $horarioInicio . ':00';
 $dataHoraConclusao = $dataFim . ' ' . $horarioFim . ':00';
+
+// Combina data e hora das inscrições (se fornecidas)
+$inicioInscricao = null;
+$fimInscricao = null;
+if (!empty($dataInicioInscricao) && !empty($horarioInicioInscricao)) {
+    $inicioInscricao = $dataInicioInscricao . ' ' . $horarioInicioInscricao . ':00';
+}
+if (!empty($dataFimInscricao) && !empty($horarioFimInscricao)) {
+    $fimInscricao = $dataFimInscricao . ' ' . $horarioFimInscricao . ':00';
+}
 
 // Calcula duração do evento em horas
 $objetoDataInicio = new DateTime($dataHoraInicio);
@@ -183,6 +197,10 @@ if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name']
     }
 }
 
+// Garante que as colunas de inscrição existem
+mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS inicio_inscricao datetime NULL");
+mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS fim_inscricao datetime NULL");
+
 // Atualiza evento no banco de dados
 if ($deveAtualizarImagem) {
     // Query com atualização de imagem
@@ -197,13 +215,15 @@ if ($deveAtualizarImagem) {
                     duracao = ?, 
                     certificado = ?, 
                     modalidade = ?,
-                    imagem = ?
+                    imagem = ?,
+                    inicio_inscricao = ?,
+                    fim_inscricao = ?
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
     mysqli_stmt_bind_param(
         $declaracaoAtualizacao,
-        "sssssssdissi",
+        "sssssssdissssi",
         $categoriaEvento,
         $nomeEvento,
         $localEvento,
@@ -215,6 +235,8 @@ if ($deveAtualizarImagem) {
         $certificadoBooleano,
         $modalidadeEvento,
         $caminhoNovaImagemPrincipal,
+        $inicioInscricao,
+        $fimInscricao,
         $codigoEvento
     );
     
@@ -243,13 +265,15 @@ if ($deveAtualizarImagem) {
                     conclusao = ?, 
                     duracao = ?, 
                     certificado = ?, 
-                    modalidade = ?
+                    modalidade = ?,
+                    inicio_inscricao = ?,
+                    fim_inscricao = ?
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
     mysqli_stmt_bind_param(
         $declaracaoAtualizacao,
-        "sssssssdisi",
+        "ssssssssisssi",
         $categoriaEvento,
         $nomeEvento,
         $localEvento,
@@ -260,6 +284,8 @@ if ($deveAtualizarImagem) {
         $duracaoEmHoras,
         $certificadoBooleano,
         $modalidadeEvento,
+        $inicioInscricao,
+        $fimInscricao,
         $codigoEvento
     );
 }

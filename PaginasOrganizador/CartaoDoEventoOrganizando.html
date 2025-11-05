@@ -24,7 +24,7 @@
     max-width: 60rem;
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(7, auto);
+    grid-template-rows: repeat(8, auto);
     gap: 1rem;
     margin: 1rem auto;
   }
@@ -330,33 +330,56 @@
     grid-row-start: 3;
   }
 
-  .PublicoAlvo {
+  .DataInicioInscricao {
     grid-column: span 2 / span 2;
     grid-row-start: 4;
   }
 
-  .Categoria {
+  .DataFimInscricao {
     grid-column: span 2 / span 2;
     grid-column-start: 3;
     grid-row-start: 4;
   }
 
-  .Modalidade {
+  .HorarioInicioInscricao {
     grid-column: span 2 / span 2;
     grid-column-start: 5;
     grid-row-start: 4;
   }
 
-  .Certificado {
+  .HorarioFimInscricao {
     grid-column: span 2 / span 2;
     grid-column-start: 7;
     grid-row-start: 4;
   }
 
+  .PublicoAlvo {
+    grid-column: span 2 / span 2;
+    grid-row-start: 5;
+  }
+
+  .Categoria {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 5;
+  }
+
+  .Modalidade {
+    grid-column: span 2 / span 2;
+    grid-column-start: 5;
+    grid-row-start: 5;
+  }
+
+  .Certificado {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 5;
+  }
+
   .Imagem {
     grid-column: span 4 / span 4;
     grid-row: span 3 / span 3;
-    grid-row-start: 5;
+    grid-row-start: 6;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -368,24 +391,24 @@
     grid-column: span 4 / span 4;
     grid-row: span 3 / span 3;
     grid-column-start: 5;
-    grid-row-start: 5;
+    grid-row-start: 6;
   }
 
   .BotaoVoltar {
     grid-column: span 2 / span 2;
-    grid-row-start: 8;
+    grid-row-start: 9;
   }
 
   .BotaoParticipantes {
     grid-column: span 2 / span 2;
     grid-column-start: 4;
-    grid-row-start: 8;
+    grid-row-start: 9;
   }
 
   .BotaoEditar {
     grid-column: span 2 / span 2;
     grid-column-start: 7;
-    grid-row-start: 8;
+    grid-row-start: 9;
   }
 
   .campo-imagem {
@@ -847,6 +870,26 @@
           <span class="rotulo-campo">Horário fim:</span>
           <div id="end-time" class="caixa-valor">14:00</div>
           <input type="time" id="input-horario-fim" class="campo-input" autocomplete="off">
+        </div>
+        <div class="DataInicioInscricao grupo-campo">
+          <span class="rotulo-campo">Início Inscrições:</span>
+          <div id="inicio-inscricao" class="caixa-valor">-</div>
+          <input type="date" id="input-data-inicio-inscricao" class="campo-input" autocomplete="off">
+        </div>
+        <div class="DataFimInscricao grupo-campo">
+          <span class="rotulo-campo">Fim Inscrições:</span>
+          <div id="fim-inscricao" class="caixa-valor">-</div>
+          <input type="date" id="input-data-fim-inscricao" class="campo-input" autocomplete="off">
+        </div>
+        <div class="HorarioInicioInscricao grupo-campo">
+          <span class="rotulo-campo">Horário Início:</span>
+          <div id="horario-inicio-inscricao" class="caixa-valor">-</div>
+          <input type="time" id="input-horario-inicio-inscricao" class="campo-input" autocomplete="off">
+        </div>
+        <div class="HorarioFimInscricao grupo-campo">
+          <span class="rotulo-campo">Horário Fim:</span>
+          <div id="horario-fim-inscricao" class="caixa-valor">-</div>
+          <input type="time" id="input-horario-fim-inscricao" class="campo-input" autocomplete="off">
         </div>
         <div class="PublicoAlvo grupo-campo">
           <span class="rotulo-campo">Público alvo:</span>

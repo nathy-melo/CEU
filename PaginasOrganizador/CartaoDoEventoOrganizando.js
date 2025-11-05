@@ -22,7 +22,7 @@
 
     codigoEventoAtual = codigoEvento;
 
-    fetch('BuscarDetalheEvento.php?cod_evento=' + codigoEvento)
+    fetch('GerenciadorEventos.php?action=detalhe&cod_evento=' + codigoEvento)
       .then(respostaServidor => respostaServidor.json())
       .then(dadosRecebidos => {
         if (dadosRecebidos.erro) {
@@ -132,7 +132,7 @@
 
   async function carregarListasColaboradoresESolicitacoes() {
     try {
-      const url = `ListarColaboradores.php?cod_evento=${encodeURIComponent(codigoEventoAtual)}`;
+      const url = `GerenciadorColaboradores.php?cod_evento=${encodeURIComponent(codigoEventoAtual)}`;
       const resp = await fetch(url);
       const data = await resp.json();
       if (!data.sucesso) {
@@ -245,10 +245,11 @@
     }
     try {
       const form = new FormData();
+      form.append('action', 'adicionar');
       form.append('cod_evento', String(codigoEventoAtual));
       form.append('identificador', identificador);
       form.append('papel', 'colaborador'); // Sempre colaborador
-      const resp = await fetch('AdicionarColaborador.php', { method: 'POST', body: form });
+      const resp = await fetch('GerenciadorColaboradores.php', { method: 'POST', body: form });
       const data = await resp.json();
       if (!data.sucesso) {
         alert('Erro ao adicionar colaborador: ' + (data.erro || 'desconhecido'));
@@ -266,9 +267,10 @@
     if (!confirm('Remover este colaborador do evento?')) return;
     try {
       const form = new FormData();
+      form.append('action', 'remover');
       form.append('cod_evento', String(codigoEventoAtual));
       form.append('cpf', String(cpf));
-      const resp = await fetch('RemoverColaborador.php', { method: 'POST', body: form });
+      const resp = await fetch('GerenciadorColaboradores.php', { method: 'POST', body: form });
       const data = await resp.json();
       if (!data.sucesso) {
         alert('Erro ao remover colaborador: ' + (data.erro || 'desconhecido'));
@@ -284,9 +286,9 @@
   async function atualizarSolicitacao(id, acao) {
     try {
       const form = new FormData();
+      form.append('action', acao); // 'aprovar' ou 'recusar'
       form.append('id', String(id));
-      form.append('acao', String(acao));
-      const resp = await fetch('AtualizarSolicitacaoColaboracao.php', { method: 'POST', body: form });
+      const resp = await fetch('GerenciadorColaboradores.php', { method: 'POST', body: form });
       const data = await resp.json();
       if (!data.sucesso) {
         alert('Erro ao atualizar solicitação: ' + (data.erro || 'desconhecido'));
@@ -300,7 +302,15 @@
   }
 
   function irParaParticipantes() {
-    console.log('Navegar para página de participantes');
+    if (!codigoEventoAtual) {
+      console.error('Código do evento não encontrado');
+      alert('Erro: Código do evento não disponível. Recarregue a página.');
+      return;
+    }
+    console.log('Navegar para página de participantes do evento:', codigoEventoAtual);
+    if (typeof carregarPagina === 'function') {
+      carregarPagina('listaParticipantes', codigoEventoAtual);
+    }
   }
 
   function editarEvento() {

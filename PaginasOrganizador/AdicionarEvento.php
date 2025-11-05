@@ -14,6 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dataFim = $_POST['data_fim'] ?? '';
     $horarioInicio = $_POST['horario_inicio'] ?? '';
     $horarioFim = $_POST['horario_fim'] ?? '';
+    $dataInicioInscricao = $_POST['data_inicio_inscricao'] ?? '';
+    $dataFimInscricao = $_POST['data_fim_inscricao'] ?? '';
+    $horarioInicioInscricao = $_POST['horario_inicio_inscricao'] ?? '';
+    $horarioFimInscricao = $_POST['horario_fim_inscricao'] ?? '';
     $publicoAlvo = $_POST['publico_alvo'] ?? '';
     $categoria = $_POST['categoria'] ?? '';
     $modalidade = $_POST['modalidade'] ?? '';
@@ -33,6 +37,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Combina data e hora
     $inicio = $dataInicio . ' ' . $horarioInicio . ':00';
     $conclusao = $dataFim . ' ' . $horarioFim . ':00';
+    
+    // Combina data e hora das inscrições (se fornecidas)
+    $inicioInscricao = null;
+    $fimInscricao = null;
+    if (!empty($dataInicioInscricao) && !empty($horarioInicioInscricao)) {
+        $inicioInscricao = $dataInicioInscricao . ' ' . $horarioInicioInscricao . ':00';
+    }
+    if (!empty($dataFimInscricao) && !empty($horarioFimInscricao)) {
+        $fimInscricao = $dataFimInscricao . ' ' . $horarioFimInscricao . ':00';
+    }
 
     // Calcula duração em horas
     $dataInicioObj = new DateTime($inicio);
@@ -109,14 +123,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_begin_transaction($conexao);
 
     try {
+        // Garante que as colunas de inscrição existem
+        mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS inicio_inscricao datetime NULL");
+        mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS fim_inscricao datetime NULL");
+        
         // Insere evento (mantém campo imagem com a principal para compatibilidade)
-        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
         mysqli_stmt_bind_param(
             $stmtEvento,
-            "isssssssdsss",
+            "isssssssdsssss",
             $codEvento,
             $categoria,
             $nome,
@@ -128,7 +146,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $duracao,
             $certificadoBool,
             $modalidade,
-            $caminhoImagemPrincipal
+            $caminhoImagemPrincipal,
+            $inicioInscricao,
+            $fimInscricao
         );
 
         if (!mysqli_stmt_execute($stmtEvento)) {
@@ -213,7 +233,7 @@ mysqli_close($conexao);
             max-width: 60rem;
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(7, auto);
+            grid-template-rows: repeat(8, auto);
             gap: 1rem;
             margin: 1rem auto;
         }
@@ -527,33 +547,56 @@ mysqli_close($conexao);
             grid-row-start: 3;
         }
 
-        .PublicoAlvo {
+        .DataInicioInscricao {
             grid-column: span 2 / span 2;
             grid-row-start: 4;
         }
 
-        .Categoria {
+        .DataFimInscricao {
             grid-column: span 2 / span 2;
             grid-column-start: 3;
             grid-row-start: 4;
         }
 
-        .Modalidade {
+        .HorarioInicioInscricao {
             grid-column: span 2 / span 2;
             grid-column-start: 5;
             grid-row-start: 4;
         }
 
-        .Certificado {
+        .HorarioFimInscricao {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
             grid-row-start: 4;
         }
 
+        .PublicoAlvo {
+            grid-column: span 2 / span 2;
+            grid-row-start: 5;
+        }
+
+        .Categoria {
+            grid-column: span 2 / span 2;
+            grid-column-start: 3;
+            grid-row-start: 5;
+        }
+
+        .Modalidade {
+            grid-column: span 2 / span 2;
+            grid-column-start: 5;
+            grid-row-start: 5;
+        }
+
+        .Certificado {
+            grid-column: span 2 / span 2;
+            grid-column-start: 7;
+            grid-row-start: 5;
+        }
+
         .Imagem {
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
-            grid-row-start: 5;
+            grid-row-start: 6;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -565,18 +608,18 @@ mysqli_close($conexao);
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
             grid-column-start: 5;
-            grid-row-start: 5;
+            grid-row-start: 6;
         }
 
         .BotaoVoltar {
             grid-column: span 2 / span 2;
-            grid-row-start: 8;
+            grid-row-start: 9;
         }
 
         .BotaoCriar {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 8;
+            grid-row-start: 9;
         }
 
         .campo-imagem {
@@ -851,6 +894,22 @@ mysqli_close($conexao);
             <div class="HorarioDeFim grupo-campo">
                 <label for="horario-fim"><span style="color: red;">*</span> Horário de Fim:</label>
                 <input type="time" id="horario-fim" name="horario_fim" class="campo-input" required autocomplete="off">
+            </div>
+            <div class="DataInicioInscricao grupo-campo">
+                <label for="data-inicio-inscricao">Início Inscrições:</label>
+                <input type="date" id="data-inicio-inscricao" name="data_inicio_inscricao" class="campo-input" autocomplete="off">
+            </div>
+            <div class="DataFimInscricao grupo-campo">
+                <label for="data-fim-inscricao">Fim Inscrições:</label>
+                <input type="date" id="data-fim-inscricao" name="data_fim_inscricao" class="campo-input" autocomplete="off">
+            </div>
+            <div class="HorarioInicioInscricao grupo-campo">
+                <label for="horario-inicio-inscricao">Horário Início:</label>
+                <input type="time" id="horario-inicio-inscricao" name="horario_inicio_inscricao" class="campo-input" autocomplete="off">
+            </div>
+            <div class="HorarioFimInscricao grupo-campo">
+                <label for="horario-fim-inscricao">Horário Fim:</label>
+                <input type="time" id="horario-fim-inscricao" name="horario_fim_inscricao" class="campo-input" autocomplete="off">
             </div>
             <div class="PublicoAlvo grupo-campo">
                 <label for="publico-alvo"><span style="color: red;">*</span> Público Alvo:</label>
