@@ -574,6 +574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         width: 100%;
+        margin-bottom: 30px;
     }
 
     .dados-evento-grid {
@@ -615,25 +616,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
     }
 
-    .grade-acoes-gerenciamento {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 10px 12px;
+    /* Container principal de gerenciamento */
+    .container-gerenciamento {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 32px;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .secao-gerenciamento {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .secao-titulo {
+        color: var(--branco);
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        margin: 0 0 8px 0;
+        text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .divisor-secao {
+        height: 2px;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+        margin: 16px 0;
+    }
+
+    /* Centralização da barra de pesquisa */
+    .container-gerenciamento .barra-pesquisa-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 100%;
+    }
+
+    .container-gerenciamento .barra-pesquisa {
+        width: 100%;
+        max-width: 580px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .grade-acoes-gerenciamento {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        width: 100%;
+        justify-content: center;
     }
 
     .botao-acao {
         background-color: var(--branco);
         border-radius: 8px;
-        padding: 10px 12px;
+        padding: 10px 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 8px;
         font-size: 13px;
         white-space: nowrap;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        min-width: fit-content;
+        flex-shrink: 0;
     }
 
     .botao-acao:hover {
@@ -643,11 +691,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .botao-acao img {
         height: 20px;
+        width: 20px;
         flex-shrink: 0;
     }
 
     .botao-acao span {
         white-space: nowrap;
+        font-size: 13px;
     }
 
     .acoes-em-massa {
@@ -706,11 +756,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .contador-participantes {
         text-align: center;
-        margin-top: 16px;
-        padding: 12px 20px;
-        background-color: #6598D2;
-        border-radius: 8px;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, #6598D2 0%, #5080BE 100%);
+        border-radius: 10px;
         backdrop-filter: blur(10px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .contador-participantes span {
@@ -723,7 +773,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .envoltorio-tabela {
         overflow-x: auto;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        background-color: var(--tabela_participantes);
+        margin-top: 20px;
     }
 
     .tabela-participantes {
@@ -866,7 +918,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .rodape-lista {
         display: flex;
         justify-content: center;
-        margin-top: 14px;
+        margin-top: 28px;
     }
 
     .checkbox-selecionar {
@@ -1070,8 +1122,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                 </div>
+            </header>
 
-                <div class="grade-acoes-gerenciamento">
+            <!-- Container Principal de Gerenciamento -->
+            <div class="container-gerenciamento">
+                <div class="secao-gerenciamento">
+                    
+                    <!-- Seção: Ações Rápidas -->
+                    <div>
+                        <h2 class="secao-titulo">Ações Rápidas</h2>
+                        <div class="grade-acoes-gerenciamento">
                     <button class="botao botao-acao" id="btn-adicionar-participante">
                         <span>Adicionar</span>
                         <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
@@ -1096,9 +1156,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span>Exportar Lista de Inscritos</span>
                         <img src="../Imagens/Exportar_lista.svg" alt="Exportar icon">
                     </button>
-                </div>
+                        </div>
+                    </div>
 
-                <div class="barra-pesquisa-container">
+                    <div class="divisor-secao"></div>
+
+                    <!-- Seção: Buscar Participantes -->
+                    <div>
+                        <h2 class="secao-titulo">Buscar Participantes</h2>
+                        <div class="barra-pesquisa-container">
                     <div class="barra-pesquisa">
                         <div class="campo-pesquisa-wrapper">
                             <input class="campo-pesquisa" type="text" id="busca-participantes" name="busca_participantes" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
@@ -1109,9 +1175,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </button>
                         </div>
                     </div>
-                </div>
+                    </div>
 
-                <div class="acoes-em-massa">
+                    <div class="divisor-secao"></div>
+
+                    <!-- Seção: Ações em Massa -->
+                    <div>
+                        <h2 class="secao-titulo">Ações em Massa</h2>
+                        <div class="acoes-em-massa">
                     <button class="botao botao-em-massa botao-branco" id="botao-toggle-selecao">
                         <span id="texto-toggle-selecao">Selecionar Todos</span>
                         <img src="../Imagens/Grupo_de_pessoas.svg" alt="">
@@ -1128,14 +1199,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span>Excluir Participantes</span>
                         <img src="../Imagens/Excluir.svg" alt="">
                     </button>
-                </div>
+                        </div>
+                    </div>
 
-                <div class="contador-participantes">
-                    <span id="total-participantes">Total de participantes: 0</span>
-                </div>
-            </header>
+                    <div class="divisor-secao"></div>
 
-            <div class="envoltorio-tabela">
+                    <!-- Seção: Lista de Participantes -->
+                    <div>
+                                <div class="contador-participantes">
+                            <span id="total-participantes">Total de participantes: 0</span>
+                        </div>
+
+                        <div class="envoltorio-tabela">
                 <table class="tabela-participantes">
                     <thead>
                         <tr>
@@ -1153,7 +1228,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </tr>
                     </tbody>
                 </table>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+
             <footer class="rodape-lista">
                 <button type="button" class="botao botao-voltar" onclick="history.back()">Voltar</button>
             </footer>
@@ -1430,6 +1510,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const txtToggle = document.getElementById('texto-toggle-selecao');
             if (btnToggle) {
                 btnToggle.addEventListener('click', function() {
+                    if (todosParticipantes.length === 0) {
+                        alert('Não há participantes inscritos neste evento');
+                        return;
+                    }
+
                     const todosSelecionados = participantesSelecionados.size === todosParticipantes.length && participantesSelecionados.size > 0;
 
                     if (todosSelecionados) {
@@ -1459,6 +1544,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const btnPesquisa = document.querySelector('.botao-pesquisa');
             if (campoPesquisa && btnPesquisa) {
                 const filtrar = () => {
+                    if (todosParticipantes.length === 0) {
+                        return; // Não faz nada se não houver participantes
+                    }
                     const termo = campoPesquisa.value.toLowerCase();
                     document.querySelectorAll('.tabela-participantes tbody tr').forEach(linha => {
                         linha.style.display = linha.textContent.toLowerCase().includes(termo) ? '' : 'none';
@@ -1883,6 +1971,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // ========== AÇÕES EM MASSA ==========
         async function confirmarPresencasEmMassa() {
+            if (todosParticipantes.length === 0) {
+                alert('Não há participantes inscritos neste evento');
+                return;
+            }
+
             if (participantesSelecionados.size === 0) {
                 alert('Selecione pelo menos um participante');
                 return;
@@ -1927,6 +2020,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         async function emitirCertificadosEmMassa() {
+            if (todosParticipantes.length === 0) {
+                alert('Não há participantes inscritos neste evento');
+                return;
+            }
+
             if (participantesSelecionados.size === 0) {
                 alert('Selecione pelo menos um participante');
                 return;
@@ -1982,6 +2080,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         async function excluirParticipantesEmMassa() {
+            if (todosParticipantes.length === 0) {
+                alert('Não há participantes inscritos neste evento');
+                return;
+            }
+
             if (participantesSelecionados.size === 0) {
                 alert('Selecione pelo menos um participante');
                 return;
