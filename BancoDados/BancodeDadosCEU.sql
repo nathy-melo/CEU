@@ -150,13 +150,20 @@ CREATE TABLE IF NOT EXISTS solicitacoes_redefinicao_senha (
     observacoes TEXT NULL
 );
 
-INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
-('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0);
+-- Inserir usuários (ignora se já existirem)
+INSERT IGNORE INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
+('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
+('123', 'Caike', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
+('1234', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0);
 
-INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes)
-VALUES ('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora');
+-- Inserir códigos de organizador (ignora se já existirem)
+INSERT IGNORE INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes)
+VALUES 
+('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora'),
+('CAIKE001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '123', 'SISTEMA', 'Código de teste - Caike - ck@ceu.com');
 
-INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) VALUES
+-- Inserir eventos (ignora se já existirem)
+INSERT IGNORE INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) VALUES
 (1, 'Workshop', 'Workshop de JavaScript', 'Sala 101', 'Aprenda conceitos básicos e avançados de JavaScript.', 'Todos', '2025-02-15 09:00:00', '2025-02-15 17:00:00', 8.0, 1, 'Presencial', '/ImagensEventos/JavaScript_Workshop.png', '2025-01-15 08:00:00', '2025-02-14 23:59:59'),
 (2, 'Palestra', 'Palestra sobre IA', 'Auditório Principal', 'Discussão sobre o futuro da Inteligência Artificial.', 'Estudantes', '2025-03-10 14:00:00', '2025-03-10 16:00:00', 2.0, 1, 'Híbrido', '/ImagensEventos/Palestra_sobre_IA.png', '2025-02-10 08:00:00', '2025-03-09 23:59:59'),
 (3, 'Curso', 'Curso de Python', 'Laboratório 2', 'Curso completo de programação em Python.', 'Iniciantes', '2025-04-05 08:00:00', '2025-04-12 18:00:00', 40.0, 1, 'Presencial', '/ImagensEventos/Python.png', '2025-03-05 08:00:00', '2025-04-04 23:59:59'),
@@ -176,7 +183,7 @@ INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo,
 (17, 'Conferência', 'Conferência de Cloud Computing', 'Auditório 3', 'Conferência sobre tendências em computação em nuvem.', 'Estudantes', '2025-12-03 13:00:00', '2025-12-03 18:00:00', 5.0, 1, 'Híbrido', '/ImagensEventos/Cloud_Computing.png', '2025-11-03 08:00:00', '2025-12-02 23:59:59');
 
 -- Popula tabela imagens_evento com as imagens existentes na pasta ImagensEventos
-INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
+INSERT IGNORE INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (1, '/ImagensEventos/JavaScript_Workshop.png', 0, 1),
 (2, '/ImagensEventos/Palestra_sobre_IA.png', 0, 1),
 (3, '/ImagensEventos/Python.png', 0, 1),
@@ -196,12 +203,13 @@ INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (17, '/ImagensEventos/Cloud_Computing.png', 0, 1);
 
 -- Adiciona imagem CEU-ImagemEvento.png como segunda imagem para testar carrossel
-INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
+INSERT IGNORE INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (1, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0),
 (12, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0),
 (13, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0);
 
-INSERT INTO organiza (cod_evento, CPF) VALUES
+-- Inserir organizadores dos eventos (ignora se já existirem)
+INSERT IGNORE INTO organiza (cod_evento, CPF) VALUES
 (1, '12345678901'),
 (2, '12345678901'),
 (3, '12345678901'),
@@ -221,4 +229,3 @@ INSERT INTO organiza (cod_evento, CPF) VALUES
 (17, '12345678901');
 
 show tables;
-
