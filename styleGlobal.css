@@ -1053,6 +1053,12 @@ body.pagina-lista-eventos #conteudo-dinamico {
   box-shadow: 0 0 0 clamp(3px, 0.5vw, 5px) var(--botao), 0 0 clamp(12px, 2.5vw, 16px) 0 var(--azul-escuro);
 }
 
+.Menu .rodape.ativo {
+  background-color: var(--botao);
+  border-radius: clamp(24px, 4vw, 30px);
+  box-shadow: 0 0 0 clamp(2px, 0.4vw, 3px) var(--botao), 0 clamp(2px, 0.5vw, 3px) clamp(6px, 1.2vw, 8px) 0 var(--azul-escuro);
+}
+
 .Menu .rodape {
   position: absolute;
   /* Eleva o rodapé do menu acima da barra do navegador (quando existir) */
@@ -1066,11 +1072,12 @@ body.pagina-lista-eventos #conteudo-dinamico {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(6px, 1.2vw, 8px);
+  padding: clamp(6px, 1.2vw, 8px) clamp(10px, 2vw, 15px);
   border-radius: clamp(8px, 1.5vw, 10px);
   background-color: var(--caixas);
-  width: auto;
-  max-width: calc(100% - clamp(12px, 2.4vw, 16px));
+  width: fit-content;
+  max-width: 90%;
+  transition: all 0.2s ease;
 }
 
 .Menu .rodape img {
