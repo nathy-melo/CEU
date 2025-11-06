@@ -149,14 +149,32 @@
   .Nome { grid-column: span 4 / span 4; }
   .Organizador { grid-column: span 4 / span 4; grid-column-start: 5; }
   .Local { grid-column: span 8 / span 8; grid-row-start: 2; }
-  .DataDeInicio { grid-column: span 2 / span 2; grid-row-start: 3; }
-  .DataDeFim { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 3; }
-  .HorarioDeInicio { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 3; }
-  .HorarioDeFim { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 3; }
-  .DataInicioInscricao { grid-column: span 2 / span 2; grid-row-start: 4; }
-  .DataFimInscricao { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 4; }
-  .HorarioInicioInscricao { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 4; }
-  .HorarioFimInscricao { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 4; }
+  
+  .DataHorarioInicio { grid-column: span 4 / span 4; grid-row-start: 3; }
+  .DataHorarioFim { grid-column: span 4 / span 4; grid-column-start: 5; grid-row-start: 3; }
+  
+  .DataHorarioInscricaoInicio { grid-column: span 4 / span 4; grid-row-start: 4; }
+  .DataHorarioInscricaoFim { grid-column: span 4 / span 4; grid-column-start: 5; grid-row-start: 4; }
+  
+  /* Container para campos de data e horário */
+  .campo-data-horario {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .campo-data-horario .caixa-valor {
+    flex: 1;
+  }
+
+  .campo-data-horario .caixa-valor:first-child {
+    flex: 1.2;
+  }
+
+  .campo-data-horario .caixa-valor:last-child {
+    flex: 0.8;
+  }
+  
   .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 5; }
   .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 5; }
   .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 5; }
@@ -283,37 +301,33 @@
           <label>Local:</label>
           <div id="event-local" class="caixa-valor"><?= htmlspecialchars($evento['lugar']) ?></div>
         </div>
-        <div class="DataDeInicio grupo-campo">
-          <label>Data de Início:</label>
-          <div id="start-date" class="caixa-valor"><?= htmlspecialchars($data_inicio) ?></div>
+        <div class="DataHorarioInicio grupo-campo">
+          <label>Data e Horário de Início:</label>
+          <div class="campo-data-horario">
+            <div id="start-date" class="caixa-valor"><?= htmlspecialchars($data_inicio) ?></div>
+            <div id="start-time" class="caixa-valor"><?= htmlspecialchars($hora_inicio) ?></div>
+          </div>
         </div>
-        <div class="DataDeFim grupo-campo">
-          <label>Data de Fim:</label>
-          <div id="end-date" class="caixa-valor"><?= htmlspecialchars($data_fim) ?></div>
+        <div class="DataHorarioFim grupo-campo">
+          <label>Data e Horário de Fim:</label>
+          <div class="campo-data-horario">
+            <div id="end-date" class="caixa-valor"><?= htmlspecialchars($data_fim) ?></div>
+            <div id="end-time" class="caixa-valor"><?= htmlspecialchars($hora_fim) ?></div>
+          </div>
         </div>
-        <div class="HorarioDeInicio grupo-campo">
-          <label>Horário de Início:</label>
-          <div id="start-time" class="caixa-valor"><?= htmlspecialchars($hora_inicio) ?></div>
-        </div>
-        <div class="HorarioDeFim grupo-campo">
-          <label>Horário de Fim:</label>
-          <div id="end-time" class="caixa-valor"><?= htmlspecialchars($hora_fim) ?></div>
-        </div>
-        <div class="DataInicioInscricao grupo-campo">
+        <div class="DataHorarioInscricaoInicio grupo-campo">
           <label>Início Inscrições:</label>
-          <div id="inicio-inscricao" class="caixa-valor"><?= htmlspecialchars($data_inicio_inscricao) ?></div>
+          <div class="campo-data-horario">
+            <div id="inicio-inscricao" class="caixa-valor"><?= htmlspecialchars($data_inicio_inscricao) ?></div>
+            <div id="horario-inicio-inscricao" class="caixa-valor"><?= htmlspecialchars($hora_inicio_inscricao) ?></div>
+          </div>
         </div>
-        <div class="DataFimInscricao grupo-campo">
+        <div class="DataHorarioInscricaoFim grupo-campo">
           <label>Fim Inscrições:</label>
-          <div id="fim-inscricao" class="caixa-valor"><?= htmlspecialchars($data_fim_inscricao) ?></div>
-        </div>
-        <div class="HorarioInicioInscricao grupo-campo">
-          <label>Horário Início:</label>
-          <div id="horario-inicio-inscricao" class="caixa-valor"><?= htmlspecialchars($hora_inicio_inscricao) ?></div>
-        </div>
-        <div class="HorarioFimInscricao grupo-campo">
-          <label>Horário Fim:</label>
-          <div id="horario-fim-inscricao" class="caixa-valor"><?= htmlspecialchars($hora_fim_inscricao) ?></div>
+          <div class="campo-data-horario">
+            <div id="fim-inscricao" class="caixa-valor"><?= htmlspecialchars($data_fim_inscricao) ?></div>
+            <div id="horario-fim-inscricao" class="caixa-valor"><?= htmlspecialchars($hora_fim_inscricao) ?></div>
+          </div>
         </div>
         <div class="PublicoAlvo grupo-campo">
           <label>Público Alvo:</label>
