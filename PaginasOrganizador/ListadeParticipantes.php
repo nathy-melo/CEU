@@ -1542,19 +1542,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function inicializarEventos() {
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('checkbox-selecionar')) {
-                    const tr = e.target.closest('tr');
-                    tr.classList.toggle('linha-selecionada', e.target.checked);
-                    e.target.checked ? participantesSelecionados.add(e.target.value) : participantesSelecionados.delete(e.target.value);
-                    atualizarVisibilidadeBotoesAcao();
-                    atualizarTextoBotaoToggle();
-                }
-            });
+            if (!window.__listaDocChangeBound) {
+                window.__listaDocChangeBound = true;
+                document.addEventListener('change', function(e) {
+                    if (e.target.classList && e.target.classList.contains('checkbox-selecionar')) {
+                        const tr = e.target.closest('tr');
+                        tr.classList.toggle('linha-selecionada', e.target.checked);
+                        e.target.checked ? participantesSelecionados.add(e.target.value) : participantesSelecionados.delete(e.target.value);
+                        atualizarVisibilidadeBotoesAcao();
+                        atualizarTextoBotaoToggle();
+                    }
+
+                    // Atualizar mensagem no modal de mensagem ao alternar "Enviar para todos"
+                    if (e.target && e.target.id === 'msg-todos') {
+                        const msgSel = document.getElementById('msg-selecionados');
+                        if (!e.target.checked && participantesSelecionados.size > 0) {
+                            msgSel.textContent = `Enviando para ${participantesSelecionados.size} participante(s) selecionado(s)`;
+                            msgSel.style.display = 'block';
+                        } else if (msgSel) {
+                            msgSel.style.display = 'none';
+                        }
+                    }
+                });
+            }
 
             const btnToggle = document.getElementById('botao-toggle-selecao');
             const txtToggle = document.getElementById('texto-toggle-selecao');
-            if (btnToggle) {
+            if (btnToggle && !btnToggle.dataset.bound) {
+                btnToggle.dataset.bound = '1';
                 btnToggle.addEventListener('click', function() {
                     if (todosParticipantes.length === 0) {
                         alert('Não há participantes inscritos neste evento');
@@ -1589,36 +1604,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const campoPesquisa = document.getElementById('busca-participantes');
             const btnPesquisa = document.querySelector('.botao-pesquisa');
             if (campoPesquisa && btnPesquisa) {
-                const filtrar = () => {
-                    if (todosParticipantes.length === 0) {
-                        return; // Não faz nada se não houver participantes
+                const atualizarMensagemSemResultados = (existeVisivel) => {
+                    const tbody = document.getElementById('tbody-participantes');
+                    if (!tbody) return;
+                    const idMsg = 'linha-sem-resultados-busca';
+                    const existente = document.getElementById(idMsg);
+                    if (existeVisivel) {
+                        if (existente) existente.remove();
+                        return;
                     }
-                    const termo = campoPesquisa.value.toLowerCase();
-                    document.querySelectorAll('.tabela-participantes tbody tr').forEach(linha => {
-                        linha.style.display = linha.textContent.toLowerCase().includes(termo) ? '' : 'none';
-                    });
+                    // Se não há visíveis e ainda não existe a linha de mensagem, adiciona
+                    if (!existente) {
+                        const tr = document.createElement('tr');
+                        tr.id = idMsg;
+                        const td = document.createElement('td');
+                        td.colSpan = 4;
+                        td.style.textAlign = 'center';
+                        td.style.padding = '30px';
+                        td.style.color = 'var(--botao)';
+                        td.textContent = 'Nenhum participante encontrado para a busca';
+                        tr.appendChild(td);
+                        tbody.appendChild(tr);
+                    }
                 };
-                btnPesquisa.addEventListener('click', filtrar);
-                campoPesquisa.addEventListener('keydown', e => e.key === 'Enter' && filtrar());
-                campoPesquisa.addEventListener('input', filtrar);
+
+                const filtrar = () => {
+                    const tbody = document.getElementById('tbody-participantes');
+                    if (!tbody) return;
+                    // Se não há participantes carregados, não faz nada (renderização já mostra a mensagem padrão)
+                    if (todosParticipantes.length === 0) {
+                        return;
+                    }
+                    const termo = (campoPesquisa.value || '').toLowerCase();
+                    let visiveis = 0;
+                    // Considera apenas linhas de participantes (que possuem data-cpf)
+                    tbody.querySelectorAll('tr').forEach(linha => {
+                        if (!linha.hasAttribute('data-cpf')) return; // ignora mensagens
+                        const match = linha.textContent.toLowerCase().includes(termo);
+                        linha.style.display = match ? '' : 'none';
+                        if (match) visiveis++;
+                    });
+                    atualizarMensagemSemResultados(visiveis > 0);
+                };
+
+                if (!btnPesquisa.dataset.bound) {
+                    btnPesquisa.dataset.bound = '1';
+                    btnPesquisa.addEventListener('click', (e) => { e.preventDefault(); filtrar(); });
+                }
+                if (!campoPesquisa.dataset.bound) {
+                    campoPesquisa.dataset.bound = '1';
+                    campoPesquisa.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); filtrar(); } });
+                    campoPesquisa.addEventListener('input', filtrar);
+                }
             }
 
             // Botões de ação do topo
-            document.getElementById('btn-adicionar-participante')?.addEventListener('click', abrirModalAdicionar);
-            document.getElementById('btn-importar-presenca')?.addEventListener('click', importarListaPresenca);
-            document.getElementById('btn-exportar-presenca')?.addEventListener('click', exportarListaPresenca);
-            document.getElementById('btn-enviar-mensagem')?.addEventListener('click', abrirModalMensagem);
-            document.getElementById('btn-importar-inscritos')?.addEventListener('click', importarListaInscritos);
-            document.getElementById('btn-exportar-inscritos')?.addEventListener('click', exportarListaInscritos);
+            const bindsTopo = [
+                { id: 'btn-adicionar-participante', fn: abrirModalAdicionar },
+                { id: 'btn-importar-presenca', fn: importarListaPresenca },
+                { id: 'btn-exportar-presenca', fn: exportarListaPresenca },
+                { id: 'btn-enviar-mensagem', fn: abrirModalMensagem },
+                { id: 'btn-importar-inscritos', fn: importarListaInscritos },
+                { id: 'btn-exportar-inscritos', fn: exportarListaInscritos }
+            ];
+            bindsTopo.forEach(({ id, fn }) => {
+                const el = document.getElementById(id);
+                if (el && !el.dataset.bound) {
+                    el.dataset.bound = '1';
+                    el.addEventListener('click', fn);
+                }
+            });
 
             // Botões de ação em massa
-            document.getElementById('btn-confirmar-presencas-massa')?.addEventListener('click', confirmarPresencasEmMassa);
-            document.getElementById('btn-emitir-certificados-massa')?.addEventListener('click', emitirCertificadosEmMassa);
-            document.getElementById('btn-excluir-participantes-massa')?.addEventListener('click', excluirParticipantesEmMassa);
+            const bindsMassa = [
+                { id: 'btn-confirmar-presencas-massa', fn: confirmarPresencasEmMassa },
+                { id: 'btn-emitir-certificados-massa', fn: emitirCertificadosEmMassa },
+                { id: 'btn-excluir-participantes-massa', fn: excluirParticipantesEmMassa }
+            ];
+            bindsMassa.forEach(({ id, fn }) => {
+                const el = document.getElementById(id);
+                if (el && !el.dataset.bound) {
+                    el.dataset.bound = '1';
+                    el.addEventListener('click', fn);
+                }
+            });
 
             // Verificar se CPF existe no sistema
             const addCpfInput = document.getElementById('add-cpf');
-            if (addCpfInput) {
+            if (addCpfInput && !addCpfInput.dataset.bound) {
+                addCpfInput.dataset.bound = '1';
                 addCpfInput.addEventListener('input', function(e) {
                     let valor = e.target.value.replace(/\D/g, '');
                     if (valor.length <= 11) {
@@ -1628,20 +1702,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         e.target.value = valor;
                     }
                 });
-
                 addCpfInput.addEventListener('blur', verificarCPFExistente);
             }
 
-            // Atualizar mensagem de selecionados
-            document.getElementById('msg-todos')?.addEventListener('change', function(e) {
-                const msgSel = document.getElementById('msg-selecionados');
-                if (!e.target.checked && participantesSelecionados.size > 0) {
-                    msgSel.textContent = `Enviando para ${participantesSelecionados.size} participante(s) selecionado(s)`;
-                    msgSel.style.display = 'block';
-                } else {
-                    msgSel.style.display = 'none';
-                }
-            });
         }
 
         function confirmarPresenca(cpf) {

@@ -904,7 +904,13 @@
     const inputImagem = document.getElementById('input-imagem');
 
     if (btnVoltar && btnParticipantes && btnEditar) {
-      btnVoltar.onclick = function () { history.back(); };
+      btnVoltar.onclick = function () {
+        if (typeof carregarPagina === 'function') {
+          carregarPagina('meusEventos');
+        } else {
+          window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+        }
+      };
       btnParticipantes.onclick = irParaParticipantes;
       btnEditar.onclick = editarEvento;
       console.log('✓ Botões inicializados');
