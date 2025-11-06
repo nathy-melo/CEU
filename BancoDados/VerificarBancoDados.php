@@ -500,5 +500,57 @@ if (isset($_GET['atualizar'])) {
     exit;
 }
 
+// Endpoint para verificar se usuário existe por CPF
+if (isset($_GET['action']) && $_GET['action'] === 'verificar_usuario' && isset($_GET['cpf'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    
+    $cpf = $_GET['cpf'];
+    
+    // Conecta ao banco
+    if (!verificarBancoExiste($conexaoServidor, $banco)) {
+        echo json_encode(['existe' => false, 'erro' => 'Banco de dados não existe']);
+        mysqli_close($conexaoServidor);
+        exit;
+    }
+    
+    mysqli_select_db($conexaoServidor, $banco);
+    
+    try {
+        $sql = "SELECT CPF, Nome, Email, RA FROM usuario WHERE CPF = ?";
+        $stmt = mysqli_prepare($conexaoServidor, $sql);
+        
+        if (!$stmt) {
+            echo json_encode(['existe' => false, 'erro' => 'Erro ao preparar consulta']);
+            mysqli_close($conexaoServidor);
+            exit;
+        }
+        
+        mysqli_stmt_bind_param($stmt, "s", $cpf);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $usuario = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+        
+        if ($usuario) {
+            echo json_encode([
+                'existe' => true,
+                'usuario' => [
+                    'cpf' => $usuario['CPF'],
+                    'nome' => $usuario['Nome'],
+                    'email' => $usuario['Email'],
+                    'ra' => $usuario['RA'] ?? ''
+                ]
+            ]);
+        } else {
+            echo json_encode(['existe' => false]);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['existe' => false, 'erro' => $e->getMessage()]);
+    }
+    
+    mysqli_close($conexaoServidor);
+    exit;
+}
+
 mysqli_close($conexaoServidor);
 ?>

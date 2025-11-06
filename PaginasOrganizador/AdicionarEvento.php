@@ -1,11 +1,21 @@
 <?php
+// Inicia a sessão se ainda não foi iniciada
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 // Processa o formulário quando enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
 
     require_once('../BancoDados/conexao.php');
 
-    $cpfOrganizador = $_SESSION['cpf'];
+    $cpfOrganizador = $_SESSION['cpf'] ?? null;
+    
+    if (!$cpfOrganizador) {
+        echo json_encode(['erro' => 'Sessão expirada. Faça login novamente.']);
+        exit;
+    }
 
     // Recebe os dados do formulário
     $nome = $_POST['nome'] ?? '';
@@ -37,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Combina data e hora
     $inicio = $dataInicio . ' ' . $horarioInicio . ':00';
     $conclusao = $dataFim . ' ' . $horarioFim . ':00';
-    
+
     // Combina data e hora das inscrições (se fornecidas)
     $inicioInscricao = null;
     $fimInscricao = null;
@@ -60,40 +70,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Processa upload de múltiplas imagens
     $imagensUpload = [];
     $caminhoImagemPrincipal = null;
-    
+
     if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name'][0])) {
         $totalImagens = count($_FILES['imagens_evento']['name']);
         $tamanhoMaximo = 10 * 1024 * 1024; // 10MB em bytes
         $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        
+
         for ($i = 0; $i < $totalImagens; $i++) {
             // Verifica se houve erro no upload
             if ($_FILES['imagens_evento']['error'][$i] !== UPLOAD_ERR_OK) {
                 continue;
             }
-            
+
             $nomeArquivo = $_FILES['imagens_evento']['name'][$i];
             $tmpName = $_FILES['imagens_evento']['tmp_name'][$i];
             $tamanhoArquivo = $_FILES['imagens_evento']['size'][$i];
             $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
-            
+
             // Valida tamanho do arquivo
             if ($tamanhoArquivo > $tamanhoMaximo) {
                 $tamanhoMB = round($tamanhoArquivo / 1024 / 1024, 2);
                 echo json_encode(['erro' => "A imagem '{$nomeArquivo}' excede o limite de 10MB. Tamanho: {$tamanhoMB}MB"]);
                 exit;
             }
-            
+
             // Valida extensão
             if (!in_array($extensao, $extensoesPermitidas)) {
                 echo json_encode(['erro' => "Formato de imagem não permitido em '{$nomeArquivo}'. Use: JPG, JPEG, PNG, GIF ou WEBP"]);
                 exit;
             }
-            
+
             // Gera nome único
             $nomeUnico = uniqid() . '_' . time() . '_' . $i . '.' . $extensao;
             $destino = '../ImagensEventos/' . $nomeUnico;
-            
+
             if (move_uploaded_file($tmpName, $destino)) {
                 $caminhoCompleto = 'ImagensEventos/' . $nomeUnico;
                 $imagensUpload[] = [
@@ -101,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'ordem' => $i,
                     'principal' => ($i === 0) ? 1 : 0
                 ];
-                
+
                 // A primeira imagem é a principal
                 if ($i === 0) {
                     $caminhoImagemPrincipal = $caminhoCompleto;
@@ -126,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Garante que as colunas de inscrição existem
         mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS inicio_inscricao datetime NULL");
         mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS fim_inscricao datetime NULL");
-        
+
         // Insere evento (mantém campo imagem com a principal para compatibilidade)
         $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) 
                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -159,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($imagensUpload)) {
             $sqlImagem = "INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES (?, ?, ?, ?)";
             $stmtImagem = mysqli_prepare($conexao, $sqlImagem);
-            
+
             foreach ($imagensUpload as $img) {
                 mysqli_stmt_bind_param($stmtImagem, "isii", $codEvento, $img['caminho'], $img['ordem'], $img['principal']);
                 if (!mysqli_stmt_execute($stmtImagem)) {
@@ -177,12 +187,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!mysqli_stmt_execute($stmtOrganiza)) {
             throw new Exception('Erro ao vincular organizador: ' . mysqli_error($conexao));
         }
+        mysqli_stmt_close($stmtOrganiza);
+
+        // Adiciona colaboradores se houver
+        if (isset($_POST['colaboradores']) && !empty($_POST['colaboradores'])) {
+            $colaboradores = json_decode($_POST['colaboradores'], true);
+
+            if (is_array($colaboradores) && count($colaboradores) > 0) {
+                // Garante que a coluna certificado_emitido existe
+                mysqli_query($conexao, "ALTER TABLE colaboradores_evento ADD COLUMN IF NOT EXISTS certificado_emitido tinyint(1) DEFAULT 0");
+
+                $sqlColab = "INSERT INTO colaboradores_evento (cod_evento, CPF, certificado_emitido) VALUES (?, ?, 0)";
+                $stmtColab = mysqli_prepare($conexao, $sqlColab);
+
+                foreach ($colaboradores as $colab) {
+                    if (isset($colab['cpf']) && !empty($colab['cpf'])) {
+                        mysqli_stmt_bind_param($stmtColab, "is", $codEvento, $colab['cpf']);
+
+                        if (!mysqli_stmt_execute($stmtColab)) {
+                            // Continua mesmo se houver erro em um colaborador
+                            error_log('Erro ao adicionar colaborador: ' . mysqli_error($conexao));
+                        }
+                    }
+                }
+
+                mysqli_stmt_close($stmtColab);
+            }
+        }
 
         // Commit da transação
         mysqli_commit($conexao);
 
         mysqli_stmt_close($stmtEvento);
-        mysqli_stmt_close($stmtOrganiza);
         mysqli_close($conexao);
 
         echo json_encode(['sucesso' => true, 'cod_evento' => $codEvento, 'mensagem' => 'Evento criado com sucesso!']);
@@ -200,19 +236,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // busca o nome do usuário logado
 require_once('../BancoDados/conexao.php');
 
-$cpfUsuario = $_SESSION['cpf'];
-$consultaSQL = "SELECT Nome FROM usuario WHERE CPF = ?";
-$declaracaoPreparada = mysqli_prepare($conexao, $consultaSQL);
+$cpfUsuario = $_SESSION['cpf'] ?? null;
+$nomeOrganizador = 'Organizador';
 
-if ($declaracaoPreparada) {
-    mysqli_stmt_bind_param($declaracaoPreparada, "s", $cpfUsuario);
-    mysqli_stmt_execute($declaracaoPreparada);
-    $resultadoConsulta = mysqli_stmt_get_result($declaracaoPreparada);
-    $dadosUsuario = mysqli_fetch_assoc($resultadoConsulta);
-    mysqli_stmt_close($declaracaoPreparada);
+if ($cpfUsuario) {
+    $consultaSQL = "SELECT Nome FROM usuario WHERE CPF = ?";
+    $declaracaoPreparada = mysqli_prepare($conexao, $consultaSQL);
+
+    if ($declaracaoPreparada) {
+        mysqli_stmt_bind_param($declaracaoPreparada, "s", $cpfUsuario);
+        mysqli_stmt_execute($declaracaoPreparada);
+        $resultadoConsulta = mysqli_stmt_get_result($declaracaoPreparada);
+        $dadosUsuario = mysqli_fetch_assoc($resultadoConsulta);
+        mysqli_stmt_close($declaracaoPreparada);
+        
+        if ($dadosUsuario) {
+            $nomeOrganizador = $dadosUsuario['Nome'];
+        }
+    }
 }
 
-$nomeOrganizador = $dadosUsuario['Nome'] ?? 'Organizador';
 mysqli_close($conexao);
 ?>
 <!DOCTYPE html>
@@ -517,6 +560,193 @@ mysqli_close($conexao);
 
         .btn-adicionar-colaborador:active {
             transform: scale(0.95);
+        }
+
+        /* Lista de Colaboradores */
+        .lista-colaboradores {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .colaborador-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .colaborador-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .colaborador-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .colaborador-nome {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--branco);
+        }
+
+        .colaborador-cpf {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-remover-colaborador {
+            background: var(--vermelho);
+            color: var(--branco);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-remover-colaborador:hover {
+            opacity: 0.9;
+        }
+
+        /* Modal de Colaboradores */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-colaboradores-content {
+            background: var(--branco);
+            border-radius: 16px;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--azul-escuro);
+        }
+
+        .btn-fechar-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #666;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .btn-fechar-modal:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #6598D2;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--azul-escuro);
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+            background-color: var(--branco);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--azul-escuro);
+            box-shadow: 0 0 0 3px rgba(20, 40, 80, 0.1);
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .btn-modal {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-modal:hover {
+            opacity: 0.9;
+        }
+
+        .btn-modal:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-cancelar {
+            background-color: var(--vermelho);
+            color: var(--branco);
+        }
+
+        .btn-salvar {
+            background-color: var(--verde);
+            color: var(--branco);
         }
 
         .Local {
@@ -874,6 +1104,9 @@ mysqli_close($conexao);
                     <div class="campo-organizador"><?php echo htmlspecialchars($nomeOrganizador); ?></div>
                     <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()" title="Adicionar colaborador">+</button>
                 </div>
+                <div id="lista-colaboradores" class="lista-colaboradores" style="display: none;">
+                    <!-- Colaboradores serão listados aqui -->
+                </div>
             </div>
             <div class="Local grupo-campo">
                 <label for="local"><span style="color: red;">*</span> Local:</label>
@@ -986,10 +1219,40 @@ mysqli_close($conexao);
             <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima"
                 onclick="mudarImagemModal(1)">⮞</button>
         </div>
+
+        <!-- Modal Adicionar Colaborador -->
+        <div id="modal-colaboradores" class="modal-overlay" style="display: none;" onclick="fecharModalColabSeForFundo(event)">
+            <div class="modal-colaboradores-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Adicionar Colaborador</h2>
+                    <button class="btn-fechar-modal" onclick="fecharModalColaboradores()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="colab-cpf">CPF do Colaborador*</label>
+                        <input type="text" id="colab-cpf" maxlength="14" placeholder="000.000.000-00">
+                        <small id="msg-colab-status" style="display: none; margin-top: 4px;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="colab-nome">Nome</label>
+                        <input type="text" id="colab-nome" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="colab-email">E-mail</label>
+                        <input type="email" id="colab-email" disabled>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalColaboradores()">Cancelar</button>
+                    <button type="button" class="btn-modal btn-salvar" id="btn-adicionar-colab" onclick="adicionarColaborador()" disabled>Adicionar</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         let imagens = [];
         let indiceAtual = 0;
+        let colaboradores = [];
 
         function validarFormulario() {
             const nome = document.getElementById('nome').value.trim();
@@ -1011,10 +1274,146 @@ mysqli_close($conexao);
             document.getElementById('btn-criar').disabled = !todosPreenchidos;
         }
 
-        // Função para abrir modal de colaboradores
+        // ==== FUNÇÕES DE COLABORADORES ====
         function abrirModalColaboradores() {
-            alert('Funcionalidade de adicionar colaboradores em desenvolvimento!\n\nEm breve você poderá adicionar outros organizadores para colaborar com este evento.');
-            // TODO: Implementar modal para adicionar colaboradores
+            document.getElementById('modal-colaboradores').style.display = 'flex';
+            limparCamposColaborador();
+        }
+
+        function fecharModalColaboradores() {
+            document.getElementById('modal-colaboradores').style.display = 'none';
+            limparCamposColaborador();
+        }
+
+        function fecharModalColabSeForFundo(event) {
+            if (event.target.id === 'modal-colaboradores') {
+                fecharModalColaboradores();
+            }
+        }
+
+        function limparCamposColaborador() {
+            document.getElementById('colab-cpf').value = '';
+            document.getElementById('colab-nome').value = '';
+            document.getElementById('colab-email').value = '';
+            document.getElementById('btn-adicionar-colab').disabled = true;
+            document.getElementById('msg-colab-status').style.display = 'none';
+        }
+
+        function formatarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length <= 11) {
+                cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+                cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+                cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            }
+            return cpf;
+        }
+
+        function verificarCPFColaborador() {
+            const cpfInput = document.getElementById('colab-cpf');
+            const cpf = cpfInput.value.replace(/\D/g, '');
+            const msgStatus = document.getElementById('msg-colab-status');
+            const btnAdicionar = document.getElementById('btn-adicionar-colab');
+
+            if (cpf.length !== 11) {
+                msgStatus.style.display = 'none';
+                btnAdicionar.disabled = true;
+                return;
+            }
+
+            // Verifica se já está na lista
+            if (colaboradores.find(c => c.cpf === cpf)) {
+                msgStatus.style.display = 'block';
+                msgStatus.style.color = '#f44336';
+                msgStatus.textContent = '❌ Este colaborador já foi adicionado';
+                btnAdicionar.disabled = true;
+                return;
+            }
+
+            // Busca no banco de dados
+            fetch(`../BancoDados/VerificarBancoDados.php?action=verificar_usuario&cpf=${cpf}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.existe && data.usuario) {
+                        document.getElementById('colab-nome').value = data.usuario.nome || '';
+                        document.getElementById('colab-email').value = data.usuario.email || '';
+                        msgStatus.style.display = 'block';
+                        msgStatus.style.color = '#4CAF50';
+                        msgStatus.textContent = '✓ Usuário encontrado no sistema';
+                        btnAdicionar.disabled = false;
+                    } else {
+                        document.getElementById('colab-nome').value = '';
+                        document.getElementById('colab-email').value = '';
+                        msgStatus.style.display = 'block';
+                        msgStatus.style.color = '#f44336';
+                        msgStatus.textContent = '❌ Usuário não cadastrado no sistema';
+                        btnAdicionar.disabled = true;
+                    }
+                })
+                .catch(() => {
+                    msgStatus.style.display = 'block';
+                    msgStatus.style.color = '#f44336';
+                    msgStatus.textContent = '❌ Erro ao verificar CPF';
+                    btnAdicionar.disabled = true;
+                });
+        }
+
+        function adicionarColaborador() {
+            const cpf = document.getElementById('colab-cpf').value.replace(/\D/g, '');
+            const nome = document.getElementById('colab-nome').value;
+            const email = document.getElementById('colab-email').value;
+
+            if (!cpf || !nome || !email) {
+                alert('Dados incompletos');
+                return;
+            }
+
+            colaboradores.push({
+                cpf,
+                nome,
+                email
+            });
+            atualizarListaColaboradores();
+            fecharModalColaboradores();
+        }
+
+        function removerColaborador(cpf) {
+            if (confirm('Deseja remover este colaborador?')) {
+                colaboradores = colaboradores.filter(c => c.cpf !== cpf);
+                atualizarListaColaboradores();
+            }
+        }
+
+        function atualizarListaColaboradores() {
+            const lista = document.getElementById('lista-colaboradores');
+
+            if (colaboradores.length === 0) {
+                lista.style.display = 'none';
+                return;
+            }
+
+            lista.style.display = 'block';
+            lista.innerHTML = colaboradores.map(colab => `
+                <div class="colaborador-item">
+                    <div class="colaborador-info">
+                        <div class="colaborador-nome">${colab.nome}</div>
+                        <div class="colaborador-cpf">CPF: ${formatarCPF(colab.cpf)}</div>
+                    </div>
+                    <button type="button" class="btn-remover-colaborador" onclick="removerColaborador('${colab.cpf}')">
+                        Remover
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Event listener para o CPF do colaborador
+        const colabCpfInput = document.getElementById('colab-cpf');
+        if (colabCpfInput) {
+            colabCpfInput.addEventListener('input', function(e) {
+                e.target.value = formatarCPF(e.target.value);
+            });
+
+            colabCpfInput.addEventListener('blur', verificarCPFColaborador);
         }
 
         // Adicionar listeners para validar em tempo real
@@ -1023,24 +1422,29 @@ mysqli_close($conexao);
             element.addEventListener('change', validarFormulario);
         });
 
+        // Chama validação inicial ao carregar a página
+        setTimeout(() => {
+            validarFormulario();
+        }, 100);
+
         function adicionarImagens(event) {
             const files = Array.from(event.target.files);
             const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB em bytes
-            
+
             files.forEach(file => {
                 // Validar tamanho do arquivo
                 if (file.size > MAX_FILE_SIZE) {
                     alert(`Erro: A imagem "${file.name}" excede o limite de 10MB.\nTamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
                     return; // Pula este arquivo
                 }
-                
+
                 // Validar tipo de arquivo
                 const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                 if (!tiposPermitidos.includes(file.type)) {
                     alert(`Erro: O arquivo "${file.name}" não é uma imagem válida.\nFormatos aceitos: JPG, JPEG, PNG, GIF, WEBP`);
                     return;
                 }
-                
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     imagens.push(e.target.result);
@@ -1052,7 +1456,7 @@ mysqli_close($conexao);
                 };
                 reader.readAsDataURL(file);
             });
-            
+
             // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
             event.target.value = '';
         }
@@ -1127,6 +1531,11 @@ mysqli_close($conexao);
             e.preventDefault();
 
             const formData = new FormData(this);
+
+            // Adiciona colaboradores ao FormData
+            if (colaboradores.length > 0) {
+                formData.append('colaboradores', JSON.stringify(colaboradores));
+            }
 
             // Desabilita o botão durante o envio
             const btnCriar = document.getElementById('btn-criar');
