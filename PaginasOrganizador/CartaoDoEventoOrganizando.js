@@ -189,21 +189,21 @@
       const acoes = document.createElement('div');
       acoes.className = 'acoes';
       
-      // Se é organizador, pode remover outros colaboradores
-      if (ehOrganizador) {
-        const btnRem = document.createElement('button');
-        btnRem.className = 'btn-remover';
-        btnRem.textContent = 'Remover';
-        btnRem.onclick = () => removerColaboradorEvento(item.CPF);
-        acoes.appendChild(btnRem);
-      } 
-      // Se é colaborador e é ele mesmo, pode sair
-      else if (item.CPF === cpfUsuario) {
+      // Se for o próprio usuário, mostra botão de sair
+      if (item.CPF === cpfUsuario) {
         const btnSair = document.createElement('button');
         btnSair.className = 'btn-sair';
         btnSair.textContent = 'Sair da Colaboração';
         btnSair.onclick = () => sairDaColaboracao();
         acoes.appendChild(btnSair);
+      } 
+      // Se for organizador ou colaborador vendo outro colaborador, pode remover
+      else {
+        const btnRem = document.createElement('button');
+        btnRem.className = 'btn-remover';
+        btnRem.textContent = 'Remover';
+        btnRem.onclick = () => removerColaboradorEvento(item.CPF);
+        acoes.appendChild(btnRem);
       }
 
       linha.appendChild(info);

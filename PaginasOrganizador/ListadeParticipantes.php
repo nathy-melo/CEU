@@ -795,7 +795,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .tabela-participantes th,
     .tabela-participantes td {
-        padding: 16px;
+        padding: 10px 12px;
         text-align: left;
         vertical-align: middle;
         border-bottom: 1px solid var(--azul-escuro);
@@ -803,10 +803,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .tabela-participantes th {
         border-right: 1px solid var(--azul-escuro);
+        font-size: 14px;
     }
 
     .tabela-participantes td {
         border-right: 1px solid var(--azul-escuro);
+        font-size: 13.5px;
     }
 
     .tabela-participantes th:last-child,
@@ -834,6 +836,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .tabela-participantes th:first-child {
         text-align: center;
         border-top-left-radius: 12px;
+        width: 50px;
     }
 
     .tabela-participantes th:last-child {
@@ -842,32 +845,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .tabela-participantes td.coluna-selecionar {
         text-align: center;
+        width: 50px;
+    }
+
+    .coluna-dados {
+        max-width: 350px;
     }
 
     .coluna-dados p {
-        margin: 0 0 4px 0;
+        margin: 0 0 3px 0;
+        font-size: 13px;
+        line-height: 1.4;
     }
 
     .coluna-dados p:last-child {
         margin-bottom: 0;
     }
 
+    .coluna-dados strong {
+        font-weight: 600;
+        font-size: 12px;
+        color: #555;
+    }
+
     .grupo-acoes,
     .grupo-status {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        min-width: 220px;
+        gap: 6px;
+        min-width: 180px;
     }
 
     .botao-acao-tabela {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 4px 12px;
+        padding: 4px 10px;
         border-radius: 600px;
         color: var(--branco);
         width: 100%;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .botao-acao-tabela.botao-verde {
@@ -883,24 +901,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .botao-acao-tabela img {
-        height: 22.5px;
+        height: 18px;
+        width: 18px;
     }
 
     .linha-status {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .linha-status > span:first-child {
+        font-weight: 600;
+        color: #444;
+        min-width: 70px;
     }
 
     .emblema-status {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 4px 12px;
+        gap: 6px;
+        padding: 3px 10px;
         border-radius: 600px;
         color: var(--branco);
         white-space: nowrap;
+        font-size: 11px;
+        font-weight: 600;
     }
 
     .emblema-status.confirmado {
@@ -912,7 +940,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .emblema-status img {
-        height: 22.5px;
+        height: 16px;
+        width: 16px;
+        flex-shrink: 0;
+        object-fit: contain;
     }
 
     .rodape-lista {
@@ -922,8 +953,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .checkbox-selecionar {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
         accent-color: var(--azul-escuro);
         cursor: pointer;
         transition: transform 0.2s ease;
@@ -1234,10 +1265,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <footer class="rodape-lista">
-                <button type="button" class="botao botao-voltar" onclick="voltarParaEventos()">Voltar</button>
-            </footer>
         </div>
+        
+        <footer class="rodape-lista">
+            <button type="button" class="botao botao-voltar" onclick="voltarParaEventos()">Voltar</button>
+        </footer>
     </div>
 
     <!-- Modal Adicionar Participante -->
