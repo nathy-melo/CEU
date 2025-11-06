@@ -303,6 +303,11 @@
                     // Como o servidor retorna apenas o conteúdo da página, não precisa extrair
                     document.getElementById('conteudo-dinamico').innerHTML = html;
                     
+                    // Garante que a classe js-ready está presente
+                    if (!document.body.classList.contains('js-ready')) {
+                        document.body.classList.add('js-ready');
+                    }
+                    
                     // Força scroll para o topo ao trocar de página
                     window.scrollTo(0, 0);
                     
@@ -333,7 +338,14 @@
             carregarPagina(pagina);
         };
 
+        // Marca que JS está pronto IMEDIATAMENTE para prevenir FOUC
+        document.documentElement.classList.add('js-loading');
+        
         document.addEventListener('DOMContentLoaded', function() {
+            // Marca que o DOM está pronto
+            document.body.classList.add('js-ready');
+            document.documentElement.classList.remove('js-loading');
+            
             // Força scroll para o topo ao carregar/recarregar a página
             window.scrollTo(0, 0);
             

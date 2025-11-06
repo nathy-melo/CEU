@@ -62,14 +62,40 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/CEU/manifest.json" />
-    <link rel="stylesheet" href="../styleGlobal.css" />
+    <?php
+        // Cache-busting para CSS global
+        $__cssPath = realpath(__DIR__ . '/../styleGlobal.css');
+        $__cssVer = $__cssPath ? filemtime($__cssPath) : time();
+    ?>
+    <link rel="stylesheet" href="../styleGlobal.css?v=<?= $__cssVer ?>" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
     <script src="/CEU/pwa-config.js" defer></script>
+    <style>
+        /* Evita centralização em páginas de listagem (meus eventos, etc.) */
+        body.pagina-lista-eventos #conteudo-dinamico {
+            display: block !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            min-height: auto !important;
+            padding-top: 1rem;
+            width: 100%;
+        }
+    </style>
 </head>
 
-<body <?php if ((($pagina ?? ($_GET['pagina'] ?? 'inicio')) === 'inicio')) {
-            echo 'class="pagina-inicio"';
-        } ?>>
+<body <?php 
+        $paginaAtual = $pagina ?? ($_GET['pagina'] ?? 'inicio');
+        $classes = [];
+        if ($paginaAtual === 'inicio') {
+            $classes[] = 'pagina-inicio';
+        }
+        if ($paginaAtual === 'meusEventos') {
+            $classes[] = 'pagina-lista-eventos';
+        }
+        if (!empty($classes)) {
+            echo 'class="' . implode(' ', $classes) . '"';
+        }
+    ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
@@ -220,6 +246,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             } else {
                 b.classList.remove('pagina-inicio');
             }
+            
+            // Páginas que precisam começar do topo (não centralizadas)
+            if (pagina === 'meusEventos') {
+                b.classList.add('pagina-lista-eventos');
+            } else {
+                b.classList.remove('pagina-lista-eventos');
+            }
         }
 
         // =========================
@@ -365,6 +398,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         const alvo = document.getElementById('conteudo-dinamico');
                         alvo.innerHTML = novoConteudo.innerHTML;
                         
+                        // Garante que a classe js-ready está presente
+                        if (!document.body.classList.contains('js-ready')) {
+                            document.body.classList.add('js-ready');
+                        }
+                        
                         // Força scroll para o topo ao trocar de página
                         window.scrollTo(0, 0);
                         
@@ -404,7 +442,14 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             carregarPagina(pagina);
         };
 
+        // Marca que JS está pronto IMEDIATAMENTE para prevenir FOUC
+        document.documentElement.classList.add('js-loading');
+        
         document.addEventListener('DOMContentLoaded', function() {
+            // Marca que o DOM está pronto
+            document.body.classList.add('js-ready');
+            document.documentElement.classList.remove('js-loading');
+            
             // Força scroll para o topo ao carregar/recarregar a página
             window.scrollTo(0, 0);
             

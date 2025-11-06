@@ -92,17 +92,43 @@ body {
   /* Usar viewport dinâmico para evitar conteúdo escondido sob barras do navegador */
   min-height: 100vh;
   min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   /* Garantir respiro inferior quando houver barra de navegação inferior */
   padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px));
+  /* Previne FOUC (Flash of Unstyled Content) - não centraliza até JS carregar */
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.15s ease-in;
+}
+
+/* Previne FOUC - Esconde body até JS estar pronto */
+body:not(.js-ready) {
+  overflow: hidden;
+}
+
+/* Quando JS estiver pronto, mostra com transição suave */
+body.js-ready {
+  overflow: visible;
 }
 
 /* Mantém o conteúdo FIXO no topo somente na página pública de Início */
 body.pagina-inicio {
   justify-content: center;
   align-items: flex-start;
+}
+
+/* Páginas de login/cadastro precisam estar centralizadas */
+body.js-ready:not(.pagina-inicio):not(.pagina-lista-eventos) #conteudo-dinamico {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Páginas de lista de eventos começam do topo */
+body.pagina-lista-eventos #conteudo-dinamico {
+  display: block;
+  padding-top: 1rem;
 }
 
 /* ====== Botões ====== */

@@ -7,12 +7,6 @@
     <title>Meus Eventos</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
-<style>
-    body {
-        align-items: flex-start;
-        padding-top: 1rem;
-    }
-</style>
 
 <body>
     <div id="main-content">
