@@ -1,5 +1,5 @@
 // Service Worker para CEU PWA
-const CACHE_NAME = 'ceu-v1.0.1';
+const CACHE_NAME = 'ceu-v1.0.2';
 const urlsToCache = [
   '/CEU/',
   '/CEU/index.php',

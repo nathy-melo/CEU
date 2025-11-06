@@ -105,9 +105,21 @@ body:not(.js-ready) {
   overflow: hidden;
 }
 
+/* CRÍTICO: Esconde #conteudo-dinamico até JS estar pronto */
+body:not(.js-ready) #conteudo-dinamico {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Quando JS estiver pronto, mostra com transição suave */
 body.js-ready {
   overflow: visible;
+}
+
+body.js-ready #conteudo-dinamico {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease-in;
 }
 
 /* Mantém o conteúdo FIXO no topo somente na página pública de Início */
