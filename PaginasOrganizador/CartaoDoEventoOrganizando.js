@@ -358,9 +358,9 @@
       alert('Erro: Código do evento não disponível. Recarregue a página.');
       return;
     }
-    console.log('Navegar para página de participantes do evento:', codigoEventoAtual);
+    console.log('Navegar para gerenciar evento:', codigoEventoAtual);
     if (typeof carregarPagina === 'function') {
-      carregarPagina('listaParticipantes', codigoEventoAtual);
+      carregarPagina('gerenciarEvento', codigoEventoAtual);
     }
   }
 

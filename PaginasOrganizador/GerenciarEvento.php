@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Lista de Participantes - Arquivo consolidado
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -117,6 +117,114 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar' && isset($_GET['cod_e
             ],
             'participantes' => $participantes,
             'total' => count($participantes)
+        ]);
+    } catch (Throwable $e) {
+        http_response_code(500);
+        echo json_encode(['sucesso' => false, 'erro' => 'erro_interno', 'detalhe' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// Se for requisição AJAX para buscar organizadores/colaboradores
+if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset($_GET['cod_evento'])) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    require_once __DIR__ . '/../BancoDados/conexao.php';
+
+    $cpfOrganizador = $_SESSION['cpf'];
+    $codEvento = intval($_GET['cod_evento']);
+
+    try {
+        // Verifica permissão
+        $consultaPermissao = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?
+                              UNION
+                              SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?
+                              LIMIT 1";
+
+        $stmtPermissao = mysqli_prepare($conexao, $consultaPermissao);
+        mysqli_stmt_bind_param($stmtPermissao, "isis", $codEvento, $cpfOrganizador, $codEvento, $cpfOrganizador);
+        mysqli_stmt_execute($stmtPermissao);
+        $resultadoPermissao = mysqli_stmt_get_result($stmtPermissao);
+
+        if (!mysqli_fetch_assoc($resultadoPermissao)) {
+            mysqli_stmt_close($stmtPermissao);
+            mysqli_close($conexao);
+            echo json_encode(['sucesso' => false, 'erro' => 'sem_permissao']);
+            exit;
+        }
+
+        mysqli_stmt_close($stmtPermissao);
+
+        // Garante que a coluna certificado_emitido existe
+        mysqli_query($conexao, "ALTER TABLE colaboradores_evento ADD COLUMN IF NOT EXISTS certificado_emitido tinyint(1) DEFAULT 0");
+
+        // Busca organizador principal
+        $consultaOrganizador = "SELECT 
+                                    o.CPF,
+                                    u.Nome,
+                                    u.Email,
+                                    u.RA,
+                                    'Organizador' as tipo,
+                                    NULL as certificado_emitido
+                                  FROM organiza o
+                                  INNER JOIN usuario u ON o.CPF = u.CPF
+                                  WHERE o.cod_evento = ?";
+
+        $stmtOrg = mysqli_prepare($conexao, $consultaOrganizador);
+        mysqli_stmt_bind_param($stmtOrg, "i", $codEvento);
+        mysqli_stmt_execute($stmtOrg);
+        $resultadoOrg = mysqli_stmt_get_result($stmtOrg);
+
+        $membrosOrganizacao = [];
+        while ($row = mysqli_fetch_assoc($resultadoOrg)) {
+            $membrosOrganizacao[] = [
+                'cpf' => $row['CPF'],
+                'nome' => $row['Nome'],
+                'email' => $row['Email'],
+                'ra' => $row['RA'] ?? 'Não informado',
+                'tipo' => 'Organizador',
+                'certificado_emitido' => false
+            ];
+        }
+
+        mysqli_stmt_close($stmtOrg);
+
+        // Busca colaboradores
+        $consultaColaboradores = "SELECT 
+                                    c.CPF,
+                                    u.Nome,
+                                    u.Email,
+                                    u.RA,
+                                    'Colaborador' as tipo,
+                                    c.certificado_emitido
+                                  FROM colaboradores_evento c
+                                  INNER JOIN usuario u ON c.CPF = u.CPF
+                                  WHERE c.cod_evento = ?
+                                  ORDER BY u.Nome";
+
+        $stmtColab = mysqli_prepare($conexao, $consultaColaboradores);
+        mysqli_stmt_bind_param($stmtColab, "i", $codEvento);
+        mysqli_stmt_execute($stmtColab);
+        $resultadoColab = mysqli_stmt_get_result($stmtColab);
+
+        while ($row = mysqli_fetch_assoc($resultadoColab)) {
+            $membrosOrganizacao[] = [
+                'cpf' => $row['CPF'],
+                'nome' => $row['Nome'],
+                'email' => $row['Email'],
+                'ra' => $row['RA'] ?? 'Não informado',
+                'tipo' => 'Colaborador',
+                'certificado_emitido' => (int)$row['certificado_emitido'] === 1
+            ];
+        }
+
+        mysqli_stmt_close($stmtColab);
+        mysqli_close($conexao);
+
+        echo json_encode([
+            'sucesso' => true,
+            'membros' => $membrosOrganizacao,
+            'total' => count($membrosOrganizacao)
         ]);
     } catch (Throwable $e) {
         http_response_code(500);
@@ -395,7 +503,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Requisições JSON (confirmar presença, excluir)
+    // Requisições JSON (confirmar presença, excluir, emitir certificado organização)
     $dadosJSON = file_get_contents('php://input');
     $dados = json_decode($dadosJSON, true);
 
@@ -470,6 +578,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                SET status = 'cancelada' 
                                WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
             $mensagemSucesso = 'Participante excluído com sucesso';
+        } elseif ($acao === 'emitir_certificado_organizacao') {
+            // Emitir certificado para colaborador (organizador não precisa dessa coluna)
+            $consultaUpdate = "UPDATE colaboradores_evento 
+                               SET certificado_emitido = 1 
+                               WHERE cod_evento = ? AND CPF = ?";
+            $mensagemSucesso = 'Certificado emitido com sucesso';
         } else {
             echo json_encode(['sucesso' => false, 'erro' => 'acao_invalida']);
             exit;
@@ -501,7 +615,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Participantes</title>
+    <title>Gerenciar Evento</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
 </head>
 <style>
@@ -913,7 +1027,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-size: 12px;
     }
 
-    .linha-status > span:first-child {
+    .linha-status>span:first-child {
         font-weight: 600;
         color: #444;
         min-width: 70px;
@@ -969,6 +1083,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         box-shadow: inset 0 0 0 2px var(--azul-escuro);
     }
 
+    .rodape-lista {
+        display: flex;
+        justify-content: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
     .botao-voltar {
         background-color: var(--botao);
         color: var(--branco);
@@ -977,6 +1099,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         line-height: 1;
         text-align: center;
         min-height: 2.25em;
+        border-radius: 8px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .botao-voltar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
 
     /* Modal Editar Dados */
@@ -1109,13 +1239,237 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         background-color: var(--verde);
         color: var(--branco);
     }
+
+    /* ==== Sistema de Abas ==== */
+    .container-abas {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 0;
+    }
+
+    .aba-botao {
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.6);
+        background: transparent;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        bottom: -2px;
+    }
+
+    .aba-botao:hover {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .aba-botao.ativa {
+        color: var(--branco);
+        border-bottom-color: var(--azul-escuro);
+    }
+
+    .conteudo-aba {
+        display: none;
+    }
+
+    .conteudo-aba.ativa {
+        display: block;
+    }
+
+    /* Ajustes para a aba de organização */
+    .tipo-membro {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .tipo-organizador {
+        background-color: #FFD700;
+        color: #000;
+    }
+
+    .tipo-colaborador {
+        background-color: #4CAF50;
+        color: var(--branco);
+    }
+
+    /* Ajuste de colunas da tabela de organização */
+    #aba-organizacao .tabela-participantes th:nth-child(1),
+    #aba-organizacao .tabela-participantes td:nth-child(1) {
+        width: 150px;
+        text-align: center;
+    }
+
+    #aba-organizacao .tabela-participantes th:nth-child(2),
+    #aba-organizacao .tabela-participantes td:nth-child(2) {
+        max-width: 500px;
+    }
+
+    #aba-organizacao .tabela-participantes th:nth-child(3),
+    #aba-organizacao .tabela-participantes td:nth-child(3) {
+        width: 120px;
+        text-align: center;
+    }
+
+    .celula-tipo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .celula-status {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ==== ESTILOS PARA CONTEÚDO DINÂMICO (Filtros, etc) ==== */
+    .controles-filtro {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .campo-filtro {
+        padding: 10px 14px;
+        border: 1px solid var(--borda, #ddd);
+        border-radius: 8px;
+        font-size: 14px;
+        color: var(--texto);
+        background: var(--cartao, #fff);
+        min-width: 200px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .campo-filtro:focus {
+        outline: none;
+        border-color: var(--botao, #4CAF50);
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .campo-filtro::placeholder {
+        color: var(--texto-secundario, #999);
+    }
+
+    .botao-limpar {
+        padding: 10px 20px;
+        background: var(--vermelho, #dc3545);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .botao-limpar:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+
+    .grupo-acoes-tabela {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .botao-acao-tabela {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .botao-acao-tabela:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .botao-acao-tabela img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .botao-acao-tabela.botao-verde {
+        background: var(--verde, #4CAF50);
+        color: white;
+    }
+
+    .botao-acao-tabela.botao-azul {
+        background: var(--botao, #2196F3);
+        color: white;
+    }
+
+    .botao-acao-tabela.botao-vermelho {
+        background: var(--vermelho, #dc3545);
+        color: white;
+    }
+
+    .botao-acao-tabela.botao-neutro {
+        background: var(--fundo-secundario, #f0f0f0);
+        color: var(--texto);
+    }
+
+    .emblema-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .emblema-status.confirmado {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .emblema-status.pendente {
+        background: var(--botao, #2196F3);
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .emblema-status.pendente:hover {
+        background: #1976D2;
+        transform: translateY(-2px);
+    }
+
+    .emblema-status img {
+        width: 14px;
+        height: 14px;
+        filter: brightness(0) invert(1);
+    }
 </style>
 
 <body>
     <div id="main-content">
         <div class="container-lista">
             <header class="cabecalho-lista">
-                <h1 class="titulo" id="nome-evento">Gerenciar Participantes</h1>
+                <h1 class="titulo" id="nome-evento">Gerenciar Evento</h1>
 
                 <div class="dados-evento">
                     <div class="dados-evento-grid">
@@ -1155,121 +1509,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </header>
 
-            <!-- Container Principal de Gerenciamento -->
-            <div class="container-gerenciamento">
-                <div class="secao-gerenciamento">
-                    
-                    <!-- Seção: Ações Rápidas -->
-                    <div>
-                        <h2 class="secao-titulo">Ações Rápidas</h2>
-                        <div class="grade-acoes-gerenciamento">
-                    <button class="botao botao-acao" id="btn-adicionar-participante">
-                        <span>Adicionar</span>
-                        <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
-                    </button>
-                    <button class="botao botao-acao" id="btn-importar-presenca">
-                        <span>Importar Lista de Presença</span>
-                        <img src="../Imagens/Importar.svg" alt="Importar icon">
-                    </button>
-                    <button class="botao botao-acao" id="btn-exportar-presenca">
-                        <span>Exportar Lista de Presença</span>
-                        <img src="../Imagens/Exportar.svg" alt="Exportar icon">
-                    </button>
-                    <button class="botao botao-acao" id="btn-enviar-mensagem">
-                        <span>Enviar Mensagem</span>
-                        <img src="../Imagens/Email.svg" alt="Mensagem icon">
-                    </button>
-                    <button class="botao botao-acao" id="btn-importar-inscritos">
-                        <span>Importar Lista de Inscritos</span>
-                        <img src="../Imagens/Importar_lista.svg" alt="Importar icon">
-                    </button>
-                    <button class="botao botao-acao" id="btn-exportar-inscritos">
-                        <span>Exportar Lista de Inscritos</span>
-                        <img src="../Imagens/Exportar_lista.svg" alt="Exportar icon">
-                    </button>
-                        </div>
-                    </div>
-
-                    <div class="divisor-secao"></div>
-
-                    <!-- Seção: Buscar Participantes -->
-                    <div>
-                        <h2 class="secao-titulo">Buscar Participantes</h2>
-                        <div class="barra-pesquisa-container">
-                    <div class="barra-pesquisa">
-                        <div class="campo-pesquisa-wrapper">
-                            <input class="campo-pesquisa" type="text" id="busca-participantes" name="busca_participantes" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
-                            <button class="botao-pesquisa" aria-label="Procurar">
-                                <div class="icone-pesquisa">
-                                    <img src="../Imagens/lupa.png" alt="Lupa">
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                    </div>
-
-                    <div class="divisor-secao"></div>
-
-                    <!-- Seção: Ações em Massa -->
-                    <div>
-                        <h2 class="secao-titulo">Ações em Massa</h2>
-                        <div class="acoes-em-massa">
-                    <button class="botao botao-em-massa botao-branco" id="botao-toggle-selecao">
-                        <span id="texto-toggle-selecao">Selecionar Todos</span>
-                        <img src="../Imagens/Grupo_de_pessoas.svg" alt="">
-                    </button>
-                    <button class="botao botao-em-massa botao-verde" id="btn-confirmar-presencas-massa">
-                        <span>Confirmar Presenças</span>
-                        <img src="../Imagens/Certo.svg" alt="">
-                    </button>
-                    <button class="botao botao-em-massa botao-azul" id="btn-emitir-certificados-massa">
-                        <span>Emitir Certificados</span>
-                        <img src="../Imagens/Certificado.svg" alt="">
-                    </button>
-                    <button class="botao botao-em-massa botao-vermelho" id="btn-excluir-participantes-massa">
-                        <span>Excluir Participantes</span>
-                        <img src="../Imagens/Excluir.svg" alt="">
-                    </button>
-                        </div>
-                    </div>
-
-                    <div class="divisor-secao"></div>
-
-                    <!-- Seção: Lista de Participantes -->
-                    <div>
-                                <div class="contador-participantes">
-                            <span id="total-participantes">Total de participantes: 0</span>
-                        </div>
-
-                        <div class="envoltorio-tabela">
-                <table class="tabela-participantes">
-                    <thead>
-                        <tr>
-                            <th class="Titulo_Tabela">Selecionar</th>
-                            <th class="Titulo_Tabela">Dados do Participante</th>
-                            <th class="Titulo_Tabela">Modificar</th>
-                            <th class="Titulo_Tabela">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-participantes">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">
-                                Carregando participantes...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                        </div>
-                    </div>
-
-                </div>
+            <!-- Sistema de Abas -->
+            <div class="container-abas">
+                <button class="aba-botao ativa" data-aba="participantes">Participantes</button>
+                <button class="aba-botao" data-aba="organizacao">Organização</button>
             </div>
 
+            <!-- Container Principal de Gerenciamento -->
+            <div class="container-gerenciamento">
+
+                <!-- ABA: PARTICIPANTES -->
+                <div class="conteudo-aba ativa" id="aba-participantes">
+                    <div style="text-align: center; padding: 40px; color: var(--texto);">
+                        <p>Carregando conteúdo...</p>
+                    </div>
+                </div>
+                <!-- FIM ABA: PARTICIPANTES -->
+
+                <!-- ABA: ORGANIZAÇÃO -->
+                <div class="conteudo-aba" id="aba-organizacao">
+                    <div style="text-align: center; padding: 40px; color: var(--texto);">
+                        <p>Carregando conteúdo...</p>
+                    </div>
+                </div>
+                <!-- FIM ABA: ORGANIZAÇÃO -->
+
+            </div>
+
+            <!-- Rodapé com botão de voltar -->
+            <footer class="rodape-lista">
+                <button type="button" class="botao botao-voltar" onclick="voltarParaEventos()">Voltar</button>
+            </footer>
+
         </div>
-        
-        <footer class="rodape-lista">
-            <button type="button" class="botao botao-voltar" onclick="voltarParaEventos()">Voltar</button>
-        </footer>
     </div>
 
     <!-- Modal Adicionar Participante -->
@@ -1383,9 +1655,154 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        let codEventoAtual = null;
-        let todosParticipantes = [];
-        let participantesSelecionados = new Set();
+        // Evita redeclaração de variáveis globais quando página é recarregada dinamicamente
+        if (typeof codEventoAtual === 'undefined') {
+            var codEventoAtual = null;
+        }
+        if (typeof todosParticipantes === 'undefined') {
+            var todosParticipantes = [];
+        }
+        if (typeof participantesSelecionados === 'undefined') {
+            var participantesSelecionados = new Set();
+        }
+        if (typeof todosOrganizacao === 'undefined') {
+            var todosOrganizacao = [];
+        }
+        if (typeof abaAtual === 'undefined') {
+            var abaAtual = 'participantes';
+        }
+
+        // ==== SISTEMA DE ABAS ====
+        function inicializarAbas() {
+            console.log('🔧 Inicializando sistema de abas...');
+            const botoesAbas = document.querySelectorAll('.aba-botao');
+
+            botoesAbas.forEach(botao => {
+                botao.addEventListener('click', () => {
+                    const nomeAba = botao.getAttribute('data-aba');
+                    trocarAba(nomeAba);
+                });
+            });
+
+            console.log(`✓ ${botoesAbas.length} botões de aba inicializados`);
+
+            // Carrega o conteúdo da aba inicial (participantes)
+            const abaInicial = document.getElementById('aba-participantes');
+            if (abaInicial) {
+                console.log('📥 Carregando aba inicial (participantes)...');
+                carregarConteudoAba('participantes', abaInicial);
+            } else {
+                console.error('❌ Elemento aba-participantes não encontrado');
+            }
+        }
+
+        function trocarAba(nomeAba) {
+            abaAtual = nomeAba;
+
+            console.log('🔄 Trocando para aba:', nomeAba);
+
+            // Atualiza botões das abas
+            document.querySelectorAll('.aba-botao').forEach(btn => {
+                btn.classList.remove('ativa');
+            });
+            document.querySelector(`[data-aba="${nomeAba}"]`).classList.add('ativa');
+
+            // Atualiza conteúdo das abas
+            document.querySelectorAll('.conteudo-aba').forEach(conteudo => {
+                conteudo.classList.remove('ativa');
+            });
+            const abaElement = document.getElementById(`aba-${nomeAba}`);
+            abaElement.classList.add('ativa');
+
+            // Carrega conteúdo dinamicamente
+            carregarConteudoAba(nomeAba, abaElement);
+        }
+
+        // ==== FUNÇÃO PARA CARREGAR CONTEÚDO DINÂMICO DAS ABAS ====
+        function carregarConteudoAba(nomeAba, abaElement) {
+            console.log('🔍 carregarConteudoAba chamada para:', nomeAba);
+
+            // Define o arquivo de conteúdo para cada aba
+            const arquivosConteudo = {
+                'participantes': 'ConteudoParticipantes.php',
+                'organizacao': 'ConteudoOrganizacao.php'
+            };
+
+            const arquivo = arquivosConteudo[nomeAba];
+            if (!arquivo) {
+                console.error('❌ Arquivo de conteúdo não definido para:', nomeAba);
+                return;
+            }
+
+            // Verifica se já foi carregado (procura por elementos específicos)
+            const temConteudo = abaElement.querySelector('.secao-gerenciamento');
+            if (temConteudo) {
+                console.log('✓ Conteúdo já carregado para:', nomeAba);
+                // Mas chama a função de carregamento de dados se existir
+                if (nomeAba === 'participantes' && typeof carregarParticipantes === 'function') {
+                    console.log('🔄 Recarregando dados de participantes...');
+                    carregarParticipantes();
+                } else if (nomeAba === 'organizacao' && typeof carregarOrganizacao === 'function') {
+                    console.log('🔄 Recarregando dados de organização...');
+                    carregarOrganizacao();
+                }
+                return;
+            }
+
+            console.log('📥 Carregando conteúdo de:', arquivo);
+            console.log('📍 URL completa:', window.location.origin + window.location.pathname.replace('GerenciarEvento.php', arquivo));
+            abaElement.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--texto);"><p>⏳ Carregando...</p></div>';
+
+            // Carrega o conteúdo via AJAX
+            fetch(arquivo)
+                .then(response => {
+                    console.log('📡 Response recebido:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    console.log(`✓ HTML recebido (${html.length} caracteres)`);
+                    abaElement.innerHTML = html;
+                    console.log(`✓ Conteúdo inserido na aba: ${nomeAba}`);
+
+                    // Executa scripts dentro do HTML carregado
+                    executarScriptsDoConteudo(abaElement);
+                })
+                .catch(erro => {
+                    console.error('❌ Erro ao carregar conteúdo:', erro);
+                    abaElement.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--texto);">
+                            <p>❌ Erro ao carregar conteúdo</p>
+                            <p style="font-size: 0.9rem; color: var(--texto-secundario);">${erro.message}</p>
+                            <button class="botao" onclick="carregarConteudoAba('${nomeAba}', document.getElementById('aba-${nomeAba}'))">
+                                Tentar Novamente
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+
+        // ==== FUNÇÃO PARA EXECUTAR SCRIPTS DO CONTEÚDO CARREGADO ====
+        function executarScriptsDoConteudo(elemento) {
+            const scripts = elemento.querySelectorAll('script');
+            console.log(`📜 Encontrados ${scripts.length} script(s) para executar`);
+
+            scripts.forEach((scriptAntigo, index) => {
+                const scriptNovo = document.createElement('script');
+                if (scriptAntigo.src) {
+                    console.log(`  ${index + 1}. Script externo: ${scriptAntigo.src}`);
+                    scriptNovo.src = scriptAntigo.src;
+                } else {
+                    const preview = scriptAntigo.textContent.substring(0, 50).replace(/\n/g, ' ');
+                    console.log(`  ${index + 1}. Script inline: ${preview}...`);
+                    scriptNovo.textContent = scriptAntigo.textContent;
+                }
+                scriptAntigo.parentNode.replaceChild(scriptNovo, scriptAntigo);
+            });
+            console.log(`✓ ${scripts.length} script(s) executado(s)`);
+        }
 
         // Função para voltar - volta para a página do evento
         function voltarParaEventos() {
@@ -1413,51 +1830,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Função de inicialização
         function inicializarListaParticipantes() {
+            console.log('🎬 Iniciando inicializarListaParticipantes...');
+
             const urlParams = new URLSearchParams(window.location.search);
             codEventoAtual = urlParams.get('cod_evento');
 
+            console.log('📌 Código do evento capturado:', codEventoAtual);
+
             if (!codEventoAtual) {
+                console.error('❌ Evento não identificado na URL');
                 alert('Erro: Evento não identificado');
                 voltarParaEventos();
                 return;
             }
 
-            // Verifica se os elementos principais existem antes de continuar
+            // Verifica se o elemento principal existe antes de continuar
             const containerLista = document.querySelector('.container-lista');
-            const tbodyParticipantes = document.getElementById('tbody-participantes');
-            
-            if (!containerLista || !tbodyParticipantes) {
-                // DOM ainda não está pronto, tenta novamente após pequeno delay
+
+            if (!containerLista) {
+                console.warn('⏳ container-lista não encontrado, tentando novamente em 100ms...');
                 setTimeout(inicializarListaParticipantes, 100);
                 return;
             }
 
-            carregarParticipantes();
+            console.log('✓ container-lista encontrado');
+
+            // Carrega dados do evento PRIMEIRO (antes das abas)
+            carregarDadosEvento();
+
+            // Depois inicializa as abas
+            inicializarAbas();
             inicializarEventos();
+
+            console.log('✓ inicializarListaParticipantes concluído');
         }
 
-        // Expõe função globalmente para ser chamada pelo Container
-        window.inicializarListaParticipantes = inicializarListaParticipantes;
+        // ==== FUNÇÃO PARA CARREGAR DADOS DO EVENTO ====
+        function carregarDadosEvento() {
+            console.log('📊 Carregando dados do evento:', codEventoAtual);
 
-        // Inicializa - verifica se DOM está pronto
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', inicializarListaParticipantes);
-        } else {
-            // DOM já está pronto ou página carregada via fetch
-            // Aguarda um tick para garantir que elementos existem
-            setTimeout(inicializarListaParticipantes, 50);
-        }
-
-        function carregarParticipantes() {
-            fetch(`ListadeParticipantes.php?action=buscar&cod_evento=${codEventoAtual}`)
+            fetch(`GerenciarEvento.php?action=buscar&cod_evento=${codEventoAtual}`)
                 .then(response => response.json())
                 .then(dados => {
                     if (!dados.sucesso) {
-                        alert('Erro ao carregar participantes: ' + (dados.erro || 'Erro desconhecido'));
+                        alert('Erro ao carregar dados do evento: ' + (dados.erro || 'Erro desconhecido'));
                         return;
                     }
-
-                    todosParticipantes = dados.participantes || [];
 
                     // Atualiza título e dados gerais do evento
                     if (dados.evento) {
@@ -1474,85 +1892,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         document.getElementById('evento-conclusao').textContent = dados.evento.conclusao || '-';
                         document.getElementById('evento-inicio-inscricao').textContent = dados.evento.inicio_inscricao || '-';
                         document.getElementById('evento-fim-inscricao').textContent = dados.evento.fim_inscricao || '-';
-                        
+
                         const duracao = dados.evento.duracao;
                         document.getElementById('evento-duracao').textContent = duracao ? `${duracao}h` : '-';
-                    }
 
-                    renderizarParticipantes();
+                        console.log('✓ Dados do evento carregados');
+                    }
                 })
                 .catch(erro => {
-                    console.error('Erro:', erro);
-                    alert('Erro ao carregar participantes. Tente novamente.');
+                    console.error('❌ Erro ao carregar dados do evento:', erro);
+                    alert('Erro ao carregar dados do evento. Tente novamente.');
                 });
         }
 
-        function renderizarParticipantes() {
-            const tbody = document.getElementById('tbody-participantes');
-            if (!tbody) return;
+        // Função para limpar estado ao sair da página
+        window.limparGerenciarEvento = function() {
+            console.log('🧹 Limpando estado do GerenciarEvento...');
+            window.__gerenciarEventoInicializado = false;
+            codEventoAtual = null;
+            todosParticipantes = [];
+            participantesSelecionados = new Set();
+            todosOrganizacao = [];
+            abaAtual = 'participantes';
+        };
 
-            tbody.innerHTML = '';
+        // Expõe função globalmente para ser chamada pelo Container
+        window.inicializarListaParticipantes = inicializarListaParticipantes;
 
-            // Atualiza contador de participantes
-            const contadorElement = document.getElementById('total-participantes');
-            if (contadorElement) {
-                contadorElement.textContent = `Total de participantes: ${todosParticipantes.length}`;
-            }
+        // Inicializa SEMPRE quando o script for executado
+        // (isso acontece quando a página é carregada dinamicamente pelo Container)
+        console.log('🔄 Executando script GerenciarEvento...');
 
-            if (todosParticipantes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">Nenhum participante inscrito neste evento ainda</td></tr>';
-                return;
-            }
+        // Limpa flag anterior para permitir nova inicialização
+        window.__gerenciarEventoInicializado = false;
 
-            todosParticipantes.forEach((p, i) => {
-                const statusPresenca = p.presenca_confirmada ?
-                    '<span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span>' :
-                    '<span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span>';
-
-                const statusCertificado = p.certificado_emitido ?
-                    '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
-                    '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
-
-                const btnCertificado = p.certificado_emitido ?
-                    '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificado(\'' + p.cpf + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
-                    '';
-
-                tbody.innerHTML += `
-            <tr data-cpf="${p.cpf}">
-                <td class="coluna-selecionar">
-                    <input type="checkbox" class="checkbox-selecionar" id="part-${i}" value="${p.cpf}">
-                </td>
-                <td class="coluna-dados">
-                    <p><strong>Nome:</strong> ${p.nome}</p>
-                    <p><strong>E-mail:</strong> ${p.email}</p>
-                    <p><strong>Registro Acadêmico:</strong> ${p.ra}</p>
-                    <p><strong>Data de Inscrição:</strong> ${p.data_inscricao}</p>
-                </td>
-                <td class="coluna-modificar">
-                    <div class="grupo-acoes">
-                        <button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresenca('${p.cpf}')">
-                            <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
-                        </button>
-                        <button class="botao botao-acao-tabela botao-vermelho" onclick="excluirParticipante('${p.cpf}')">
-                            <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
-                        </button>
-                        <button class="botao botao-acao-tabela botao-neutro" onclick="editarDados('${p.cpf}')">
-                            <span>Editar Dados</span><img src="../Imagens/Editar.svg" alt="">
-                        </button>
-                    </div>
-                </td>
-                <td class="coluna-status">
-                    <div class="grupo-status">
-                        <div class="linha-status"><span>Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                        <div class="linha-status"><span>Presença:</span>${statusPresenca}</div>
-                        <div class="linha-status"><span>Certificado:</span>${statusCertificado}</div>
-                        ${btnCertificado}
-                    </div>
-                </td>
-            </tr>
-        `;
-            });
+        if (document.readyState === 'loading') {
+            console.log('⏳ DOM ainda carregando, aguardando DOMContentLoaded...');
+            document.addEventListener('DOMContentLoaded', inicializarListaParticipantes);
+        } else {
+            // DOM já está pronto ou página carregada via fetch
+            console.log('✓ DOM pronto, inicializando em 50ms...');
+            setTimeout(inicializarListaParticipantes, 50);
         }
+
+        // Nota: renderizarParticipantes() agora está em ConteudoParticipantes.php
 
         function atualizarVisibilidadeBotoesAcao() {
             const acoesEmMassa = document.querySelector('.acoes-em-massa');
@@ -1681,25 +2064,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!btnPesquisa.dataset.bound) {
                     btnPesquisa.dataset.bound = '1';
-                    btnPesquisa.addEventListener('click', (e) => { e.preventDefault(); filtrar(); });
+                    btnPesquisa.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        filtrar();
+                    });
                 }
                 if (!campoPesquisa.dataset.bound) {
                     campoPesquisa.dataset.bound = '1';
-                    campoPesquisa.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); filtrar(); } });
+                    campoPesquisa.addEventListener('keydown', e => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            filtrar();
+                        }
+                    });
                     campoPesquisa.addEventListener('input', filtrar);
                 }
             }
 
-            // Botões de ação do topo
-            const bindsTopo = [
-                { id: 'btn-adicionar-participante', fn: abrirModalAdicionar },
-                { id: 'btn-importar-presenca', fn: importarListaPresenca },
-                { id: 'btn-exportar-presenca', fn: exportarListaPresenca },
-                { id: 'btn-enviar-mensagem', fn: abrirModalMensagem },
-                { id: 'btn-importar-inscritos', fn: importarListaInscritos },
-                { id: 'btn-exportar-inscritos', fn: exportarListaInscritos }
+            // Botões de ação do topo (Participantes)
+            const bindsTopo = [{
+                    id: 'btn-adicionar-participante',
+                    fn: abrirModalAdicionar
+                },
+                {
+                    id: 'btn-importar-presenca',
+                    fn: importarListaPresenca
+                },
+                {
+                    id: 'btn-exportar-presenca',
+                    fn: exportarListaPresenca
+                },
+                {
+                    id: 'btn-enviar-mensagem',
+                    fn: abrirModalMensagem
+                },
+                {
+                    id: 'btn-importar-inscritos',
+                    fn: importarListaInscritos
+                },
+                {
+                    id: 'btn-exportar-inscritos',
+                    fn: exportarListaInscritos
+                }
             ];
-            bindsTopo.forEach(({ id, fn }) => {
+            bindsTopo.forEach(({
+                id,
+                fn
+            }) => {
+                const el = document.getElementById(id);
+                if (el && !el.dataset.bound) {
+                    el.dataset.bound = '1';
+                    el.addEventListener('click', fn);
+                }
+            });
+
+            // Botões de ação da aba de Organização
+            const bindsOrganizacao = [{
+                    id: 'btn-adicionar-organizacao',
+                    fn: () => alert('Funcionalidade em desenvolvimento: Adicionar colaborador pela aba Colaboradores do evento')
+                },
+                {
+                    id: 'btn-enviar-mensagem-organizacao',
+                    fn: () => alert('Funcionalidade em desenvolvimento: Enviar mensagem para organização')
+                }
+            ];
+            bindsOrganizacao.forEach(({
+                id,
+                fn
+            }) => {
                 const el = document.getElementById(id);
                 if (el && !el.dataset.bound) {
                     el.dataset.bound = '1';
@@ -1708,12 +2140,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
 
             // Botões de ação em massa
-            const bindsMassa = [
-                { id: 'btn-confirmar-presencas-massa', fn: confirmarPresencasEmMassa },
-                { id: 'btn-emitir-certificados-massa', fn: emitirCertificadosEmMassa },
-                { id: 'btn-excluir-participantes-massa', fn: excluirParticipantesEmMassa }
+            const bindsMassa = [{
+                    id: 'btn-confirmar-presencas-massa',
+                    fn: confirmarPresencasEmMassa
+                },
+                {
+                    id: 'btn-emitir-certificados-massa',
+                    fn: emitirCertificadosEmMassa
+                },
+                {
+                    id: 'btn-excluir-participantes-massa',
+                    fn: excluirParticipantesEmMassa
+                }
             ];
-            bindsMassa.forEach(({ id, fn }) => {
+            bindsMassa.forEach(({
+                id,
+                fn
+            }) => {
                 const el = document.getElementById(id);
                 if (el && !el.dataset.bound) {
                     el.dataset.bound = '1';
@@ -1742,7 +2185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function confirmarPresenca(cpf) {
             if (!confirm('Confirmar presença deste participante?')) return;
 
-            fetch('ListadeParticipantes.php', {
+            fetch('GerenciarEvento.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1768,7 +2211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function excluirParticipante(cpf) {
             if (!confirm('Tem certeza que deseja excluir este participante?')) return;
 
-            fetch('ListadeParticipantes.php', {
+            fetch('GerenciarEvento.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1835,7 +2278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const ra = document.getElementById('edit-ra').value;
 
             try {
-                const response = await fetch('ListadeParticipantes.php', {
+                const response = await fetch('GerenciarEvento.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1890,7 +2333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (cpf.length !== 11) return;
 
             try {
-                const response = await fetch(`ListadeParticipantes.php?action=verificar_cpf&cpf=${cpf}`);
+                const response = await fetch(`GerenciarEvento.php?action=verificar_cpf&cpf=${cpf}`);
                 const data = await response.json();
 
                 if (data.existe) {
@@ -1932,7 +2375,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('ListadeParticipantes.php', {
+                const response = await fetch('GerenciarEvento.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -2005,7 +2448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('ListadeParticipantes.php', {
+                const response = await fetch('GerenciarEvento.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -2048,7 +2491,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 formData.append('arquivo', file);
 
                 try {
-                    const response = await fetch('ListadeParticipantes.php', {
+                    const response = await fetch('GerenciarEvento.php', {
                         method: 'POST',
                         body: formData
                     });
@@ -2069,7 +2512,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function exportarListaPresenca() {
-            window.location.href = `ListadeParticipantes.php?action=exportar_presenca&cod_evento=${codEventoAtual}`;
+            window.location.href = `GerenciarEvento.php?action=exportar_presenca&cod_evento=${codEventoAtual}`;
         }
 
         function importarListaInscritos() {
@@ -2086,7 +2529,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 formData.append('arquivo', file);
 
                 try {
-                    const response = await fetch('ListadeParticipantes.php', {
+                    const response = await fetch('GerenciarEvento.php', {
                         method: 'POST',
                         body: formData
                     });
@@ -2107,7 +2550,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function exportarListaInscritos() {
-            window.location.href = `ListadeParticipantes.php?action=exportar_inscritos&cod_evento=${codEventoAtual}`;
+            window.location.href = `GerenciarEvento.php?action=exportar_inscritos&cod_evento=${codEventoAtual}`;
         }
 
         // ========== AÇÕES EM MASSA ==========
@@ -2131,7 +2574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             for (const cpf of participantesSelecionados) {
                 try {
-                    const response = await fetch('ListadeParticipantes.php', {
+                    const response = await fetch('GerenciarEvento.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -2181,7 +2624,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             for (const cpf of participantesSelecionados) {
                 try {
-                    const response = await fetch('ListadeParticipantes.php', {
+                    const response = await fetch('GerenciarEvento.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -2240,7 +2683,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             for (const cpf of participantesSelecionados) {
                 try {
-                    const response = await fetch('ListadeParticipantes.php', {
+                    const response = await fetch('GerenciarEvento.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

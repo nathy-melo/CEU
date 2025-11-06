@@ -97,7 +97,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
         'meusEventos' => 'MeusEventosOrganizador.html',
         'adicionarEvento' => 'AdicionarEvento.php',
-        'listaParticipantes' => 'ListadeParticipantes.php',
+        'gerenciarEvento' => 'GerenciarEvento.php',
         'perfil' => 'PerfilOrganizador.php',
         'certificados' => 'CertificadosOrganizador.html',
         'configuracoes' => 'ConfiguracoesOrganizador.html',
@@ -277,11 +277,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 js: ['CartaoDoEventoOrganizando.js'],
                 init: () => {}
             },
-            'listaParticipantes': {
-                html: 'ListadeParticipantes.php',
+            'gerenciarEvento': {
+                html: 'GerenciarEvento.php',
                 js: [],
                 init: () => {
-                    // Força reinicialização da lista após um pequeno delay
+                    // Força reinicialização após um pequeno delay
                     setTimeout(() => {
                         if (typeof window.inicializarListaParticipantes === 'function') {
                             window.inicializarListaParticipantes();
