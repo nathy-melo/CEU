@@ -1,98 +1,104 @@
-create database if not exists CEU_bd;
-use CEU_bd;
+-- Banco de Dados CEU - Sistema de Gerenciamento de Eventos
+-- Versão completa e corrigida - sem necessidade de scripts adicionais
 
-create table if not exists evento(
-cod_evento int primary key not null,
-categoria varchar(40) not null,
-nome varchar(100) not null,
-lugar varchar(40) not null,
-descricao varchar(500),
-publico_alvo varchar(100),
-inicio datetime not null,
-conclusao datetime not null,
-duracao float, 
-certificado tinyint(1) not null default 0,
-modalidade enum('Presencial','Online','Híbrido') not null default 'Presencial',
-imagem varchar(255) null,
-inicio_inscricao datetime null,
-fim_inscricao datetime null
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Remove o banco se existir para garantir criação limpa
+DROP DATABASE IF EXISTS CEU_bd;
+CREATE DATABASE CEU_bd DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE CEU_bd;
 
-create table if not exists certificado(
-cod_verificacao varchar(8),
-modelo varchar(255),
-tipo varchar(100),
-primary key (cod_verificacao)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Configurações do MySQL para evitar problemas
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
 
-create table if not exists usuario(
-CPF char(11) primary key,
-Nome varchar(100),
-Email varchar(100),
-Senha varchar(255),
-RA char(7) null,
-Codigo varchar(8),
-Organizador tinyint(1) not null default 0,
-TemaSite tinyint(1) not null default 0,
-FotoPerfil varchar(255) null,
-constraint chk_codigo_organizador check (
-    (Organizador = 0) OR 
-    (Organizador = 1 AND Codigo is not null)
-),
-constraint chk_tema_site check (TemaSite in (0,1))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tabela de eventos
+CREATE TABLE evento(
+    cod_evento INT PRIMARY KEY NOT NULL,
+    categoria VARCHAR(40) NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    lugar VARCHAR(40) NOT NULL,
+    descricao VARCHAR(500),
+    publico_alvo VARCHAR(100),
+    inicio DATETIME NOT NULL,
+    conclusao DATETIME NOT NULL,
+    duracao FLOAT, 
+    certificado TINYINT(1) NOT NULL DEFAULT 0,
+    modalidade ENUM('Presencial','Online','Híbrido') NOT NULL DEFAULT 'Presencial',
+    imagem VARCHAR(255) NULL,
+    inicio_inscricao DATETIME NULL,
+    fim_inscricao DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE usuario ADD COLUMN IF NOT EXISTS TemaSite tinyint(1) NOT NULL DEFAULT 0;
-ALTER TABLE usuario ADD COLUMN IF NOT EXISTS FotoPerfil varchar(255) NULL;
+-- Tabela de certificados
+CREATE TABLE certificado(
+    cod_verificacao VARCHAR(8) PRIMARY KEY,
+    modelo VARCHAR(255),
+    tipo VARCHAR(100)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE evento ADD COLUMN IF NOT EXISTS modalidade enum('Presencial','Online','Híbrido') NOT NULL DEFAULT 'Presencial';
-ALTER TABLE evento ADD COLUMN IF NOT EXISTS imagem varchar(255) NULL;
-ALTER TABLE evento ADD COLUMN IF NOT EXISTS inicio_inscricao datetime NULL;
-ALTER TABLE evento ADD COLUMN IF NOT EXISTS fim_inscricao datetime NULL;
+-- Tabela de usuários
+CREATE TABLE usuario(
+    CPF CHAR(11) PRIMARY KEY,
+    Nome VARCHAR(100),
+    Email VARCHAR(100),
+    Senha VARCHAR(255),
+    RA CHAR(7) NULL,
+    Codigo VARCHAR(8),
+    Organizador TINYINT(1) NOT NULL DEFAULT 0,
+    TemaSite TINYINT(1) NOT NULL DEFAULT 0,
+    FotoPerfil VARCHAR(255) NULL,
+    CONSTRAINT chk_codigo_organizador CHECK (
+        (Organizador = 0) OR 
+        (Organizador = 1 AND Codigo IS NOT NULL)
+    ),
+    CONSTRAINT chk_tema_site CHECK (TemaSite IN (0,1))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table if not exists lista_de_participantes(
-CPF char(11) primary key,
-Nome varchar(100),
-RA char(7)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tabela de lista de participantes
+CREATE TABLE lista_de_participantes(
+    CPF CHAR(11) PRIMARY KEY,
+    Nome VARCHAR(100),
+    RA CHAR(7)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table if not exists organiza(
-cod_evento int ,
-CPF char(11),
-primary key (cod_evento,CPF),
-foreign key (cod_evento) references evento(cod_evento) ON DELETE CASCADE,
-foreign key (CPF) references usuario(CPF) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tabela de organização de eventos
+CREATE TABLE organiza(
+    cod_evento INT,
+    CPF CHAR(11),
+    PRIMARY KEY (cod_evento,CPF),
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
+    FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS inscricao (
-    CPF char(11) NOT NULL,
-    cod_evento int NOT NULL,
-    data_inscricao timestamp DEFAULT CURRENT_TIMESTAMP,
-    status enum('ativa', 'cancelada') NOT NULL DEFAULT 'ativa',
-    presenca_confirmada tinyint(1) NOT NULL DEFAULT 0,
-    certificado_emitido tinyint(1) NOT NULL DEFAULT 0,
+-- Tabela de inscrições (definição limpa do ENUM)
+CREATE TABLE inscricao (
+    CPF CHAR(11) NOT NULL,
+    cod_evento INT NOT NULL,
+    data_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('ativa','cancelada') NOT NULL DEFAULT 'ativa',
+    presenca_confirmada TINYINT(1) NOT NULL DEFAULT 0,
+    certificado_emitido TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (CPF, cod_evento),
     FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Adiciona colunas caso a tabela já exista
-ALTER TABLE inscricao ADD COLUMN IF NOT EXISTS presenca_confirmada tinyint(1) NOT NULL DEFAULT 0;
-ALTER TABLE inscricao ADD COLUMN IF NOT EXISTS certificado_emitido tinyint(1) NOT NULL DEFAULT 0;
+-- Tabela de códigos de organizador
+CREATE TABLE codigos_organizador (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(8) UNIQUE NOT NULL,
+    ativo TINYINT(1) NOT NULL DEFAULT 1,
+    usado TINYINT(1) NOT NULL DEFAULT 0,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_uso TIMESTAMP NULL,
+    usado_por VARCHAR(11) NULL COMMENT 'CPF do usuário que usou o código',
+    criado_por VARCHAR(100) DEFAULT 'SISTEMA' COMMENT 'Quem criou o código',
+    observacoes TEXT NULL COMMENT 'Observações sobre o código'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table if not exists codigos_organizador (
-    id int auto_increment primary key,
-    codigo varchar(8) unique not null,
-    ativo tinyint(1) not null default 1,
-    usado tinyint(1) not null default 0,
-    data_criacao timestamp default current_timestamp,
-    data_uso timestamp null,
-    usado_por varchar(11) null comment 'CPF do usuário que usou o código',
-    criado_por varchar(100) default 'SISTEMA' comment 'Quem criou o código',
-    observacoes text null comment 'Observações sobre o código'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS imagens_evento (
+-- Tabela de imagens de eventos
+CREATE TABLE imagens_evento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_evento INT NOT NULL,
     caminho_imagem VARCHAR(255) NOT NULL,
@@ -100,11 +106,12 @@ CREATE TABLE IF NOT EXISTS imagens_evento (
     principal TINYINT(1) NOT NULL DEFAULT 0,
     data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS notificacoes (
+-- Tabela de notificações
+CREATE TABLE notificacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    CPF char(11) NOT NULL,
+    CPF CHAR(11) NOT NULL,
     tipo VARCHAR(50) NOT NULL COMMENT 'Tipo: inscricao, desinscricao, evento_cancelado, evento_prestes_iniciar, etc',
     mensagem VARCHAR(255) NOT NULL,
     cod_evento INT NULL COMMENT 'Referência ao evento se aplicável',
@@ -112,9 +119,10 @@ CREATE TABLE IF NOT EXISTS notificacoes (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS colaboradores_evento (
+-- Tabela de colaboradores de eventos
+CREATE TABLE colaboradores_evento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_evento INT NOT NULL,
     CPF CHAR(11) NOT NULL,
@@ -123,9 +131,10 @@ CREATE TABLE IF NOT EXISTS colaboradores_evento (
     UNIQUE KEY uk_evento_cpf (cod_evento, CPF),
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
     FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS solicitacoes_colaboracao (
+-- Tabela de solicitações de colaboração
+CREATE TABLE solicitacoes_colaboracao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_evento INT NOT NULL,
     cpf_solicitante CHAR(11) NOT NULL,
@@ -136,34 +145,34 @@ CREATE TABLE IF NOT EXISTS solicitacoes_colaboracao (
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
     FOREIGN KEY (cpf_solicitante) REFERENCES usuario(CPF) ON DELETE CASCADE,
     UNIQUE KEY uk_pedido (cod_evento, cpf_solicitante)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS solicitacoes_redefinicao_senha (
+-- Tabela de solicitações de redefinição de senha (definição limpa do ENUM)
+CREATE TABLE solicitacoes_redefinicao_senha (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL,
-    CPF char(11) NULL COMMENT 'CPF do usuário se encontrado',
+    CPF CHAR(11) NULL COMMENT 'CPF do usuário se encontrado',
     nome_usuario VARCHAR(100) NULL COMMENT 'Nome do usuário',
     data_solicitacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('pendente', 'resolvida', 'cancelada') NOT NULL DEFAULT 'pendente',
+    status ENUM('pendente','resolvida','cancelada') NOT NULL DEFAULT 'pendente',
     data_resolucao TIMESTAMP NULL,
     resolvido_por VARCHAR(100) NULL COMMENT 'Admin que resolveu',
     observacoes TEXT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Inserir usuários (ignora se já existirem)
-INSERT IGNORE INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
+-- Inserir usuários de exemplo
+INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
 ('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
 ('123', 'Caike', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
 ('1234', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0);
 
--- Inserir códigos de organizador (ignora se já existirem)
-INSERT IGNORE INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes)
-VALUES 
+-- Inserir códigos de organizador
+INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes) VALUES 
 ('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora'),
 ('CAIKE001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '123', 'SISTEMA', 'Código de teste - Caike - ck@ceu.com');
 
--- Inserir eventos (ignora se já existirem)
-INSERT IGNORE INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) VALUES
+-- Inserir eventos de exemplo
+INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) VALUES
 (1, 'Workshop', 'Workshop de JavaScript', 'Sala 101', 'Aprenda conceitos básicos e avançados de JavaScript.', 'Todos', '2025-02-15 09:00:00', '2025-02-15 17:00:00', 8.0, 1, 'Presencial', '/ImagensEventos/JavaScript_Workshop.png', '2025-01-15 08:00:00', '2025-02-14 23:59:59'),
 (2, 'Palestra', 'Palestra sobre IA', 'Auditório Principal', 'Discussão sobre o futuro da Inteligência Artificial.', 'Estudantes', '2025-03-10 14:00:00', '2025-03-10 16:00:00', 2.0, 1, 'Híbrido', '/ImagensEventos/Palestra_sobre_IA.png', '2025-02-10 08:00:00', '2025-03-09 23:59:59'),
 (3, 'Curso', 'Curso de Python', 'Laboratório 2', 'Curso completo de programação em Python.', 'Iniciantes', '2025-04-05 08:00:00', '2025-04-12 18:00:00', 40.0, 1, 'Presencial', '/ImagensEventos/Python.png', '2025-03-05 08:00:00', '2025-04-04 23:59:59'),
@@ -182,8 +191,8 @@ INSERT IGNORE INTO evento (cod_evento, categoria, nome, lugar, descricao, public
 (16, 'Minicurso', 'Cybersecurity Basics', 'Sala de Segurança', 'Fundamentos de segurança da informação.', 'Todos', '2025-08-22 14:00:00', '2025-08-22 18:00:00', 4.0, 1, 'Online', '/ImagensEventos/CyberSecurity.png', '2025-07-22 08:00:00', '2025-08-21 23:59:59'),
 (17, 'Conferência', 'Conferência de Cloud Computing', 'Auditório 3', 'Conferência sobre tendências em computação em nuvem.', 'Estudantes', '2025-12-03 13:00:00', '2025-12-03 18:00:00', 5.0, 1, 'Híbrido', '/ImagensEventos/Cloud_Computing.png', '2025-11-03 08:00:00', '2025-12-02 23:59:59');
 
--- Popula tabela imagens_evento com as imagens existentes na pasta ImagensEventos
-INSERT IGNORE INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
+-- Inserir imagens dos eventos
+INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (1, '/ImagensEventos/JavaScript_Workshop.png', 0, 1),
 (2, '/ImagensEventos/Palestra_sobre_IA.png', 0, 1),
 (3, '/ImagensEventos/Python.png', 0, 1),
@@ -202,34 +211,31 @@ INSERT IGNORE INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal)
 (16, '/ImagensEventos/CyberSecurity.png', 0, 1),
 (17, '/ImagensEventos/Cloud_Computing.png', 0, 1);
 
--- Adiciona imagem CEU-ImagemEvento.png como segunda imagem para testar carrossel
-INSERT IGNORE INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
+-- Adicionar imagens secundárias para teste de carrossel
+INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (1, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0),
 (12, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0),
 (13, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0);
 
--- Inserir organizadores dos eventos (ignora se já existirem)
-INSERT IGNORE INTO organiza (cod_evento, CPF) VALUES
-(1, '12345678901'),
-(2, '12345678901'),
-(3, '12345678901'),
-(4, '12345678901'),
-(5, '12345678901'),
-(6, '12345678901'),
-(7, '12345678901'),
-(8, '12345678901'),
-(9, '12345678901'),
-(10, '12345678901'),
-(11, '12345678901'),
-(12, '12345678901'),
-(13, '12345678901'),
-(14, '12345678901'),
-(15, '12345678901'),
-(16, '12345678901'),
+-- Inserir organizadores dos eventos
+INSERT INTO organiza (cod_evento, CPF) VALUES
+(1, '12345678901'), (2, '12345678901'), (3, '12345678901'), (4, '12345678901'),
+(5, '12345678901'), (6, '12345678901'), (7, '12345678901'), (8, '12345678901'),
+(9, '12345678901'), (10, '12345678901'), (11, '12345678901'), (12, '12345678901'),
+(13, '12345678901'), (14, '12345678901'), (15, '12345678901'), (16, '12345678901'),
 (17, '12345678901');
 
-INSERT IGNORE INTO colaboradores_evento (cod_evento, CPF, papel, criado_em) VALUES
+-- Inserir colaboradores de eventos
+INSERT INTO colaboradores_evento (cod_evento, CPF, papel, criado_em) VALUES
 (1, '123', 'colaborador', CURRENT_TIMESTAMP),
 (7, '123', 'colaborador', CURRENT_TIMESTAMP);
 
-show tables;
+-- Confirmar transação
+COMMIT;
+
+-- Verificar estrutura criada
+SHOW TABLES;
+
+-- Exibir informações das tabelas problemáticas para verificação
+DESCRIBE inscricao;
+DESCRIBE solicitacoes_redefinicao_senha;
