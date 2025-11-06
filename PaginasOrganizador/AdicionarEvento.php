@@ -754,50 +754,45 @@ mysqli_close($conexao);
             grid-row-start: 2;
         }
 
-        .DataDeInicio {
-            grid-column: span 2 / span 2;
+        .DataHorarioInicio {
+            grid-column: span 4 / span 4;
             grid-row-start: 3;
         }
 
-        .DataDeFim {
-            grid-column: span 2 / span 2;
-            grid-column-start: 3;
-            grid-row-start: 3;
-        }
-
-        .HorarioDeInicio {
-            grid-column: span 2 / span 2;
+        .DataHorarioFim {
+            grid-column: span 4 / span 4;
             grid-column-start: 5;
             grid-row-start: 3;
         }
 
-        .HorarioDeFim {
-            grid-column: span 2 / span 2;
-            grid-column-start: 7;
-            grid-row-start: 3;
-        }
-
-        .DataInicioInscricao {
-            grid-column: span 2 / span 2;
+        .DataHorarioInscricaoInicio {
+            grid-column: span 4 / span 4;
             grid-row-start: 4;
         }
 
-        .DataFimInscricao {
-            grid-column: span 2 / span 2;
-            grid-column-start: 3;
-            grid-row-start: 4;
-        }
-
-        .HorarioInicioInscricao {
-            grid-column: span 2 / span 2;
+        .DataHorarioInscricaoFim {
+            grid-column: span 4 / span 4;
             grid-column-start: 5;
             grid-row-start: 4;
         }
 
-        .HorarioFimInscricao {
-            grid-column: span 2 / span 2;
-            grid-column-start: 7;
-            grid-row-start: 4;
+        /* Container para campos de data e horário */
+        .campo-data-horario {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+
+        .campo-data-horario input {
+            flex: 1;
+        }
+
+        .campo-data-horario input[type="date"] {
+            flex: 1.2;
+        }
+
+        .campo-data-horario input[type="time"] {
+            flex: 0.8;
         }
 
         .PublicoAlvo {
@@ -1112,37 +1107,33 @@ mysqli_close($conexao);
                 <label for="local"><span style="color: red;">*</span> Local:</label>
                 <input type="text" id="local" name="local" class="campo-input" placeholder="Digite o local do evento" required autocomplete="off">
             </div>
-            <div class="DataDeInicio grupo-campo">
-                <label for="data-inicio"><span style="color: red;">*</span> Data de Início:</label>
-                <input type="date" id="data-inicio" name="data_inicio" class="campo-input" required autocomplete="off">
+            <div class="DataHorarioInicio grupo-campo">
+                <label for="data-inicio"><span style="color: red;">*</span> Data e Horário de Início do Evento:</label>
+                <div class="campo-data-horario">
+                    <input type="date" id="data-inicio" name="data_inicio" class="campo-input" required autocomplete="off">
+                    <input type="time" id="horario-inicio" name="horario_inicio" class="campo-input" required autocomplete="off">
+                </div>
             </div>
-            <div class="DataDeFim grupo-campo">
-                <label for="data-fim"><span style="color: red;">*</span> Data de Fim:</label>
-                <input type="date" id="data-fim" name="data_fim" class="campo-input" required autocomplete="off">
+            <div class="DataHorarioFim grupo-campo">
+                <label for="data-fim"><span style="color: red;">*</span> Data e Horário de Fim do Evento:</label>
+                <div class="campo-data-horario">
+                    <input type="date" id="data-fim" name="data_fim" class="campo-input" required autocomplete="off">
+                    <input type="time" id="horario-fim" name="horario_fim" class="campo-input" required autocomplete="off">
+                </div>
             </div>
-            <div class="HorarioDeInicio grupo-campo">
-                <label for="horario-inicio"><span style="color: red;">*</span> Horário de Início:</label>
-                <input type="time" id="horario-inicio" name="horario_inicio" class="campo-input" required autocomplete="off">
+            <div class="DataHorarioInscricaoInicio grupo-campo">
+                <label for="data-inicio-inscricao">Início das Inscrições:</label>
+                <div class="campo-data-horario">
+                    <input type="date" id="data-inicio-inscricao" name="data_inicio_inscricao" class="campo-input" autocomplete="off">
+                    <input type="time" id="horario-inicio-inscricao" name="horario_inicio_inscricao" class="campo-input" autocomplete="off">
+                </div>
             </div>
-            <div class="HorarioDeFim grupo-campo">
-                <label for="horario-fim"><span style="color: red;">*</span> Horário de Fim:</label>
-                <input type="time" id="horario-fim" name="horario_fim" class="campo-input" required autocomplete="off">
-            </div>
-            <div class="DataInicioInscricao grupo-campo">
-                <label for="data-inicio-inscricao">Início Inscrições:</label>
-                <input type="date" id="data-inicio-inscricao" name="data_inicio_inscricao" class="campo-input" autocomplete="off">
-            </div>
-            <div class="DataFimInscricao grupo-campo">
-                <label for="data-fim-inscricao">Fim Inscrições:</label>
-                <input type="date" id="data-fim-inscricao" name="data_fim_inscricao" class="campo-input" autocomplete="off">
-            </div>
-            <div class="HorarioInicioInscricao grupo-campo">
-                <label for="horario-inicio-inscricao">Horário Início:</label>
-                <input type="time" id="horario-inicio-inscricao" name="horario_inicio_inscricao" class="campo-input" autocomplete="off">
-            </div>
-            <div class="HorarioFimInscricao grupo-campo">
-                <label for="horario-fim-inscricao">Horário Fim:</label>
-                <input type="time" id="horario-fim-inscricao" name="horario_fim_inscricao" class="campo-input" autocomplete="off">
+            <div class="DataHorarioInscricaoFim grupo-campo">
+                <label for="data-fim-inscricao">Fim das Inscrições:</label>
+                <div class="campo-data-horario">
+                    <input type="date" id="data-fim-inscricao" name="data_fim_inscricao" class="campo-input" autocomplete="off">
+                    <input type="time" id="horario-fim-inscricao" name="horario_fim_inscricao" class="campo-input" autocomplete="off">
+                </div>
             </div>
             <div class="PublicoAlvo grupo-campo">
                 <label for="publico-alvo"><span style="color: red;">*</span> Público Alvo:</label>

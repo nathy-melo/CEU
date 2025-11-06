@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Mapeamento: cada array contém as páginas que ativam o respectivo botão
       const mapeamentoBotoes = {
         perfil: ['perfil', 'editarPerfil'],
-        inicio: ['inicio'],
-        eventosInscritos: ['eventosInscritos'],
+        inicio: ['inicio', 'evento'],
+        eventosInscritos: ['eventosInscritos', 'eventoInscrito'],
         meusEventos: ['meusEventos', 'eventoOrganizado', 'adicionarEvento'],
         certificados: ['certificados'],
         configuracoes: ['configuracoes', 'termos', 'redefinirSenha', 'emailRecuperacao', 'temaDoSite', 'manualDeUso', 'duvidasFrequentes', 'sobreNos'],
