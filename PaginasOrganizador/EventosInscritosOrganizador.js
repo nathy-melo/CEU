@@ -1,5 +1,4 @@
 function inicializarFiltroEventos() {
-    console.log('[EventosInscritosOrganizador] inicializando listagem e filtros');
     const searchInput = document.querySelector('.campo-pesquisa');
     const searchButton = document.querySelector('.botao-pesquisa');
     const eventosContainer = document.getElementById('eventos-container');

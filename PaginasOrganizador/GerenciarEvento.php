@@ -16,6 +16,80 @@ if (!isset($_SESSION['organizador']) || $_SESSION['organizador'] != 1) {
     exit;
 }
 
+// Função auxiliar para exportar em diferentes formatos
+function exportarArquivo($dados, $colunas, $nomeBase, $formato = 'csv')
+{
+    switch ($formato) {
+        case 'xlsx':
+        case 'ods':
+            // Para formatos mais complexos, vamos usar uma biblioteca simples ou gerar XML
+            exportarPlanilha($dados, $colunas, $nomeBase, $formato);
+            break;
+        case 'csv':
+        default:
+            exportarCSV($dados, $colunas, $nomeBase);
+            break;
+    }
+}
+
+function exportarCSV($dados, $colunas, $nomeBase)
+{
+    header('Content-Type: text/csv; charset=utf-8');
+    header("Content-Disposition: attachment; filename=\"{$nomeBase}.csv\"");
+
+    $output = fopen('php://output', 'w');
+    fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM para UTF-8
+    fputcsv($output, $colunas);
+
+    foreach ($dados as $linha) {
+        fputcsv($output, $linha);
+    }
+
+    fclose($output);
+}
+
+function exportarPlanilha($dados, $colunas, $nomeBase, $formato)
+{
+    // Gera XML básico compatível com Excel e LibreOffice
+    $isODS = ($formato === 'ods');
+
+    if ($isODS) {
+        header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
+        header("Content-Disposition: attachment; filename=\"{$nomeBase}.ods\"");
+    } else {
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$nomeBase}.xlsx\"");
+    }
+
+    // Cria XML simples que funciona tanto para Excel quanto LibreOffice
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    echo '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"' . "\n";
+    echo '  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' . "\n";
+    echo '  <Worksheet ss:Name="Dados">' . "\n";
+    echo '    <Table>' . "\n";
+
+    // Cabeçalho
+    echo '      <Row>' . "\n";
+    foreach ($colunas as $coluna) {
+        echo '        <Cell><Data ss:Type="String">' . htmlspecialchars($coluna) . '</Data></Cell>' . "\n";
+    }
+    echo '      </Row>' . "\n";
+
+    // Dados
+    foreach ($dados as $linha) {
+        echo '      <Row>' . "\n";
+        foreach ($linha as $valor) {
+            $tipo = is_numeric($valor) ? 'Number' : 'String';
+            echo '        <Cell><Data ss:Type="' . $tipo . '">' . htmlspecialchars($valor) . '</Data></Cell>' . "\n";
+        }
+        echo '      </Row>' . "\n";
+    }
+
+    echo '    </Table>' . "\n";
+    echo '  </Worksheet>' . "\n";
+    echo '</Workbook>';
+}
+
 // Se for requisição AJAX para buscar participantes
 if (isset($_GET['action']) && $_GET['action'] === 'buscar' && isset($_GET['cod_evento'])) {
     header('Content-Type: application/json; charset=utf-8');
@@ -268,11 +342,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'verificar_cpf' && isset($_GET
     exit;
 }
 
-// Exportar lista de presença (CSV)
+// Exportar lista de presença
 if (isset($_GET['action']) && $_GET['action'] === 'exportar_presenca' && isset($_GET['cod_evento'])) {
     require_once __DIR__ . '/../BancoDados/conexao.php';
 
     $codEvento = intval($_GET['cod_evento']);
+    $formato = $_GET['formato'] ?? 'csv';
 
     try {
         $sql = "SELECT u.Nome, u.Email, u.RA, u.CPF, i.data_inscricao, i.presenca_confirmada
@@ -286,28 +361,27 @@ if (isset($_GET['action']) && $_GET['action'] === 'exportar_presenca' && isset($
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
-        // Cabeçalhos para download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="lista_presenca_evento_' . $codEvento . '.csv"');
-
-        $output = fopen('php://output', 'w');
-        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM para UTF-8
-        fputcsv($output, ['Nome', 'Email', 'RA', 'CPF', 'Data Inscrição', 'Presença Confirmada']);
-
+        $dados = [];
         while ($row = mysqli_fetch_assoc($result)) {
-            fputcsv($output, [
+            $dados[] = [
                 $row['Nome'],
                 $row['Email'],
                 $row['RA'] ?? '',
                 $row['CPF'],
                 $row['data_inscricao'],
                 $row['presenca_confirmada'] ? 'Sim' : 'Não'
-            ]);
+            ];
         }
 
-        fclose($output);
         mysqli_stmt_close($stmt);
         mysqli_close($conexao);
+
+        exportarArquivo(
+            $dados,
+            ['Nome', 'Email', 'RA', 'CPF', 'Data Inscrição', 'Presença Confirmada'],
+            "lista_presenca_evento_{$codEvento}",
+            $formato
+        );
     } catch (Exception $e) {
         http_response_code(500);
         echo "Erro ao exportar: " . $e->getMessage();
@@ -315,11 +389,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'exportar_presenca' && isset($
     exit;
 }
 
-// Exportar lista de inscritos (CSV)
+// Exportar lista de inscritos
 if (isset($_GET['action']) && $_GET['action'] === 'exportar_inscritos' && isset($_GET['cod_evento'])) {
     require_once __DIR__ . '/../BancoDados/conexao.php';
 
     $codEvento = intval($_GET['cod_evento']);
+    $formato = $_GET['formato'] ?? 'csv';
 
     try {
         $sql = "SELECT u.Nome, u.Email, u.RA, u.CPF, i.data_inscricao
@@ -333,27 +408,26 @@ if (isset($_GET['action']) && $_GET['action'] === 'exportar_inscritos' && isset(
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
-        // Cabeçalhos para download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="lista_inscritos_evento_' . $codEvento . '.csv"');
-
-        $output = fopen('php://output', 'w');
-        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM para UTF-8
-        fputcsv($output, ['Nome', 'Email', 'RA', 'CPF', 'Data Inscrição']);
-
+        $dados = [];
         while ($row = mysqli_fetch_assoc($result)) {
-            fputcsv($output, [
+            $dados[] = [
                 $row['Nome'],
                 $row['Email'],
                 $row['RA'] ?? '',
                 $row['CPF'],
                 $row['data_inscricao']
-            ]);
+            ];
         }
 
-        fclose($output);
         mysqli_stmt_close($stmt);
         mysqli_close($conexao);
+
+        exportarArquivo(
+            $dados,
+            ['Nome', 'Email', 'RA', 'CPF', 'Data Inscrição'],
+            "lista_inscritos_evento_{$codEvento}",
+            $formato
+        );
     } catch (Exception $e) {
         http_response_code(500);
         echo "Erro ao exportar: " . $e->getMessage();
@@ -777,17 +851,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .grade-acoes-gerenciamento {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 12px;
         width: 100%;
-        justify-content: center;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .grade-acoes-gerenciamento {
+            grid-template-columns: 1fr;
+        }
     }
 
     .botao-acao {
         background-color: var(--branco);
         border-radius: 8px;
-        padding: 10px 16px;
+        padding: 12px 16px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -796,6 +877,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         white-space: nowrap;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         flex-shrink: 0;
+        min-height: 48px;
     }
 
     .botao-acao:hover {
@@ -1118,7 +1200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         right: 0;
         bottom: 0;
         background-color: rgba(0, 0, 0, 0.6);
-        z-index: 9998;
+        z-index: 10000;
         backdrop-filter: blur(4px);
     }
 
@@ -1138,7 +1220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         overflow-y: auto;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         position: relative;
-        z-index: 9999;
+        z-index: 10001;
     }
 
     .modal-header {
@@ -1247,6 +1329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         margin-bottom: 24px;
         border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         padding-bottom: 0;
+        justify-content: center;
     }
 
     .aba-botao {
@@ -1425,8 +1508,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .botao-acao-tabela.botao-neutro {
-        background: var(--fundo-secundario, #f0f0f0);
-        color: var(--texto);
+        background: var(--fundo-secundario, var(--caixas));
+        color: #fff;
     }
 
     .emblema-status {
@@ -1672,9 +1755,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             var abaAtual = 'participantes';
         }
 
+        // Declarações stub das funções de importar/exportar (serão sobrescritas pelo ConteudoParticipantes.php)
+        if (typeof importarListaPresenca === 'undefined') {
+            var importarListaPresenca = function() { console.log('Aguardando carregamento do conteúdo...'); };
+        }
+        if (typeof exportarListaPresenca === 'undefined') {
+            var exportarListaPresenca = function() { console.log('Aguardando carregamento do conteúdo...'); };
+        }
+        if (typeof importarListaInscritos === 'undefined') {
+            var importarListaInscritos = function() { console.log('Aguardando carregamento do conteúdo...'); };
+        }
+        if (typeof exportarListaInscritos === 'undefined') {
+            var exportarListaInscritos = function() { console.log('Aguardando carregamento do conteúdo...'); };
+        }
+        if (typeof fecharModalFormato === 'undefined') {
+            var fecharModalFormato = function() { };
+        }
+        if (typeof fecharModalImportacao === 'undefined') {
+            var fecharModalImportacao = function() { };
+        }
+        if (typeof executarExportacao === 'undefined') {
+            var executarExportacao = function() { console.log('Aguardando carregamento do conteúdo...'); };
+        }
+        if (typeof selecionarArquivoImportacao === 'undefined') {
+            var selecionarArquivoImportacao = function() { console.log('Aguardando carregamento do conteúdo...'); };
+        }
+        if (typeof fecharModalSeForFundo === 'undefined') {
+            var fecharModalSeForFundo = function() { };
+        }
+
         // ==== SISTEMA DE ABAS ====
         function inicializarAbas() {
-            console.log('🔧 Inicializando sistema de abas...');
             const botoesAbas = document.querySelectorAll('.aba-botao');
 
             botoesAbas.forEach(botao => {
@@ -1684,22 +1795,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             });
 
-            console.log(`✓ ${botoesAbas.length} botões de aba inicializados`);
-
             // Carrega o conteúdo da aba inicial (participantes)
             const abaInicial = document.getElementById('aba-participantes');
             if (abaInicial) {
-                console.log('📥 Carregando aba inicial (participantes)...');
                 carregarConteudoAba('participantes', abaInicial);
-            } else {
-                console.error('❌ Elemento aba-participantes não encontrado');
             }
         }
 
         function trocarAba(nomeAba) {
             abaAtual = nomeAba;
-
-            console.log('🔄 Trocando para aba:', nomeAba);
 
             // Atualiza botões das abas
             document.querySelectorAll('.aba-botao').forEach(btn => {
@@ -1720,8 +1824,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // ==== FUNÇÃO PARA CARREGAR CONTEÚDO DINÂMICO DAS ABAS ====
         function carregarConteudoAba(nomeAba, abaElement) {
-            console.log('🔍 carregarConteudoAba chamada para:', nomeAba);
-
             // Define o arquivo de conteúdo para cada aba
             const arquivosConteudo = {
                 'participantes': 'ConteudoParticipantes.php',
@@ -1730,48 +1832,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             const arquivo = arquivosConteudo[nomeAba];
             if (!arquivo) {
-                console.error('❌ Arquivo de conteúdo não definido para:', nomeAba);
                 return;
             }
 
             // Verifica se já foi carregado (procura por elementos específicos)
             const temConteudo = abaElement.querySelector('.secao-gerenciamento');
             if (temConteudo) {
-                console.log('✓ Conteúdo já carregado para:', nomeAba);
                 // Mas chama a função de carregamento de dados se existir
                 if (nomeAba === 'participantes' && typeof carregarParticipantes === 'function') {
-                    console.log('🔄 Recarregando dados de participantes...');
                     carregarParticipantes();
                 } else if (nomeAba === 'organizacao' && typeof carregarOrganizacao === 'function') {
-                    console.log('🔄 Recarregando dados de organização...');
                     carregarOrganizacao();
                 }
                 return;
             }
 
-            console.log('📥 Carregando conteúdo de:', arquivo);
-            console.log('📍 URL completa:', window.location.origin + window.location.pathname.replace('GerenciarEvento.php', arquivo));
             abaElement.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--texto);"><p>⏳ Carregando...</p></div>';
 
             // Carrega o conteúdo via AJAX
             fetch(arquivo)
                 .then(response => {
-                    console.log('📡 Response recebido:', response.status, response.statusText);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.text();
                 })
                 .then(html => {
-                    console.log(`✓ HTML recebido (${html.length} caracteres)`);
                     abaElement.innerHTML = html;
-                    console.log(`✓ Conteúdo inserido na aba: ${nomeAba}`);
 
                     // Executa scripts dentro do HTML carregado
                     executarScriptsDoConteudo(abaElement);
                 })
                 .catch(erro => {
-                    console.error('❌ Erro ao carregar conteúdo:', erro);
+                    console.error('Erro ao carregar conteúdo:', erro);
                     abaElement.innerHTML = `
                         <div style="text-align: center; padding: 40px; color: var(--texto);">
                             <p>❌ Erro ao carregar conteúdo</p>
@@ -1787,21 +1880,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // ==== FUNÇÃO PARA EXECUTAR SCRIPTS DO CONTEÚDO CARREGADO ====
         function executarScriptsDoConteudo(elemento) {
             const scripts = elemento.querySelectorAll('script');
-            console.log(`📜 Encontrados ${scripts.length} script(s) para executar`);
 
-            scripts.forEach((scriptAntigo, index) => {
+            scripts.forEach((scriptAntigo) => {
                 const scriptNovo = document.createElement('script');
                 if (scriptAntigo.src) {
-                    console.log(`  ${index + 1}. Script externo: ${scriptAntigo.src}`);
                     scriptNovo.src = scriptAntigo.src;
                 } else {
-                    const preview = scriptAntigo.textContent.substring(0, 50).replace(/\n/g, ' ');
-                    console.log(`  ${index + 1}. Script inline: ${preview}...`);
                     scriptNovo.textContent = scriptAntigo.textContent;
                 }
                 scriptAntigo.parentNode.replaceChild(scriptNovo, scriptAntigo);
             });
-            console.log(`✓ ${scripts.length} script(s) executado(s)`);
         }
 
         // Função para voltar - volta para a página do evento
@@ -1830,15 +1918,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Função de inicialização
         function inicializarListaParticipantes() {
-            console.log('🎬 Iniciando inicializarListaParticipantes...');
-
             const urlParams = new URLSearchParams(window.location.search);
             codEventoAtual = urlParams.get('cod_evento');
 
-            console.log('📌 Código do evento capturado:', codEventoAtual);
-
             if (!codEventoAtual) {
-                console.error('❌ Evento não identificado na URL');
                 alert('Erro: Evento não identificado');
                 voltarParaEventos();
                 return;
@@ -1848,12 +1931,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const containerLista = document.querySelector('.container-lista');
 
             if (!containerLista) {
-                console.warn('⏳ container-lista não encontrado, tentando novamente em 100ms...');
                 setTimeout(inicializarListaParticipantes, 100);
                 return;
             }
-
-            console.log('✓ container-lista encontrado');
 
             // Carrega dados do evento PRIMEIRO (antes das abas)
             carregarDadosEvento();
@@ -1861,14 +1941,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Depois inicializa as abas
             inicializarAbas();
             inicializarEventos();
-
-            console.log('✓ inicializarListaParticipantes concluído');
         }
 
         // ==== FUNÇÃO PARA CARREGAR DADOS DO EVENTO ====
         function carregarDadosEvento() {
-            console.log('📊 Carregando dados do evento:', codEventoAtual);
-
             fetch(`GerenciarEvento.php?action=buscar&cod_evento=${codEventoAtual}`)
                 .then(response => response.json())
                 .then(dados => {
@@ -1895,19 +1971,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         const duracao = dados.evento.duracao;
                         document.getElementById('evento-duracao').textContent = duracao ? `${duracao}h` : '-';
-
-                        console.log('✓ Dados do evento carregados');
                     }
                 })
                 .catch(erro => {
-                    console.error('❌ Erro ao carregar dados do evento:', erro);
+                    console.error('Erro ao carregar dados do evento:', erro);
                     alert('Erro ao carregar dados do evento. Tente novamente.');
                 });
         }
 
         // Função para limpar estado ao sair da página
         window.limparGerenciarEvento = function() {
-            console.log('🧹 Limpando estado do GerenciarEvento...');
             window.__gerenciarEventoInicializado = false;
             codEventoAtual = null;
             todosParticipantes = [];
@@ -1916,22 +1989,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             abaAtual = 'participantes';
         };
 
-        // Expõe função globalmente para ser chamada pelo Container
+        // Expõe funções globalmente para serem chamadas pelo Container e ConteudoParticipantes
         window.inicializarListaParticipantes = inicializarListaParticipantes;
+        window.importarListaPresenca = importarListaPresenca;
+        window.exportarListaPresenca = exportarListaPresenca;
+        window.importarListaInscritos = importarListaInscritos;
+        window.exportarListaInscritos = exportarListaInscritos;
+        window.fecharModalFormato = fecharModalFormato;
+        window.fecharModalImportacao = fecharModalImportacao;
+        window.executarExportacao = executarExportacao;
+        window.selecionarArquivoImportacao = selecionarArquivoImportacao;
 
         // Inicializa SEMPRE quando o script for executado
         // (isso acontece quando a página é carregada dinamicamente pelo Container)
-        console.log('🔄 Executando script GerenciarEvento...');
-
         // Limpa flag anterior para permitir nova inicialização
         window.__gerenciarEventoInicializado = false;
 
         if (document.readyState === 'loading') {
-            console.log('⏳ DOM ainda carregando, aguardando DOMContentLoaded...');
             document.addEventListener('DOMContentLoaded', inicializarListaParticipantes);
         } else {
             // DOM já está pronto ou página carregada via fetch
-            console.log('✓ DOM pronto, inicializando em 50ms...');
             setTimeout(inicializarListaParticipantes, 50);
         }
 
@@ -2257,13 +2334,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('formEditarDados').reset();
         }
 
-        function fecharModalSeForFundo(event, modalId) {
+        // fecharModalSeForFundo está definido como stub no início e será sobrescrito pelo ConteudoParticipantes.php
+        // Aqui apenas estendemos a funcionalidade para os modais locais
+        const fecharModalSeForFundoOriginal = fecharModalSeForFundo;
+        fecharModalSeForFundo = function(event, modalId) {
             if (event.target.id === modalId) {
                 if (modalId === 'modalEditarDados') fecharModal();
                 else if (modalId === 'modalAdicionarParticipante') fecharModalAdicionar();
                 else if (modalId === 'modalEnviarMensagem') fecharModalMensagem();
+                else if (typeof fecharModalSeForFundoOriginal === 'function') {
+                    fecharModalSeForFundoOriginal(event, modalId);
+                }
             }
-        }
+        };
 
         function formatarCPF(cpf) {
             return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -2474,83 +2557,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 console.error('Erro:', error);
                 alert('Erro ao enviar notificação');
             }
-        }
-
-        // ========== IMPORTAR/EXPORTAR ==========
-        function importarListaPresenca() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.csv,.xlsx';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append('action', 'importar_presenca');
-                formData.append('cod_evento', codEventoAtual);
-                formData.append('arquivo', file);
-
-                try {
-                    const response = await fetch('GerenciarEvento.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await response.json();
-                    if (data.sucesso) {
-                        alert(`Importação concluída!\nConfirmados: ${data.confirmados}\nErros: ${data.erros}`);
-                        carregarParticipantes();
-                    } else {
-                        alert('Erro ao importar: ' + (data.erro || 'Erro desconhecido'));
-                    }
-                } catch (error) {
-                    console.error('Erro:', error);
-                    alert('Erro ao importar arquivo');
-                }
-            };
-            input.click();
-        }
-
-        function exportarListaPresenca() {
-            window.location.href = `GerenciarEvento.php?action=exportar_presenca&cod_evento=${codEventoAtual}`;
-        }
-
-        function importarListaInscritos() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.csv,.xlsx';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append('action', 'importar_inscritos');
-                formData.append('cod_evento', codEventoAtual);
-                formData.append('arquivo', file);
-
-                try {
-                    const response = await fetch('GerenciarEvento.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await response.json();
-                    if (data.sucesso) {
-                        alert(`Importação concluída!\nInscritos: ${data.inscritos}\nErros: ${data.erros}`);
-                        carregarParticipantes();
-                    } else {
-                        alert('Erro ao importar: ' + (data.erro || 'Erro desconhecido'));
-                    }
-                } catch (error) {
-                    console.error('Erro:', error);
-                    alert('Erro ao importar arquivo');
-                }
-            };
-            input.click();
-        }
-
-        function exportarListaInscritos() {
-            window.location.href = `GerenciarEvento.php?action=exportar_inscritos&cod_evento=${codEventoAtual}`;
         }
 
         // ========== AÇÕES EM MASSA ==========

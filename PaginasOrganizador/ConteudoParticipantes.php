@@ -110,13 +110,13 @@
 </div>
 
 <!-- Modal Adicionar Participante -->
-<div class="modal-overlay" id="modalAdicionarParticipante" onclick="fecharModalSeForFundo(event, 'modalAdicionarParticipante')">
+<div class="modal-overlay" id="modalAdicionarParticipante">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Adicionar Participante</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalAdicionar()">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalAdicionar(); event.stopPropagation();">&times;</button>
         </div>
-        <form id="formAdicionarParticipante" onsubmit="salvarNovoParticipante(event)">
+        <form id="formAdicionarParticipante" onsubmit="salvarNovoParticipante(event); event.stopPropagation();">
             <div class="form-group">
                 <label for="add-cpf">CPF*</label>
                 <input type="text" id="add-cpf" maxlength="14" placeholder="000.000.000-00" required>
@@ -139,21 +139,21 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalAdicionar()">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar">Adicionar Participante</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalAdicionar(); event.stopPropagation();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Adicionar Participante</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Enviar Mensagem -->
-<div class="modal-overlay" id="modalEnviarMensagemPart" onclick="fecharModalSeForFundo(event, 'modalEnviarMensagemPart')">
+<div class="modal-overlay" id="modalEnviarMensagemPart">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Enviar Mensagem aos Participantes</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalMensagemPart()">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalMensagemPart(); event.stopPropagation();">&times;</button>
         </div>
-        <form id="formEnviarMensagemPart" onsubmit="enviarMensagemParticipantes(event)">
+        <form id="formEnviarMensagemPart" onsubmit="enviarMensagemParticipantes(event); event.stopPropagation();">
             <div class="form-group">
                 <label for="msg-titulo-part">Título da Notificação*</label>
                 <input type="text" id="msg-titulo-part" maxlength="100" required>
@@ -174,21 +174,21 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemPart()">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar">Enviar Notificação</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemPart(); event.stopPropagation();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Enviar Notificação</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Editar Dados -->
-<div class="modal-overlay" id="modalEditarDadosPart" onclick="fecharModalSeForFundo(event, 'modalEditarDadosPart')">
+<div class="modal-overlay" id="modalEditarDadosPart">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Editar Dados do Participante</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalEditarPart()">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalEditarPart(); event.stopPropagation();">&times;</button>
         </div>
-        <form id="formEditarDadosPart" onsubmit="salvarEdicaoPart(event)">
+        <form id="formEditarDadosPart" onsubmit="salvarEdicaoPart(event); event.stopPropagation();">
             <input type="hidden" id="edit-cpf-part">
 
             <div class="form-group">
@@ -212,8 +212,8 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalEditarPart()">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar">Salvar Alterações</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalEditarPart(); event.stopPropagation();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Salvar Alterações</button>
             </div>
         </form>
     </div>
@@ -228,32 +228,264 @@
         var participantesSelecionados = new Set();
     }
 
+    // ===== FUNÇÕES DE IMPORTAR/EXPORTAR (DECLARADAS NO INÍCIO) =====
+    
+    // Salva o HTML original do modal de importação
+    window.modalImportacaoOriginalHTML = null;
+
+    window.importarListaPresenca = function() {
+        const modal = document.getElementById('modalInfoImportacao');
+        if (modal) {
+            // Salva o HTML original na primeira vez
+            if (!window.modalImportacaoOriginalHTML) {
+                const modalBody = modal.querySelector('.modal-body');
+                if (modalBody) {
+                    window.modalImportacaoOriginalHTML = modalBody.innerHTML;
+                }
+            }
+            
+            // Restaura o HTML original toda vez que abrir
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody && window.modalImportacaoOriginalHTML) {
+                modalBody.innerHTML = window.modalImportacaoOriginalHTML;
+            }
+            
+            // Limpa qualquer arquivo selecionado anteriormente
+            window.arquivoSelecionado = null;
+            
+            modal.style.display = 'flex';
+            window.tipoImportacaoAtual = 'presenca';
+        }
+    };
+
+    window.exportarListaPresenca = function() {
+        const modal = document.getElementById('modalEscolherFormato');
+        if (modal) {
+            modal.style.display = 'flex';
+            window.tipoExportacaoAtual = 'presenca';
+        }
+    };
+
+    window.importarListaInscritos = function() {
+        const modal = document.getElementById('modalInfoImportacao');
+        if (modal) {
+            // Salva o HTML original na primeira vez
+            if (!window.modalImportacaoOriginalHTML) {
+                const modalBody = modal.querySelector('.modal-body');
+                if (modalBody) {
+                    window.modalImportacaoOriginalHTML = modalBody.innerHTML;
+                }
+            }
+            
+            // Restaura o HTML original toda vez que abrir
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody && window.modalImportacaoOriginalHTML) {
+                modalBody.innerHTML = window.modalImportacaoOriginalHTML;
+            }
+            
+            // Limpa qualquer arquivo selecionado anteriormente
+            window.arquivoSelecionado = null;
+            
+            modal.style.display = 'flex';
+            window.tipoImportacaoAtual = 'inscritos';
+        }
+    };
+
+    window.exportarListaInscritos = function() {
+        const modal = document.getElementById('modalEscolherFormato');
+        if (modal) {
+            modal.style.display = 'flex';
+            window.tipoExportacaoAtual = 'inscritos';
+        }
+    };
+
+    window.fecharModalFormato = function() {
+        const modal = document.getElementById('modalEscolherFormato');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    window.fecharModalImportacao = function() {
+        const modal = document.getElementById('modalInfoImportacao');
+        if (modal) {
+            // Restaura o HTML original antes de fechar
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody && window.modalImportacaoOriginalHTML) {
+                modalBody.innerHTML = window.modalImportacaoOriginalHTML;
+            }
+            
+            // Limpa o arquivo selecionado
+            window.arquivoSelecionado = null;
+            
+            modal.style.display = 'none';
+        }
+    };
+
+    window.executarExportacao = function(formato) {
+        const tipo = window.tipoExportacaoAtual || 'presenca';
+        const action = tipo === 'presenca' ? 'exportar_presenca' : 'exportar_inscritos';
+        
+        if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
+            alert('Código do evento não encontrado');
+            return;
+        }
+        
+        const url = `GerenciarEvento.php?action=${action}&formato=${formato}&cod_evento=${codEventoAtual}`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        window.fecharModalFormato();
+    };
+
+    window.selecionarArquivoImportacao = function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.csv,.xlsx,.xls,.ods';
+        input.onchange = async (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+
+            // Verifica o tamanho do arquivo (10MB)
+            if (arquivo.size > 10 * 1024 * 1024) {
+                alert('O arquivo excede o limite de 10MB');
+                return;
+            }
+
+            if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
+                alert('Código do evento não encontrado');
+                return;
+            }
+
+            // Atualiza o modal para mostrar o arquivo selecionado
+            const modalBody = document.querySelector('#modalInfoImportacao .info-importacao');
+            const tamanhoMB = (arquivo.size / 1024 / 1024).toFixed(2);
+            
+            modalBody.innerHTML = `
+                <div class="info-item" style="text-align: center; padding: 20px;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--azul-escuro)" stroke-width="2" style="margin-bottom: 16px;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="11" x2="12" y2="17"></line>
+                        <polyline points="9 14 12 17 15 14"></polyline>
+                    </svg>
+                    <h3 style="color: var(--azul-escuro); margin: 16px 0 8px 0;">Arquivo Selecionado</h3>
+                    <p style="font-size: 16px; font-weight: 600; color: #333; margin: 8px 0;">${arquivo.name}</p>
+                    <p style="color: #666; margin: 4px 0;">Tamanho: ${tamanhoMB} MB</p>
+                    <p style="color: #666; margin: 4px 0;">Tipo: ${arquivo.type || 'Desconhecido'}</p>
+                </div>
+            `;
+
+            // Atualiza os botões do footer
+            const modalFooter = document.querySelector('#modalInfoImportacao .modal-footer');
+            modalFooter.innerHTML = `
+                <button class="botao botao-secundario" onclick="window.cancelarImportacao(); event.stopPropagation();">
+                    Cancelar
+                </button>
+                <button class="botao botao-primario" onclick="window.confirmarImportacao(); event.stopPropagation();">
+                    Confirmar Importação
+                </button>
+            `;
+
+            // Armazena o arquivo para uso posterior
+            window.arquivoSelecionado = arquivo;
+        };
+        
+        input.click();
+    };
+
+    window.cancelarImportacao = function() {
+        window.arquivoSelecionado = null;
+        
+        // Restaura o HTML original do modal
+        const modal = document.getElementById('modalInfoImportacao');
+        if (modal && window.modalImportacaoOriginalHTML) {
+            const modalBody = modal.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = window.modalImportacaoOriginalHTML;
+            }
+        }
+        
+        // Fecha o modal
+        window.fecharModalImportacao();
+    };
+
+    window.confirmarImportacao = async function() {
+        const arquivo = window.arquivoSelecionado;
+        if (!arquivo) return;
+
+        const tipo = window.tipoImportacaoAtual || 'presenca';
+        const action = tipo === 'presenca' ? 'importar_presenca' : 'importar_inscritos';
+
+        // Fecha o modal antes de processar
+        window.fecharModalImportacao();
+
+        // Envia o arquivo
+        const formData = new FormData();
+        formData.append('arquivo', arquivo);
+        formData.append('action', action);
+        formData.append('cod_evento', codEventoAtual);
+
+        try {
+            const response = await fetch('GerenciarEvento.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.sucesso) {
+                alert(data.mensagem || 'Importação realizada com sucesso!');
+                if (typeof carregarParticipantes === 'function') {
+                    carregarParticipantes();
+                }
+            } else {
+                alert(data.erro || 'Erro ao importar arquivo');
+            }
+        } catch (error) {
+            console.error('Erro ao importar:', error);
+            alert('Erro ao processar importação');
+        }
+
+        window.arquivoSelecionado = null;
+    };
+
+    window.fecharModalSeForFundo = function(event, modalId) {
+        // Verifica se o clique foi no overlay (fundo) e não no conteúdo do modal
+        if (event.target.classList && event.target.classList.contains('modal-overlay')) {
+            // Fecha e restaura o estado original para modais de importação/exportação
+            if (modalId === 'modalEscolherFormato') {
+                window.fecharModalFormato();
+            } else if (modalId === 'modalInfoImportacao') {
+                window.fecharModalImportacao();
+            }
+        }
+    };
+
     // Função para carregar participantes
     function carregarParticipantes() {
         if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
-            console.error('❌ Código do evento não definido');
             return;
         }
-
-        console.log('📊 Carregando participantes do evento:', codEventoAtual);
 
         fetch(`GerenciarEvento.php?action=buscar&cod_evento=${codEventoAtual}`)
             .then(response => response.json())
             .then(dados => {
                 if (!dados.sucesso) {
-                    console.error('❌ Erro ao carregar participantes:', dados.erro);
                     alert('Erro ao carregar participantes: ' + (dados.erro || 'Erro desconhecido'));
                     return;
                 }
 
                 todosParticipantes = dados.participantes || [];
-                console.log(`✓ ${todosParticipantes.length} participantes carregados`);
 
                 renderizarParticipantes();
                 inicializarEventosParticipantes();
             })
             .catch(erro => {
-                console.error('❌ Erro ao carregar participantes:', erro);
+                console.error('Erro ao carregar participantes:', erro);
                 alert('Erro ao carregar participantes. Tente novamente.');
             });
     }
@@ -264,7 +496,6 @@
         const totalSpan = document.getElementById('total-participantes');
 
         if (!tbody || !totalSpan) {
-            console.error('❌ Elementos da tabela não encontrados');
             return;
         }
 
@@ -323,8 +554,6 @@
             </tr>
         `;
         }).join('');
-
-        console.log('✓ Tabela de participantes renderizada');
     }
 
     // Função para inicializar eventos
@@ -402,11 +631,11 @@
             },
             {
                 id: 'btn-importar-presenca',
-                fn: importarListaPresenca
+                fn: window.importarListaPresenca
             },
             {
                 id: 'btn-exportar-presenca',
-                fn: exportarListaPresenca
+                fn: window.exportarListaPresenca
             },
             {
                 id: 'btn-enviar-mensagem-part',
@@ -414,11 +643,11 @@
             },
             {
                 id: 'btn-importar-inscritos',
-                fn: importarListaInscritos
+                fn: window.importarListaInscritos
             },
             {
                 id: 'btn-exportar-inscritos',
-                fn: exportarListaInscritos
+                fn: window.exportarListaInscritos
             }
         ];
         bindsTopo.forEach(({
@@ -472,8 +701,6 @@
             });
             addCpfInput.addEventListener('blur', verificarCPFExistente);
         }
-
-        console.log('✓ Eventos dos participantes inicializados');
     }
 
     // Funções auxiliares
@@ -599,13 +826,10 @@
         return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
     }
 
-    // Modals
+    // Modals - Removido o fechamento ao clicar fora para evitar perda de dados por missclick
     function fecharModalSeForFundo(event, modalId) {
-        if (event.target.id === modalId) {
-            if (modalId === 'modalAdicionarParticipante') fecharModalAdicionar();
-            else if (modalId === 'modalEnviarMensagemPart') fecharModalMensagemPart();
-            else if (modalId === 'modalEditarDadosPart') fecharModalEditarPart();
-        }
+        // Não fecha mais ao clicar fora - usuário deve usar botão Cancelar
+        // Isso evita perda acidental de dados preenchidos
     }
 
     function abrirModalAdicionar() {
@@ -1047,6 +1271,295 @@
     }
 
     // Inicializa quando o conteúdo for carregado
-    console.log('✓ ConteudoParticipantes.php carregado');
     carregarParticipantes();
 </script>
+
+<!-- Modal: Escolher Formato de Exportação -->
+<div id="modalEscolherFormato" class="modal-overlay" onclick="window.fecharModalSeForFundo(event, 'modalEscolherFormato')">
+    <div class="modal-conteudo" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Escolha o formato de exportação</h2>
+            <button class="btn-fechar-modal" onclick="window.fecharModalFormato(); event.stopPropagation();" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="formatos-exportacao">
+                <button class="btn-formato" onclick="window.executarExportacao('csv'); event.stopPropagation();">
+                    <img src="../Imagens/CSV.svg" alt="CSV">
+                    <span>CSV</span>
+                    <small>Valores separados por vírgula</small>
+                </button>
+                <button class="btn-formato" onclick="window.executarExportacao('xlsx'); event.stopPropagation();">
+                    <img src="../Imagens/Excel.svg" alt="Excel">
+                    <span>Excel</span>
+                    <small>Microsoft Excel (.xlsx)</small>
+                </button>
+                <button class="btn-formato" onclick="window.executarExportacao('ods'); event.stopPropagation();">
+                    <img src="../Imagens/LibreOffice.svg" alt="LibreOffice">
+                    <span>LibreOffice</span>
+                    <small>Planilha ODS</small>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Informações sobre Importação -->
+<div id="modalInfoImportacao" class="modal-overlay" onclick="window.fecharModalSeForFundo(event, 'modalInfoImportacao')">
+    <div class="modal-conteudo" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Importar Arquivo</h2>
+            <button class="btn-fechar-modal" onclick="window.fecharModalImportacao(); event.stopPropagation();" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="info-importacao">
+                <div class="info-item">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Formatos aceitos:
+                    </h3>
+                    <p>CSV (.csv), Excel (.xlsx, .xls), LibreOffice (.ods)</p>
+                </div>
+                <div class="info-item">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                        Tamanho máximo:
+                    </h3>
+                    <p>10 MB por arquivo</p>
+                </div>
+                <div class="info-item">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                        Estrutura do arquivo:
+                    </h3>
+                    <p>O arquivo deve conter as seguintes colunas:</p>
+                    <ul>
+                        <li><strong>CPF</strong> - CPF do participante (obrigatório)</li>
+                        <li><strong>Nome</strong> - Nome completo</li>
+                        <li><strong>RA</strong> - Registro Acadêmico (opcional)</li>
+                        <li><strong>Email</strong> - E-mail do participante</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Importante:
+                    </h3>
+                    <ul>
+                        <li>A primeira linha deve conter os nomes das colunas</li>
+                        <li>CPFs duplicados serão ignorados</li>
+                        <li>Participantes já cadastrados serão atualizados</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="botao botao-primario" onclick="window.selecionarArquivoImportacao(); event.stopPropagation();">
+                    Selecionar Arquivo
+                </button>
+                <button class="botao botao-secundario" onclick="window.fecharModalImportacao(); event.stopPropagation();">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos dos Modais */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.ativo {
+    display: flex;
+}
+
+.modal-conteudo {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--azul-escuro);
+}
+
+.btn-fechar-modal {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.btn-fechar-modal:hover {
+    background-color: #f0f0f0;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Estilos dos botões de formato */
+.formatos-exportacao {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.btn-formato {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    background: var(--branco);
+    border: 2px solid var(--azul-escuro);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 15px;
+}
+
+.btn-formato:hover {
+    border-color: var(--azul-escuro);
+    background-color: #f0f7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(101, 152, 210, 0.3);
+}
+
+.btn-formato img {
+    width: 48px;
+    height: 48px;
+}
+
+.btn-formato span {
+    font-weight: 600;
+    color: var(--azul-escuro);
+    font-size: 1.1rem;
+}
+
+.btn-formato small {
+    color: var(--texto);
+    font-size: 0.85rem;
+}
+
+/* Estilos da informação de importação */
+.info-importacao {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-item h3 {
+    margin: 0 0 8px 0;
+    color: var(--azul-escuro);
+    font-size: 1.1rem;
+}
+
+.info-item p {
+    margin: 0;
+    color: var(--texto);
+    line-height: 1.6;
+}
+
+.info-item ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+    color: var(--texto);
+}
+
+.info-item li {
+    margin: 4px 0;
+    line-height: 1.6;
+}
+
+.botao-primario {
+    background-color: var(--azul-escuro);
+    color: var(--branco);
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.botao-primario:hover {
+    background-color: var(--azul-escuro);
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(101, 152, 210, 0.3);
+}
+
+.botao-secundario {
+    background-color: var(--branco);
+    color: var(--azul-escuro);
+    padding: 12px 28px;
+    border: 2px solid var(--azul-escuro);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.botao-secundario:hover {
+    background-color: #f0f7ff;
+    transform: translateY(-1px);
+}
+</style>

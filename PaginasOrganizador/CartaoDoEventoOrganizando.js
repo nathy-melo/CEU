@@ -354,11 +354,9 @@
 
   function irParaParticipantes() {
     if (!codigoEventoAtual) {
-      console.error('Código do evento não encontrado');
       alert('Erro: Código do evento não disponível. Recarregue a página.');
       return;
     }
-    console.log('Navegar para gerenciar evento:', codigoEventoAtual);
     if (typeof carregarPagina === 'function') {
       carregarPagina('gerenciarEvento', codigoEventoAtual);
     }
@@ -367,8 +365,6 @@
   function editarEvento() {
     if (modoEdicao) return;
     modoEdicao = true;
-
-    console.log('=== EDITANDO EVENTO ===');
 
     try {
       // Salvar dados originais
@@ -455,25 +451,19 @@
 
       if (btnRemoverImagem) btnRemoverImagem.style.display = 'flex';
       if (btnAdicionarMais) btnAdicionarMais.style.display = 'flex';
-
-      console.log('=== MODO EDIÇÃO ATIVO ===');
     } catch (error) {
       console.error('Erro ao editar evento:', error);
-      console.error('Stack trace:', error.stack);
       alert('Erro ao ativar modo de edição: ' + error.message);
       modoEdicao = false;
     }
   }
 
   function trocarParaBotoesEdicao() {
-    console.log('Trocando para botões de edição...');
-
     const btnVoltar = document.getElementById('btn-voltar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
 
     if (!btnVoltar || !btnParticipantes || !btnEditar) {
-      console.error('Botões não encontrados!');
       return;
     }
 
@@ -491,46 +481,21 @@
     btnEditar.textContent = 'Salvar';
     btnEditar.className = 'botao-salvar';
     btnEditar.onclick = salvarEvento;
-
-    console.log('Botões trocados:', {
-      voltar: btnVoltar.textContent,
-      participantes: btnParticipantes.textContent,
-      editar: btnEditar.textContent
-    });
   }
 
   function trocarParaBotoesVisualizacao() {
-    console.log('=== INICIANDO TROCA PARA VISUALIZAÇÃO ===');
-
     const btnVoltar = document.getElementById('btn-voltar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
 
-    console.log('Botões encontrados:', {
-      btnVoltar: btnVoltar ? 'SIM' : 'NÃO',
-      btnParticipantes: btnParticipantes ? 'SIM' : 'NÃO',
-      btnEditar: btnEditar ? 'SIM' : 'NÃO'
-    });
-
     if (!btnVoltar || !btnParticipantes || !btnEditar) {
-      console.error('✗ Botões não encontrados ao restaurar!');
-      console.error('btnVoltar:', btnVoltar);
-      console.error('btnParticipantes:', btnParticipantes);
-      console.error('btnEditar:', btnEditar);
       return;
     }
-
-    console.log('Texto atual dos botões ANTES:', {
-      voltar: btnVoltar.textContent,
-      participantes: btnParticipantes.textContent,
-      editar: btnEditar.textContent
-    });
 
     // Botão Voltar
     btnVoltar.textContent = 'Voltar';
     btnVoltar.className = 'botao-voltar';
     btnVoltar.onclick = function () {
-      console.log('Botão Voltar clicado - voltando para Meus Eventos');
       if (typeof carregarPagina === 'function') {
         carregarPagina('meusEventos');
       } else {
@@ -542,7 +507,6 @@
     btnParticipantes.textContent = 'Participantes';
     btnParticipantes.className = 'botao-participantes';
     btnParticipantes.onclick = function () {
-      console.log('Botão Participantes clicado');
       irParaParticipantes();
     };
 
@@ -550,25 +514,13 @@
     btnEditar.textContent = 'Editar';
     btnEditar.className = 'botao-editar';
     btnEditar.onclick = function () {
-      console.log('Botão Editar clicado');
       editarEvento();
     };
-
-    console.log('Texto atual dos botões DEPOIS:', {
-      voltar: btnVoltar.textContent,
-      participantes: btnParticipantes.textContent,
-      editar: btnEditar.textContent
-    });
-
-    console.log('✓ Botões restaurados com sucesso');
-    console.log('=== FIM DA TROCA PARA VISUALIZAÇÃO ===');
   }
 
   function cancelarEdicao() {
     if (!modoEdicao) return;
     modoEdicao = false;
-
-    console.log('=== CANCELANDO EDIÇÃO ===');
 
     try {
       // Restaurar dados originais
@@ -629,18 +581,13 @@
 
       // Restaurar botões
       trocarParaBotoesVisualizacao();
-
-      console.log('=== EDIÇÃO CANCELADA ===');
     } catch (error) {
       console.error('Erro ao cancelar edição:', error);
-      console.error('Stack trace:', error.stack);
     }
   }
 
   function salvarEvento() {
     if (!modoEdicao) return;
-
-    console.log('=== SALVANDO EVENTO ===');
 
     try {
       const inputNome = document.getElementById('input-nome');
@@ -765,7 +712,6 @@
 
     } catch (error) {
       console.error('Erro ao salvar evento:', error);
-      console.error('Stack trace:', error.stack);
       alert('Erro ao salvar evento: ' + error.message);
     }
   }
@@ -895,8 +841,6 @@
   }
 
   function inicializarCartaoEventoOrganizando() {
-    console.log('📋 Inicializando Cartão do Evento Organizando...');
-
     const btnVoltar = document.getElementById('btn-voltar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
@@ -913,9 +857,6 @@
       };
       btnParticipantes.onclick = irParaParticipantes;
       btnEditar.onclick = editarEvento;
-      console.log('✓ Botões inicializados');
-    } else {
-      console.error('✗ Erro: Botões não encontrados');
     }
 
     if (imagemCarrossel) {
@@ -926,12 +867,10 @@
           document.getElementById('modal-imagem').style.display = 'flex';
         }
       };
-      console.log('✓ Imagem do carrossel inicializada');
     }
 
     if (inputImagem) {
       inputImagem.onchange = adicionarImagens;
-      console.log('✓ Input de imagem inicializado');
     }
 
     // Expor funções globais necessárias
@@ -954,11 +893,7 @@
 
     if (codEvento) {
       carregarDadosEventoDoServidor(codEvento);
-    } else {
-      console.warn('⚠ Código do evento não fornecido na URL');
     }
-
-    console.log('✓ CartaoDoEventoOrganizando pronto!');
   }
 
   // Inicializar quando o DOM estiver pronto
