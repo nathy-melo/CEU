@@ -259,7 +259,7 @@
         gerenciarResize();
         aplicarSafeAreaDinamica();
         
-        console.log('✅ ResponsividadeMobile.js inicializado com gestos de swipe');
+        // Log desabilitado para reduzir ruído no console
     }
     
     // Rodar quando DOM estiver pronto

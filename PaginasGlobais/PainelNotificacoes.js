@@ -6,13 +6,13 @@ let notificacoesGlobal = [];
 let filtroAtual = 'todas';
 let intervalID = null;
 
-console.log('🔵 PainelNotificacoes.js CARREGADO');
+// Log inicial desabilitado para reduzir ruído no console
 
 // ==================================================
 // INICIALIZAÇÃO
 // ==================================================
 function inicializarPainel() {
-    console.log('🚀 Inicializando Painel de Notificações');
+    // Log inicial desabilitado para reduzir ruído no console
     
     // Verifica se elementos existem
     const btnVoltar = document.getElementById('btn-voltar');
@@ -24,16 +24,11 @@ function inicializarPainel() {
         return;
     }
     
-    console.log('✅ Elementos encontrados:', {
-        btnVoltar: !!btnVoltar,
-        btnsFiltro: btnsFiltro.length,
-        lista: !!lista
-    });
+    // Log desabilitado para reduzir ruído no console
     
     // Event listener - Botão Voltar
     if (btnVoltar) {
         btnVoltar.addEventListener('click', () => {
-            console.log('👈 Voltando para página anterior');
             window.history.back();
         });
     }
@@ -47,13 +42,13 @@ function inicializarPainel() {
             this.classList.add('ativo');
             // Atualiza filtro
             filtroAtual = this.getAttribute('data-tipo');
-            console.log('🔄 Filtro alterado para:', filtroAtual);
+            // Log desabilitado para reduzir ruído no console
             // Reexibe notificações
             mostrarNotificacoes();
         });
     });
     
-    console.log('✅ Event listeners configurados');
+    // Log desabilitado para reduzir ruído no console
     
     // Carrega notificações iniciais
     carregarNotificacoes();
@@ -63,11 +58,11 @@ function inicializarPainel() {
         clearInterval(intervalID);
     }
     intervalID = setInterval(() => {
-        console.log('⏰ Recarregando notificações (polling)');
+        // Log desabilitado para reduzir ruído no console
         carregarNotificacoes();
     }, 15000);
     
-    console.log('✅ Sistema de polling iniciado (15s)');
+    // Log desabilitado para reduzir ruído no console
 }
 
 // Expõe função globalmente para ser chamada pelos Containers
@@ -85,7 +80,7 @@ if (document.readyState === 'loading') {
 // CARREGAR NOTIFICAÇÕES DO SERVIDOR
 // ==================================================
 function carregarNotificacoes() {
-    console.log('📡 Buscando notificações...');
+    // Log desabilitado para reduzir ruído no console
     
     fetch('../PaginasGlobais/BuscarNotificacoes.php?todas=true')
         .then(response => {
@@ -95,11 +90,11 @@ function carregarNotificacoes() {
             return response.json();
         })
         .then(data => {
-            console.log('📥 Resposta:', data);
+            // Log desabilitado para reduzir ruído no console
             
             if (data.sucesso && Array.isArray(data.notificacoes)) {
                 notificacoesGlobal = data.notificacoes;
-                console.log(`✅ ${notificacoesGlobal.length} notificações carregadas`);
+                // Log desabilitado para reduzir ruído no console
                 mostrarNotificacoes();
             } else {
                 console.warn('⚠️ Resposta inválida:', data);
@@ -130,7 +125,7 @@ function mostrarNotificacoes() {
         notificacoesFiltradas = notificacoesGlobal.filter(n => n.tipo === filtroAtual);
     }
     
-    console.log(`📋 Exibindo ${notificacoesFiltradas.length} de ${notificacoesGlobal.length} (filtro: ${filtroAtual})`);
+    // Log desabilitado para reduzir ruído no console
     
     // Lista vazia
     if (notificacoesFiltradas.length === 0) {
@@ -188,7 +183,7 @@ function mostrarNotificacoes() {
             : `${naoLidas} não lida${naoLidas > 1 ? 's' : ''}`;
     }
     
-    console.log(`✅ Interface atualizada: ${notificacoesFiltradas.length} itens, ${naoLidas} não lidas`);
+    // Log desabilitado para reduzir ruído no console
 }
 
 // ==================================================
@@ -209,7 +204,7 @@ function mostrarVazio(mensagem) {
 // MARCAR NOTIFICAÇÃO COMO LIDA
 // ==================================================
 function marcarComoLida(id) {
-    console.log('📝 Marcando notificação', id, 'como lida');
+    // Log desabilitado para reduzir ruído no console
     
     // Verifica se o endpoint existe
     const endpoint = '../PaginasGlobais/AtualizarNotificacao.php';
@@ -232,7 +227,7 @@ function marcarComoLida(id) {
     })
     .then(data => {
         if (data.sucesso) {
-            console.log('✅ Notificação marcada como lida');
+            // Log desabilitado para reduzir ruído no console
             // Atualiza localmente
             const notif = notificacoesGlobal.find(n => n.id == id);
             if (notif) {
@@ -307,9 +302,9 @@ function formatarData(dataStr) {
 window.addEventListener('beforeunload', () => {
     if (intervalID) {
         clearInterval(intervalID);
-        console.log('🧹 Polling limpo');
+        // Log desabilitado para reduzir ruído no console
     }
 });
 
-console.log('🟢 PainelNotificacoes.js PRONTO');
+// Log final desabilitado para reduzir ruído no console
 

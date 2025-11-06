@@ -29,7 +29,7 @@ function garantirEsquemaColaboradores(mysqli $conexao)
         id INT AUTO_INCREMENT PRIMARY KEY,
         cod_evento INT NOT NULL,
         CPF CHAR(11) NOT NULL,
-        papel ENUM('colaborador','coorganizador') NOT NULL DEFAULT 'colaborador',
+        papel VARCHAR(20) NOT NULL DEFAULT 'colaborador',
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE KEY uk_evento_cpf (cod_evento, CPF),
         FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,

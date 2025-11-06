@@ -91,34 +91,39 @@ function parseSqlSchema($caminhoArquivo) {
     }
 
     // Captura blocos de CREATE TABLE ... ( ... );
-    if (preg_match_all('/create\s+table\s+if\s+not\s+exists\s+`?([a-zA-Z0-9_]+)`?\s*\((.*?)\)\s*(?:ENGINE|;)/is', $sql, $matches, PREG_SET_ORDER)) {
+    // Regex mais robusta que captura até o ponto e vírgula final
+    if (preg_match_all('/create\s+table\s+(?:if\s+not\s+exists\s+)?`?([a-zA-Z0-9_]+)`?\s*\(((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)\s*([^;]*);/is', $sql, $matches, PREG_SET_ORDER)) {
         foreach ($matches as $mt) {
             $tabela = $mt[1];
             $conteudo = $mt[2];
-            $schema['tables'][$tabela] = $schema['tables'][$tabela] ?? ['create' => '', 'columns' => []];
-            // Reconstrói o bloco CREATE completo (pega até o próximo ; após o fecha parênteses)
-            $posInicio = strpos($sql, $mt[0]);
-            $posDepois = $posInicio + strlen($mt[0]);
-            $proximoPontoVirgula = strpos($sql, ';', $posDepois);
-            if ($proximoPontoVirgula !== false) {
-                $blocoCompleto = substr($sql, $posInicio, ($proximoPontoVirgula - $posInicio + 1));
-            } else {
-                $blocoCompleto = $mt[0] . ';';
-            }
+            $opcoes = $mt[3]; // ENGINE, DEFAULT CHARSET, etc.
+            $schema['tables'][$tabela] = $schema['tables'][$tabela] ?? ['create' => '', 'columns' => [], 'options' => ''];
+            
+            // Guarda o bloco CREATE completo
+            $blocoCompleto = trim($mt[0]);
             $schema['tables'][$tabela]['create'] = $blocoCompleto;
-            // Percorre linhas internas do create
-            $linhas = preg_split('/\n/', $conteudo);
+            $schema['tables'][$tabela]['options'] = trim($opcoes);
+            
+            // Percorre linhas internas do create de forma mais precisa
+            $linhas = preg_split('/,\s*\n/', $conteudo);
             foreach ($linhas as $linha) {
-                $linha = trim(trim($linha), ',');
+                $linha = trim($linha);
+                $linha = rtrim($linha, ',');
                 if ($linha === '') continue;
+                
                 $lower = strtolower($linha);
+                
                 // Ignora constraints/keys/foreigns/primary etc
-                if (preg_match('/^(primary|foreign|unique|constraint|key|check)\b/', $lower)) continue;
+                if (preg_match('/^\s*(primary\s+key|foreign\s+key|unique\s+(?:key|index)?|constraint|key\s+|index\s+|check\s*\()/i', $lower)) {
+                    continue;
+                }
+                
                 // Captura nome da coluna (entre crase ou primeira palavra)
-                if (preg_match('/^`?([a-zA-Z0-9_]+)`?\s+/', $linha, $mc)) {
+                if (preg_match('/^\s*`?([a-zA-Z0-9_]+)`?\s+(.+)$/i', $linha, $mc)) {
                     $col = $mc[1];
-                    // Guarda definição original da coluna (sem vírgula final)
-                    $schema['tables'][$tabela]['columns'][$col] = $linha;
+                    $def = trim($mc[2]);
+                    // Guarda definição completa da coluna (tipo, NOT NULL, DEFAULT, etc.)
+                    $schema['tables'][$tabela]['columns'][$col] = "`$col` $def";
                 }
             }
         }
@@ -171,11 +176,66 @@ function verificarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
             // Não tenta checar colunas se a tabela nem existe
             continue;
         }
+        
+        // Pega todas as colunas da tabela atual no banco
+        $colunasAtuais = [];
+        $resColsAtual = mysqli_query($conexaoServidor, "SHOW FULL COLUMNS FROM `$tabela`");
+        if ($resColsAtual) {
+            while ($row = mysqli_fetch_assoc($resColsAtual)) {
+                $colunasAtuais[$row['Field']] = $row;
+            }
+        }
+        
         // Colunas esperadas
         foreach ($colunas as $coluna) {
-            $resCol = mysqli_query($conexaoServidor, "SHOW COLUMNS FROM `$tabela` LIKE '" . mysqli_real_escape_string($conexaoServidor, $coluna) . "'");
-            if (!$resCol || mysqli_num_rows($resCol) == 0) {
+            if (!isset($colunasAtuais[$coluna])) {
                 $diferencas[] = "Coluna '$tabela.$coluna' não existe";
+                continue;
+            }
+            
+            // Verifica tipo de dados da coluna
+            $defEsperada = strtolower($info['columns'][$coluna]);
+            $tipoAtual = strtolower($colunasAtuais[$coluna]['Type']);
+            
+            // Extrai o tipo da definição esperada (ex: "varchar(100)" de "`nome` varchar(100) NOT NULL")
+            if (preg_match('/`?' . preg_quote($coluna, '/') . '`?\s+([a-z0-9_]+(?:\([^)]+\))?)/i', $defEsperada, $m)) {
+                $tipoEsperado = strtolower(trim($m[1]));
+                
+                // Normaliza alguns tipos equivalentes
+                $tipoEsperado = str_replace(['integer', 'int(11)'], 'int', $tipoEsperado);
+                $tipoAtual = str_replace(['integer', 'int(11)'], 'int', $tipoAtual);
+                $tipoEsperado = str_replace('datetime(0)', 'datetime', $tipoEsperado);
+                $tipoAtual = str_replace('datetime(0)', 'datetime', $tipoAtual);
+                
+                // Compara tipos (permite diferenças menores como int(10) vs int(11))
+                if (strpos($tipoAtual, $tipoEsperado) === false && strpos($tipoEsperado, $tipoAtual) === false) {
+                    $diferencas[] = "Coluna '$tabela.$coluna' tem tipo diferente: esperado '$tipoEsperado', atual '$tipoAtual'";
+                }
+            }
+            
+            // Verifica NOT NULL
+            if (stripos($defEsperada, 'not null') !== false) {
+                if ($colunasAtuais[$coluna]['Null'] === 'YES') {
+                    $diferencas[] = "Coluna '$tabela.$coluna' deveria ser NOT NULL";
+                }
+            }
+        }
+        
+        // Verifica se há colunas extras no banco que não estão no SQL
+        foreach ($colunasAtuais as $nomeCol => $infoCol) {
+            if (!isset($info['columns'][$nomeCol])) {
+                $diferencas[] = "Coluna extra '$tabela.$nomeCol' existe no banco mas não está no SQL";
+            }
+        }
+    }
+    
+    // Verifica se há tabelas extras no banco que não estão no SQL
+    $resTabelas = mysqli_query($conexaoServidor, "SHOW TABLES");
+    if ($resTabelas) {
+        while ($row = mysqli_fetch_array($resTabelas)) {
+            $tabelaAtual = $row[0];
+            if (!isset($schema['tables'][$tabelaAtual])) {
+                $diferencas[] = "Tabela extra '$tabelaAtual' existe no banco mas não está no SQL";
             }
         }
     }
@@ -273,14 +333,12 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
         if (!@mysqli_query($conexaoServidor, $comando)) {
             $erro = mysqli_error($conexaoServidor);
             
-            // Lista de erros que devem ser ignorados
+            // Lista restrita de erros que podem ser ignorados (apenas duplicações ao reexecutar)
             $ignorarErros = [
-                'already exists',
-                'Duplicate',
-                'Unknown column',
-                'Duplicate key name',
-                'Multiple primary key',
-                'Check constraint'
+                'Table already exists',           // Tabela já existe
+                'Duplicate column name',          // Coluna duplicada ao tentar adicionar
+                'Duplicate key name',             // Chave duplicada
+                'Multiple primary key defined'    // PK já existe
             ];
             
             $deveIgnorar = false;
@@ -291,9 +349,31 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
                 }
             }
             
-            // Só adiciona aos erros se não for um erro ignorável e não estiver vazio
-            if (!$deveIgnorar && !empty($erro)) {
-                $erros[] = substr($comando, 0, 80) . '... → ' . substr($erro, 0, 100);
+            // ERROS IMPORTANTES QUE NUNCA DEVEM SER IGNORADOS
+            $errosCriticos = [
+                'syntax error',
+                'unknown database',
+                'access denied',
+                'unknown table',
+                'column cannot be null',
+                'data too long',
+                'out of range',
+                'incorrect',
+                'invalid'
+            ];
+            
+            $ehCritico = false;
+            foreach ($errosCriticos as $textoCritico) {
+                if (stripos($erro, $textoCritico) !== false) {
+                    $ehCritico = true;
+                    break;
+                }
+            }
+            
+            // Adiciona aos erros se for crítico OU se não for ignorável
+            if ($ehCritico || (!$deveIgnorar && !empty($erro))) {
+                $marcador = $ehCritico ? '❌ CRÍTICO: ' : '⚠️ ';
+                $erros[] = $marcador . substr($comando, 0, 60) . '... → ' . $erro;
             }
         } else {
             $executados++;
@@ -327,12 +407,38 @@ if (isset($_GET['verificar'])) {
             'diferencas' => ['Banco de dados CEU_bd não existe']
         ], JSON_UNESCAPED_UNICODE);
     } else {
-        $diferencas = verificarDiferencas($conexaoServidor, $banco, __DIR__ . '/BancodeDadosCEU.sql');
-        echo json_encode([
-            'bancoExiste' => true,
-            'atualizado' => empty($diferencas),
-            'diferencas' => $diferencas
-        ], JSON_UNESCAPED_UNICODE);
+        // Verifica se o banco está vazio
+        mysqli_select_db($conexaoServidor, $banco);
+        $resTabelas = mysqli_query($conexaoServidor, "SHOW TABLES");
+        $numTabelas = $resTabelas ? mysqli_num_rows($resTabelas) : 0;
+        
+        if ($numTabelas === 0) {
+            echo json_encode([
+                'bancoExiste' => true,
+                'atualizado' => false,
+                'bancoVazio' => true,
+                'diferencas' => ['Banco de dados está vazio - nenhuma tabela encontrada']
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            $diferencas = verificarDiferencas($conexaoServidor, $banco, __DIR__ . '/BancodeDadosCEU.sql');
+            
+            // Adiciona estatísticas
+            $schema = parseSqlSchema(__DIR__ . '/BancodeDadosCEU.sql');
+            $tabelasEsperadas = count($schema['tables']);
+            $tabelasEncontradas = $numTabelas;
+            
+            echo json_encode([
+                'bancoExiste' => true,
+                'atualizado' => empty($diferencas),
+                'bancoVazio' => false,
+                'diferencas' => $diferencas,
+                'estatisticas' => [
+                    'tabelasEsperadas' => $tabelasEsperadas,
+                    'tabelasEncontradas' => $tabelasEncontradas,
+                    'diferencasTotal' => count($diferencas)
+                ]
+            ], JSON_UNESCAPED_UNICODE);
+        }
     }
     
     mysqli_close($conexaoServidor);
@@ -361,15 +467,32 @@ if (isset($_GET['atualizar'])) {
     }
     
     $caminhoSQL = __DIR__ . '/BancodeDadosCEU.sql';
+    
+    // Verifica diferenças antes de aplicar
+    $diferencasAntes = verificarDiferencas($conexaoServidor, $banco, $caminhoSQL);
+    
     // Aplica diferenças (para quando apenas o CREATE foi alterado)
     $rDiff = aplicarDiferencas($conexaoServidor, $banco, $caminhoSQL);
+    
     // Executa o arquivo completo (para inserts e demais comandos)
     $rExec = executarArquivoSQL($conexaoServidor, $banco, $caminhoSQL);
+    
+    // Verifica diferenças depois de aplicar
+    $diferencasDepois = verificarDiferencas($conexaoServidor, $banco, $caminhoSQL);
+    
+    $todosErros = array_merge($rDiff['erros'] ?? [], $rExec['erros'] ?? []);
+    $sucesso = empty($diferencasDepois) && (empty($todosErros) || count(array_filter($todosErros, function($e) { 
+        return strpos($e, '❌ CRÍTICO') !== false; 
+    })) === 0);
+    
     $resultado = [
-        'sucesso' => ($rDiff['sucesso'] && $rExec['sucesso']),
+        'sucesso' => $sucesso,
         'executados' => ($rDiff['executados'] + $rExec['executados']),
-        'erros' => array_merge($rDiff['erros'] ?? [], $rExec['erros'] ?? []),
-        'avisos' => $rExec['avisos'] ?? ''
+        'erros' => $todosErros,
+        'avisos' => $rExec['avisos'] ?? '',
+        'diferencasAntes' => count($diferencasAntes),
+        'diferencasDepois' => count($diferencasDepois),
+        'detalheDiferencasRestantes' => $diferencasDepois
     ];
     
     mysqli_close($conexaoServidor);

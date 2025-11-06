@@ -51,6 +51,13 @@
     document.getElementById('end-date').textContent = dadosEvento.data_fim_formatada;
     document.getElementById('start-time').textContent = dadosEvento.horario_inicio;
     document.getElementById('end-time').textContent = dadosEvento.horario_fim;
+    
+    // Preenche datas e horários de inscrição
+    document.getElementById('inicio-inscricao').textContent = dadosEvento.data_inicio_inscricao || '-';
+    document.getElementById('fim-inscricao').textContent = dadosEvento.data_fim_inscricao || '-';
+    document.getElementById('horario-inicio-inscricao').textContent = dadosEvento.hora_inicio_inscricao || '-';
+    document.getElementById('horario-fim-inscricao').textContent = dadosEvento.hora_fim_inscricao || '-';
+    
     document.getElementById('audience').textContent = dadosEvento.publico_alvo;
     document.getElementById('category').textContent = dadosEvento.categoria;
     document.getElementById('modality').textContent = dadosEvento.modalidade;
@@ -78,6 +85,12 @@
       dataFimParaInput: dadosEvento.data_fim_para_input,
       horarioInicio: dadosEvento.horario_inicio,
       horarioFim: dadosEvento.horario_fim,
+      dataInicioInscricao: dadosEvento.data_inicio_inscricao || '-',
+      dataFimInscricao: dadosEvento.data_fim_inscricao || '-',
+      dataInicioInscricaoParaInput: dadosEvento.data_inicio_inscricao_para_input || '',
+      dataFimInscricaoParaInput: dadosEvento.data_fim_inscricao_para_input || '',
+      horarioInicioInscricao: dadosEvento.hora_inicio_inscricao || '-',
+      horarioFimInscricao: dadosEvento.hora_fim_inscricao || '-',
       publicoAlvo: dadosEvento.publico_alvo,
       categoria: dadosEvento.categoria,
       modalidade: dadosEvento.modalidade,
@@ -139,7 +152,7 @@
         alert('Erro ao carregar colaboradores: ' + (data.erro || 'desconhecido'));
         return;
       }
-      renderizarColaboradores(data.colaboradores || []);
+      renderizarColaboradores(data.colaboradores || [], data.eh_organizador || false, data.cpf_usuario || '');
       renderizarSolicitacoes(data.solicitacoes || []);
     } catch (e) {
       console.error('Falha ao carregar listas de colaboradores/solicitações', e);
@@ -147,7 +160,7 @@
     }
   }
 
-  function renderizarColaboradores(lista) {
+  function renderizarColaboradores(lista, ehOrganizador, cpfUsuario) {
     const container = document.getElementById('lista-colaboradores');
     if (!container) return;
     container.innerHTML = '';
@@ -175,11 +188,23 @@
 
       const acoes = document.createElement('div');
       acoes.className = 'acoes';
-      const btnRem = document.createElement('button');
-      btnRem.className = 'btn-remover';
-      btnRem.textContent = 'Remover';
-      btnRem.onclick = () => removerColaboradorEvento(item.CPF);
-      acoes.appendChild(btnRem);
+      
+      // Se é organizador, pode remover outros colaboradores
+      if (ehOrganizador) {
+        const btnRem = document.createElement('button');
+        btnRem.className = 'btn-remover';
+        btnRem.textContent = 'Remover';
+        btnRem.onclick = () => removerColaboradorEvento(item.CPF);
+        acoes.appendChild(btnRem);
+      } 
+      // Se é colaborador e é ele mesmo, pode sair
+      else if (item.CPF === cpfUsuario) {
+        const btnSair = document.createElement('button');
+        btnSair.className = 'btn-sair';
+        btnSair.textContent = 'Sair da Colaboração';
+        btnSair.onclick = () => sairDaColaboracao();
+        acoes.appendChild(btnSair);
+      }
 
       linha.appendChild(info);
       linha.appendChild(acoes);
@@ -283,6 +308,32 @@
     }
   }
 
+  async function sairDaColaboracao() {
+    if (!confirm('Deseja sair da colaboração deste evento?')) return;
+    try {
+      const form = new FormData();
+      form.append('action', 'sair');
+      form.append('cod_evento', String(codigoEventoAtual));
+      const resp = await fetch('GerenciadorColaboradores.php', { method: 'POST', body: form });
+      const data = await resp.json();
+      if (!data.sucesso) {
+        alert('Erro ao sair da colaboração: ' + (data.erro || 'desconhecido'));
+        return;
+      }
+      alert('Você saiu da colaboração do evento');
+      fecharModalColaboradores();
+      // Volta para a página de eventos
+      if (typeof carregarPagina === 'function') {
+        carregarPagina('meusEventos');
+      } else {
+        window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+      }
+    } catch (e) {
+      console.error('Falha ao sair da colaboração', e);
+      alert('Falha ao sair da colaboração');
+    }
+  }
+
   async function atualizarSolicitacao(id, acao) {
     try {
       const form = new FormData();
@@ -358,6 +409,10 @@
       const inputDataFim = document.getElementById('input-data-fim');
       const inputHorarioInicio = document.getElementById('input-horario-inicio');
       const inputHorarioFim = document.getElementById('input-horario-fim');
+      const inputDataInicioInscricao = document.getElementById('input-data-inicio-inscricao');
+      const inputDataFimInscricao = document.getElementById('input-data-fim-inscricao');
+      const inputHorarioInicioInscricao = document.getElementById('input-horario-inicio-inscricao');
+      const inputHorarioFimInscricao = document.getElementById('input-horario-fim-inscricao');
       const inputPublicoAlvo = document.getElementById('input-publico-alvo');
       const inputCategoria = document.getElementById('input-categoria');
       const inputModalidade = document.getElementById('input-modalidade');
@@ -367,12 +422,19 @@
       if (inputNome) inputNome.value = dadosOriginaisEvento.nome;
       if (inputLocal) inputLocal.value = dadosOriginaisEvento.local;
 
-      // Usar datas no formato yyyy-mm-dd para os inputs
+      // Usar datas no formato yyyy-mm-dd para os inputs do evento
       if (inputDataInicio) inputDataInicio.value = dadosOriginaisEvento.dataInicioParaInput;
       if (inputDataFim) inputDataFim.value = dadosOriginaisEvento.dataFimParaInput;
 
       if (inputHorarioInicio) inputHorarioInicio.value = dadosOriginaisEvento.horarioInicio;
       if (inputHorarioFim) inputHorarioFim.value = dadosOriginaisEvento.horarioFim;
+      
+      // Preencher datas e horários de inscrição
+      if (inputDataInicioInscricao) inputDataInicioInscricao.value = dadosOriginaisEvento.dataInicioInscricaoParaInput || '';
+      if (inputDataFimInscricao) inputDataFimInscricao.value = dadosOriginaisEvento.dataFimInscricaoParaInput || '';
+      if (inputHorarioInicioInscricao) inputHorarioInicioInscricao.value = dadosOriginaisEvento.horarioInicioInscricao || '';
+      if (inputHorarioFimInscricao) inputHorarioFimInscricao.value = dadosOriginaisEvento.horarioFimInscricao || '';
+      
       if (inputPublicoAlvo) inputPublicoAlvo.value = dadosOriginaisEvento.publicoAlvo;
       if (inputCategoria) inputCategoria.value = dadosOriginaisEvento.categoria;
       if (inputModalidade) inputModalidade.value = dadosOriginaisEvento.modalidade;
@@ -468,8 +530,12 @@
     btnVoltar.textContent = 'Voltar';
     btnVoltar.className = 'botao-voltar';
     btnVoltar.onclick = function () {
-      console.log('Botão Voltar clicado');
-      history.back();
+      console.log('Botão Voltar clicado - voltando para Meus Eventos');
+      if (typeof carregarPagina === 'function') {
+        carregarPagina('meusEventos');
+      } else {
+        window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+      }
     };
 
     // Botão Participantes
@@ -512,6 +578,10 @@
       const endDate = document.getElementById('end-date');
       const startTime = document.getElementById('start-time');
       const endTime = document.getElementById('end-time');
+      const inicioInscricao = document.getElementById('inicio-inscricao');
+      const fimInscricao = document.getElementById('fim-inscricao');
+      const horarioInicioInscricao = document.getElementById('horario-inicio-inscricao');
+      const horarioFimInscricao = document.getElementById('horario-fim-inscricao');
       const audience = document.getElementById('audience');
       const category = document.getElementById('category');
       const modality = document.getElementById('modality');
@@ -525,6 +595,10 @@
       if (endDate) endDate.textContent = dadosOriginaisEvento.dataFim;
       if (startTime) startTime.textContent = dadosOriginaisEvento.horarioInicio;
       if (endTime) endTime.textContent = dadosOriginaisEvento.horarioFim;
+      if (inicioInscricao) inicioInscricao.textContent = dadosOriginaisEvento.dataInicioInscricao;
+      if (fimInscricao) fimInscricao.textContent = dadosOriginaisEvento.dataFimInscricao;
+      if (horarioInicioInscricao) horarioInicioInscricao.textContent = dadosOriginaisEvento.horarioInicioInscricao;
+      if (horarioFimInscricao) horarioFimInscricao.textContent = dadosOriginaisEvento.horarioFimInscricao;
       if (audience) audience.textContent = dadosOriginaisEvento.publicoAlvo;
       if (category) category.textContent = dadosOriginaisEvento.categoria;
       if (modality) modality.textContent = dadosOriginaisEvento.modalidade;
@@ -575,6 +649,10 @@
       const inputDataFim = document.getElementById('input-data-fim');
       const inputHorarioInicio = document.getElementById('input-horario-inicio');
       const inputHorarioFim = document.getElementById('input-horario-fim');
+      const inputDataInicioInscricao = document.getElementById('input-data-inicio-inscricao');
+      const inputDataFimInscricao = document.getElementById('input-data-fim-inscricao');
+      const inputHorarioInicioInscricao = document.getElementById('input-horario-inicio-inscricao');
+      const inputHorarioFimInscricao = document.getElementById('input-horario-fim-inscricao');
       const inputPublicoAlvo = document.getElementById('input-publico-alvo');
       const inputCategoria = document.getElementById('input-categoria');
       const inputModalidade = document.getElementById('input-modalidade');
@@ -590,6 +668,10 @@
       formData.append('data_fim', inputDataFim.value);
       formData.append('horario_inicio', inputHorarioInicio.value);
       formData.append('horario_fim', inputHorarioFim.value);
+      formData.append('data_inicio_inscricao', inputDataInicioInscricao.value || '');
+      formData.append('data_fim_inscricao', inputDataFimInscricao.value || '');
+      formData.append('horario_inicio_inscricao', inputHorarioInicioInscricao.value || '');
+      formData.append('horario_fim_inscricao', inputHorarioFimInscricao.value || '');
       formData.append('publico_alvo', inputPublicoAlvo.value);
       formData.append('categoria', inputCategoria.value);
       formData.append('modalidade', inputModalidade.value);

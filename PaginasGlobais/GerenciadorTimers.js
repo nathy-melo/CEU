@@ -21,10 +21,7 @@
             delay: delay,
             timestamp: Date.now()
         });
-        // Log reduzido apenas para debugging importante
-        if (delay > 10000 || callback.name) { // Só loga se for delay grande ou função nomeada
-            console.log(`[Gerenciador Timers] Registrado interval ID: ${id}, delay: ${delay}ms`);
-        }
+        // Log desabilitado para reduzir ruído no console
         return id;
     };
     
@@ -38,10 +35,7 @@
             delay: delay,
             timestamp: Date.now()
         });
-        // Log reduzido apenas para debugging importante
-        if (delay > 5000 || callback.name) { // Só loga se for delay grande ou função nomeada
-            console.log(`[Gerenciador Timers] Registrado timeout ID: ${id}, delay: ${delay}ms`);
-        }
+        // Log desabilitado para reduzir ruído no console
         return id;
     };
     
@@ -61,28 +55,21 @@
     
     // Função para limpar todos os timers ativos
     function limparTodosOsTimers() {
-        // Log apenas se houver muitos timers para limpar
-        if (intervalosAtivos.length > 3 || timeoutsAtivos.length > 3) {
-            console.log(`[Gerenciador Timers] Limpando ${intervalosAtivos.length} intervalos e ${timeoutsAtivos.length} timeouts`);
-        }
-        
         // Limpar todos os intervalos
         intervalosAtivos.forEach(timer => {
             clearIntervalOriginal(timer.id);
-            // console.log(`[Gerenciador Timers] Limpando interval: ${timer.callback} (${timer.delay}ms)`); // Log reduzido
         });
         
         // Limpar todos os timeouts
         timeoutsAtivos.forEach(timer => {
             clearTimeoutOriginal(timer.id);
-            // console.log(`[Gerenciador Timers] Limpando timeout: ${timer.callback} (${timer.delay}ms)`); // Log reduzido
         });
         
         // Resetar arrays
         intervalosAtivos = [];
         timeoutsAtivos = [];
         
-        console.log('[Gerenciador Timers] Todos os timers foram limpos');
+        // Log desabilitado
     }
     
     // Função para listar timers ativos (debug)
@@ -99,7 +86,7 @@
     
     // Função para limpar listeners de eventos
     function limparEventListeners() {
-        console.log('[Gerenciador Timers] Limpando event listeners...');
+        // Log desabilitado para reduzir ruído no console
         
         // Remove todos os listeners de elementos específicos que podem causar problemas
         const elementosProblematicos = [
@@ -118,8 +105,6 @@
     
     // Função para resetar variáveis globais específicas do CEU
     function resetarVariaveisGlobais() {
-        console.log('[Gerenciador Timers] Resetando variáveis globais...');
-        
         // Lista de variáveis globais que devem ser resetadas
         const variaveisParaResetar = [
             'conteudoOriginalFaleConosco',
@@ -136,7 +121,6 @@
         variaveisParaResetar.forEach(nomeVariavel => {
             if (window[nomeVariavel] !== undefined) {
                 window[nomeVariavel] = null;
-                console.log(`[Gerenciador Timers] Resetada variável: ${nomeVariavel}`);
             }
         });
         
@@ -149,15 +133,12 @@
         sessionKeysParaLimpar.forEach(key => {
             if (sessionStorage.getItem(key)) {
                 sessionStorage.removeItem(key);
-                console.log(`[Gerenciador Timers] Removida sessionStorage key: ${key}`);
             }
         });
     }
     
     // Função principal de limpeza completa
     function limpezaCompleta() {
-        console.log('[Gerenciador Timers] Iniciando limpeza completa...');
-        
         // Parar verificação de sessão se estiver ativa
         if (typeof window.pararVerificacaoSessao === 'function') {
             window.pararVerificacaoSessao();
@@ -165,7 +146,6 @@
         
         // Limpar listeners de cancelamento de timer se existirem
         if (window.eventosCancelamentoTimer && Array.isArray(window.eventosCancelamentoTimer)) {
-            console.log('[Gerenciador Timers] Removendo listeners de cancelamento de timer');
             window.eventosCancelamentoTimer.forEach(evento => {
                 try {
                     document.removeEventListener(evento, window.cancelarTimer);
@@ -188,8 +168,6 @@
                 modal.parentNode.removeChild(modal);
             }
         });
-        
-        console.log('[Gerenciador Timers] Limpeza completa finalizada');
     }
     
     // Tornar funções globais
@@ -200,17 +178,15 @@
     
     // Auto-limpeza antes de sair da página
     window.addEventListener('beforeunload', function() {
-        console.log('[Gerenciador Timers] Limpeza automática ao sair da página');
         limpezaCompleta();
     });
     
     // Limpeza quando a página fica invisível (melhor que unload)
     document.addEventListener('visibilitychange', function() {
         if (document.visibilityState === 'hidden') {
-            console.log('[Gerenciador Timers] Limpeza automática - página oculta');
             limpezaCompleta();
         }
     });
     
-    console.log('[Gerenciador Timers] Sistema de limpeza inicializado');
+    // Log inicial desabilitado para reduzir ruído no console
 })();

@@ -166,10 +166,11 @@
         const tempoInativo = timestampAtual - timestampUltimaAtividade;
         const segundosInativos = Math.floor(tempoInativo / 1000);
         
-        // Debug apenas quando próximo do limite (reduzindo spam)
-        if (segundosInativos % 30 === 0 || segundosInativos > 270) {
-            console.log(`Verificando inatividade: ${segundosInativos}s de ${tempoLimiteSessaoInatividade/1000}s (5 minutos)`);
-        }
+        // Log desabilitado para evitar poluição do console
+        // Debug apenas quando próximo do limite crítico (últimos 30 segundos)
+        // if (segundosInativos > 270) {
+        //     console.log(`Verificando inatividade: ${segundosInativos}s de ${tempoLimiteSessaoInatividade/1000}s (5 minutos)`);
+        // }
         
         // Se passou do tempo limite, expira a sessão
         if (tempoInativo >= tempoLimiteSessaoInatividade) {
@@ -199,7 +200,8 @@
 
     // Função para iniciar verificação de sessão
     function iniciarVerificacaoSessao(tempoSessaoSegundos = 300) {
-        console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
+        // Log inicial desabilitado para reduzir ruído no console
+        // console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
 
         
         // Para qualquer verificação anterior
@@ -246,7 +248,8 @@
 
     // Função para reiniciar verificação de sessão (útil após navegação)
     function reiniciarVerificacaoSessao(tempoSessaoSegundos = 300) {
-        console.log(`Reiniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
+        // Log desabilitado para reduzir ruído no console
+        // console.log(`Reiniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
         pararVerificacaoSessao();
         setTimeout(() => {
             iniciarVerificacaoSessao(tempoSessaoSegundos);
@@ -296,7 +299,8 @@
         
         if (usuarioEstaLogado) {
             iniciarVerificacaoSessao(300); // 300 segundos (5 minutos)
-            console.log('Sistema de verificação de sessão iniciado automaticamente (5 minutos de inatividade + 1 minuto de extensão)');
+            // Log inicial desabilitado para reduzir ruído no console
+            // console.log('Sistema de verificação de sessão iniciado automaticamente (5 minutos de inatividade + 1 minuto de extensão)');
         }
     });
 })();

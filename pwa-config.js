@@ -12,7 +12,7 @@
       const prev = link.getAttribute('href');
       if (prev !== href) {
         link.setAttribute('href', href);
-        console.log('[PWA] Manifest atualizado para', href);
+        // Log desabilitado para reduzir ruído no console
       }
     } catch (e) { console.warn('Não foi possível ajustar o manifest:', e); }
   }
@@ -49,21 +49,21 @@
 
       navigator.serviceWorker.getRegistration().then(function(existing){
         if (existing) {
-          console.log('SW já registrado:', existing.scope);
+          // Log desabilitado para reduzir ruído no console
           setupRegistrationListeners(existing);
         } else {
           navigator.serviceWorker.register('/CEU/sw.js')
             .then(function(registration){
-              console.log('SW registrado com sucesso:', registration.scope);
+              // Log desabilitado para reduzir ruído no console
               setupRegistrationListeners(registration);
             })
             .catch(function(error){
-              console.log('Falha no registro do SW:', error);
+              console.error('Falha no registro do SW:', error);
             });
         }
       });
     } catch (e) {
-      console.log('Falha ao inicializar Service Worker:', e);
+      console.error('Falha ao inicializar Service Worker:', e);
     }
   }
 
@@ -82,7 +82,7 @@
 
   // Detectar quando app foi instalado
   window.addEventListener('appinstalled', (evt) => {
-    console.log('PWA foi instalada');
+    // Log desabilitado para reduzir ruído no console
     // Limpa o prompt guardado
     deferredPrompt = null;
     window.deferredPrompt = null;

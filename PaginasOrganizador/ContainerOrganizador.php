@@ -258,7 +258,14 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'listaParticipantes': {
                 html: 'ListadeParticipantes.php',
                 js: [],
-                init: () => {}
+                init: () => {
+                    // Força reinicialização da lista após um pequeno delay
+                    setTimeout(() => {
+                        if (typeof window.inicializarListaParticipantes === 'function') {
+                            window.inicializarListaParticipantes();
+                        }
+                    }, 100);
+                }
             },
             'perfil': {
                 html: 'PerfilOrganizador.html',

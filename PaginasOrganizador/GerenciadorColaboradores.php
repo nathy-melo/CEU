@@ -29,7 +29,7 @@ function garantirEsquemaColaboradores(mysqli $conexao)
         id INT AUTO_INCREMENT PRIMARY KEY,
         cod_evento INT NOT NULL,
         CPF CHAR(11) NOT NULL,
-        papel ENUM('colaborador','coorganizador') NOT NULL DEFAULT 'colaborador',
+        papel VARCHAR(20) NOT NULL DEFAULT 'colaborador',
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE KEY uk_evento_cpf (cod_evento, CPF),
         FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
@@ -129,6 +129,9 @@ try {
             exit;
         }
 
+        // Verifica se usuário é organizador
+        $ehOrganizador = verificarPermissaoOrganizador($conexao, $codEvento, $cpfUsuario);
+
         // Lista colaboradores
         $sql = "SELECT c.CPF, u.Nome AS nome, u.Email AS email, c.papel, c.criado_em
                 FROM colaboradores_evento c
@@ -147,7 +150,7 @@ try {
 
         // Lista solicitações pendentes (apenas para organizador)
         $solicitacoes = [];
-        if (verificarPermissaoOrganizador($conexao, $codEvento, $cpfUsuario)) {
+        if ($ehOrganizador) {
             $sql = "SELECT s.id, s.cpf_solicitante AS CPF, u.Nome AS nome, u.Email AS email, s.status, s.data_criacao
                     FROM solicitacoes_colaboracao s
                     JOIN usuario u ON u.CPF = s.cpf_solicitante
@@ -163,7 +166,13 @@ try {
             mysqli_stmt_close($stmt);
         }
 
-        echo json_encode(['sucesso' => true, 'colaboradores' => $colaboradores, 'solicitacoes' => $solicitacoes]);
+        echo json_encode([
+            'sucesso' => true, 
+            'colaboradores' => $colaboradores, 
+            'solicitacoes' => $solicitacoes,
+            'eh_organizador' => $ehOrganizador,
+            'cpf_usuario' => $cpfUsuario
+        ]);
         exit;
     }
 
@@ -238,7 +247,45 @@ try {
         }
 
         // ===========================
-        // REMOVER COLABORADOR
+        // SAIR DA COLABORAÇÃO
+        // ===========================
+        if ($action === 'sair') {
+            $codEvento = isset($_POST['cod_evento']) ? (int) $_POST['cod_evento'] : 0;
+            
+            if ($codEvento <= 0) {
+                echo json_encode(['sucesso' => false, 'erro' => 'parametros_invalidos']);
+                exit;
+            }
+
+            // Verifica se usuário é colaborador
+            $stmt = mysqli_prepare($conexao, "SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ? LIMIT 1");
+            mysqli_stmt_bind_param($stmt, 'is', $codEvento, $cpfUsuario);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_store_result($stmt);
+            $ehColaborador = mysqli_stmt_num_rows($stmt) > 0;
+            mysqli_stmt_close($stmt);
+
+            if (!$ehColaborador) {
+                echo json_encode(['sucesso' => false, 'erro' => 'nao_eh_colaborador']);
+                exit;
+            }
+
+            // Remove o próprio usuário da colaboração
+            $stmt = mysqli_prepare($conexao, "DELETE FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?");
+            mysqli_stmt_bind_param($stmt, 'is', $codEvento, $cpfUsuario);
+            
+            if (!mysqli_stmt_execute($stmt)) {
+                echo json_encode(['sucesso' => false, 'erro' => 'falha_sair']);
+                exit;
+            }
+            mysqli_stmt_close($stmt);
+
+            echo json_encode(['sucesso' => true, 'mensagem' => 'Você saiu da colaboração']);
+            exit;
+        }
+
+        // ===========================
+        // REMOVER COLABORADOR (apenas organizador)
         // ===========================
         if ($action === 'remover') {
             $codEvento = isset($_POST['cod_evento']) ? (int) $_POST['cod_evento'] : 0;

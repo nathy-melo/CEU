@@ -80,7 +80,7 @@ function garantirEsquemaColaboradores($conexao)
         id INT AUTO_INCREMENT PRIMARY KEY,
         cod_evento INT NOT NULL,
         CPF CHAR(11) NOT NULL,
-        papel ENUM('colaborador','coorganizador') NOT NULL DEFAULT 'colaborador',
+        papel VARCHAR(20) NOT NULL DEFAULT 'colaborador',
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE KEY uk_evento_cpf (cod_evento, CPF),
         FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
@@ -243,6 +243,8 @@ try {
                     evento.certificado,
                     evento.modalidade,
                     evento.imagem,
+                    evento.inicio_inscricao,
+                    evento.fim_inscricao,
                     usuario.Nome as nome_organizador
                 FROM evento
                 INNER JOIN organiza ON evento.cod_evento = organiza.cod_evento
@@ -274,6 +276,28 @@ try {
                 $statusEvento = 'Finalizado';
             }
 
+            // Formatar datas de inscrição se existirem
+            $dataInicioInscricao = '-';
+            $horaInicioInscricao = '-';
+            $dataFimInscricao = '-';
+            $horaFimInscricao = '-';
+            $dataInicioInscricaoParaInput = '';
+            $dataFimInscricaoParaInput = '';
+            
+            if (!empty($dadosEvento['inicio_inscricao'])) {
+                $dtInicioInsc = new DateTime($dadosEvento['inicio_inscricao']);
+                $dataInicioInscricao = $dtInicioInsc->format('d/m/y');
+                $horaInicioInscricao = $dtInicioInsc->format('H:i');
+                $dataInicioInscricaoParaInput = $dtInicioInsc->format('Y-m-d');
+            }
+            
+            if (!empty($dadosEvento['fim_inscricao'])) {
+                $dtFimInsc = new DateTime($dadosEvento['fim_inscricao']);
+                $dataFimInscricao = $dtFimInsc->format('d/m/y');
+                $horaFimInscricao = $dtFimInsc->format('H:i');
+                $dataFimInscricaoParaInput = $dtFimInsc->format('Y-m-d');
+            }
+
             $eventoFormatado = [
                 'cod_evento' => $dadosEvento['cod_evento'],
                 'categoria' => $dadosEvento['categoria'],
@@ -295,7 +319,13 @@ try {
                 'data_inicio_para_input' => $dataHoraInicio->format('Y-m-d'),
                 'data_fim_para_input' => $dataHoraConclusao->format('Y-m-d'),
                 'horario_inicio' => $dataHoraInicio->format('H:i'),
-                'horario_fim' => $dataHoraConclusao->format('H:i')
+                'horario_fim' => $dataHoraConclusao->format('H:i'),
+                'data_inicio_inscricao' => $dataInicioInscricao,
+                'hora_inicio_inscricao' => $horaInicioInscricao,
+                'data_fim_inscricao' => $dataFimInscricao,
+                'hora_fim_inscricao' => $horaFimInscricao,
+                'data_inicio_inscricao_para_input' => $dataInicioInscricaoParaInput,
+                'data_fim_inscricao_para_input' => $dataFimInscricaoParaInput
             ];
 
             mysqli_stmt_close($stmt);

@@ -1235,7 +1235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <footer class="rodape-lista">
-                <button type="button" class="botao botao-voltar" onclick="history.back()">Voltar</button>
+                <button type="button" class="botao botao-voltar" onclick="voltarParaEventos()">Voltar</button>
             </footer>
         </div>
     </div>
@@ -1355,20 +1355,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         let todosParticipantes = [];
         let participantesSelecionados = new Set();
 
-        // Inicializa
-        (function() {
+        // Função para voltar - volta para a página do evento
+        function voltarParaEventos() {
+            if (!codEventoAtual) {
+                // Se não tem código do evento, vai para meus eventos
+                if (typeof window.carregarPagina === 'function') {
+                    window.carregarPagina('meusEventos');
+                } else if (window.parent && window.parent !== window && typeof window.parent.carregarPagina === 'function') {
+                    window.parent.carregarPagina('meusEventos');
+                } else {
+                    window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+                }
+                return;
+            }
+
+            // Volta para a página do evento específico
+            if (typeof window.carregarPagina === 'function') {
+                window.carregarPagina('eventoOrganizado', codEventoAtual);
+            } else if (window.parent && window.parent !== window && typeof window.parent.carregarPagina === 'function') {
+                window.parent.carregarPagina('eventoOrganizado', codEventoAtual);
+            } else {
+                window.location.href = 'ContainerOrganizador.php?pagina=eventoOrganizado&cod_evento=' + codEventoAtual;
+            }
+        }
+
+        // Função de inicialização
+        function inicializarListaParticipantes() {
             const urlParams = new URLSearchParams(window.location.search);
             codEventoAtual = urlParams.get('cod_evento');
 
             if (!codEventoAtual) {
                 alert('Erro: Evento não identificado');
-                history.back();
+                voltarParaEventos();
+                return;
+            }
+
+            // Verifica se os elementos principais existem antes de continuar
+            const containerLista = document.querySelector('.container-lista');
+            const tbodyParticipantes = document.getElementById('tbody-participantes');
+            
+            if (!containerLista || !tbodyParticipantes) {
+                // DOM ainda não está pronto, tenta novamente após pequeno delay
+                setTimeout(inicializarListaParticipantes, 100);
                 return;
             }
 
             carregarParticipantes();
             inicializarEventos();
-        })();
+        }
+
+        // Expõe função globalmente para ser chamada pelo Container
+        window.inicializarListaParticipantes = inicializarListaParticipantes;
+
+        // Inicializa - verifica se DOM está pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarListaParticipantes);
+        } else {
+            // DOM já está pronto ou página carregada via fetch
+            // Aguarda um tick para garantir que elementos existem
+            setTimeout(inicializarListaParticipantes, 50);
+        }
 
         function carregarParticipantes() {
             fetch(`ListadeParticipantes.php?action=buscar&cod_evento=${codEventoAtual}`)
