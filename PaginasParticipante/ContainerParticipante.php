@@ -70,17 +70,6 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <link rel="stylesheet" href="../styleGlobal.css?v=<?= $__cssVer ?>" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
     <script src="/CEU/pwa-config.js" defer></script>
-    <style>
-        /* Evita centralização em páginas de listagem (meus eventos, etc.) */
-        body.pagina-lista-eventos #conteudo-dinamico {
-            display: block !important;
-            align-items: flex-start !important;
-            justify-content: flex-start !important;
-            min-height: auto !important;
-            padding-top: 1rem;
-            width: 100%;
-        }
-    </style>
 </head>
 
 <body <?php 
