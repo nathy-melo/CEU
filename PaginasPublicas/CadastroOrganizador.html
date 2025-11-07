@@ -6,25 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar conta como Organizador</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <script src="ValidacoesComuns.js" defer></script>
+    <script src="ValidacoesCadastro.js" defer></script>
+
     <style>
-        .visually-hidden {
+        .visualmente-oculto {
             position: absolute;
             left: -10000px;
             width: 1px;
             height: 1px;
             overflow: hidden;
         }
-    </style>
-    <script src="ValidacoesComuns.js" defer></script>
-    <script src="ValidacoesCadastro.js" defer></script>
-
-    <style>
-        body {
-            overflow: hidden;
-        }
 
         .sombra-texto {
-            text-shadow: 0px 0.275em 1.375em var(sombra-padrao);
+            text-shadow: 0px 0.275em 1.375em var(--sombra-padrao);
         }
 
         .cartao-cadastro {
@@ -59,7 +54,7 @@
             overflow-wrap: break-word;
         }
 
-        .cartao-cadastro-seletor-papel {
+        .seletor-tipo-conta {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -71,7 +66,7 @@
             right: 0.6rem;
         }
 
-        .opcao-papel {
+        .opcao-tipo-conta {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -86,11 +81,11 @@
             transition: transform 0.22s ease;
         }
 
-        .opcao-papel:hover {
+        .opcao-tipo-conta:hover {
             transform: scale(1.05);
         }
 
-        .opcao-papel--ativa {
+        .opcao-tipo-conta--ativa {
             width: 100%;
             height: 2em;
             padding: 0;
@@ -100,7 +95,7 @@
             border-radius: 1em;
         }
 
-        .opcao-papel-texto {
+        .texto-opcao-tipo-conta {
             color: var(--branco);
             font-family: 'Inter', sans-serif;
             font-weight: 400;
@@ -129,7 +124,7 @@
             margin-bottom: 6.776em;
         }
 
-        #main-content.main-content--com-aviso .cartao-cadastro-formulario {
+        #main-content.conteudo-principal--com-aviso .cartao-cadastro-formulario {
             margin-top: 0.8em;
             margin-bottom: 3.0em;
         }
@@ -172,7 +167,7 @@
             bottom: 4.5em;
         }
 
-        #main-content.main-content--com-aviso .cartao-cadastro-termos {
+        #main-content.conteudo-principal--com-aviso .cartao-cadastro-termos {
             bottom: 4.5em;
         }
 
@@ -218,7 +213,7 @@
             cursor: pointer;
         }
 
-        .switch-toggle {
+        .interruptor-termos {
             position: relative;
             display: inline-block;
             width: 2.2em;
@@ -227,7 +222,7 @@
             vertical-align: middle;
         }
 
-        .switch-toggle input {
+        .interruptor-termos input {
             position: absolute;
             left: 0;
             top: 0;
@@ -240,7 +235,7 @@
             cursor: pointer;
         }
 
-        .slider-toggle {
+        .trilho-interruptor {
             position: absolute;
             cursor: pointer;
             top: 0;
@@ -252,7 +247,7 @@
             border-radius: 1.1em;
         }
 
-        .slider-toggle:before {
+        .trilho-interruptor:before {
             position: absolute;
             content: "";
             height: 0.99em;
@@ -264,16 +259,16 @@
             border-radius: 50%;
         }
 
-        .switch-toggle input:checked+.slider-toggle {
+        .interruptor-termos input:checked+.trilho-interruptor {
             background-color: var(--botao);
         }
 
-        .switch-toggle input:checked+.slider-toggle:before {
+        .interruptor-termos input:checked+.trilho-interruptor:before {
             background: var(--branco);
             transform: translateX(0.88em);
         }
 
-        .termos-toggle {
+        .indicador-termos {
             width: 1.1616em;
             height: 1.1616em;
             display: block;
@@ -286,11 +281,11 @@
             transition: box-shadow 0.22s;
         }
 
-        .termos-toggle.selected {
+        .indicador-termos.selected {
             box-shadow: 0 0 0 2.75px var(--botao);
         }
 
-        .termos-toggle.selected::after {
+        .indicador-termos.selected::after {
             content: '';
             display: block;
             position: absolute;
@@ -345,7 +340,7 @@
             max-width: 100%;
         }
 
-        #main-content.main-content--com-aviso .aviso-codigo-organizador {
+        #main-content.conteudo-principal--com-aviso .aviso-codigo-organizador {
             margin-bottom: 0.55em;
         }
 
@@ -381,11 +376,11 @@
             --altura-extra-aviso: 0em;
         }
 
-        #main-content.main-content--com-aviso {
+        #main-content.conteudo-principal--com-aviso {
             --altura-extra-aviso: 3.2em;
         }
 
-        #main-content.main-content--com-aviso .cartao-cadastro {
+        #main-content.conteudo-principal--com-aviso .cartao-cadastro {
             min-height: calc(30em + var(--altura-extra-aviso));
             height: auto;
         }
@@ -401,7 +396,7 @@
             transform: translate(-50%, calc(-50% + 17.4em));
         }
 
-        #main-content.main-content--com-aviso .div-botao-solicitar-codigo {
+        #main-content.conteudo-principal--com-aviso .div-botao-solicitar-codigo {
             transform: translate(-50%, calc(-50% + 17.4em + var(--altura-extra-aviso)));
         }
 
@@ -446,12 +441,12 @@
         <div class="cartao-cadastro">
             <h1 class="cartao-cadastro-titulo sombra-texto">Criar conta</h1>
 
-            <div class="cartao-cadastro-seletor-papel">
-                <div class="opcao-papel" onclick="carregarPagina('cadastroP')">
-                    <span class="opcao-papel-texto sombra-texto">Como participante</span>
+            <div class="seletor-tipo-conta">
+                <div class="opcao-tipo-conta" onclick="carregarPagina('cadastroP')">
+                    <span class="texto-opcao-tipo-conta sombra-texto">Como participante</span>
                 </div>
-                <div class="opcao-papel opcao-papel--ativa">
-                    <span class="opcao-papel-texto sombra-texto">Como organizador</span>
+                <div class="opcao-tipo-conta opcao-tipo-conta--ativa">
+                    <span class="texto-opcao-tipo-conta sombra-texto">Como organizador</span>
                 </div>
             </div>
 
@@ -460,30 +455,30 @@
             <form action="CadastroOrganizador.php" class="cartao-cadastro-formulario" method="post"
                 id="form-cadastro-organizador" name="cadastro_organizador">
                 <div class="formulario-grupo">
-                    <label for="codigo-acesso" class="visually-hidden">Código de Acesso</label>
+                    <label for="codigo-acesso" class="visualmente-oculto">Código de Acesso</label>
                     <input type="text" id="codigo-acesso" name="codigo_acesso" placeholder="Código de Acesso"
                         class="formulario-input" maxlength="8" required autocomplete="off">
                 </div>
                 <div class="formulario-grupo">
-                    <label for="nome-completo" class="visually-hidden">Nome Completo</label>
+                    <label for="nome-completo" class="visualmente-oculto">Nome Completo</label>
                     <input type="text" id="nome-completo" name="nome_completo" placeholder="Nome Completo"
                         class="formulario-input" required autocomplete="name">
                 </div>
                 <div class="formulario-grupo">
-                    <label for="cpf" class="visually-hidden">CPF</label>
+                    <label for="cpf" class="visualmente-oculto">CPF</label>
                     <input type="text" id="cpf" name="cpf" placeholder="CPF" class="formulario-input" required autocomplete="off">
                 </div>
                 <div class="formulario-grupo">
-                    <label for="email" class="visually-hidden">E-mail</label>
+                    <label for="email" class="visualmente-oculto">E-mail</label>
                     <input type="email" id="email" name="email" placeholder="E-mail" class="formulario-input" required autocomplete="email">
                 </div>
                 <div class="formulario-grupo">
-                    <label for="senha" class="visually-hidden">Senha</label>
+                    <label for="senha" class="visualmente-oculto">Senha</label>
                     <input type="password" id="senha" name="senha" placeholder="Senha" class="formulario-input"
                         required autocomplete="new-password">
                 </div>
                 <div class="formulario-grupo">
-                    <label for="confirmar-senha" class="visually-hidden">Confirmar senha</label>
+                    <label for="confirmar-senha" class="visualmente-oculto">Confirmar senha</label>
                     <input type="password" id="confirmar-senha" name="confirmar_senha" placeholder="Confirmar senha"
                         class="formulario-input" required autocomplete="new-password">
                 </div>
@@ -494,9 +489,9 @@
                     <p class="termos-texto sombra-texto">
                         Concordo com os <a onclick="carregarPagina('termos')" class="link-termos">Termos de
                             Condições</a>
-                        <span class="switch-toggle">
+                        <span class="interruptor-termos">
                             <input type="checkbox" id="aceite-termos" name="aceite_termos" value="1" required>
-                            <span class="slider-toggle"></span>
+                            <span class="trilho-interruptor"></span>
                         </span>
                     </p>
                 </div>

@@ -53,6 +53,9 @@
 html, body {
     scrollbar-width: thin;
     scrollbar-color: var(--botao) var(--caixas);
+    /* Evita barra horizontal causada por transforms absolutos e 100vw */
+    overflow-x: hidden;
+    max-width: 100%;
 }
 html::-webkit-scrollbar, body::-webkit-scrollbar {
     width: 0.8rem;
@@ -89,9 +92,8 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--fundo);
   color: var(--branco);
-  /* Usar viewport dinâmico para evitar conteúdo escondido sob barras do navegador */
-  min-height: 100vh;
-  min-height: 100dvh;
+  /* Usar viewport dinâmico e compensar padding inferior (safe area) para não gerar scroll extra */
+  min-height: calc(100dvh - max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px)));
   /* Garantir respiro inferior quando houver barra de navegação inferior */
   padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px));
   /* Previne FOUC (Flash of Unstyled Content) - não centraliza até JS carregar */
@@ -133,8 +135,12 @@ body.js-ready:not(.pagina-inicio):not(.pagina-lista-eventos) #conteudo-dinamico 
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* Evita overflow vertical causado por 100vh + padding do body */
+  min-height: calc(100dvh - max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px)));
   width: 100%;
+  /* Previne barra de rolagem horizontal em layouts de cadastro */
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Páginas de lista de eventos começam do topo */
@@ -1842,7 +1848,8 @@ body[data-theme="dark"] .btn-toggle-senha img {
     margin-bottom: 1rem !important;
   }
   
-  .cartao-cadastro-seletor-papel {
+  .cartao-cadastro-seletor-papel,
+  .seletor-tipo-conta {
     flex-direction: column;
     gap: 0.8rem !important;
     margin-bottom: 1.2rem !important;
@@ -1850,18 +1857,21 @@ body[data-theme="dark"] .btn-toggle-senha img {
     left: 0 !important;
   }
   
-  .opcao-papel {
+  .opcao-papel,
+  .opcao-tipo-conta {
     width: 100% !important;
     max-width: 100% !important;
     height: 2.5rem !important;
     padding: 0 !important;
   }
   
-  .opcao-papel--ativa {
+  .opcao-papel--ativa,
+  .opcao-tipo-conta--ativa {
     height: 2.5rem !important;
   }
   
-  .opcao-papel-texto {
+  .opcao-papel-texto,
+  .texto-opcao-tipo-conta {
     font-size: clamp(1.1rem, 4vw, 1.4rem) !important;
     line-height: 2.5rem !important;
     height: 2.5rem !important;
@@ -1910,17 +1920,20 @@ body[data-theme="dark"] .btn-toggle-senha img {
     flex-wrap: wrap;
   }
   
-  .switch-toggle {
+  .switch-toggle,
+  .interruptor-termos {
     width: 2.5rem !important;
     height: 1.5rem !important;
   }
   
-  .slider-toggle:before {
+  .slider-toggle:before,
+  .trilho-interruptor:before {
     height: 1.1rem !important;
     width: 1.1rem !important;
   }
   
-  .switch-toggle input:checked+.slider-toggle:before {
+  .switch-toggle input:checked + .slider-toggle:before,
+  .interruptor-termos input:checked + .trilho-interruptor:before {
     transform: translateX(1rem) !important;
   }
   
@@ -2023,15 +2036,18 @@ body[data-theme="dark"] .btn-toggle-senha img {
     margin-bottom: 0.8rem !important;
   }
   
-  .opcao-papel {
+  .opcao-papel,
+  .opcao-tipo-conta {
     height: 2.2rem !important;
   }
   
-  .opcao-papel--ativa {
+  .opcao-papel--ativa,
+  .opcao-tipo-conta--ativa {
     height: 2.2rem !important;
   }
   
-  .opcao-papel-texto {
+  .opcao-papel-texto,
+  .texto-opcao-tipo-conta {
     font-size: 1rem !important;
     line-height: 2.2rem !important;
     height: 2.2rem !important;
@@ -2327,17 +2343,20 @@ body[data-theme="dark"] .btn-toggle-senha img {
     text-align: center;
   }
   
-  .switch-toggle {
+  .grupo-termos .switch-toggle,
+  .grupo-termos .interruptor-termos {
     width: 2.5rem !important;
     height: 1.5rem !important;
   }
   
-  .slider-toggle:before {
+  .grupo-termos .slider-toggle:before,
+  .grupo-termos .trilho-interruptor:before {
     height: 1.1rem !important;
     width: 1.1rem !important;
   }
   
-  .switch-toggle input:checked + .slider-toggle:before {
+  .grupo-termos .switch-toggle input:checked + .slider-toggle:before,
+  .grupo-termos .interruptor-termos input:checked + .trilho-interruptor:before {
     transform: translateX(1rem) !important;
   }
   

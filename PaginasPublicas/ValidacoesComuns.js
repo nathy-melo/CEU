@@ -55,6 +55,7 @@ function mostrarMensagem(mensagem, tipo, containerId) {
         var mainContent = document.getElementById('main-content');
         if (mainContent) {
             mainContent.classList.add('main-content--com-aviso');
+            mainContent.classList.add('conteudo-principal--com-aviso');
         }
     }
 
@@ -101,6 +102,7 @@ function limparMensagens(containerId) {
 
             if (!mensagemVisivel) {
                 mainContent.classList.remove('main-content--com-aviso');
+                mainContent.classList.remove('conteudo-principal--com-aviso');
             }
         }
     }
