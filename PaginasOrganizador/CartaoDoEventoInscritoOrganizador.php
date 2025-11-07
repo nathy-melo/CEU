@@ -988,7 +988,6 @@
             }
         };
     </script>
-    <script src="CartaoDoEventoInscrito.js"></script>
 </body>
 
 </html>
