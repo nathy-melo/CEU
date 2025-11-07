@@ -53,6 +53,9 @@
 html, body {
     scrollbar-width: thin;
     scrollbar-color: var(--botao) var(--caixas);
+    /* Evita barra horizontal causada por transforms absolutos e 100vw */
+    overflow-x: hidden;
+    max-width: 100%;
 }
 html::-webkit-scrollbar, body::-webkit-scrollbar {
     width: 0.8rem;
@@ -89,9 +92,8 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--fundo);
   color: var(--branco);
-  /* Usar viewport dinâmico para evitar conteúdo escondido sob barras do navegador */
-  min-height: 100vh;
-  min-height: 100dvh;
+  /* Usar viewport dinâmico e compensar padding inferior (safe area) para não gerar scroll extra */
+  min-height: calc(100dvh - max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px)));
   /* Garantir respiro inferior quando houver barra de navegação inferior */
   padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px));
   /* Previne FOUC (Flash of Unstyled Content) - não centraliza até JS carregar */
@@ -133,8 +135,12 @@ body.js-ready:not(.pagina-inicio):not(.pagina-lista-eventos) #conteudo-dinamico 
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* Evita overflow vertical causado por 100vh + padding do body */
+  min-height: calc(100dvh - max(env(safe-area-inset-bottom, 0px), var(--ceu-safe-bottom, 0px)));
   width: 100%;
+  /* Previne barra de rolagem horizontal em layouts de cadastro */
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Páginas de lista de eventos começam do topo */
