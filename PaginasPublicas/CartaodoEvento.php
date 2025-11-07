@@ -341,14 +341,14 @@
             </div>
         </div>
         <div class="DataHorarioInscricaoInicio grupo-campo">
-            <label>Início Inscrições:</label>
+            <label>Início das Inscrições:</label>
             <div class="campo-data-horario">
                 <div class="caixa-valor"><?php echo htmlspecialchars($data_inicio_inscricao); ?></div>
                 <div class="caixa-valor"><?php echo htmlspecialchars($hora_inicio_inscricao); ?></div>
             </div>
         </div>
         <div class="DataHorarioInscricaoFim grupo-campo">
-            <label>Fim Inscrições:</label>
+            <label>Fim das Inscrições:</label>
             <div class="campo-data-horario">
                 <div class="caixa-valor"><?php echo htmlspecialchars($data_fim_inscricao); ?></div>
                 <div class="caixa-valor"><?php echo htmlspecialchars($hora_fim_inscricao); ?></div>

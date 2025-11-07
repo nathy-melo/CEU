@@ -136,6 +136,7 @@ function inicializarValidacoesCadastro() {
     var mainContent = document.getElementById('main-content');
     if (mainContent) {
         mainContent.classList.remove('main-content--com-aviso');
+        mainContent.classList.remove('conteudo-principal--com-aviso');
     }
 
     exibirErroURLPadrao();
