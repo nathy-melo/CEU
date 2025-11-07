@@ -132,7 +132,41 @@ try {
         // Verifica se usuário é organizador
         $ehOrganizador = verificarPermissaoOrganizador($conexao, $codEvento, $cpfUsuario);
 
-        // Lista colaboradores
+        // Busca CPF do criador do evento (da tabela organiza)
+        $cpfCriador = null;
+        $sqlCriador = "SELECT CPF FROM organiza WHERE cod_evento = ? LIMIT 1";
+        $stmtCriador = mysqli_prepare($conexao, $sqlCriador);
+        if ($stmtCriador) {
+            mysqli_stmt_bind_param($stmtCriador, 'i', $codEvento);
+            mysqli_stmt_execute($stmtCriador);
+            $resultCriador = mysqli_stmt_get_result($stmtCriador);
+            if ($rowCriador = mysqli_fetch_assoc($resultCriador)) {
+                $cpfCriador = $rowCriador['CPF'];
+            }
+            mysqli_stmt_close($stmtCriador);
+        }
+
+        // Adiciona o criador do evento na lista primeiro
+        $colaboradores = [];
+        if ($cpfCriador) {
+            $sqlCriadorInfo = "SELECT CPF, Nome AS nome, Email AS email FROM usuario WHERE CPF = ?";
+            $stmtCriadorInfo = mysqli_prepare($conexao, $sqlCriadorInfo);
+            mysqli_stmt_bind_param($stmtCriadorInfo, 's', $cpfCriador);
+            mysqli_stmt_execute($stmtCriadorInfo);
+            $resultCriadorInfo = mysqli_stmt_get_result($stmtCriadorInfo);
+            if ($rowCriadorInfo = mysqli_fetch_assoc($resultCriadorInfo)) {
+                $colaboradores[] = [
+                    'CPF' => $rowCriadorInfo['CPF'],
+                    'nome' => $rowCriadorInfo['nome'],
+                    'email' => $rowCriadorInfo['email'],
+                    'papel' => 'organizador',
+                    'criado_em' => null
+                ];
+            }
+            mysqli_stmt_close($stmtCriadorInfo);
+        }
+
+        // Lista colaboradores (sem incluir o criador se ele também estiver na tabela colaboradores_evento)
         $sql = "SELECT c.CPF, u.Nome AS nome, u.Email AS email, c.papel, c.criado_em
                 FROM colaboradores_evento c
                 JOIN usuario u ON u.CPF = c.CPF
@@ -142,9 +176,11 @@ try {
         mysqli_stmt_bind_param($stmt, 'i', $codEvento);
         mysqli_stmt_execute($stmt);
         $resultado = mysqli_stmt_get_result($stmt);
-        $colaboradores = [];
         while ($row = mysqli_fetch_assoc($resultado)) {
-            $colaboradores[] = $row;
+            // Não adiciona se já é o criador
+            if ($row['CPF'] !== $cpfCriador) {
+                $colaboradores[] = $row;
+            }
         }
         mysqli_stmt_close($stmt);
 
@@ -171,7 +207,8 @@ try {
             'colaboradores' => $colaboradores, 
             'solicitacoes' => $solicitacoes,
             'eh_organizador' => $ehOrganizador,
-            'cpf_usuario' => $cpfUsuario
+            'cpf_usuario' => $cpfUsuario,
+            'cpf_criador' => $cpfCriador
         ]);
         exit;
     }

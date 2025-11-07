@@ -162,7 +162,7 @@ function inicializarFiltroEventos() {
             
             todasMensagens.forEach(elemento => {
                 const texto = elemento.textContent;
-                if (texto && (texto.includes('Você ainda não criou') || texto.includes('colaborador em nenhum evento'))) {
+                if (texto && (texto.includes('Você ainda não criou') || texto.includes('organizador em nenhum evento'))) {
                     elemento.style.display = '';
                 }
             });
@@ -351,7 +351,7 @@ function carregarEventosColaboracao() {
                 });
             } else {
                 const mensagemSemEventos = document.createElement('div');
-                mensagemSemEventos.textContent = 'Você não é colaborador em nenhum evento ainda';
+                mensagemSemEventos.textContent = 'Você não é organizador em nenhum evento ainda';
                 mensagemSemEventos.style.gridColumn = '1/-1';
                 mensagemSemEventos.style.textAlign = 'center';
                 mensagemSemEventos.style.padding = '30px 0';

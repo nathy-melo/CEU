@@ -104,7 +104,7 @@
   async function abrirModalColaboradores() {
     const modal = document.getElementById('modal-colaboradores');
     if (!modal) {
-      alert('Interface de colaboradores não encontrada. Atualize a página.');
+      alert('Interface de organização não encontrada. Atualize a página.');
       return;
     }
     // Guardar foco atual para restaurar ao fechar
@@ -113,6 +113,7 @@
     // Exibir modal e ajustar acessibilidade
     modal.style.display = 'flex';
     modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
 
     // Tenta focar o campo de entrada dentro do modal
     setTimeout(() => {
@@ -134,6 +135,7 @@
       }
       modal.setAttribute('aria-hidden', 'true');
       modal.style.display = 'none';
+      document.body.style.overflow = '';
 
       // Restaurar foco para o elemento que abriu o modal, se ainda estiver no DOM
       if (ultimoFocoAntesModal && document.contains(ultimoFocoAntesModal)) {
@@ -149,23 +151,23 @@
       const resp = await fetch(url);
       const data = await resp.json();
       if (!data.sucesso) {
-        alert('Erro ao carregar colaboradores: ' + (data.erro || 'desconhecido'));
+        alert('Erro ao carregar organização: ' + (data.erro || 'desconhecido'));
         return;
       }
-      renderizarColaboradores(data.colaboradores || [], data.eh_organizador || false, data.cpf_usuario || '');
-      renderizarSolicitacoes(data.solicitacoes || []);
+      renderizarColaboradores(data.colaboradores || [], data.eh_organizador || false, data.cpf_usuario || '', data.cpf_criador || null);
+      renderizarSolicitacoes(data.solicitacoes || [], data.eh_organizador || false);
     } catch (e) {
       console.error('Falha ao carregar listas de colaboradores/solicitações', e);
-      alert('Falha ao carregar colaboradores');
+      alert('Falha ao carregar organização');
     }
   }
 
-  function renderizarColaboradores(lista, ehOrganizador, cpfUsuario) {
+  function renderizarColaboradores(lista, ehOrganizador, cpfUsuario, cpfCriador) {
     const container = document.getElementById('lista-colaboradores');
     if (!container) return;
     container.innerHTML = '';
     if (!lista.length) {
-      container.innerHTML = '<div class="mensagem-vazio">Nenhum colaborador adicionado ainda.</div>';
+      container.innerHTML = '<div class="mensagem-vazio">Nenhum organizador adicionado ainda.</div>';
       return;
     }
     lista.forEach(item => {
@@ -189,15 +191,25 @@
       const acoes = document.createElement('div');
       acoes.className = 'acoes';
       
-      // Se for o próprio usuário, mostra botão de sair
-      if (item.CPF === cpfUsuario) {
+      // Se for o criador do evento, mostra apenas um texto
+      if (item.CPF === cpfCriador) {
+        const txtCriador = document.createElement('span');
+        txtCriador.className = 'texto-criador';
+        txtCriador.textContent = 'Criador do Evento';
+        txtCriador.style.color = '#666';
+        txtCriador.style.fontStyle = 'italic';
+        txtCriador.style.fontSize = '0.9rem';
+        acoes.appendChild(txtCriador);
+      }
+      // Se for o próprio usuário (mas não criador), mostra botão de sair
+      else if (item.CPF === cpfUsuario) {
         const btnSair = document.createElement('button');
         btnSair.className = 'btn-sair';
         btnSair.textContent = 'Sair da Colaboração';
         btnSair.onclick = () => sairDaColaboracao();
         acoes.appendChild(btnSair);
       } 
-      // Se for organizador ou colaborador vendo outro colaborador, pode remover
+      // Se for outro colaborador, pode remover
       else {
         const btnRem = document.createElement('button');
         btnRem.className = 'btn-remover';
@@ -277,19 +289,19 @@
       const resp = await fetch('GerenciadorColaboradores.php', { method: 'POST', body: form });
       const data = await resp.json();
       if (!data.sucesso) {
-        alert('Erro ao adicionar colaborador: ' + (data.erro || 'desconhecido'));
+        alert('Erro ao adicionar organizador: ' + (data.erro || 'desconhecido'));
         return;
       }
       inp.value = '';
       await carregarListasColaboradoresESolicitacoes();
     } catch (e) {
       console.error('Falha ao adicionar colaborador', e);
-      alert('Falha ao adicionar colaborador');
+      alert('Falha ao adicionar organizador');
     }
   }
 
   async function removerColaboradorEvento(cpf) {
-    if (!confirm('Remover este colaborador do evento?')) return;
+    if (!confirm('Remover este organizador do evento?')) return;
     try {
       const form = new FormData();
       form.append('action', 'remover');
@@ -298,13 +310,13 @@
       const resp = await fetch('GerenciadorColaboradores.php', { method: 'POST', body: form });
       const data = await resp.json();
       if (!data.sucesso) {
-        alert('Erro ao remover colaborador: ' + (data.erro || 'desconhecido'));
+        alert('Erro ao remover organizador: ' + (data.erro || 'desconhecido'));
         return;
       }
       await carregarListasColaboradoresESolicitacoes();
     } catch (e) {
       console.error('Falha ao remover colaborador', e);
-      alert('Falha ao remover colaborador');
+      alert('Falha ao remover organizador');
     }
   }
 
@@ -838,16 +850,113 @@
 
   function fecharModalImagem() {
     document.getElementById('modal-imagem').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function abrirModalCompartilhar() {
+    const modal = document.getElementById('modal-compartilhar');
+    if (!modal) return;
+    
+    // Gera o link de inscrição do evento
+    const linkInscricao = window.location.origin + '/CEU/PaginasPublicas/ContainerPublico.php?pagina=evento&cod_evento=' + codigoEventoAtual;
+    document.getElementById('link-inscricao').value = linkInscricao;
+    
+    modal.classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function fecharModalCompartilhar() {
+    const modal = document.getElementById('modal-compartilhar');
+    if (modal) {
+      modal.classList.remove('ativo');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function copiarLink() {
+    const linkInput = document.getElementById('link-inscricao');
+    const textoSpan = document.getElementById('texto-copiar');
+    const iconeDiv = document.getElementById('icone-copiar');
+    
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // Para mobile
+    
+    navigator.clipboard.writeText(linkInput.value).then(() => {
+      // Feedback visual
+      if (textoSpan) textoSpan.textContent = 'Copiado!';
+      if (iconeDiv) {
+        const corOriginal = iconeDiv.style.backgroundColor;
+        iconeDiv.style.backgroundColor = '#28a745';
+        
+        setTimeout(() => {
+          if (textoSpan) textoSpan.textContent = 'Copiar';
+          if (iconeDiv) iconeDiv.style.backgroundColor = corOriginal;
+        }, 2000);
+      }
+    }).catch(err => {
+      console.error('Erro ao copiar:', err);
+      // Fallback para navegadores antigos
+      try {
+        linkInput.focus();
+        document.execCommand('copy');
+        if (textoSpan) textoSpan.textContent = 'Copiado!';
+        setTimeout(() => {
+          if (textoSpan) textoSpan.textContent = 'Copiar';
+        }, 2000);
+      } catch (e) {
+        alert('Por favor, copie o link manualmente.');
+      }
+    });
+  }
+
+  function compartilharWhatsApp() {
+    const link = document.getElementById('link-inscricao').value;
+    const texto = encodeURIComponent('Confira este evento! Inscreva-se aqui: ' + link);
+    window.open('https://wa.me/?text=' + texto, '_blank');
+  }
+
+  function compartilharInstagram() {
+    const link = document.getElementById('link-inscricao').value;
+    // Instagram não suporta compartilhamento direto de links via URL scheme
+    // Então vamos copiar o link e informar ao usuário
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
+    }).catch(() => {
+      // Fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = link;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
+    });
+  }
+
+  function compartilharEmail() {
+    const link = document.getElementById('link-inscricao').value;
+    const assunto = encodeURIComponent('Convite para Evento');
+    const corpo = encodeURIComponent('Olá!\n\nGostaria de convidá-lo(a) para participar deste evento.\n\nInscreva-se através do link: ' + link + '\n\nAté breve!');
+    window.location.href = 'mailto:?subject=' + assunto + '&body=' + corpo;
+  }
+
+  function compartilharX() {
+    const link = document.getElementById('link-inscricao').value;
+    const texto = encodeURIComponent('Confira este evento! 🎉');
+    window.open('https://twitter.com/intent/tweet?text=' + texto + '&url=' + encodeURIComponent(link), '_blank');
   }
 
   function inicializarCartaoEventoOrganizando() {
     const btnVoltar = document.getElementById('btn-voltar');
+    const btnCompartilhar = document.getElementById('btn-compartilhar');
     const btnParticipantes = document.getElementById('btn-participantes');
     const btnEditar = document.getElementById('btn-editar');
     const imagemCarrossel = document.getElementById('imagem-carrossel');
     const inputImagem = document.getElementById('input-imagem');
 
-    if (btnVoltar && btnParticipantes && btnEditar) {
+    if (btnVoltar && btnCompartilhar && btnParticipantes && btnEditar) {
       btnVoltar.onclick = function () {
         if (typeof carregarPagina === 'function') {
           carregarPagina('meusEventos');
@@ -855,6 +964,7 @@
           window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
         }
       };
+      btnCompartilhar.onclick = abrirModalCompartilhar;
       btnParticipantes.onclick = irParaParticipantes;
       btnEditar.onclick = editarEvento;
     }
@@ -865,6 +975,7 @@
         if (listaImagensEvento.length > 0) {
           document.getElementById('imagem-ampliada').src = listaImagensEvento[indiceImagemAtual];
           document.getElementById('modal-imagem').style.display = 'flex';
+          document.body.style.overflow = 'hidden';
         }
       };
     }
@@ -875,6 +986,13 @@
 
     // Expor funções globais necessárias
     window.abrirModalColaboradores = abrirModalColaboradores;
+    window.abrirModalCompartilhar = abrirModalCompartilhar;
+    window.fecharModalCompartilhar = fecharModalCompartilhar;
+    window.copiarLink = copiarLink;
+    window.compartilharWhatsApp = compartilharWhatsApp;
+    window.compartilharInstagram = compartilharInstagram;
+    window.compartilharEmail = compartilharEmail;
+    window.compartilharX = compartilharX;
     window.mudarImagem = mudarImagem;
     window.mudarImagemModal = mudarImagemModal;
     window.fecharModalImagem = fecharModalImagem;
@@ -889,7 +1007,12 @@
 
     // Carrega dados do evento se o código foi passado
     const urlParams = new URLSearchParams(window.location.search);
-    const codEvento = urlParams.get('cod_evento');
+    let codEvento = urlParams.get('cod_evento');
+    
+    // Se não vier da URL, tenta pegar da variável global (quando carregado via AJAX)
+    if (!codEvento && window.codigoEventoParaGerenciar) {
+      codEvento = window.codigoEventoParaGerenciar;
+    }
 
     if (codEvento) {
       carregarDadosEventoDoServidor(codEvento);

@@ -166,7 +166,7 @@
             </div>
 
             <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <label for="msg-todos-part" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                     <input type="checkbox" id="msg-todos-part" checked style="width: 20px; height: 20px;">
                     <span>Enviar para todos os participantes</span>
                 </label>
@@ -207,7 +207,7 @@
             </div>
 
             <div class="form-group">
-                <label>CPF</label>
+                <label for="edit-cpf-display-part">CPF</label>
                 <input type="text" id="edit-cpf-display-part" disabled>
             </div>
 

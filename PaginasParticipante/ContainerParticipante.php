@@ -272,14 +272,14 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             },
             'evento': {
                 html: 'CartaodoEventoParticipante.php',
-                js: ['CartaoDoEventoParticipante.js'],
+                js: [],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoEvento === 'function') window.inicializarEventosCartaoEvento();
                 }
             },
             'eventoInscrito': {
                 html: 'CartaodoEventoInscrito.php',
-                js: ['CartaoDoEventoInscrito.js'],
+                js: [],
                 init: () => {
                     if (typeof window.inicializarEventosCartaoDoEventoInscrito === 'function') window.inicializarEventosCartaoDoEventoInscrito();
                 }

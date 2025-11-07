@@ -86,7 +86,10 @@ function inscreverNoEvento(codEvento) {
         .then(r => r.json())
         .then(data => {
             if (data.sucesso) {
-                mostrarMensagemInscricaoFeita();
+                // Mostra modal de sucesso
+                abrirModalInscricaoConfirmada();
+                // Atualiza o botão
+                verificarStatusInscricao(codEvento);
                 if (typeof window.dispatchEvent === 'function') {
                     window.dispatchEvent(new CustomEvent('inscricaoAtualizada'));
                 }
@@ -105,15 +108,77 @@ function desinscreverDoEvento(codEvento) {
         .then(r => r.json())
         .then(data => {
             if (data.sucesso) {
+                // Mostra modal de sucesso
+                abrirModalDesinscricaoConfirmada();
+                // Atualiza o botão
+                verificarStatusInscricao(codEvento);
                 if (typeof window.dispatchEvent === 'function') {
                     window.dispatchEvent(new CustomEvent('inscricaoAtualizada'));
                 }
-                location.reload();
             } else {
                 alert(data.mensagem || 'Erro ao cancelar inscrição');
             }
         })
         .catch(err => { console.error('Erro:', err); alert('Erro ao processar cancelamento'); });
+}
+
+// Variável global para armazenar o código do evento
+var codEventoAtualInscricao = null;
+
+// Funções dos modais de confirmação
+function abrirModalConfirmarInscricao() {
+    document.getElementById('modalConfirmarInscricao').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModalConfirmarInscricao() {
+    document.getElementById('modalConfirmarInscricao').classList.remove('ativo');
+    document.body.style.overflow = '';
+}
+
+function confirmarInscricao() {
+    fecharModalConfirmarInscricao();
+    if (codEventoAtualInscricao) {
+        inscreverNoEvento(codEventoAtualInscricao);
+    }
+}
+
+function abrirModalConfirmarDesinscricao() {
+    document.getElementById('modalConfirmarDesinscricao').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModalConfirmarDesinscricao() {
+    document.getElementById('modalConfirmarDesinscricao').classList.remove('ativo');
+    document.body.style.overflow = '';
+}
+
+function confirmarDesinscricao() {
+    fecharModalConfirmarDesinscricao();
+    if (codEventoAtualInscricao) {
+        desinscreverDoEvento(codEventoAtualInscricao);
+    }
+}
+
+// Funções dos modais de sucesso
+function abrirModalInscricaoConfirmada() {
+    document.getElementById('modalInscricaoConfirmada').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModalInscricaoConfirmada() {
+    document.getElementById('modalInscricaoConfirmada').classList.remove('ativo');
+    document.body.style.overflow = '';
+}
+
+function abrirModalDesinscricaoConfirmada() {
+    document.getElementById('modalDesinscricaoConfirmada').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModalDesinscricaoConfirmada() {
+    document.getElementById('modalDesinscricaoConfirmada').classList.remove('ativo');
+    document.body.style.overflow = '';
 }
 
 function verificarStatusInscricao(codEvento) {
@@ -124,16 +189,20 @@ function verificarStatusInscricao(codEvento) {
             var btnInscrever = document.querySelector('.BotaoInscrever .botao');
             if (!btnInscrever) return;
             if (data.inscrito) {
-                btnInscrever.textContent = 'Desinscrever-se';
-                btnInscrever.style.backgroundColor = 'var(--vermelho)';
-                btnInscrever.disabled = false;
-                btnInscrever.style.cursor = 'pointer';
+                // Mostra "Já Inscrito no Evento" em verde e desabilita o botão
+                // Para cancelar a inscrição, deve ir em "Meus Eventos"
+                btnInscrever.textContent = 'Já Inscrito no Evento';
+                btnInscrever.style.backgroundColor = '#28a745'; // Verde
+                btnInscrever.disabled = true;
+                btnInscrever.style.cursor = 'not-allowed';
+                btnInscrever.style.opacity = '0.9';
                 btnInscrever.dataset.inscrito = 'true';
             } else {
                 btnInscrever.textContent = 'Inscrever-se';
                 btnInscrever.style.backgroundColor = 'var(--botao)';
                 btnInscrever.disabled = false;
                 btnInscrever.style.cursor = 'pointer';
+                btnInscrever.style.opacity = '1';
                 btnInscrever.dataset.inscrito = 'false';
             }
         })
@@ -143,18 +212,20 @@ function verificarStatusInscricao(codEvento) {
 function inicializarEventosCartaoEvento() {
     var params = new URLSearchParams(window.location.search);
     var codEvento = params.get('id');
+    codEventoAtualInscricao = codEvento; // Armazena globalmente
     if (codEvento) verificarStatusInscricao(codEvento);
 
     var btnInscrever = document.querySelector('.BotaoInscrever .botao');
     if (btnInscrever) {
         btnInscrever.classList.add('botao-inscrever');
         btnInscrever.onclick = function () {
-            if (this.disabled) return;
-            // Verifica se já está inscrito
-            if (this.dataset.inscrito === 'true') {
-                desinscreverDoEvento(codEvento);
-            } else {
-                inscreverNoEvento(codEvento);
+            // Se estiver desabilitado (já inscrito), não faz nada
+            if (this.disabled) {
+                return;
+            }
+            // Se não estiver inscrito, permite inscrever-se
+            if (this.dataset.inscrito === 'false') {
+                abrirModalConfirmarInscricao();
             }
         };
     }
@@ -162,3 +233,7 @@ function inicializarEventosCartaoEvento() {
 
 window.addEventListener('DOMContentLoaded', inicializarEventosCartaoEvento);
 window.inicializarEventosCartaoEvento = inicializarEventosCartaoEvento;
+window.abrirModalInscricaoConfirmada = abrirModalInscricaoConfirmada;
+window.fecharModalInscricaoConfirmada = fecharModalInscricaoConfirmada;
+window.abrirModalDesinscricaoConfirmada = abrirModalDesinscricaoConfirmada;
+window.fecharModalDesinscricaoConfirmada = fecharModalDesinscricaoConfirmada;

@@ -1375,12 +1375,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .tipo-organizador {
-        background-color: #FFD700;
-        color: #000;
+        background-color: var(--botao);
+        color: var(--branco);
     }
 
     .tipo-colaborador {
-        background-color: #4CAF50;
+        background-color: var(--caixas);
         color: var(--branco);
     }
 
@@ -1684,7 +1684,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <label for="msg-todos" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                         <input type="checkbox" id="msg-todos" checked style="width: 20px; height: 20px;">
                         <span>Enviar para todos os participantes</span>
                     </label>
@@ -1725,7 +1725,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label>CPF</label>
+                    <label for="edit-cpf-display">CPF</label>
                     <input type="text" id="edit-cpf-display" disabled>
                 </div>
 
@@ -1918,8 +1918,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Função de inicialização
         function inicializarListaParticipantes() {
+            // Tenta pegar da URL primeiro
             const urlParams = new URLSearchParams(window.location.search);
-            codEventoAtual = urlParams.get('cod_evento');
+            let codFromUrl = urlParams.get('cod_evento');
+            
+            // Se não vier da URL, tenta pegar da variável global (quando carregado via AJAX)
+            if (!codFromUrl && window.codigoEventoParaGerenciar) {
+                codFromUrl = window.codigoEventoParaGerenciar;
+            }
+            
+            codEventoAtual = codFromUrl;
 
             if (!codEventoAtual) {
                 alert('Erro: Evento não identificado');
@@ -2198,7 +2206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Botões de ação da aba de Organização
             const bindsOrganizacao = [{
                     id: 'btn-adicionar-organizacao',
-                    fn: () => alert('Funcionalidade em desenvolvimento: Adicionar colaborador pela aba Colaboradores do evento')
+                    fn: () => alert('Funcionalidade em desenvolvimento: Adicionar organizador pela aba de Organização do evento')
                 },
                 {
                     id: 'btn-enviar-mensagem-organizacao',
@@ -2336,14 +2344,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // fecharModalSeForFundo está definido como stub no início e será sobrescrito pelo ConteudoParticipantes.php
         // Aqui apenas estendemos a funcionalidade para os modais locais
-        const fecharModalSeForFundoOriginal = fecharModalSeForFundo;
+        if (typeof window.fecharModalSeForFundoOriginal === 'undefined') {
+            window.fecharModalSeForFundoOriginal = fecharModalSeForFundo;
+        }
         fecharModalSeForFundo = function(event, modalId) {
             if (event.target.id === modalId) {
                 if (modalId === 'modalEditarDados') fecharModal();
                 else if (modalId === 'modalAdicionarParticipante') fecharModalAdicionar();
                 else if (modalId === 'modalEnviarMensagem') fecharModalMensagem();
-                else if (typeof fecharModalSeForFundoOriginal === 'function') {
-                    fecharModalSeForFundoOriginal(event, modalId);
+                else if (typeof window.fecharModalSeForFundoOriginal === 'function') {
+                    window.fecharModalSeForFundoOriginal(event, modalId);
                 }
             }
         };

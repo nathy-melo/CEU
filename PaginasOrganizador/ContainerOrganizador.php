@@ -399,6 +399,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             }
 
+            // Define variável global para páginas que precisam do código do evento
+            if (codEvento) {
+                window.codigoEventoParaGerenciar = codEvento;
+            }
+
             let url = 'ContainerOrganizador.php?pagina=' + encodeURIComponent(pagina);
             if (codEvento) {
                 url += '&cod_evento=' + encodeURIComponent(codEvento);

@@ -1097,10 +1097,10 @@ mysqli_close($conexao);
                 <label>Organizado por:</label>
                 <div class="campo-organizador-wrapper">
                     <div class="campo-organizador"><?php echo htmlspecialchars($nomeOrganizador); ?></div>
-                    <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()" title="Adicionar colaborador">+</button>
+                    <button type="button" class="btn-adicionar-colaborador" onclick="abrirModalColaboradores()" title="Adicionar organizador">+</button>
                 </div>
                 <div id="lista-colaboradores" class="lista-colaboradores" style="display: none;">
-                    <!-- Colaboradores serão listados aqui -->
+                    <!-- Organizadores serão listados aqui -->
                 </div>
             </div>
             <div class="Local grupo-campo">
@@ -1215,12 +1215,12 @@ mysqli_close($conexao);
         <div id="modal-colaboradores" class="modal-overlay" style="display: none;" onclick="fecharModalColabSeForFundo(event)">
             <div class="modal-colaboradores-content" onclick="event.stopPropagation()">
                 <div class="modal-header">
-                    <h2>Adicionar Colaborador</h2>
+                    <h2>Adicionar Organizador</h2>
                     <button class="btn-fechar-modal" onclick="fecharModalColaboradores()">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="colab-cpf">CPF do Colaborador*</label>
+                        <label for="colab-cpf">CPF do Organizador*</label>
                         <input type="text" id="colab-cpf" maxlength="14" placeholder="000.000.000-00">
                         <small id="msg-colab-status" style="display: none; margin-top: 4px;"></small>
                     </div>
@@ -1316,7 +1316,7 @@ mysqli_close($conexao);
             if (colaboradores.find(c => c.cpf === cpf)) {
                 msgStatus.style.display = 'block';
                 msgStatus.style.color = '#f44336';
-                msgStatus.textContent = '❌ Este colaborador já foi adicionado';
+                msgStatus.textContent = '❌ Este organizador já foi adicionado';
                 btnAdicionar.disabled = true;
                 return;
             }
@@ -1369,7 +1369,7 @@ mysqli_close($conexao);
         }
 
         function removerColaborador(cpf) {
-            if (confirm('Deseja remover este colaborador?')) {
+            if (confirm('Deseja remover este organizador?')) {
                 colaboradores = colaboradores.filter(c => c.cpf !== cpf);
                 atualizarListaColaboradores();
             }
