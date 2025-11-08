@@ -75,6 +75,15 @@
   ?>
 </head>
 <style>
+  /* Desabilitar scroll quando modal está aberto */
+  body.modal-aberto {
+    overflow: hidden !important;
+  }
+
+  body.modal-aberto #main-content {
+    overflow: hidden !important;
+  }
+
   .secao-detalhes-evento {
     width: 100%;
     display: flex;
@@ -439,6 +448,107 @@
   .aviso-compartilhar strong {
     color: var(--botao);
   }
+
+  /* Modais de Confirmação */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10001;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay.ativo {
+    display: flex;
+  }
+
+  .modal-cancelamento {
+    background: var(--caixas);
+    border-radius: 1.875rem;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.4);
+    padding: 1.875rem;
+    max-width: 32rem;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-cancelamento-titulo {
+    color: var(--branco);
+    font-size: 1.5rem;
+    margin: 0 0 2rem 0;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .modal-cancelamento-botoes {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .botao-cancelamento-cancelar,
+  .botao-cancelamento-continuar {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.625rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .botao-cancelamento-cancelar {
+    background: var(--vermelho) !important;
+    background-image: none !important;
+    color: var(--branco);
+  }
+
+  .botao-cancelamento-continuar {
+    background-color: #28a745;
+    color: var(--branco);
+  }
+
+  .botao-cancelamento-cancelar:hover,
+  .botao-cancelamento-continuar:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  .botao-cancelamento-ok {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.625rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+    transition: opacity 0.2s, transform 0.15s;
+    background: var(--botao) !important;
+    background-image: none !important;
+    color: var(--branco);
+  }
+
+  .botao-cancelamento-ok:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  /* Bloquear scroll quando modal aberto */
+  body.modal-aberto {
+    overflow: hidden !important;
+  }
 </style>
 
 <body>
@@ -651,6 +761,39 @@
     // Carrega as imagens quando a página é carregada
     carregarImagensEvento();
 
+    // Função para bloquear scroll
+    function bloquearScroll() {
+      document.body.classList.add('modal-aberto');
+      document.addEventListener('wheel', prevenirScroll, { passive: false });
+      document.addEventListener('touchmove', prevenirScroll, { passive: false });
+      document.addEventListener('keydown', prevenirScrollTeclado, false);
+    }
+
+    // Função para desbloquear scroll
+    function desbloquearScroll() {
+      document.body.classList.remove('modal-aberto');
+      document.removeEventListener('wheel', prevenirScroll);
+      document.removeEventListener('touchmove', prevenirScroll);
+      document.removeEventListener('keydown', prevenirScrollTeclado);
+    }
+
+    // Previne scroll com mouse wheel e touchmove
+    function prevenirScroll(e) {
+      if (document.body.classList.contains('modal-aberto')) {
+        e.preventDefault();
+      }
+    }
+
+    // Previne scroll com setas do teclado e Page Up/Down
+    function prevenirScrollTeclado(e) {
+      if (!document.body.classList.contains('modal-aberto')) return;
+      
+      const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+      if (teclas.includes(e.keyCode)) {
+        e.preventDefault();
+      }
+    }
+
     // Funções de compartilhamento
     function abrirModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
@@ -660,14 +803,14 @@
       document.getElementById('link-inscricao').value = linkInscricao;
       
       modal.classList.add('ativo');
-      document.body.style.overflow = 'hidden';
+      bloquearScroll();
     }
 
     function fecharModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
       if (modal) {
         modal.classList.remove('ativo');
-        document.body.style.overflow = '';
+        desbloquearScroll();
       }
     }
 
@@ -743,6 +886,28 @@
       }
     };
   </script>
+
+  <!-- Modais de Confirmação -->
+  <div class="modal-overlay" id="modalConfirmarDesinscricao">
+    <div class="modal-cancelamento" onclick="event.stopPropagation()">
+      <h2 class="modal-cancelamento-titulo">Deseja realmente cancelar sua inscrição neste evento?</h2>
+      <div class="modal-cancelamento-botoes">
+        <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarDesinscricao(); event.stopPropagation();">Não</button>
+        <button type="button" class="botao-cancelamento-continuar" onclick="confirmarDesinscricao(); event.stopPropagation();">Sim, cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalDesinscricaoConfirmada">
+    <div class="modal-cancelamento" onclick="event.stopPropagation()">
+      <h2 class="modal-cancelamento-titulo">Inscrição cancelada com sucesso!</h2>
+      <div class="modal-cancelamento-botoes">
+        <button type="button" class="botao-cancelamento-ok" onclick="fecharModalDesinscricaoConfirmada(); event.stopPropagation();">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="CartaoDoEventoInscrito.js?v=<?= time() ?>"></script>
 </body>
 
 </html>

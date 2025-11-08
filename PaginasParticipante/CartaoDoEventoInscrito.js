@@ -1,111 +1,106 @@
-function mostrarMensagemDesinscricao() {
-    var mainContent = document.getElementById('main-content');
-    if (!mainContent) return;
-    mainContent.innerHTML = '';
-    var container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.background = 'var(--caixas)';
-    container.style.borderRadius = '1.875rem';
-    container.style.padding = '1.875rem';
-    container.style.maxWidth = '32rem';
-    container.style.margin = '3rem auto 0 auto';
-    container.style.width = '100%';
-    container.style.boxShadow = '0 0.25rem 1rem rgba(0,0,0,0.25)';
-
-    var titulo = document.createElement('h2');
-    titulo.textContent = 'Você deseja cancelar a inscrição?';
-    titulo.style.color = '#fff';
-    titulo.style.fontSize = '1.5em';
-    titulo.style.marginBottom = '2rem';
-    titulo.style.textAlign = 'center';
-
-    var botoesWrapper = document.createElement('div');
-    botoesWrapper.style.display = 'flex';
-    botoesWrapper.style.flexDirection = 'row';
-    botoesWrapper.style.justifyContent = 'space-between';
-    botoesWrapper.style.alignItems = 'center';
-    botoesWrapper.style.width = '100%';
-
-    var btnCancelar = document.createElement('button');
-    btnCancelar.className = 'botao';
-    btnCancelar.type = 'button';
-    btnCancelar.textContent = 'Cancelar';
-    btnCancelar.style.backgroundColor = 'var(--botao)';
-    btnCancelar.style.color = '#fff';
-    btnCancelar.style.padding = '0.5rem 1.5rem';
-    btnCancelar.style.fontWeight = '700';
-    btnCancelar.style.fontSize = '1.1rem';
-    btnCancelar.style.cursor = 'pointer';
-    btnCancelar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
-    btnCancelar.style.width = 'auto';
-    btnCancelar.onclick = function() { window.location.reload(); };
-
-    var btnContinuar = document.createElement('button');
-    btnContinuar.className = 'botao';
-    btnContinuar.type = 'button';
-    btnContinuar.textContent = 'Continuar';
-    btnContinuar.style.backgroundColor = 'var(--vermelho)';
-    btnContinuar.style.color = '#fff';
-    btnContinuar.style.padding = '0.5rem 1.5rem';
-    btnContinuar.style.fontWeight = '700';
-    btnContinuar.style.fontSize = '1.1rem';
-    btnContinuar.style.cursor = 'pointer';
-    btnContinuar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
-    btnContinuar.style.width = 'auto';
-    btnContinuar.onclick = function() {
-        // Pegar código do evento da URL
-        var params = new URLSearchParams(window.location.search);
-        var codEvento = params.get('id');
-        
-        if (!codEvento) {
-            alert('Erro: código do evento não encontrado');
-            return;
-        }
-
-        var formData = new FormData();
-        formData.append('cod_evento', codEvento);
-
-        fetch('DesinscreverEvento.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.sucesso) {
-                carregarPagina('meusEventos');
-            } else {
-                alert(data.mensagem || 'Erro ao cancelar inscrição');
-                window.location.reload();
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao processar cancelamento');
-            window.location.reload();
-        });
-    };
-
-    botoesWrapper.appendChild(btnCancelar);
-    botoesWrapper.appendChild(btnContinuar);
-    container.appendChild(titulo);
-    container.appendChild(botoesWrapper);
-    mainContent.appendChild(container);
+// Função para bloquear scroll
+function bloquearScroll() {
+    document.body.classList.add('modal-aberto');
+    document.addEventListener('wheel', prevenirScroll, { passive: false });
+    document.addEventListener('touchmove', prevenirScroll, { passive: false });
+    document.addEventListener('keydown', prevenirScrollTeclado, false);
 }
 
-function inicializarEventosCartaoDoEventoInscrito() {
-    var btnDesinscrever = document.querySelector('.botao-desinscrever');
-    if (btnDesinscrever) {
-        btnDesinscrever.onclick = mostrarMensagemDesinscricao;
+// Função para desbloquear scroll
+function desbloquearScroll() {
+    document.body.classList.remove('modal-aberto');
+    document.removeEventListener('wheel', prevenirScroll);
+    document.removeEventListener('touchmove', prevenirScroll);
+    document.removeEventListener('keydown', prevenirScrollTeclado);
+}
+
+// Previne scroll com mouse wheel e touchmove
+function prevenirScroll(e) {
+    if (document.body.classList.contains('modal-aberto')) {
+        e.preventDefault();
     }
 }
 
-// Inicializa ao carregar normalmente
-window.addEventListener('DOMContentLoaded', inicializarEventosCartaoDoEventoInscrito);
-// Permite inicialização após AJAX
-window.inicializarEventosCartaoDoEventoInscrito = inicializarEventosCartaoDoEventoInscrito;
+// Previne scroll com setas do teclado e Page Up/Down
+function prevenirScrollTeclado(e) {
+    if (!document.body.classList.contains('modal-aberto')) return;
+    
+    const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    if (teclas.includes(e.keyCode)) {
+        e.preventDefault();
+    }
+}
 
-// Garante inicialização imediata após carregamento dinâmico do JS
-setTimeout(inicializarEventosCartaoDoEventoInscrito, 0);
+// Funções do modal de desinscrição
+function abrirModalConfirmarDesinscricao() {
+    document.getElementById('modalConfirmarDesinscricao').classList.add('ativo');
+    bloquearScroll();
+}
+
+function fecharModalConfirmarDesinscricao() {
+    document.getElementById('modalConfirmarDesinscricao').classList.remove('ativo');
+    desbloquearScroll();
+}
+
+function confirmarDesinscricao() {
+    fecharModalConfirmarDesinscricao();
+    desinscreverDoEvento();
+}
+
+// Funções do modal de desinscrição confirmada
+function abrirModalDesinscricaoConfirmada() {
+    document.getElementById('modalDesinscricaoConfirmada').classList.add('ativo');
+    bloquearScroll();
+}
+
+function fecharModalDesinscricaoConfirmada() {
+    document.getElementById('modalDesinscricaoConfirmada').classList.remove('ativo');
+    desbloquearScroll();
+    // Voltar para "Meus Eventos"
+    window.location.href = 'ContainerParticipante.php?pagina=meusEventos';
+}
+
+// Função para desinscrever do evento
+function desinscreverDoEvento() {
+    var params = new URLSearchParams(window.location.search);
+    var codEvento = params.get('id');
+    
+    if (!codEvento) {
+        alert('Erro: código do evento não encontrado');
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('cod_evento', codEvento);
+
+    fetch('DesinscreverEvento.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            abrirModalDesinscricaoConfirmada();
+            // Disparar evento personalizado para atualizar outras páginas
+            if (typeof window.dispatchEvent === 'function') {
+                window.dispatchEvent(new CustomEvent('inscricaoAtualizada'));
+            }
+        } else {
+            alert(data.mensagem || 'Erro ao cancelar inscrição');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao processar cancelamento');
+    });
+}
+
+// Inicializar eventos
+document.addEventListener('DOMContentLoaded', function() {
+    var btnDesinscrever = document.getElementById('btn-desinscrever');
+    if (btnDesinscrever) {
+        btnDesinscrever.onclick = function() {
+            abrirModalConfirmarDesinscricao();
+        };
+    }
+});

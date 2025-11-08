@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         perfil: ['perfil', 'editarPerfil'],
         inicio: ['inicio', 'evento'],
         eventosInscritos: ['eventosInscritos', 'eventoInscrito'],
-        meusEventos: ['meusEventos', 'eventoOrganizado', 'adicionarEvento'],
+        meusEventos: ['meusEventos', 'eventoOrganizado', 'adicionarEvento', 'gerenciarEvento'],
         certificados: ['certificados'],
         configuracoes: ['configuracoes', 'termos', 'redefinirSenha', 'emailRecuperacao', 'temaDoSite', 'manualDeUso', 'duvidasFrequentes', 'sobreNos'],
         faleConosco: ['faleconosco'],

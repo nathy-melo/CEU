@@ -99,7 +99,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'adicionarEvento' => 'AdicionarEvento.php',
         'gerenciarEvento' => 'GerenciarEvento.php',
         'perfil' => 'PerfilOrganizador.php',
-        'certificados' => 'CertificadosOrganizador.html',
+        'certificados' => 'CertificadosOrganizador.php',
+        'visualizarCertificado' => 'VisualizarCertificado.php',
+        'visualizarCertificadoGerenciar' => 'VisualizarCertificadoGerenciar.php',
         'configuracoes' => 'ConfiguracoesOrganizador.html',
         'painelnotificacoes' => '../PaginasGlobais/PainelNotificacoes.php',
         // Reaproveita conteúdos globais quando aplicável
@@ -297,7 +299,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'certificados': {
-                html: 'CertificadosOrganizador.html',
+                html: 'CertificadosOrganizador.php',
                 js: [],
                 init: () => {}
             },

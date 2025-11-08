@@ -1,12 +1,45 @@
+// Função para bloquear scroll
+function bloquearScroll() {
+    document.body.classList.add('modal-aberto');
+    document.addEventListener('wheel', prevenirScroll, { passive: false });
+    document.addEventListener('touchmove', prevenirScroll, { passive: false });
+    document.addEventListener('keydown', prevenirScrollTeclado, false);
+}
+
+// Função para desbloquear scroll
+function desbloquearScroll() {
+    document.body.classList.remove('modal-aberto');
+    document.removeEventListener('wheel', prevenirScroll);
+    document.removeEventListener('touchmove', prevenirScroll);
+    document.removeEventListener('keydown', prevenirScrollTeclado);
+}
+
+// Previne scroll com mouse wheel e touchmove
+function prevenirScroll(e) {
+    if (document.body.classList.contains('modal-aberto')) {
+        e.preventDefault();
+    }
+}
+
+// Previne scroll com setas do teclado e Page Up/Down
+function prevenirScrollTeclado(e) {
+    if (!document.body.classList.contains('modal-aberto')) return;
+    
+    const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    if (teclas.includes(e.keyCode)) {
+        e.preventDefault();
+    }
+}
+
 // Funções para controlar os modais de cancelamento
 function abrirModalConfirmarCancelamento() {
     document.getElementById('modalConfirmarCancelamento').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
 }
 
 function fecharModalConfirmarCancelamento() {
     document.getElementById('modalConfirmarCancelamento').style.display = 'none';
-    document.body.style.overflow = '';
+    desbloquearScroll();
 }
 
 function confirmarCancelamento() {
@@ -45,12 +78,12 @@ function confirmarCancelamento() {
 
 function abrirModalCancelamentoConfirmado() {
     document.getElementById('modalCancelamentoConfirmado').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
 }
 
 function fecharModalCancelamentoConfirmado() {
     document.getElementById('modalCancelamentoConfirmado').style.display = 'none';
-    document.body.style.overflow = '';
+    desbloquearScroll();
     // Redirecionar para eventos inscritos após fechar modal
     if (typeof carregarPagina === 'function') {
         carregarPagina('eventosInscritos');

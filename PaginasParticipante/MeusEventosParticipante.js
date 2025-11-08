@@ -265,3 +265,4 @@ window.addEventListener('focus', function() {
 
 window.inicializarFiltroEventos = inicializarFiltroEventos;
 window.carregarEventosDoServidor = carregarEventosDoServidor;
+

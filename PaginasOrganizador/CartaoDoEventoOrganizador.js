@@ -125,15 +125,48 @@ function desinscreverDoEvento(codEvento) {
 // Variável global para armazenar o código do evento
 var codEventoAtualInscricao = null;
 
+// Função para bloquear scroll
+function bloquearScroll() {
+    document.body.classList.add('modal-aberto');
+    document.addEventListener('wheel', prevenirScroll, { passive: false });
+    document.addEventListener('touchmove', prevenirScroll, { passive: false });
+    document.addEventListener('keydown', prevenirScrollTeclado, false);
+}
+
+// Função para desbloquear scroll
+function desbloquearScroll() {
+    document.body.classList.remove('modal-aberto');
+    document.removeEventListener('wheel', prevenirScroll);
+    document.removeEventListener('touchmove', prevenirScroll);
+    document.removeEventListener('keydown', prevenirScrollTeclado);
+}
+
+// Previne scroll com mouse wheel e touchmove
+function prevenirScroll(e) {
+    if (document.body.classList.contains('modal-aberto')) {
+        e.preventDefault();
+    }
+}
+
+// Previne scroll com setas do teclado e Page Up/Down
+function prevenirScrollTeclado(e) {
+    if (!document.body.classList.contains('modal-aberto')) return;
+    
+    const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    if (teclas.includes(e.keyCode)) {
+        e.preventDefault();
+    }
+}
+
 // Funções dos modais de confirmação
 function abrirModalConfirmarInscricao() {
     document.getElementById('modalConfirmarInscricao').classList.add('ativo');
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
 }
 
 function fecharModalConfirmarInscricao() {
     document.getElementById('modalConfirmarInscricao').classList.remove('ativo');
-    document.body.style.overflow = '';
+    desbloquearScroll();
 }
 
 function confirmarInscricao() {
@@ -145,12 +178,12 @@ function confirmarInscricao() {
 
 function abrirModalConfirmarDesinscricao() {
     document.getElementById('modalConfirmarDesinscricao').classList.add('ativo');
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
 }
 
 function fecharModalConfirmarDesinscricao() {
     document.getElementById('modalConfirmarDesinscricao').classList.remove('ativo');
-    document.body.style.overflow = '';
+    desbloquearScroll();
 }
 
 function confirmarDesinscricao() {
@@ -163,22 +196,22 @@ function confirmarDesinscricao() {
 // Funções dos modais de sucesso
 function abrirModalInscricaoConfirmada() {
     document.getElementById('modalInscricaoConfirmada').classList.add('ativo');
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
 }
 
 function fecharModalInscricaoConfirmada() {
     document.getElementById('modalInscricaoConfirmada').classList.remove('ativo');
-    document.body.style.overflow = '';
+    desbloquearScroll();
 }
 
 function abrirModalDesinscricaoConfirmada() {
     document.getElementById('modalDesinscricaoConfirmada').classList.add('ativo');
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
 }
 
 function fecharModalDesinscricaoConfirmada() {
     document.getElementById('modalDesinscricaoConfirmada').classList.remove('ativo');
-    document.body.style.overflow = '';
+    desbloquearScroll();
 }
 
 function verificarStatusInscricao(codEvento) {

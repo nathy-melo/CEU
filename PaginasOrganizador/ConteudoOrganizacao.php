@@ -48,6 +48,10 @@
                 <span id="texto-toggle-selecao-org">Selecionar Todos</span>
                 <img src="../Imagens/Grupo_de_pessoas.svg" alt="">
             </button>
+            <button class="botao botao-em-massa botao-verde" id="btn-confirmar-presencas-massa-org">
+                <span>Confirmar Presenças</span>
+                <img src="../Imagens/Certo.svg" alt="">
+            </button>
             <button class="botao botao-em-massa botao-azul" id="btn-emitir-certificados-massa-org">
                 <span>Emitir Certificados</span>
                 <img src="../Imagens/Certificado.svg" alt="">
@@ -72,15 +76,14 @@
                 <thead>
                     <tr>
                         <th class="Titulo_Tabela">Selecionar</th>
-                        <th class="Titulo_Tabela">Tipo</th>
                         <th class="Titulo_Tabela">Dados do Membro</th>
                         <th class="Titulo_Tabela">Modificar</th>
-                        <th class="Titulo_Tabela">Certificado</th>
+                        <th class="Titulo_Tabela">Status</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-organizacao">
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px; color: var(--botao);">
+                        <td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">
                             Carregando membros...
                         </td>
                     </tr>
@@ -154,7 +157,7 @@
             </div>
 
             <div class="form-group">
-                <small style="color: #666;">A mensagem será enviada para todos os membros da organização (${todosOrganizacao.length} ${todosOrganizacao.length === 1 ? 'membro' : 'membros'})</small>
+                <small id="info-destinatarios-org" style="color: #666;">A mensagem será enviada para todos os membros da organização</small>
             </div>
 
             <div class="modal-footer">
@@ -174,7 +177,7 @@
         </div>
         <form id="formEditarMembro" onsubmit="salvarEdicaoMembro(event); event.stopPropagation()">
             <input type="hidden" id="edit-cpf-org">
-            
+
             <div class="campo-formulario">
                 <label for="edit-cpf-display-org">CPF</label>
                 <input type="text" id="edit-cpf-display-org" disabled style="background-color: #f5f5f5; cursor: not-allowed;">
@@ -263,46 +266,53 @@
             return;
         }
 
-        tbody.innerHTML = todosOrganizacao.map(membro => {
+        tbody.innerHTML = todosOrganizacao.map((membro, i) => {
             const isChecked = membrosSelecionados.has(membro.cpf);
             const rowClass = isChecked ? 'linha-selecionada' : '';
-            
-            const tipoBadge = '<span class="tipo-membro tipo-organizador">Organizador</span>';
+
+            const statusPresenca = membro.presenca_confirmada ?
+                '<span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span>' :
+                '<span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span>';
 
             const statusCertificado = membro.certificado_emitido ?
-                `<span class="emblema-status confirmado">
-                 <img src="../Imagens/Certo.svg" alt="Emitido" style="width: 18px; height: 18px;">
-                 Emitido
-               </span>` :
-                `<button class="emblema-status pendente" onclick="emitirCertificadoOrganizacao('${membro.cpf}')">
-                 <img src="../Imagens/Certificado.svg" alt="Emitir" style="width: 18px; height: 18px;">
-                 Emitir
-               </button>`;
+                '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
+                '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
+
+            const btnCertificado = membro.certificado_emitido ?
+                '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoOrg(\'' + (membro.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
+                '';
+
+            // Botão de emitir certificado só aparece se a presença foi confirmada
+            const btnEmitirCertificado = membro.presenca_confirmada && !membro.certificado_emitido ?
+                '<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoOrganizacao(\'' + membro.cpf + '\')"><span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
+                '';
 
             return `
-            <tr class="${rowClass}">
-                <td style="text-align: center;">
-                    <input type="checkbox" class="checkbox-selecionar-org" value="${membro.cpf}" ${isChecked ? 'checked' : ''}>
-                </td>
-                <td style="text-align: center;">
-                    ${tipoBadge}
+            <tr class="${rowClass}" data-cpf="${membro.cpf}">
+                <td class="coluna-selecionar">
+                    <input type="checkbox" class="checkbox-selecionar-org" id="org-${i}" value="${membro.cpf}" ${isChecked ? 'checked' : ''}>
                 </td>
                 <td class="coluna-dados">
                     <p><strong>Nome:</strong> ${membro.nome || '-'}</p>
-                    <p><strong>CPF:</strong> ${membro.cpf || '-'}</p>
                     <p><strong>E-mail:</strong> ${membro.email || '-'}</p>
-                    <p><strong>RA:</strong> ${membro.ra || '-'}</p>
+                    <p><strong>Registro Acadêmico:</strong> ${membro.ra || '-'}</p>
+                    <p><strong>Data de Inscrição:</strong> ${membro.data_inscricao || '-'}</p>
                 </td>
-                <td style="text-align: center;">
-                    <button class="botao-editar" onclick="abrirModalEditarMembro('${membro.cpf}')">
-                        <img src="../Imagens/Editar.svg" alt="Editar">
-                    </button>
-                    <button class="botao-excluir" onclick="excluirMembro('${membro.cpf}')">
-                        <img src="../Imagens/Excluir.svg" alt="Excluir">
-                    </button>
+                <td class="coluna-modificar">
+                    <div class="grupo-acoes">
+                        <button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaOrg('${membro.cpf}')">
+                            <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
+                        </button>
+                        ${btnEmitirCertificado}
+                    </div>
                 </td>
-                <td style="text-align: center;">
-                    ${statusCertificado}
+                <td class="coluna-status">
+                    <div class="grupo-status">
+                        <div class="linha-status"><span>Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                        <div class="linha-status"><span>Presença:</span>${statusPresenca}</div>
+                        <div class="linha-status"><span>Certificado:</span>${statusCertificado}</div>
+                        ${btnCertificado}
+                    </div>
                 </td>
             </tr>
         `;
@@ -334,7 +344,9 @@
                     alert('Certificado emitido com sucesso!');
                     carregarOrganizacao(); // Recarrega a lista
                 } else {
-                    alert('Erro ao emitir certificado: ' + (dados.erro || 'Erro desconhecido'));
+                    const mensagemErro = dados.detalhe ? `${dados.erro}: ${dados.detalhe}` : (dados.erro || 'Erro desconhecido');
+                    alert('Erro ao emitir certificado: ' + mensagemErro);
+                    console.error('Detalhes do erro:', dados);
                 }
             })
             .catch(erro => {
@@ -342,8 +354,52 @@
             });
     }
 
+    // Função para verificar certificado
+    function verificarCertificadoOrg(codigo) {
+        if (!codigo) {
+            alert('Código de verificação não disponível');
+            return;
+        }
+        // Abre a página de visualização em uma nova aba usando o código
+        const url = `VisualizarCertificado.php?codigo=${encodeURIComponent(codigo)}`;
+        window.open(url, '_blank');
+    }
+
+    // Função para confirmar presença
+    function confirmarPresencaOrg(cpf) {
+        if (!confirm('Deseja confirmar a presença deste organizador?')) {
+            return;
+        }
+
+        fetch('GerenciarEvento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'confirmar_presenca_organizacao',
+                    cod_evento: codEventoAtual,
+                    cpf: cpf
+                })
+            })
+            .then(response => response.json())
+            .then(dados => {
+                if (dados.sucesso) {
+                    alert('Presença confirmada com sucesso!');
+                    carregarOrganizacao();
+                } else {
+                    const mensagemErro = dados.detalhe ? `${dados.erro}: ${dados.detalhe}` : (dados.erro || 'Erro desconhecido');
+                    alert('Erro ao confirmar presença: ' + mensagemErro);
+                    console.error('Detalhes do erro:', dados);
+                }
+            })
+            .catch(erro => {
+                alert('Erro ao confirmar presença');
+            });
+    }
+
     // ===== AÇÕES RÁPIDAS =====
-    
+
     // Funções dos modais - declaradas globalmente primeiro
     function abrirModalAdicionarColaborador() {
         const modal = document.getElementById('modalAdicionarColaborador');
@@ -366,6 +422,14 @@
         const modal = document.getElementById('modalEnviarMensagemOrg');
         if (modal) {
             modal.classList.add('ativo');
+
+            // Atualizar informação de destinatários
+            const infoDestinatarios = document.getElementById('info-destinatarios-org');
+            if (infoDestinatarios && typeof todosOrganizacao !== 'undefined') {
+                const total = todosOrganizacao.length;
+                const texto = total === 1 ? 'membro' : 'membros';
+                infoDestinatarios.textContent = `A mensagem será enviada para todos os membros da organização (${total} ${texto})`;
+            }
         }
     }
 
@@ -536,7 +600,7 @@
     }
 
     // ===== FUNÇÕES DE EDIÇÃO E EXCLUSÃO =====
-    
+
     function abrirModalEditarMembro(cpf) {
         const membro = todosOrganizacao.find(m => m.cpf === cpf);
         if (!membro) return;
@@ -628,7 +692,55 @@
     }
 
     // ===== FUNÇÕES DE AÇÕES EM MASSA =====
-    
+
+    async function confirmarPresencasEmMassaOrg() {
+        if (todosOrganizacao.length === 0) {
+            alert('Não há membros na organização');
+            return;
+        }
+
+        if (membrosSelecionados.size === 0) {
+            alert('Selecione pelo menos um membro');
+            return;
+        }
+
+        if (!confirm(`Confirmar presença de ${membrosSelecionados.size} membro(s)?`)) {
+            return;
+        }
+
+        let confirmados = 0;
+        let erros = 0;
+
+        for (const cpf of membrosSelecionados) {
+            try {
+                const response = await fetch('GerenciarEvento.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'confirmar_presenca_organizacao',
+                        cod_evento: codEventoAtual,
+                        cpf: cpf
+                    })
+                });
+
+                const data = await response.json();
+                if (data.sucesso) {
+                    confirmados++;
+                } else {
+                    erros++;
+                }
+            } catch (error) {
+                erros++;
+            }
+        }
+
+        alert(`Operação concluída!\nPresenças confirmadas: ${confirmados}\nErros: ${erros}`);
+        membrosSelecionados.clear();
+        carregarOrganizacao();
+    }
+
     async function emitirCertificadosEmMassaOrg() {
         if (todosOrganizacao.length === 0) {
             alert('Não há membros na organização');
@@ -640,14 +752,31 @@
             return;
         }
 
-        if (!confirm(`Emitir certificado para ${membrosSelecionados.size} membro(s)?`)) {
+        // Filtrar apenas membros com presença confirmada
+        const membrosComPresenca = Array.from(membrosSelecionados).filter(cpf => {
+            const membro = todosOrganizacao.find(m => m.cpf === cpf);
+            return membro && membro.presenca_confirmada;
+        });
+
+        if (membrosComPresenca.length === 0) {
+            alert('Nenhum dos membros selecionados possui presença confirmada.\nConfirme a presença antes de emitir certificados.');
+            return;
+        }
+
+        const ignorados = membrosSelecionados.size - membrosComPresenca.length;
+        let mensagemConfirmacao = `Emitir certificado para ${membrosComPresenca.length} membro(s)?`;
+        if (ignorados > 0) {
+            mensagemConfirmacao += `\n\nObs: ${ignorados} membro(s) será(ão) ignorado(s) por não ter presença confirmada.`;
+        }
+
+        if (!confirm(mensagemConfirmacao)) {
             return;
         }
 
         let emitidos = 0;
         let erros = 0;
 
-        for (const cpf of membrosSelecionados) {
+        for (const cpf of membrosComPresenca) {
             try {
                 const response = await fetch('GerenciarEvento.php', {
                     method: 'POST',
@@ -726,7 +855,7 @@
     }
 
     // ===== FUNÇÕES DE EVENTOS E PESQUISA =====
-    
+
     function inicializarEventosOrganizacao() {
         // Eventos de checkbox
         if (!window.__orgCheckboxBound) {
@@ -779,8 +908,14 @@
         }
 
         // Botões de ação em massa
+        const btnConfirmarPresencaMassa = document.getElementById('btn-confirmar-presencas-massa-org');
         const btnEmitirCertMassa = document.getElementById('btn-emitir-certificados-massa-org');
         const btnExcluirMassa = document.getElementById('btn-excluir-membros-massa');
+
+        if (btnConfirmarPresencaMassa && !btnConfirmarPresencaMassa.dataset.bound) {
+            btnConfirmarPresencaMassa.dataset.bound = '1';
+            btnConfirmarPresencaMassa.addEventListener('click', confirmarPresencasEmMassaOrg);
+        }
 
         if (btnEmitirCertMassa && !btnEmitirCertMassa.dataset.bound) {
             btnEmitirCertMassa.dataset.bound = '1';
@@ -795,7 +930,7 @@
         // Pesquisa
         const campoPesquisa = document.getElementById('busca-organizacao');
         const btnPesquisa = document.getElementById('btn-buscar-org');
-        
+
         if (campoPesquisa) {
             campoPesquisa.addEventListener('input', filtrarMembros);
             campoPesquisa.addEventListener('keypress', function(e) {

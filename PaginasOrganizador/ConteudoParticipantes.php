@@ -516,7 +516,7 @@
                 '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
 
             const btnCertificado = p.certificado_emitido ?
-                '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoPart(\'' + p.cpf + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
+                '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoPart(\'' + (p.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
                 '';
 
             return `
@@ -818,8 +818,20 @@
         document.getElementById('modalEditarDadosPart').classList.add('ativo');
     }
 
-    function verificarCertificadoPart(cpf) {
-        alert('Funcionalidade em desenvolvimento');
+    function verificarCertificadoPart(codigo) {
+        if (!codigo) {
+            alert('Código de verificação não disponível');
+            return;
+        }
+        
+        // Usa a variável global codEventoAtual que já está definida no GerenciarEvento.php
+        if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
+            alert('Erro: código do evento não encontrado');
+            return;
+        }
+        
+        // Navega para visualizar o certificado dentro do container
+        window.location.href = `ContainerOrganizador.php?pagina=visualizarCertificadoGerenciar&codigo=${encodeURIComponent(codigo)}&cod_evento=${codEventoAtual}`;
     }
 
     function formatarCPF(cpf) {

@@ -90,6 +90,51 @@ function exportarPlanilha($dados, $colunas, $nomeBase, $formato)
     echo '</Workbook>';
 }
 
+// Se for requisição AJAX para buscar código de verificação do certificado
+if (isset($_GET['action']) && $_GET['action'] === 'buscar_codigo_certificado' && isset($_GET['cpf']) && isset($_GET['cod_evento'])) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    require_once __DIR__ . '/../BancoDados/conexao.php';
+
+    $cpfParticipante = $_GET['cpf'];
+    $codEvento = intval($_GET['cod_evento']);
+
+    try {
+        // Buscar código de verificação do certificado
+        $consultaCertificado = "SELECT cod_verificacao 
+                                FROM certificado 
+                                WHERE cpf = ? AND cod_evento = ?
+                                LIMIT 1";
+        
+        $stmt = mysqli_prepare($conexao, $consultaCertificado);
+        mysqli_stmt_bind_param($stmt, "si", $cpfParticipante, $codEvento);
+        mysqli_stmt_execute($stmt);
+        $resultado = mysqli_stmt_get_result($stmt);
+        $certificado = mysqli_fetch_assoc($resultado);
+        mysqli_stmt_close($stmt);
+
+        if ($certificado) {
+            echo json_encode([
+                'sucesso' => true,
+                'codigo_verificacao' => $certificado['cod_verificacao']
+            ]);
+        } else {
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Certificado não encontrado para este participante.'
+            ]);
+        }
+
+        mysqli_close($conexao);
+    } catch (Exception $e) {
+        echo json_encode([
+            'sucesso' => false,
+            'mensagem' => 'Erro ao buscar certificado: ' . $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
 // Se for requisição AJAX para buscar participantes
 if (isset($_GET['action']) && $_GET['action'] === 'buscar' && isset($_GET['cod_evento'])) {
     header('Content-Type: application/json; charset=utf-8');
@@ -148,9 +193,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar' && isset($_GET['cod_e
                                     i.data_inscricao,
                                     i.presenca_confirmada,
                                     i.certificado_emitido,
+                                    cert.cod_verificacao,
                                     DATE_FORMAT(i.data_inscricao, '%d/%m/%y - %H:%i') as data_inscricao_formatada
                                   FROM inscricao i
                                   INNER JOIN usuario u ON i.CPF = u.CPF
+                                  LEFT JOIN certificado cert ON cert.cpf = i.CPF AND cert.cod_evento = i.cod_evento
                                   WHERE i.cod_evento = ? AND i.status = 'ativa'
                                   ORDER BY i.data_inscricao DESC";
 
@@ -168,7 +215,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar' && isset($_GET['cod_e
                 'ra' => $row['RA'] ?? 'Não informado',
                 'data_inscricao' => $row['data_inscricao_formatada'],
                 'presenca_confirmada' => (int)$row['presenca_confirmada'] === 1,
-                'certificado_emitido' => (int)$row['certificado_emitido'] === 1
+                'certificado_emitido' => (int)$row['certificado_emitido'] === 1,
+                'cod_verificacao' => $row['cod_verificacao'] ?? null
             ];
         }
 
@@ -239,6 +287,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
                                     u.Email,
                                     u.RA,
                                     'Organizador' as tipo,
+                                    NULL as presenca_confirmada,
                                     NULL as certificado_emitido
                                   FROM organiza o
                                   INNER JOIN usuario u ON o.CPF = u.CPF
@@ -257,6 +306,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
                 'email' => $row['Email'],
                 'ra' => $row['RA'] ?? 'Não informado',
                 'tipo' => 'Organizador',
+                'presenca_confirmada' => false,
                 'certificado_emitido' => false
             ];
         }
@@ -270,9 +320,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
                                     u.Email,
                                     u.RA,
                                     'Colaborador' as tipo,
-                                    c.certificado_emitido
+                                    c.presenca_confirmada,
+                                    c.certificado_emitido,
+                                    cert.cod_verificacao
                                   FROM colaboradores_evento c
                                   INNER JOIN usuario u ON c.CPF = u.CPF
+                                  LEFT JOIN certificado cert ON cert.cpf = c.CPF AND cert.cod_evento = c.cod_evento
                                   WHERE c.cod_evento = ?
                                   ORDER BY u.Nome";
 
@@ -288,7 +341,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
                 'email' => $row['Email'],
                 'ra' => $row['RA'] ?? 'Não informado',
                 'tipo' => 'Colaborador',
-                'certificado_emitido' => (int)$row['certificado_emitido'] === 1
+                'presenca_confirmada' => (int)$row['presenca_confirmada'] === 1,
+                'certificado_emitido' => (int)$row['certificado_emitido'] === 1,
+                'cod_verificacao' => $row['cod_verificacao'] ?? null
             ];
         }
 
@@ -620,10 +675,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                SET presenca_confirmada = 1 
                                WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
             $mensagemSucesso = 'Presença confirmada com sucesso';
+            
+            $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
+            
+            if ($stmtUpdate) {
+                mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
+                
+                if (mysqli_stmt_execute($stmtUpdate)) {
+                    $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
+                    mysqli_stmt_close($stmtUpdate);
+                    
+                    if ($linhasAfetadas > 0) {
+                        echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
+                    } else {
+                        echo json_encode(['sucesso' => false, 'erro' => 'nenhuma_alteracao']);
+                    }
+                } else {
+                    echo json_encode(['sucesso' => false, 'erro' => 'falha_execucao', 'detalhe' => mysqli_stmt_error($stmtUpdate)]);
+                    mysqli_stmt_close($stmtUpdate);
+                }
+            } else {
+                echo json_encode(['sucesso' => false, 'erro' => 'falha_preparacao', 'detalhe' => mysqli_error($conexao)]);
+            }
+            
+            mysqli_close($conexao);
+            exit;
+
         } elseif ($acao === 'emitir_certificado') {
-            // Verifica se a presença está confirmada
-            $consultaVerifica = "SELECT presenca_confirmada FROM inscricao 
-                                WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
+            // Verifica se a presença está confirmada e busca dados do participante
+            $consultaVerifica = "SELECT i.presenca_confirmada, u.Nome, u.Email 
+                                FROM inscricao i
+                                JOIN usuario u ON i.CPF = u.CPF
+                                WHERE i.cod_evento = ? AND i.CPF = ? AND i.status = 'ativa'";
             $stmtVerifica = mysqli_prepare($conexao, $consultaVerifica);
             mysqli_stmt_bind_param($stmtVerifica, "is", $codEvento, $cpfParticipante);
             mysqli_stmt_execute($stmtVerifica);
@@ -643,38 +726,351 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            $consultaUpdate = "UPDATE inscricao 
-                               SET certificado_emitido = 1 
-                               WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
-            $mensagemSucesso = 'Certificado emitido com sucesso';
+            // Buscar dados do evento
+            $consultaEvento = "SELECT nome, inicio, conclusao, lugar, duracao FROM evento WHERE cod_evento = ?";
+            $stmtEvento = mysqli_prepare($conexao, $consultaEvento);
+            mysqli_stmt_bind_param($stmtEvento, "i", $codEvento);
+            mysqli_stmt_execute($stmtEvento);
+            $resultEvento = mysqli_stmt_get_result($stmtEvento);
+            $dadosEvento = mysqli_fetch_assoc($resultEvento);
+            mysqli_stmt_close($stmtEvento);
+
+            if (!$dadosEvento) {
+                echo json_encode(['sucesso' => false, 'erro' => 'evento_nao_encontrado']);
+                mysqli_close($conexao);
+                exit;
+            }
+
+            // Buscar nome do organizador
+            $consultaOrganizador = "SELECT u.Nome FROM organiza o 
+                                    JOIN usuario u ON o.CPF = u.CPF 
+                                    WHERE o.cod_evento = ? LIMIT 1";
+            $stmtOrg = mysqli_prepare($conexao, $consultaOrganizador);
+            mysqli_stmt_bind_param($stmtOrg, "i", $codEvento);
+            mysqli_stmt_execute($stmtOrg);
+            $resultOrg = mysqli_stmt_get_result($stmtOrg);
+            $dadosOrganizador = mysqli_fetch_assoc($resultOrg);
+            mysqli_stmt_close($stmtOrg);
+
+            // Gerar certificado usando o sistema de certificação
+            try {
+                require_once __DIR__ . '/../Certificacao/config.php';
+                require_once __DIR__ . '/../Certificacao/ProcessadorTemplate.php';
+                require_once __DIR__ . '/../Certificacao/RepositorioCertificados.php';
+
+                $autoload = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
+                $processador = new \CEU\Certificacao\ProcessadorTemplate($autoload);
+                $repositorio = new \CEU\Certificacao\RepositorioCertificados($conexao);
+                $repositorio->garantirEsquema();
+
+                // Gerar código único
+                $codigoVerificacao = $repositorio->gerarCodigoUnico(8);
+
+                // Dados para o template
+                $dados = [
+                    'NomeParticipante' => $inscricao['Nome'],
+                    'Email' => $inscricao['Email'],
+                    'CPF' => $cpfParticipante,
+                    'NomeEvento' => $dadosEvento['nome'],
+                    'NomeOrganizador' => $dadosOrganizador['Nome'] ?? 'CEU',
+                    'LocalEvento' => $dadosEvento['lugar'] ?? 'Online',
+                    'Data' => date('d/m/Y', strtotime($dadosEvento['inicio'])),
+                    'DataEvento' => date('d/m/Y', strtotime($dadosEvento['inicio'])),
+                    'CargaHoraria' => $dadosEvento['duracao'] ? $dadosEvento['duracao'] . ' horas' : 'A definir',
+                    'CodigoVerificacao' => $codigoVerificacao,
+                    'CodigoAutenticador' => $codigoVerificacao,
+                    'TipoParticipacao' => 'Participante'
+                ];
+
+                // Procura por templates em ordem de prioridade
+                $templatesPath = __DIR__ . '/../Certificacao/templates/';
+                $possiveisTemplates = [
+                    'ModeloExemplo.pptx',
+                    'ModeloExemplo.docx',
+                    'certificado_participante.pptx',
+                    'certificado_participante.docx',
+                    'certificado_padrao.pptx',
+                    'certificado_padrao.docx',
+                    'certificado_participante.odt',
+                    'certificado_padrao.odt'
+                ];
+                
+                $templatePath = null;
+                foreach ($possiveisTemplates as $template) {
+                    $caminho = $templatesPath . $template;
+                    if (file_exists($caminho)) {
+                        $templatePath = $caminho;
+                        break;
+                    }
+                }
+                
+                if (!$templatePath) {
+                    throw new Exception('Nenhum template de certificado encontrado na pasta templates/');
+                }
+
+                // Diretório de saída
+                $dirCertificados = __DIR__ . '/../Certificacao/certificados/';
+                if (!is_dir($dirCertificados)) {
+                    mkdir($dirCertificados, 0755, true);
+                }
+
+                $nomeArquivo = 'cert_part_' . $codEvento . '_' . $cpfParticipante . '_' . $codigoVerificacao . '.pdf';
+                $caminhoCompleto = $dirCertificados . $nomeArquivo;
+                $caminhoRelativo = 'Certificacao/certificados/' . $nomeArquivo;
+
+                // Gerar PDF usando o método universal que detecta automaticamente a extensão
+                $resultado = $processador->gerarPdfDeModelo($templatePath, $dados, $caminhoCompleto);
+
+                if ($resultado['success']) {
+                    // Salvar no repositório
+                    $repositorio->salvarCertificado(
+                        $codigoVerificacao,
+                        $caminhoRelativo,
+                        'participante',
+                        'participacao',
+                        $dados,
+                        $cpfParticipante,
+                        $codEvento
+                    );
+
+                    // Atualizar status no banco
+                    $consultaUpdate = "UPDATE inscricao 
+                                       SET certificado_emitido = 1 
+                                       WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
+                    $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
+                    mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
+                    mysqli_stmt_execute($stmtUpdate);
+                    mysqli_stmt_close($stmtUpdate);
+
+                    echo json_encode([
+                        'sucesso' => true,
+                        'mensagem' => 'Certificado emitido com sucesso',
+                        'codigo_verificacao' => $codigoVerificacao,
+                        'arquivo' => $caminhoRelativo
+                    ]);
+                } else {
+                    echo json_encode(['sucesso' => false, 'erro' => 'falha_geracao_pdf', 'detalhe' => $resultado['error'] ?? 'Erro desconhecido']);
+                }
+            } catch (Throwable $e) {
+                echo json_encode(['sucesso' => false, 'erro' => 'erro_certificacao', 'detalhe' => $e->getMessage()]);
+            }
+            mysqli_close($conexao);
+            exit;
         } elseif ($acao === 'excluir') {
             $consultaUpdate = "UPDATE inscricao 
                                SET status = 'cancelada' 
                                WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
             $mensagemSucesso = 'Participante excluído com sucesso';
-        } elseif ($acao === 'emitir_certificado_organizacao') {
-            // Emitir certificado para colaborador (organizador não precisa dessa coluna)
+            
+            $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
+            
+            if ($stmtUpdate) {
+                mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
+                
+                if (mysqli_stmt_execute($stmtUpdate)) {
+                    $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
+                    mysqli_stmt_close($stmtUpdate);
+                    
+                    if ($linhasAfetadas > 0) {
+                        echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
+                    } else {
+                        echo json_encode(['sucesso' => false, 'erro' => 'nenhuma_alteracao']);
+                    }
+                } else {
+                    echo json_encode(['sucesso' => false, 'erro' => 'falha_execucao', 'detalhe' => mysqli_stmt_error($stmtUpdate)]);
+                    mysqli_stmt_close($stmtUpdate);
+                }
+            } else {
+                echo json_encode(['sucesso' => false, 'erro' => 'falha_preparacao', 'detalhe' => mysqli_error($conexao)]);
+            }
+            
+            mysqli_close($conexao);
+            exit;
+
+        } elseif ($acao === 'confirmar_presenca_organizacao') {
             $consultaUpdate = "UPDATE colaboradores_evento 
-                               SET certificado_emitido = 1 
+                               SET presenca_confirmada = 1 
                                WHERE cod_evento = ? AND CPF = ?";
-            $mensagemSucesso = 'Certificado emitido com sucesso';
+            $mensagemSucesso = 'Presença confirmada com sucesso';
+            
+            $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
+            
+            if ($stmtUpdate) {
+                mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
+                
+                if (mysqli_stmt_execute($stmtUpdate)) {
+                    $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
+                    mysqli_stmt_close($stmtUpdate);
+                    
+                    if ($linhasAfetadas > 0) {
+                        echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
+                    } else {
+                        echo json_encode(['sucesso' => false, 'erro' => 'nenhuma_alteracao']);
+                    }
+                } else {
+                    echo json_encode(['sucesso' => false, 'erro' => 'falha_execucao', 'detalhe' => mysqli_stmt_error($stmtUpdate)]);
+                    mysqli_stmt_close($stmtUpdate);
+                }
+            } else {
+                echo json_encode(['sucesso' => false, 'erro' => 'falha_preparacao', 'detalhe' => mysqli_error($conexao)]);
+            }
+            
+            mysqli_close($conexao);
+            exit;
+
+        } elseif ($acao === 'emitir_certificado_organizacao') {
+            // Verificar se a presença foi confirmada antes de emitir certificado
+            $consultaPresenca = "SELECT ce.presenca_confirmada, u.Nome, u.Email 
+                                FROM colaboradores_evento ce
+                                JOIN usuario u ON ce.CPF = u.CPF
+                                WHERE ce.cod_evento = ? AND ce.CPF = ?";
+            $stmtPresenca = mysqli_prepare($conexao, $consultaPresenca);
+            mysqli_stmt_bind_param($stmtPresenca, "is", $codEvento, $cpfParticipante);
+            mysqli_stmt_execute($stmtPresenca);
+            $resultPresenca = mysqli_stmt_get_result($stmtPresenca);
+            $dadosPresenca = mysqli_fetch_assoc($resultPresenca);
+            mysqli_stmt_close($stmtPresenca);
+
+            if (!$dadosPresenca || !$dadosPresenca['presenca_confirmada']) {
+                echo json_encode(['sucesso' => false, 'erro' => 'presenca_nao_confirmada', 'mensagem' => 'A presença precisa ser confirmada antes de emitir o certificado']);
+                mysqli_close($conexao);
+                exit;
+            }
+
+            // Buscar dados do evento
+            $consultaEvento = "SELECT nome, inicio, conclusao, lugar, duracao FROM evento WHERE cod_evento = ?";
+            $stmtEvento = mysqli_prepare($conexao, $consultaEvento);
+            mysqli_stmt_bind_param($stmtEvento, "i", $codEvento);
+            mysqli_stmt_execute($stmtEvento);
+            $resultEvento = mysqli_stmt_get_result($stmtEvento);
+            $dadosEvento = mysqli_fetch_assoc($resultEvento);
+            mysqli_stmt_close($stmtEvento);
+
+            if (!$dadosEvento) {
+                echo json_encode(['sucesso' => false, 'erro' => 'evento_nao_encontrado']);
+                mysqli_close($conexao);
+                exit;
+            }
+
+            // Buscar nome do organizador
+            $consultaOrganizador = "SELECT u.Nome FROM organiza o 
+                                    JOIN usuario u ON o.CPF = u.CPF 
+                                    WHERE o.cod_evento = ? LIMIT 1";
+            $stmtOrg = mysqli_prepare($conexao, $consultaOrganizador);
+            mysqli_stmt_bind_param($stmtOrg, "i", $codEvento);
+            mysqli_stmt_execute($stmtOrg);
+            $resultOrg = mysqli_stmt_get_result($stmtOrg);
+            $dadosOrganizador = mysqli_fetch_assoc($resultOrg);
+            mysqli_stmt_close($stmtOrg);
+
+            // Gerar certificado usando o sistema de certificação
+            try {
+                require_once __DIR__ . '/../Certificacao/config.php';
+                require_once __DIR__ . '/../Certificacao/ProcessadorTemplate.php';
+                require_once __DIR__ . '/../Certificacao/RepositorioCertificados.php';
+
+                $autoload = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
+                $processador = new \CEU\Certificacao\ProcessadorTemplate($autoload);
+                $repositorio = new \CEU\Certificacao\RepositorioCertificados($conexao);
+                $repositorio->garantirEsquema();
+
+                // Gerar código único
+                $codigoVerificacao = $repositorio->gerarCodigoUnico(8);
+
+                // Dados para o template
+                $dados = [
+                    'NomeParticipante' => $dadosPresenca['Nome'],
+                    'Email' => $dadosPresenca['Email'],
+                    'CPF' => $cpfOrganizador,
+                    'NomeEvento' => $dadosEvento['nome'],
+                    'NomeOrganizador' => $dadosOrganizador['Nome'] ?? 'CEU',
+                    'LocalEvento' => $dadosEvento['lugar'] ?? 'Online',
+                    'Data' => date('d/m/Y', strtotime($dadosEvento['inicio'])),
+                    'DataEvento' => date('d/m/Y', strtotime($dadosEvento['inicio'])),
+                    'CargaHoraria' => $dadosEvento['duracao'] ? $dadosEvento['duracao'] . ' horas' : 'A definir',
+                    'CodigoVerificacao' => $codigoVerificacao,
+                    'CodigoAutenticador' => $codigoVerificacao,
+                    'TipoParticipacao' => 'Organizador'
+                ];
+
+                // Procura por templates em ordem de prioridade
+                $templatesPath = __DIR__ . '/../Certificacao/templates/';
+                $possiveisTemplates = [
+                    'ModeloExemploOrganizador.pptx',
+                    'ModeloExemploOrganizador.docx',
+                    'certificado_organizador.pptx',
+                    'certificado_organizador.docx',
+                    'certificado_padrao.pptx',
+                    'certificado_padrao.docx',
+                    'ModeloExemplo.pptx',
+                    'certificado_organizador.odt',
+                    'certificado_padrao.odt'
+                ];
+                
+                $templatePath = null;
+                foreach ($possiveisTemplates as $template) {
+                    $caminho = $templatesPath . $template;
+                    if (file_exists($caminho)) {
+                        $templatePath = $caminho;
+                        break;
+                    }
+                }
+                
+                if (!$templatePath) {
+                    throw new Exception('Nenhum template de certificado encontrado na pasta templates/');
+                }
+
+                // Diretório de saída
+                $dirCertificados = __DIR__ . '/../Certificacao/certificados/';
+                if (!is_dir($dirCertificados)) {
+                    mkdir($dirCertificados, 0755, true);
+                }
+
+                $nomeArquivo = 'cert_org_' . $codEvento . '_' . $cpfParticipante . '_' . $codigoVerificacao . '.pdf';
+                $caminhoCompleto = $dirCertificados . $nomeArquivo;
+                $caminhoRelativo = 'Certificacao/certificados/' . $nomeArquivo;
+
+                // Gerar PDF usando o método universal que detecta automaticamente a extensão
+                $resultado = $processador->gerarPdfDeModelo($templatePath, $dados, $caminhoCompleto);
+
+                if ($resultado['success']) {
+                    // Salvar no repositório
+                    $repositorio->salvarCertificado(
+                        $codigoVerificacao,
+                        $caminhoRelativo,
+                        'organizador',
+                        'organizacao',
+                        $dados,
+                        $cpfParticipante,
+                        $codEvento
+                    );
+
+                    // Atualizar status no banco
+                    $consultaUpdate = "UPDATE colaboradores_evento 
+                                       SET certificado_emitido = 1 
+                                       WHERE cod_evento = ? AND CPF = ?";
+                    $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
+                    mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
+                    mysqli_stmt_execute($stmtUpdate);
+                    mysqli_stmt_close($stmtUpdate);
+
+                    echo json_encode([
+                        'sucesso' => true,
+                        'mensagem' => 'Certificado emitido com sucesso',
+                        'codigo_verificacao' => $codigoVerificacao,
+                        'arquivo' => $caminhoRelativo
+                    ]);
+                } else {
+                    echo json_encode(['sucesso' => false, 'erro' => 'falha_geracao_pdf', 'detalhe' => $resultado['error'] ?? 'Erro desconhecido']);
+                }
+            } catch (Throwable $e) {
+                echo json_encode(['sucesso' => false, 'erro' => 'erro_certificacao', 'detalhe' => $e->getMessage()]);
+            }
+            mysqli_close($conexao);
+            exit;
         } else {
             echo json_encode(['sucesso' => false, 'erro' => 'acao_invalida']);
             exit;
-        }
-
-        $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
-        mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
-        mysqli_stmt_execute($stmtUpdate);
-
-        $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
-        mysqli_stmt_close($stmtUpdate);
-        mysqli_close($conexao);
-
-        if ($linhasAfetadas > 0) {
-            echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
-        } else {
-            echo json_encode(['sucesso' => false, 'erro' => 'participante_nao_encontrado']);
         }
     } catch (Throwable $e) {
         http_response_code(500);
@@ -940,6 +1336,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .botao-em-massa.botao-vermelho {
         background-color: var(--vermelho);
+    }
+
+    .botao-em-massa.botao-azul {
+        background-color: var(--botao);
     }
 
     .botao-em-massa img {
@@ -1384,35 +1784,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         color: var(--branco);
     }
 
-    /* Ajuste de colunas da tabela de organização */
+    /* Ajuste de colunas da tabela de organização - agora com 4 colunas igual participantes */
     #aba-organizacao .tabela-participantes th:nth-child(1),
     #aba-organizacao .tabela-participantes td:nth-child(1) {
-        width: 150px;
+        width: 50px;
         text-align: center;
     }
 
     #aba-organizacao .tabela-participantes th:nth-child(2),
     #aba-organizacao .tabela-participantes td:nth-child(2) {
-        max-width: 500px;
+        max-width: 350px;
     }
 
     #aba-organizacao .tabela-participantes th:nth-child(3),
     #aba-organizacao .tabela-participantes td:nth-child(3) {
-        width: 120px;
-        text-align: center;
+        min-width: 180px;
     }
 
-    .celula-tipo {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .celula-status {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
+    #aba-organizacao .tabela-participantes th:nth-child(4),
+    #aba-organizacao .tabela-participantes td:nth-child(4) {
+        min-width: 180px;
     }
 
     /* ==== ESTILOS PARA CONTEÚDO DINÂMICO (Filtros, etc) ==== */
@@ -1497,9 +1888,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         color: white;
     }
 
+    .botao-acao-tabela.botao-verde img {
+        filter: brightness(0) invert(1);
+    }
+
     .botao-acao-tabela.botao-azul {
         background: var(--botao, #2196F3);
         color: white;
+    }
+
+    .botao-acao-tabela.botao-azul img {
+        filter: brightness(0) invert(1);
     }
 
     .botao-acao-tabela.botao-vermelho {
@@ -1507,9 +1906,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         color: white;
     }
 
+    .botao-acao-tabela.botao-vermelho img {
+        filter: brightness(0) invert(1);
+    }
+
     .botao-acao-tabela.botao-neutro {
         background: var(--fundo-secundario, var(--caixas));
         color: #fff;
+    }
+
+    .botao-acao-tabela.botao-neutro img {
+        filter: brightness(0) invert(1);
     }
 
     .emblema-status {
@@ -1757,31 +2164,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Declarações stub das funções de importar/exportar (serão sobrescritas pelo ConteudoParticipantes.php)
         if (typeof importarListaPresenca === 'undefined') {
-            var importarListaPresenca = function() { console.log('Aguardando carregamento do conteúdo...'); };
+            var importarListaPresenca = function() {
+                console.log('Aguardando carregamento do conteúdo...');
+            };
         }
         if (typeof exportarListaPresenca === 'undefined') {
-            var exportarListaPresenca = function() { console.log('Aguardando carregamento do conteúdo...'); };
+            var exportarListaPresenca = function() {
+                console.log('Aguardando carregamento do conteúdo...');
+            };
         }
         if (typeof importarListaInscritos === 'undefined') {
-            var importarListaInscritos = function() { console.log('Aguardando carregamento do conteúdo...'); };
+            var importarListaInscritos = function() {
+                console.log('Aguardando carregamento do conteúdo...');
+            };
         }
         if (typeof exportarListaInscritos === 'undefined') {
-            var exportarListaInscritos = function() { console.log('Aguardando carregamento do conteúdo...'); };
+            var exportarListaInscritos = function() {
+                console.log('Aguardando carregamento do conteúdo...');
+            };
         }
         if (typeof fecharModalFormato === 'undefined') {
-            var fecharModalFormato = function() { };
+            var fecharModalFormato = function() {};
         }
         if (typeof fecharModalImportacao === 'undefined') {
-            var fecharModalImportacao = function() { };
+            var fecharModalImportacao = function() {};
         }
         if (typeof executarExportacao === 'undefined') {
-            var executarExportacao = function() { console.log('Aguardando carregamento do conteúdo...'); };
+            var executarExportacao = function() {
+                console.log('Aguardando carregamento do conteúdo...');
+            };
         }
         if (typeof selecionarArquivoImportacao === 'undefined') {
-            var selecionarArquivoImportacao = function() { console.log('Aguardando carregamento do conteúdo...'); };
+            var selecionarArquivoImportacao = function() {
+                console.log('Aguardando carregamento do conteúdo...');
+            };
         }
         if (typeof fecharModalSeForFundo === 'undefined') {
-            var fecharModalSeForFundo = function() { };
+            var fecharModalSeForFundo = function() {};
         }
 
         // ==== SISTEMA DE ABAS ====
@@ -1795,15 +2214,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             });
 
-            // Carrega o conteúdo da aba inicial (participantes)
-            const abaInicial = document.getElementById('aba-participantes');
-            if (abaInicial) {
-                carregarConteudoAba('participantes', abaInicial);
-            }
+            // Carrega o conteúdo da aba inicial
+            // Restaura a última aba ativa salva no localStorage
+            const abaSalva = localStorage.getItem('gerenciar_evento_aba_ativa');
+            const abaInicial = abaSalva || 'participantes';
+            
+            // Ativa a aba correta
+            trocarAba(abaInicial);
         }
 
         function trocarAba(nomeAba) {
             abaAtual = nomeAba;
+            
+            // Salva a aba atual no localStorage para manter após reload
+            localStorage.setItem('gerenciar_evento_aba_ativa', nomeAba);
 
             // Atualiza botões das abas
             document.querySelectorAll('.aba-botao').forEach(btn => {
@@ -1921,12 +2345,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Tenta pegar da URL primeiro
             const urlParams = new URLSearchParams(window.location.search);
             let codFromUrl = urlParams.get('cod_evento');
-            
+
             // Se não vier da URL, tenta pegar da variável global (quando carregado via AJAX)
             if (!codFromUrl && window.codigoEventoParaGerenciar) {
                 codFromUrl = window.codigoEventoParaGerenciar;
             }
-            
+
             codEventoAtual = codFromUrl;
 
             if (!codEventoAtual) {
@@ -2401,7 +2825,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function verificarCertificado(cpf) {
-            alert('Funcionalidade em desenvolvimento');
+            // Buscar código de verificação do certificado deste participante no evento atual
+            const codEvento = getCodigoEvento();
+            
+            fetch(`GerenciarEvento.php?action=buscar_codigo_certificado&cpf=${cpf}&cod_evento=${codEvento}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso && data.codigo_verificacao) {
+                        // Navega para visualizar o certificado dentro do container
+                        window.location.href = `ContainerOrganizador.php?pagina=visualizarCertificadoGerenciar&codigo=${encodeURIComponent(data.codigo_verificacao)}&cod_evento=${codEvento}`;
+                    } else {
+                        alert(data.mensagem || 'Certificado não encontrado para este participante.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar certificado:', error);
+                    alert('Erro ao buscar certificado. Tente novamente.');
+                });
         }
 
         // ========== MODAL ADICIONAR PARTICIPANTE ==========

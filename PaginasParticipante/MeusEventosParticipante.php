@@ -351,6 +351,8 @@
             }
         });
     </script>
+
+    <script src="MeusEventosParticipante.js?v=<?= time() ?>"></script>
 </body>
 
 </html>

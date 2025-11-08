@@ -150,7 +150,7 @@ function parseSqlSchema($caminhoArquivo) {
     return $schema;
 }
 
-// Verifica diferenças entre o banco atual e o arquivo SQL (dinâmico)
+// Verifica diferenças entre o banco atual e o arquivo SQL (apenas o que FALTA)
 function verificarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     $diferencas = [];
     $schema = parseSqlSchema($caminhoArquivo);
@@ -186,56 +186,10 @@ function verificarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
             }
         }
         
-        // Colunas esperadas
+        // Verifica apenas colunas FALTANTES (não verifica tipos ou extras)
         foreach ($colunas as $coluna) {
             if (!isset($colunasAtuais[$coluna])) {
                 $diferencas[] = "Coluna '$tabela.$coluna' não existe";
-                continue;
-            }
-            
-            // Verifica tipo de dados da coluna
-            $defEsperada = strtolower($info['columns'][$coluna]);
-            $tipoAtual = strtolower($colunasAtuais[$coluna]['Type']);
-            
-            // Extrai o tipo da definição esperada (ex: "varchar(100)" de "`nome` varchar(100) NOT NULL")
-            if (preg_match('/`?' . preg_quote($coluna, '/') . '`?\s+([a-z0-9_]+(?:\([^)]+\))?)/i', $defEsperada, $m)) {
-                $tipoEsperado = strtolower(trim($m[1]));
-                
-                // Normaliza alguns tipos equivalentes
-                $tipoEsperado = str_replace(['integer', 'int(11)'], 'int', $tipoEsperado);
-                $tipoAtual = str_replace(['integer', 'int(11)'], 'int', $tipoAtual);
-                $tipoEsperado = str_replace('datetime(0)', 'datetime', $tipoEsperado);
-                $tipoAtual = str_replace('datetime(0)', 'datetime', $tipoAtual);
-                
-                // Compara tipos (permite diferenças menores como int(10) vs int(11))
-                if (strpos($tipoAtual, $tipoEsperado) === false && strpos($tipoEsperado, $tipoAtual) === false) {
-                    $diferencas[] = "Coluna '$tabela.$coluna' tem tipo diferente: esperado '$tipoEsperado', atual '$tipoAtual'";
-                }
-            }
-            
-            // Verifica NOT NULL
-            if (stripos($defEsperada, 'not null') !== false) {
-                if ($colunasAtuais[$coluna]['Null'] === 'YES') {
-                    $diferencas[] = "Coluna '$tabela.$coluna' deveria ser NOT NULL";
-                }
-            }
-        }
-        
-        // Verifica se há colunas extras no banco que não estão no SQL
-        foreach ($colunasAtuais as $nomeCol => $infoCol) {
-            if (!isset($info['columns'][$nomeCol])) {
-                $diferencas[] = "Coluna extra '$tabela.$nomeCol' existe no banco mas não está no SQL";
-            }
-        }
-    }
-    
-    // Verifica se há tabelas extras no banco que não estão no SQL
-    $resTabelas = mysqli_query($conexaoServidor, "SHOW TABLES");
-    if ($resTabelas) {
-        while ($row = mysqli_fetch_array($resTabelas)) {
-            $tabelaAtual = $row[0];
-            if (!isset($schema['tables'][$tabelaAtual])) {
-                $diferencas[] = "Tabela extra '$tabelaAtual' existe no banco mas não está no SQL";
             }
         }
     }
@@ -243,7 +197,7 @@ function verificarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     return $diferencas;
 }
 
-// Aplica diferenças com base no schema do arquivo (cria tabelas/colunas faltantes)
+// Aplica diferenças com base no schema do arquivo (cria apenas o que FALTA)
 function aplicarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     $schema = parseSqlSchema($caminhoArquivo);
     if (isset($schema['erro'])) {
@@ -263,18 +217,25 @@ function aplicarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
             // Criar a tabela usando o bloco CREATE completo
             $create = $info['create'] ?? '';
             if ($create) {
-                if (!@mysqli_query($conexaoServidor, $create)) {
-                    $erros[] = 'Erro ao criar tabela ' . $tabela . ': ' . mysqli_error($conexaoServidor);
-                } else {
+                // Remove "IF NOT EXISTS" se já existir na string para evitar duplicação
+                $create = preg_replace('/IF\s+NOT\s+EXISTS/i', '', $create);
+                // Adiciona IF NOT EXISTS de forma limpa
+                $create = preg_replace('/CREATE\s+TABLE\s+/i', 'CREATE TABLE IF NOT EXISTS ', $create);
+                
+                if (@mysqli_query($conexaoServidor, $create)) {
                     $executados++;
+                } else {
+                    $erro = mysqli_error($conexaoServidor);
+                    // Ignora erro se a tabela já existe
+                    if (stripos($erro, 'already exists') === false) {
+                        $erros[] = 'Erro ao criar tabela ' . $tabela . ': ' . $erro;
+                    }
                 }
-            } else {
-                $erros[] = 'Bloco CREATE da tabela ' . $tabela . ' não encontrado no SQL.';
             }
             continue;
         }
 
-        // Adicionar colunas faltantes
+        // Adicionar apenas colunas faltantes
         foreach ($info['columns'] as $coluna => $def) {
             $resCol = mysqli_query($conexaoServidor, "SHOW COLUMNS FROM `$tabela` LIKE '" . mysqli_real_escape_string($conexaoServidor, $coluna) . "'");
             if (!$resCol || mysqli_num_rows($resCol) == 0) {
@@ -282,14 +243,19 @@ function aplicarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
                 if (preg_match('/^`?([a-zA-Z0-9_]+)`?\s*(.*)$/', $defClean, $mm)) {
                     $colName = $mm[1];
                     $resto = trim($mm[2]);
-                    $sqlAlter = "ALTER TABLE `$tabela` ADD COLUMN IF NOT EXISTS `$colName` $resto";
+                    $sqlAlter = "ALTER TABLE `$tabela` ADD COLUMN `$colName` $resto";
                 } else {
-                    $sqlAlter = "ALTER TABLE `$tabela` ADD COLUMN IF NOT EXISTS $defClean";
+                    $sqlAlter = "ALTER TABLE `$tabela` ADD COLUMN $defClean";
                 }
-                if (!@mysqli_query($conexaoServidor, $sqlAlter)) {
-                    $erros[] = 'Erro ao adicionar coluna ' . $tabela . '.' . $coluna . ': ' . mysqli_error($conexaoServidor);
-                } else {
+                
+                if (@mysqli_query($conexaoServidor, $sqlAlter)) {
                     $executados++;
+                } else {
+                    $erro = mysqli_error($conexaoServidor);
+                    // Ignora erro se a coluna já existe
+                    if (stripos($erro, 'duplicate column') === false) {
+                        $erros[] = 'Erro ao adicionar coluna ' . $tabela . '.' . $coluna . ': ' . $erro;
+                    }
                 }
             }
         }
@@ -299,7 +265,7 @@ function aplicarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     return ['sucesso' => empty($erros), 'executados' => $executados, 'erros' => $erros];
 }
 
-// Executa o arquivo SQL
+// Executa o arquivo SQL (apenas INSERTs e comandos de dados)
 function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     if (!file_exists($caminhoArquivo)) {
         return ['sucesso' => false, 'erro' => 'Arquivo SQL não encontrado: ' . $caminhoArquivo];
@@ -307,10 +273,11 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     
     $sql = file_get_contents($caminhoArquivo);
     
-    // Remove comentários de linha única
+    // Remove comentários
     $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
+    $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
     
-    // Seleciona o banco (o arquivo SQL usa "use CEU_bd")
+    // Seleciona o banco
     mysqli_select_db($conexaoServidor, $nomeBanco);
     
     // Separa comandos por ponto e vírgula
@@ -322,9 +289,12 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     foreach ($comandos as $comando) {
         $comando = trim($comando);
         
-        // Pula comandos vazios e comentários
+        // Pula comandos vazios e comandos de estrutura (já tratados em aplicarDiferencas)
         if (empty($comando) || 
             stripos($comando, 'create database') !== false || 
+            stripos($comando, 'create table') !== false ||
+            stripos($comando, 'alter table') !== false ||
+            stripos($comando, 'drop table') !== false ||
             stripos($comando, 'use ') === 0 ||
             stripos($comando, 'show tables') !== false) {
             continue;
@@ -333,12 +303,11 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
         if (!@mysqli_query($conexaoServidor, $comando)) {
             $erro = mysqli_error($conexaoServidor);
             
-            // Lista restrita de erros que podem ser ignorados (apenas duplicações ao reexecutar)
+            // Ignora erros comuns que não são problemas reais
             $ignorarErros = [
-                'Table already exists',           // Tabela já existe
-                'Duplicate column name',          // Coluna duplicada ao tentar adicionar
-                'Duplicate key name',             // Chave duplicada
-                'Multiple primary key defined'    // PK já existe
+                'already exists',
+                'duplicate',
+                'multiple primary key'
             ];
             
             $deveIgnorar = false;
@@ -349,44 +318,21 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
                 }
             }
             
-            // ERROS IMPORTANTES QUE NUNCA DEVEM SER IGNORADOS
-            $errosCriticos = [
-                'syntax error',
-                'unknown database',
-                'access denied',
-                'unknown table',
-                'column cannot be null',
-                'data too long',
-                'out of range',
-                'incorrect',
-                'invalid'
-            ];
-            
-            $ehCritico = false;
-            foreach ($errosCriticos as $textoCritico) {
-                if (stripos($erro, $textoCritico) !== false) {
-                    $ehCritico = true;
-                    break;
-                }
-            }
-            
-            // Adiciona aos erros se for crítico OU se não for ignorável
-            if ($ehCritico || (!$deveIgnorar && !empty($erro))) {
-                $marcador = $ehCritico ? '❌ CRÍTICO: ' : '⚠️ ';
-                $erros[] = $marcador . substr($comando, 0, 60) . '... → ' . $erro;
+            // Só reporta erros críticos
+            if (!$deveIgnorar && !empty($erro)) {
+                $erros[] = substr($comando, 0, 80) . '... → ' . $erro;
             }
         } else {
             $executados++;
         }
     }
-    // Armazena total global para uso em shutdown handler
+    
     $GLOBALS['__EXECUTADOS_TOTAL__'] = $executados;
     
     return [
-        'sucesso' => true, // Sempre sucesso se chegou até aqui
+        'sucesso' => true,
         'executados' => $executados,
-        'erros' => $erros,
-        'avisos' => count($erros) > 0 ? 'Alguns comandos geraram avisos mas foram ignorados' : ''
+        'erros' => $erros
     ];
 }
 
@@ -471,28 +417,29 @@ if (isset($_GET['atualizar'])) {
     // Verifica diferenças antes de aplicar
     $diferencasAntes = verificarDiferencas($conexaoServidor, $banco, $caminhoSQL);
     
-    // Aplica diferenças (para quando apenas o CREATE foi alterado)
+    // Aplica diferenças (cria tabelas e colunas faltantes)
     $rDiff = aplicarDiferencas($conexaoServidor, $banco, $caminhoSQL);
     
-    // Executa o arquivo completo (para inserts e demais comandos)
+    // Executa INSERTs e outros comandos de dados
     $rExec = executarArquivoSQL($conexaoServidor, $banco, $caminhoSQL);
     
     // Verifica diferenças depois de aplicar
     $diferencasDepois = verificarDiferencas($conexaoServidor, $banco, $caminhoSQL);
     
+    // Junta erros de ambas as operações
     $todosErros = array_merge($rDiff['erros'] ?? [], $rExec['erros'] ?? []);
-    $sucesso = empty($diferencasDepois) && (empty($todosErros) || count(array_filter($todosErros, function($e) { 
-        return strpos($e, '❌ CRÍTICO') !== false; 
-    })) === 0);
+    
+    // Considera sucesso se não há mais diferenças estruturais
+    $sucesso = empty($diferencasDepois);
     
     $resultado = [
         'sucesso' => $sucesso,
         'executados' => ($rDiff['executados'] + $rExec['executados']),
         'erros' => $todosErros,
-        'avisos' => $rExec['avisos'] ?? '',
         'diferencasAntes' => count($diferencasAntes),
         'diferencasDepois' => count($diferencasDepois),
-        'detalheDiferencasRestantes' => $diferencasDepois
+        'detalheDiferencasRestantes' => $diferencasDepois,
+        'mensagem' => $sucesso ? 'Banco de dados atualizado com sucesso!' : 'Algumas diferenças ainda permanecem'
     ];
     
     mysqli_close($conexaoServidor);

@@ -9,6 +9,39 @@
   let codigoEventoAtual = null;
   let ultimoFocoAntesModal = null;
 
+  // Função para bloquear scroll
+  function bloquearScroll() {
+    document.body.classList.add('modal-aberto');
+    document.addEventListener('wheel', prevenirScroll, { passive: false });
+    document.addEventListener('touchmove', prevenirScroll, { passive: false });
+    document.addEventListener('keydown', prevenirScrollTeclado, false);
+  }
+
+  // Função para desbloquear scroll
+  function desbloquearScroll() {
+    document.body.classList.remove('modal-aberto');
+    document.removeEventListener('wheel', prevenirScroll);
+    document.removeEventListener('touchmove', prevenirScroll);
+    document.removeEventListener('keydown', prevenirScrollTeclado);
+  }
+
+  // Previne scroll com mouse wheel e touchmove
+  function prevenirScroll(e) {
+    if (document.body.classList.contains('modal-aberto')) {
+      e.preventDefault();
+    }
+  }
+
+  // Previne scroll com setas do teclado e Page Up/Down
+  function prevenirScrollTeclado(e) {
+    if (!document.body.classList.contains('modal-aberto')) return;
+    
+    const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    if (teclas.includes(e.keyCode)) {
+      e.preventDefault();
+    }
+  }
+
   function elementoContem(parent, child) {
     if (!parent || !child) return false;
     return parent === child || parent.contains(child);
@@ -862,14 +895,14 @@
     document.getElementById('link-inscricao').value = linkInscricao;
     
     modal.classList.add('ativo');
-    document.body.style.overflow = 'hidden';
+    bloquearScroll();
   }
 
   function fecharModalCompartilhar() {
     const modal = document.getElementById('modal-compartilhar');
     if (modal) {
       modal.classList.remove('ativo');
-      document.body.style.overflow = '';
+      desbloquearScroll();
     }
   }
 

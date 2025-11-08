@@ -370,6 +370,15 @@
     display: flex;
   }
 
+  /* Desabilitar scroll quando modal está aberto */
+  body.modal-aberto {
+    overflow: hidden !important;
+  }
+
+  body.modal-aberto #main-content {
+    overflow: hidden !important;
+  }
+
   .modal-editar {
     background-color: var(--caixas);
     border-radius: 1rem;
@@ -548,13 +557,13 @@
   }
 
   .botao-cancelamento-cancelar {
-    background: var(--botao) !important;
+    background: var(--vermelho) !important;
     background-image: none !important;
     color: var(--branco);
   }
 
   .botao-cancelamento-continuar {
-    background-color: var(--vermelho);
+    background-color: #28a745;
     color: var(--branco);
   }
 
@@ -957,11 +966,13 @@
     // Modal de Solicitação de Colaboração
     function abrirModalSolicitacao() {
       document.getElementById('modalSolicitarColaboracao').classList.add('ativo');
+      bloquearScroll();
     }
 
     function fecharModalSolicitacao() {
       document.getElementById('modalSolicitarColaboracao').classList.remove('ativo');
       document.getElementById('mensagem-solicitacao').value = '';
+      desbloquearScroll();
     }
 
     async function enviarSolicitacaoColaboracao(event) {
@@ -1048,14 +1059,14 @@
       document.getElementById('link-inscricao').value = linkInscricao;
       
       modal.classList.add('ativo');
-      document.body.style.overflow = 'hidden';
+      bloquearScroll();
     }
 
     function fecharModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
       if (modal) {
         modal.classList.remove('ativo');
-        document.body.style.overflow = '';
+        desbloquearScroll();
       }
     }
 

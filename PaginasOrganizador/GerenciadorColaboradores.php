@@ -167,9 +167,12 @@ try {
         }
 
         // Lista colaboradores (sem incluir o criador se ele também estiver na tabela colaboradores_evento)
-        $sql = "SELECT c.CPF, u.Nome AS nome, u.Email AS email, c.papel, c.criado_em
+        $sql = "SELECT c.CPF, u.Nome AS nome, u.Email AS email, c.papel, c.criado_em, 
+                       c.presenca_confirmada, c.certificado_emitido,
+                       cert.cod_verificacao
                 FROM colaboradores_evento c
                 JOIN usuario u ON u.CPF = c.CPF
+                LEFT JOIN certificado cert ON cert.cpf = c.CPF AND cert.cod_evento = c.cod_evento
                 WHERE c.cod_evento = ?
                 ORDER BY u.Nome";
         $stmt = mysqli_prepare($conexao, $sql);

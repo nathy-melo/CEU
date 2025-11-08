@@ -127,6 +127,8 @@ CREATE TABLE colaboradores_evento (
     cod_evento INT NOT NULL,
     CPF CHAR(11) NOT NULL,
     papel ENUM('colaborador','coorganizador') NOT NULL DEFAULT 'colaborador',
+    presenca_confirmada TINYINT(1) NOT NULL DEFAULT 0,
+    certificado_emitido TINYINT(1) NOT NULL DEFAULT 0,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_evento_cpf (cod_evento, CPF),
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE,
@@ -229,6 +231,10 @@ INSERT INTO organiza (cod_evento, CPF) VALUES
 INSERT INTO colaboradores_evento (cod_evento, CPF, papel, criado_em) VALUES
 (1, '123', 'colaborador', CURRENT_TIMESTAMP),
 (7, '123', 'colaborador', CURRENT_TIMESTAMP);
+
+-- Inserir inscrições
+INSERT INTO inscricao (CPF, cod_evento, data_inscricao, status, presenca_confirmada, certificado_emitido) VALUES
+('1234', 1, CURRENT_TIMESTAMP, 'ativa', 0, 0);
 
 -- Confirmar transação
 COMMIT;

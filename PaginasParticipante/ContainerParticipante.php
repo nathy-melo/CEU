@@ -93,7 +93,8 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'eventoInscrito' => 'CartaodoEventoInscrito.php',
         'meusEventos' => 'MeusEventosParticipante.php',
         'perfil' => 'PerfilParticipante.php',
-        'certificados' => 'CerticadosParticipante.html',
+        'certificados' => 'CertificadosParticipante.php',
+        'visualizarCertificado' => 'VisualizarCertificado.php',
         'configuracoes' => 'ConfiguracoesParticipante.html',
         'painelnotificacoes' => '../PaginasGlobais/PainelNotificacoes.php',
         // Reaproveita conteúdos globais quando aplicável
