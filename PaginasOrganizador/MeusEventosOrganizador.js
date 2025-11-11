@@ -119,22 +119,24 @@ function inicializarFiltroEventos() {
     const containerEventos = document.getElementById('eventos-container');
     const containerColaboracao = document.getElementById('colaboracao-container');
 
-    // Elementos das seções (apenas os títulos h1, não a barra de pesquisa)
-    const tituloMeusEventos = document.querySelector('.div-section-title');
-    const secaoColaboracao = document.querySelector('.secao-colaboracao');
+    // Elementos que devem ser ocultados durante a pesquisa
+    const tituloMeusEventos = document.querySelector('.titulo-meus-eventos');
+    const tituloOrganizacao = document.querySelector('.titulo-organizacao');
+    const wrapperMeusEventos = tituloMeusEventos ? tituloMeusEventos.closest('.section-title-wrapper') : null;
+    const wrapperOrganizacao = document.querySelector('.secao-colaboracao');
     const divisoria = document.querySelector('.divisoria-secoes');
     const botaoAdicionar = containerEventos.querySelector('.CaixaDoEventoAdicionar');
 
     // Cria mensagem de "Sem resultados"
     let mensagemSemResultados = document.createElement('div');
     mensagemSemResultados.className = 'mensagem-sem-resultados-pesquisa';
-    mensagemSemResultados.textContent = 'Sem resultados';
+    mensagemSemResultados.textContent = 'Sem resultados.';
     mensagemSemResultados.style.color = 'var(--botao)';
     mensagemSemResultados.style.fontWeight = 'bold';
     mensagemSemResultados.style.fontSize = '1.2rem';
     mensagemSemResultados.style.gridColumn = '1/-1';
     mensagemSemResultados.style.textAlign = 'center';
-    mensagemSemResultados.style.padding = '30px 0';
+    mensagemSemResultados.style.padding = '60px 0';
 
     function filtrarEventosPorTermoBusca() {
         const termoBusca = campoInputPesquisa.value.trim().toLowerCase();
@@ -148,9 +150,9 @@ function inicializarFiltroEventos() {
             // Sem pesquisa: mostra as seções separadas normalmente
             todosEventos.forEach(evento => evento.style.display = '');
             
-            // Mostra todos os elementos das seções
-            if (tituloMeusEventos) tituloMeusEventos.style.display = '';
-            if (secaoColaboracao) secaoColaboracao.style.display = '';
+            // Mostra todos os elementos das seções (wrappers inteiros)
+            if (wrapperMeusEventos) wrapperMeusEventos.style.display = '';
+            if (wrapperOrganizacao) wrapperOrganizacao.style.display = '';
             if (divisoria) divisoria.style.display = '';
             if (botaoAdicionar) botaoAdicionar.style.display = '';
 
@@ -172,13 +174,13 @@ function inicializarFiltroEventos() {
             if (msgExistente) msgExistente.remove();
 
         } else {
-            // Com pesquisa: oculta títulos, divisória, botão adicionar e mensagens de "sem eventos"
-            if (tituloMeusEventos) tituloMeusEventos.style.display = 'none';
-            if (secaoColaboracao) secaoColaboracao.style.display = 'none';
+            // Com pesquisa ativa: oculta wrappers inteiros, divisória, botão adicionar e mensagens
+            if (wrapperMeusEventos) wrapperMeusEventos.style.display = 'none';
+            if (wrapperOrganizacao) wrapperOrganizacao.style.display = 'none';
             if (divisoria) divisoria.style.display = 'none';
             if (botaoAdicionar) botaoAdicionar.style.display = 'none';
 
-            // Oculta mensagens de "sem eventos"
+            // Oculta mensagens de "sem eventos criados" e "não é organizador"
             const mensagensSemEventos = [
                 ...Array.from(containerEventos.children).filter(el => 
                     !el.classList.contains('CaixaDoEvento') && 
@@ -194,7 +196,7 @@ function inicializarFiltroEventos() {
             ];
             mensagensSemEventos.forEach(msg => msg.style.display = 'none');
 
-            // Filtra eventos
+            // Filtra eventos por título ou informações
             todosEventos.forEach(caixaEvento => {
                 const elementoTitulo = caixaEvento.querySelector('.EventoTitulo');
                 const elementoInfo = caixaEvento.querySelector('.EventoInfo');
@@ -351,7 +353,7 @@ function carregarEventosColaboracao() {
                 });
             } else {
                 const mensagemSemEventos = document.createElement('div');
-                mensagemSemEventos.textContent = 'Você não é organizador em nenhum evento ainda';
+                mensagemSemEventos.textContent = 'Você não é organizador em nenhum evento ainda.';
                 mensagemSemEventos.style.gridColumn = '1/-1';
                 mensagemSemEventos.style.textAlign = 'center';
                 mensagemSemEventos.style.padding = '30px 0';

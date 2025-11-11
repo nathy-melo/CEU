@@ -202,24 +202,24 @@
 </style>
 
 <script>
-    let todosCertificados = [];
-    let paginaAtual = 1;
-    const itensPorPagina = 6;
-    let certificadosCarregados = false;
+    // Usa variáveis globais do window para evitar redeclaração
+    if (typeof window.todosCertificados === 'undefined') {
+        window.todosCertificados = [];
+    }
+    if (typeof window.paginaAtualCertificados === 'undefined') {
+        window.paginaAtualCertificados = 1;
+    }
+    if (typeof window.itensPorPaginaCertificados === 'undefined') {
+        window.itensPorPaginaCertificados = 6;
+    }
 
     async function carregarCertificados() {
-        if (certificadosCarregados) {
-            return;
-        }
-        
-        certificadosCarregados = true;
-        
         try {
             const response = await fetch('BuscarCertificados.php');
             const data = await response.json();
 
             if (data.sucesso) {
-                todosCertificados = data.certificados;
+                window.todosCertificados = data.certificados;
                 renderizarCertificados();
             } else {
                 mostrarErro('Erro ao carregar certificados');
@@ -234,15 +234,15 @@
         const container = document.getElementById('lista-certificados');
         const paginacao = document.getElementById('paginacao-certificados');
 
-        if (todosCertificados.length === 0) {
+        if (window.todosCertificados.length === 0) {
             container.innerHTML = '<div class="sem-certificados">Nenhum certificado encontrado</div>';
             paginacao.style.display = 'none';
             return;
         }
 
-        const inicio = (paginaAtual - 1) * itensPorPagina;
-        const fim = inicio + itensPorPagina;
-        const certificadosPagina = todosCertificados.slice(inicio, fim);
+        const inicio = (window.paginaAtualCertificados - 1) * window.itensPorPaginaCertificados;
+        const fim = inicio + window.itensPorPaginaCertificados;
+        const certificadosPagina = window.todosCertificados.slice(inicio, fim);
 
         container.innerHTML = certificadosPagina.map(cert => {
             const dataEmissao = cert.criado_em ? new Date(cert.criado_em).toLocaleDateString('pt-BR') : 'Data não informada';
@@ -288,12 +288,12 @@
         }).join('');
 
         // Atualizar paginação
-        const totalPaginas = Math.ceil(todosCertificados.length / itensPorPagina);
+        const totalPaginas = Math.ceil(window.todosCertificados.length / window.itensPorPaginaCertificados);
         if (totalPaginas > 1) {
             paginacao.style.display = 'flex';
             const infoPagina = document.getElementById('info-pagina');
             if (infoPagina) {
-                infoPagina.textContent = `${paginaAtual} / ${totalPaginas}`;
+                infoPagina.textContent = `${window.paginaAtualCertificados} / ${totalPaginas}`;
             }
         } else {
             paginacao.style.display = 'none';
@@ -301,11 +301,11 @@
     }
 
     function mudarPagina(direcao) {
-        const totalPaginas = Math.ceil(todosCertificados.length / itensPorPagina);
-        paginaAtual += direcao;
+        const totalPaginas = Math.ceil(window.todosCertificados.length / window.itensPorPaginaCertificados);
+        window.paginaAtualCertificados += direcao;
 
-        if (paginaAtual < 1) paginaAtual = 1;
-        if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+        if (window.paginaAtualCertificados < 1) window.paginaAtualCertificados = 1;
+        if (window.paginaAtualCertificados > totalPaginas) window.paginaAtualCertificados = totalPaginas;
 
         renderizarCertificados();
     }
@@ -328,6 +328,10 @@
         const container = document.getElementById('lista-certificados');
         container.innerHTML = `<div class="sem-certificados" style="color: var(--vermelho);">${mensagem}</div>`;
     }
+
+    // Reseta as variáveis ao carregar a página
+    window.todosCertificados = [];
+    window.paginaAtualCertificados = 1;
 
     // Carregar certificados sempre que esta página for carregada
     // Executa imediatamente, sem depender de DOMContentLoaded
