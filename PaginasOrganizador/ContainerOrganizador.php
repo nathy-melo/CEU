@@ -301,7 +301,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'certificados': {
                 html: 'CertificadosOrganizador.php',
                 js: [],
-                init: () => {}
+                init: () => {
+                    setTimeout(() => {
+                        if (typeof window.carregarCertificados === 'function') {
+                            window.carregarCertificados();
+                        }
+                    }, 100);
+                }
             },
             'configuracoes': {
                 html: 'ConfiguracoesOrganizador.html',

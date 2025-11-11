@@ -293,9 +293,15 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'certificados': {
-                html: 'CerticadosParticipante.html',
+                html: 'CertificadosParticipante.php',
                 js: [],
-                init: () => {}
+                init: () => {
+                    setTimeout(() => {
+                        if (typeof window.carregarCertificados === 'function') {
+                            window.carregarCertificados();
+                        }
+                    }, 100);
+                }
             },
             'configuracoes': {
                 html: 'ConfiguracoesParticipante.html',

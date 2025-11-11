@@ -1,18 +1,20 @@
-<div style="display: flex; justify-content: center; padding: 2rem 1rem; width: 100%;">
-    <div class="cartao-certificados">
-        <header class="cabecalho-cartao">
-            <h1>Certificados</h1>
-        </header>
-        <div class="corpo-cartao">
-            <div id="lista-certificados" class="lista-certificados">
-                <div class="carregando" style="text-align: center; padding: 2rem; color: var(--azul-escuro);">
-                    Carregando certificados...
+<div id="main-content">
+    <div style="display: flex; justify-content: center; padding: 2rem 1rem; width: 100%;">
+        <div class="cartao-certificados">
+            <header class="cabecalho-cartao">
+                <h1>Certificados</h1>
+            </header>
+            <div class="corpo-cartao">
+                <div id="lista-certificados" class="lista-certificados">
+                    <div class="carregando" style="text-align: center; padding: 2rem; color: var(--azul-escuro);">
+                        Carregando certificados...
+                    </div>
                 </div>
-            </div>
-            <div class="paginacao" id="paginacao-certificados" style="display: none;">
-                <a href="#" class="botao botao-paginacao" onclick="event.preventDefault(); mudarPagina(-1)">Anterior</a>
-                <span id="info-pagina" style="margin: 0 1rem; color: var(--azul-escuro); font-weight: 700;"></span>
-                <a href="#" class="botao botao-paginacao" onclick="event.preventDefault(); mudarPagina(1)">Próxima</a>
+                <div class="paginacao" id="paginacao-certificados" style="display: none;">
+                    <a href="#" class="botao botao-paginacao" onclick="event.preventDefault(); mudarPagina(-1)">Anterior</a>
+                    <span id="info-pagina" style="margin: 0 1rem; color: var(--azul-escuro); font-weight: 700;"></span>
+                    <a href="#" class="botao botao-paginacao" onclick="event.preventDefault(); mudarPagina(1)">Próxima</a>
+                </div>
             </div>
         </div>
     </div>
@@ -203,8 +205,15 @@
     let todosCertificados = [];
     let paginaAtual = 1;
     const itensPorPagina = 6;
+    let certificadosCarregados = false;
 
     async function carregarCertificados() {
+        if (certificadosCarregados) {
+            return;
+        }
+        
+        certificadosCarregados = true;
+        
         try {
             const response = await fetch('BuscarCertificados.php');
             const data = await response.json();
