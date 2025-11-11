@@ -197,9 +197,17 @@ if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name']
     }
 }
 
-// Garante que as colunas de inscrição existem
-mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS inicio_inscricao datetime NULL");
-mysqli_query($conexao, "ALTER TABLE evento ADD COLUMN IF NOT EXISTS fim_inscricao datetime NULL");
+// Garante que as colunas de inscrição existem (compatível com MySQL < 8 que não suporta IF NOT EXISTS em ADD COLUMN)
+function garantirColunaEvento(mysqli $cx, string $coluna, string $definicao) {
+    $escCol = mysqli_real_escape_string($cx, $coluna);
+    $res = mysqli_query($cx, "SHOW COLUMNS FROM evento LIKE '$escCol'");
+    if ($res && mysqli_num_rows($res) === 0) {
+        mysqli_query($cx, "ALTER TABLE evento ADD COLUMN `$coluna` $definicao");
+    }
+    if ($res) { mysqli_free_result($res); }
+}
+garantirColunaEvento($conexao, 'inicio_inscricao', 'DATETIME NULL');
+garantirColunaEvento($conexao, 'fim_inscricao', 'DATETIME NULL');
 
 // Atualiza evento no banco de dados
 if ($deveAtualizarImagem) {
@@ -271,9 +279,10 @@ if ($deveAtualizarImagem) {
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
+    // Tipos corretos: categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), inicio_inscricao(s), fim_inscricao(s), cod_evento(i)
     mysqli_stmt_bind_param(
         $declaracaoAtualizacao,
-        "ssssssssisssi",
+        "sssssssdisssi",
         $categoriaEvento,
         $nomeEvento,
         $localEvento,

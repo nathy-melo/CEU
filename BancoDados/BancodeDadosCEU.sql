@@ -27,7 +27,13 @@ CREATE TABLE evento(
 CREATE TABLE certificado(
     cod_verificacao VARCHAR(8) PRIMARY KEY,
     modelo VARCHAR(255),
-    tipo VARCHAR(100)
+    tipo VARCHAR(100),
+    arquivo VARCHAR(255) NULL,
+    dados TEXT NULL,
+    criado_em TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    cpf CHAR(11) NULL,
+    cod_evento INT NULL,
+    UNIQUE KEY uniq_cert_cpf_evento (cpf, cod_evento)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE usuario(
@@ -98,6 +104,7 @@ CREATE TABLE imagens_evento (
 CREATE TABLE notificacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     CPF CHAR(11) NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
     tipo VARCHAR(50) NOT NULL COMMENT 'Tipo: inscricao, desinscricao, evento_cancelado, evento_prestes_iniciar, etc',
     mensagem VARCHAR(255) NOT NULL,
     cod_evento INT NULL COMMENT 'Referência ao evento se aplicável',
