@@ -1,5 +1,4 @@
 <?php
-// Visualizador simples usando PDF.js para evitar barras do navegador
 $base = __DIR__;
 $file = isset($_GET['file']) ? basename((string)$_GET['file']) : '';
 $pdfPath = $base . '/certificados/' . $file;
