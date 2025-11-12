@@ -155,11 +155,14 @@ CREATE TABLE solicitacoes_redefinicao_senha (
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
 ('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
 ('123', 'Caike', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
-('1234', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0);
+('1234', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0),
+('36528418080', 'Jean Victor Gonçalves Martins', 'jeanvictornet@gmail.com', '$2y$10$nUolUejxz5t.dJPFUbPIeOFpKufkXEv9EgySB3tn4KADiNywIv6mm', NULL, 0, 1),
+('59015506680', 'Jean Martins', 'j@gmail.com', '$2y$10$nUolUejxz5t.dJPFUbPIeOFpKufkXEv9EgySB3tn4KADiNywIv6mm', 'JEAN001', 1, 1);
 
 INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes) VALUES 
 ('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora'),
-('CAIKE001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '123', 'SISTEMA', 'Código de teste - Caike - ck@ceu.com');
+('CAIKE001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '123', 'SISTEMA', 'Código de teste - Caike - ck@ceu.com'),
+('JEAN001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '59015506680', 'SISTEMA', 'Código utilizado por Jean Martins');
 
 INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) VALUES
 (1, 'Workshop', 'Workshop de JavaScript', 'Sala 101', 'Aprenda conceitos básicos e avançados de JavaScript.', 'Todos', '2025-02-15 09:00:00', '2025-02-15 17:00:00', 8.0, 1, 'Presencial', '/ImagensEventos/JavaScript_Workshop.png', '2025-01-15 08:00:00', '2025-02-14 23:59:59'),

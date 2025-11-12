@@ -1125,8 +1125,11 @@ body.pagina-lista-eventos #conteudo-dinamico {
 
 /* Estado inicial da seta (>) */
 .Menu .menu-toggle::before {
-  content: "➤";
+  content: "";
   display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  background: url('Imagens/Seta_Direita_Menu.svg') center/contain no-repeat;
   transition: transform 0.3s ease;
 }
 
