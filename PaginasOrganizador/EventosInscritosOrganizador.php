@@ -151,6 +151,35 @@
         .aviso-compartilhar strong {
             color: var(--botao);
         }
+
+        /* Botão compartilhar no card */
+        .CaixaDoEvento { position: relative; }
+        .BotaoCompartilharCard {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+            transform: scale(0.9);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            z-index: 50;
+        }
+        .CaixaDoEvento:hover .BotaoCompartilharCard { 
+            opacity: 1; 
+            visibility: visible;
+            transform: scale(1);
+        }
+        .BotaoCompartilharCard img { width: 1.1rem; height: 1.1rem; display: block; filter: invert(1); }
     </style>
 </head>
 
@@ -294,7 +323,11 @@
                         data-localizacao="<?= htmlspecialchars($local) ?>"
                         data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>"
                         data-data="<?= $dataInicioISO ?>"
-                        data-certificado="<?= $cert ?>">
+                        data-certificado="<?= $cert ?>"
+                        data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
+                        <button type="button" class="BotaoCompartilharCard" title="Compartilhar" aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
+                            <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
+                        </button>
                         <div class="EventoImagem">
                             <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
                         </div>
@@ -508,6 +541,17 @@
                 fecharModalCompartilhar();
             }
         });
+
+        // Ação do botão sobreposto no card
+        document.addEventListener('click', function(e){
+          const btn = e.target.closest('.BotaoCompartilharCard');
+          if (btn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const cod = parseInt(btn.getAttribute('data-cod'));
+            if (cod) abrirModalCompartilharEvento(cod);
+          }
+        }, true);
     </script>
 </body>
 
