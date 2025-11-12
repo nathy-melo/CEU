@@ -38,8 +38,9 @@
     body {
       font-family: 'Inter', sans-serif;
       line-height: 1.6;
-      color: var(--text);
+      color: var(--preto);
       overflow-x: hidden;
+      background-color: var(--fundo);
     }
 
     /* Seção Principal de Boas-Vindas */
@@ -49,7 +50,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #bfdbfe 100%);
+      background: var(--fundo);
       overflow: hidden;
       padding: 2rem;
     }
@@ -63,10 +64,10 @@
       right: 0;
       bottom: 0;
       background-image: 
-        linear-gradient(30deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
-        linear-gradient(150deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
-        linear-gradient(30deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
-        linear-gradient(150deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05));
+        linear-gradient(30deg, rgba(101, 152, 210, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(101, 152, 210, 0.05) 87.5%, rgba(101, 152, 210, 0.05)),
+        linear-gradient(150deg, rgba(101, 152, 210, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(101, 152, 210, 0.05) 87.5%, rgba(101, 152, 210, 0.05)),
+        linear-gradient(30deg, rgba(101, 152, 210, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(101, 152, 210, 0.05) 87.5%, rgba(101, 152, 210, 0.05)),
+        linear-gradient(150deg, rgba(101, 152, 210, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(101, 152, 210, 0.05) 87.5%, rgba(101, 152, 210, 0.05));
       background-size: 80px 140px;
       opacity: 0.5;
     }
@@ -102,7 +103,7 @@
     h1 {
       font-size: clamp(2.5rem, 5.5vw, 4rem);
       font-weight: 800;
-      color: #1e3a8a;
+      color: var(--azul-escuro);
       margin-bottom: 1.8rem;
       line-height: 1.1;
       letter-spacing: -0.03em;
@@ -112,7 +113,7 @@
 
     .texto-subtitulo {
       font-size: clamp(1.05rem, 2.2vw, 1.35rem);
-      color: #475569;
+      color: var(--cinza-escuro);
       margin-bottom: 3rem;
       line-height: 1.8;
       font-weight: 400;
@@ -169,34 +170,6 @@
       pointer-events: none;
     }
 
-    /* Sobreposição com informações do slide */
-    .info-slide {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top,
-          rgba(255, 255, 255, 0.95) 0%,
-          rgba(255, 255, 255, 0.7) 50%,
-          transparent 100%);
-      backdrop-filter: blur(10px);
-      padding: 3rem;
-      color: #1e3a8a;
-    }
-
-    .titulo-slide {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 0.8rem;
-      color: #1e3a8a;
-    }
-
-    .descricao-slide {
-      font-size: 1.1rem;
-      color: #475569;
-      font-weight: 400;
-    }
-
     /* Botões de navegação do carrossel */
     .botao-navegacao-carrossel {
       position: absolute;
@@ -211,13 +184,13 @@
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
-      color: #3b82f6;
+      color: var(--botao);
       transition: all 0.3s ease;
       z-index: 20;
     }
 
     .botao-navegacao-carrossel:hover {
-      color: white;
+      color: var(--branco);
       transform: translateY(-50%) scale(1.1);
     }
 
@@ -244,18 +217,18 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: rgba(59, 130, 246, 0.3);
+      background: rgba(101, 152, 210, 0.3);
       cursor: pointer;
       transition: all 0.3s ease;
     }
 
     .ponto-indicador:hover {
-      background: rgba(59, 130, 246, 0.6);
+      background: rgba(101, 152, 210, 0.6);
       transform: scale(1.2);
     }
 
     .ponto-indicador.ativo {
-      background: #3b82f6;
+      background: var(--botao);
       width: 30px;
       border-radius: 5px;
     }
@@ -264,9 +237,9 @@
     .grupo-botoes-acao {
       display: flex;
       gap: 1rem;
-      flex-wrap: nowrap;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      width: 100%;
     }
 
     .botao-acao {
@@ -281,36 +254,37 @@
       transition: all 0.3s ease;
       letter-spacing: 0.3px;
       white-space: nowrap;
+      cursor: pointer;
     }
 
     .botao-primario {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      background: var(--botao);
+      color: var(--branco);
+      box-shadow: 0 4px 15px rgba(101, 152, 210, 0.3);
     }
 
     .botao-primario:hover {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
-      transform: translateY(-2px);
+      background: var(--botao-escuro);
+      box-shadow: 0 6px 20px rgba(101, 152, 210, 0.4);
+      transform: scale(1.05);
     }
 
     .botao-secundario {
-      background: white;
-      color: #3b82f6;
-      border: 2px solid #3b82f6;
+      background: var(--branco);
+      color: var(--botao);
+      border: 2px solid var(--botao);
     }
 
     .botao-secundario:hover {
-      background: #3b82f6;
-      color: white;
-      transform: translateY(-2px);
+      background: var(--botao);
+      color: var(--branco);
+      transform: scale(1.05);
     }
 
     /* Seção de Recursos da Plataforma */
     .secao-recursos {
       padding: 6rem 2rem;
-      background: white;
+      background: var(--branco);
     }
 
     .cabecalho-secao {
@@ -322,13 +296,13 @@
     .cabecalho-secao h2 {
       font-size: clamp(2rem, 4vw, 2.5rem);
       font-weight: 700;
-      color: #1e3a8a;
+      color: var(--azul-escuro);
       margin-bottom: 1rem;
     }
 
     .cabecalho-secao p {
       font-size: 1.1rem;
-      color: #64748b;
+      color: var(--cinza-escuro);
       line-height: 1.7;
     }
 
@@ -342,22 +316,22 @@
 
     .cartao-recurso {
       padding: 2.5rem;
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      background: var(--branco);
       border-radius: 16px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid rgba(101, 152, 210, 0.1);
       transition: all 0.3s ease;
     }
 
     .cartao-recurso:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
-      border-color: #3b82f6;
+      box-shadow: 0 10px 30px rgba(101, 152, 210, 0.15);
+      border-color: var(--botao);
     }
 
     .icone-recurso {
       width: 60px;
       height: 60px;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: var(--botao);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -369,19 +343,19 @@
     .cartao-recurso h3 {
       font-size: 1.3rem;
       font-weight: 600;
-      color: #1e3a8a;
+      color: var(--azul-escuro);
       margin-bottom: 1rem;
     }
 
     .cartao-recurso p {
-      color: #64748b;
+      color: var(--cinza-escuro);
       line-height: 1.6;
     }
 
     /* Seção de Vantagens da Plataforma */
     .secao-vantagens {
       padding: 6rem 2rem;
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      background: var(--fundo);
     }
 
     .grade-vantagens {
@@ -389,51 +363,48 @@
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 4rem auto 0;
     }
 
     .cartao-vantagem {
       text-align: center;
       padding: 2rem;
-      background: white;
+      background: var(--branco);
       border-radius: 12px;
-      border: 1px solid rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(101, 152, 210, 0.1);
       transition: all 0.3s ease;
     }
 
     .cartao-vantagem:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+      box-shadow: 0 10px 30px rgba(101, 152, 210, 0.15);
     }
 
     .numero-destaque {
       font-size: 3rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--botao);
       margin-bottom: 0.5rem;
     }
 
     .cartao-vantagem h3 {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #1e3a8a;
+      color: var(--azul-escuro);
       margin-bottom: 0.5rem;
     }
 
     .cartao-vantagem p {
-      color: #64748b;
+      color: var(--cinza-escuro);
       font-size: 0.95rem;
     }
 
     /* Seção Final de Conversão */
     .secao-conversao-final {
       padding: 6rem 2rem;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, var(--botao) 0%, var(--botao-escuro) 100%);
       text-align: center;
-      color: white;
+      color: var(--branco);
     }
 
     .secao-conversao-final h2 {
@@ -449,16 +420,16 @@
     }
 
     .secao-conversao-final .botao-acao {
-      background: white;
-      color: #3b82f6;
+      background: var(--branco);
+      color: var(--botao);
       font-size: 1.1rem;
       padding: 1.2rem 3rem;
     }
 
     .secao-conversao-final .botao-acao:hover {
-      background: #f8fafc;
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: var(--tabela_participantes);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -485,31 +456,15 @@
           <div class="trilha-slides">
             <div class="slide-imagem">
               <img src="../Imagens/Imagem_1-Carrossel_Inicial.png" alt="CEU - Slide 1">
-              <div class="info-slide">
-                <div class="titulo-slide">Bem-vindo ao CEU</div>
-                <div class="descricao-slide">Sua plataforma completa de gestão de eventos</div>
-              </div>
             </div>
             <div class="slide-imagem">
               <img src="../Imagens/Imagem_2-Carrossel_Inicial.png" alt="CEU - Slide 2">
-              <div class="info-slide">
-                <div class="titulo-slide">Organize seus Eventos</div>
-                <div class="descricao-slide">Controle total em uma única plataforma</div>
-              </div>
             </div>
             <div class="slide-imagem">
               <img src="../Imagens/Imagem_3-Carrossel_Inicial.png" alt="CEU - Slide 3">
-              <div class="info-slide">
-                <div class="titulo-slide">Certificados Automáticos</div>
-                <div class="descricao-slide">Gere e envie certificados com facilidade</div>
-              </div>
             </div>
             <div class="slide-imagem">
               <img src="../Imagens/Imagem_4-Carrossel_Inicial.png" alt="CEU - Slide 4">
-              <div class="info-slide">
-                <div class="titulo-slide">Gestão Inteligente</div>
-                <div class="descricao-slide">Relatórios e análises em tempo real</div>
-              </div>
             </div>
           </div>
           <button class="botao-navegacao-carrossel botao-anterior">‹</button>
@@ -527,72 +482,42 @@
     <div class="scroll-indicator"></div>
   </section>
 
-  <!-- Seção de Recursos da Plataforma -->
+  <!-- Seção de Recursos e Vantagens da Plataforma -->
   <section class="secao-recursos">
     <div class="cabecalho-secao">
-      <h2>Recursos Poderosos para Seus Eventos</h2>
-      <p>Tudo que você precisa para gerenciar eventos de sucesso em uma única plataforma moderna e intuitiva.</p>
+      <h2>Recursos e Vantagens do CEU</h2>
+      <p>Tudo que você precisa para gerenciar eventos de sucesso em uma única plataforma moderna e intuitiva, ou seja, PERFEITA!</p>
     </div>
     <div class="grade-recursos">
       <div class="cartao-recurso">
         <div class="icone-recurso">📋</div>
         <h3>Gestão de Inscrições</h3>
-        <p>Sistema completo para gerenciar inscrições de participantes com validação automática e controle de vagas.</p>
+        <p>Chega de planilhas bagunçadas! Gerencie inscrições profissionalmente com validação fácil e controle de participantes.</p>
       </div>
       <div class="cartao-recurso">
         <div class="icone-recurso">🎓</div>
         <h3>Certificados Automáticos</h3>
-        <p>Gere certificados personalizados automaticamente com QR Code para validação de autenticidade.</p>
+        <p>Seus participantes merecem certificados chiques! Criação automática, com autenticidade!</p>
       </div>
       <div class="cartao-recurso">
-        <div class="icone-recurso">📊</div>
-        <h3>Relatórios Detalhados</h3>
-        <p>Acompanhe métricas e gere relatórios completos sobre participação, presença e engajamento.</p>
+        <div class="icone-recurso">🆓</div>
+        <h3>100% Gratuito</h3>
+        <p>Sim, é de graça mesmo! Sem pegadinhas, sem taxas escondidas, sem "plano premium". Só você, seus eventos e muita facilidade.</p>
       </div>
       <div class="cartao-recurso">
-        <div class="icone-recurso">✉️</div>
-        <h3>Notificações Inteligentes</h3>
-        <p>Sistema de notificações automáticas para manter participantes e organizadores sempre informados.</p>
+        <div class="icone-recurso">📱</div>
+        <h3>Totalmente Responsivo</h3>
+        <p>No PC, no celular, no tablet... Usufra um pedaço do Céu em diversos meios acessíveis!</p>
+      </div>
+      <div class="cartao-recurso">
+        <div class="icone-recurso">💡</div>
+        <h3>Interface Intuitiva</h3>
+        <p>Se até sua vó consegue usar, imagina você! Interface tão simples que nem vai precisar chamar o suporte técnico (mas temos um ótimo, caso precise).</p>
       </div>
       <div class="cartao-recurso">
         <div class="icone-recurso">🔒</div>
         <h3>Segurança Avançada</h3>
-        <p>Proteção de dados com criptografia e controles de acesso diferenciados por perfil de usuário.</p>
-      </div>
-      <div class="cartao-recurso">
-        <div class="icone-recurso">📱</div>
-        <h3>100% Responsivo</h3>
-        <p>Acesse de qualquer dispositivo - desktop, tablet ou smartphone com experiência otimizada.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Seção de Vantagens da Plataforma -->
-  <section class="secao-vantagens">
-    <div class="cabecalho-secao">
-      <h2>Por Que Escolher o CEU?</h2>
-      <p>Números que comprovam a eficiência da nossa plataforma.</p>
-    </div>
-    <div class="grade-vantagens">
-      <div class="cartao-vantagem">
-        <div class="numero-destaque">10x</div>
-        <h3>Mais Rápido</h3>
-        <p>Reduza o tempo de gestão de eventos em até 10 vezes</p>
-      </div>
-      <div class="cartao-vantagem">
-        <div class="numero-destaque">100%</div>
-        <h3>Automatizado</h3>
-        <p>Certificados e notificações gerados automaticamente</p>
-      </div>
-      <div class="cartao-vantagem">
-        <div class="numero-destaque">24/7</div>
-        <h3>Disponibilidade</h3>
-        <p>Acesso à plataforma a qualquer hora, de qualquer lugar</p>
-      </div>
-      <div class="cartao-vantagem">
-        <div class="numero-destaque">0</div>
-        <h3>Papel</h3>
-        <p>Gestão completamente digital e sustentável</p>
+        <p>Seus dados protegidos com criptografia de respeito. Nem o FBI conseguiria... quer dizer, só você e sua equipe têm acesso!</p>
       </div>
     </div>
   </section>
@@ -821,38 +746,6 @@
     }
   }
 
-  // Efeitos de Rolagem e Parallax
-  class GerenciadorEfeitosRolagem {
-    constructor() {
-      this.processandoAnimacao = false;
-      this.inicializar();
-    }
-
-    inicializar() {
-      window.addEventListener('scroll', () => {
-        if (!this.processandoAnimacao) {
-          requestAnimationFrame(() => {
-            this.atualizarParallax();
-            this.processandoAnimacao = false;
-          });
-          this.processandoAnimacao = true;
-        }
-      });
-    }
-
-    atualizarParallax() {
-      const quantidadeRolada = window.pageYOffset;
-      const secaoPrincipal = document.querySelector('.secao-principal');
-      const elementosParallax = secaoPrincipal.querySelectorAll('.conteudo-boas-vindas, .carrossel-imagens-destaque');
-
-      elementosParallax.forEach(elemento => {
-        const velocidade = 0.5;
-        const posicaoY = -(quantidadeRolada * velocidade);
-        elemento.style.transform = `translateY(${posicaoY}px)`;
-      });
-    }
-  }
-
   // Controlador de Animações Otimizadas
   class ControladorAnimacoes {
     constructor() {
@@ -893,82 +786,10 @@
     }
   }
 
-  // Efeitos Interativos dos Botões
-  class GerenciadorEfeitosBotoes {
-    constructor() {
-      this.inicializar();
-    }
-
-    inicializar() {
-      const botoes = document.querySelectorAll('.botao-acao');
-
-      botoes.forEach(botao => {
-        // Efeito de ondulação (ripple)
-        botao.addEventListener('click', (e) => {
-          const ondulacao = document.createElement('span');
-          const retangulo = botao.getBoundingClientRect();
-          const tamanho = Math.max(retangulo.width, retangulo.height);
-          const x = e.clientX - retangulo.left - tamanho / 2;
-          const y = e.clientY - retangulo.top - tamanho / 2;
-
-          ondulacao.style.cssText = `
-              position: absolute;
-              width: ${tamanho}px;
-              height: ${tamanho}px;
-              left: ${x}px;
-              top: ${y}px;
-              background: rgba(255, 255, 255, 0.3);
-              border-radius: 50%;
-              transform: scale(0);
-              animation: ondulacao 0.6s ease-out;
-              pointer-events: none;
-            `;
-
-          botao.appendChild(ondulacao);
-
-          setTimeout(() => {
-            ondulacao.remove();
-          }, 600);
-        });
-
-        // Efeito magnético
-        botao.addEventListener('mousemove', (e) => {
-          const retangulo = botao.getBoundingClientRect();
-          const x = e.clientX - retangulo.left - retangulo.width / 2;
-          const y = e.clientY - retangulo.top - retangulo.height / 2;
-
-          botao.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) scale(1.05)`;
-        });
-
-        botao.addEventListener('mouseleave', () => {
-          botao.style.transform = 'translate(0, 0)';
-        });
-      });
-    }
-  }
-
-  // Adicionar animação de ondulação ao CSS
-  const estiloOndulacao = document.createElement('style');
-  estiloOndulacao.textContent = `
-      @keyframes ondulacao {
-        from {
-          transform: scale(0);
-          opacity: 1;
-        }
-        to {
-          transform: scale(1);
-          opacity: 0;
-        }
-      }
-    `;
-  document.head.appendChild(estiloOndulacao);
-
   // Inicializar tudo quando o DOM estiver carregado
   document.addEventListener('DOMContentLoaded', () => {
     new GerenciadorCarrosselImagens();
-    new GerenciadorEfeitosRolagem();
     new ControladorAnimacoes();
-    new GerenciadorEfeitosBotoes();
 
     // Funcionalidade do indicador de rolagem
     const indicadorRolagem = document.querySelector('.scroll-indicator');
