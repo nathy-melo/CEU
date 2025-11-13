@@ -28,7 +28,7 @@
      showgrid="false"
      inkscape:zoom="1.04625"
      inkscape:cx="399.5221"
-     inkscape:cy="400.4779"
+     inkscape:cy="401.43369"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -39,10 +39,10 @@
      d="M10 3V6H4L4 10H10L10 13L11 13L16 8L11 3L10 3Z"
      fill="#000000"
      id="path2"
-     style="fill:#ffffff" />
+     style="fill:#000000" />
   <path
      d="M0 2L1.38281e-06 14H2L2 2L0 2Z"
      fill="#000000"
      id="path4"
-     style="fill:#ffffff" />
+     style="fill:#000000" />
 </svg>

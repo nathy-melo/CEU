@@ -7,12 +7,27 @@
     <title>Eventos Acontecendo</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
     <style>
-        /* Botão compartilhar no card */
+        /* Botões flutuantes no card (inscrever, mensagem, compartilhar) */
         .CaixaDoEvento { position: relative; }
-        .BotaoCompartilharCard {
+        .AcoesFlutuantes {
             position: absolute;
-            top: 0.5rem;
+            bottom: 0.5rem;
             right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-0.2rem);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+            z-index: 50;
+        }
+        .CaixaDoEvento:hover .AcoesFlutuantes {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .BotaoAcaoCard {
             width: 2.25rem;
             height: 2.25rem;
             border-radius: 999px;
@@ -20,19 +35,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 1s ease, transform 0.2s ease;
-            transform: scale(0.9);
             border: none;
             padding: 0;
             cursor: pointer;
-            z-index: 50;
         }
-        .CaixaDoEvento:hover .BotaoCompartilharCard { 
-            opacity: 1; 
-            visibility: visible;
+        .BotaoAcaoCard img { width: 1.2rem; height: 1.2rem; filter: invert(1); display: block; }
+
+        /* Botão compartilhar no card (compat) */
+        .CaixaDoEvento { position: relative; }
+        .BotaoCompartilharCard {
+            position: relative; /* agora relativo dentro da pilha */
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease, transform 0.2s ease;
             transform: scale(1);
+            border: none;
+            padding: 0;
+            cursor: pointer;
         }
         .BotaoCompartilharCard img { width: 1.1rem; height: 1.1rem; display: block; filter: invert(1); }
 
@@ -59,6 +83,58 @@
         .campo-link input { flex: 1; background: transparent; border: none; color: var(--texto); font-size: 0.85rem; outline: none; font-family: monospace; }
         .aviso-compartilhar { background: rgba(66, 135, 245, 0.1); border-left: 3px solid var(--botao); padding: 0.75rem; border-radius: 0.5rem; font-size: 0.8rem; color: var(--texto); line-height: 1.4; }
         .aviso-compartilhar strong { color: var(--botao); }
+
+        /* Modais de confirmação inscrição/desinscrição (padrão dos cartões) */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.ativo { display: flex; }
+        .modal-cancelamento { background: var(--caixas); border-radius: 1.875rem; box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.4); padding: 1.875rem; max-width: 32rem; width: 90%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .modal-cancelamento-titulo { color: var(--branco); font-size: 1.5rem; margin: 0 0 2rem 0; text-align: center; font-weight: 600; }
+        .modal-cancelamento-botoes { display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; gap: 1rem; }
+        .botao-cancelamento-cancelar, .botao-cancelamento-continuar, .botao-cancelamento-ok { flex: 1; padding: 0.75rem 1.5rem; border: none; border-radius: 0.625rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.3); transition: opacity 0.2s, transform 0.15s; }
+        .botao-cancelamento-cancelar { background: var(--vermelho) !important; color: var(--branco); }
+        .botao-cancelamento-continuar { background-color: #28a745; color: var(--branco); }
+        .botao-cancelamento-ok { background: var(--botao); color: var(--branco); width: 100%; }
+        .botao-cancelamento-cancelar:hover, .botao-cancelamento-continuar:hover, .botao-cancelamento-ok:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* Modal de mensagem ao organizador */
+        .modal-mensagem { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-mensagem.ativo { display: flex; }
+        .modal-mensagem .conteudo { background: var(--caixas); color: var(--texto); width: 100%; max-width: 32rem; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.35); }
+        .modal-mensagem .cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 800; font-size: 1.15rem; }
+        .modal-mensagem button.fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto); }
+        .modal-mensagem textarea { width: 100%; min-height: 8rem; resize: vertical; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); color: var(--texto); padding: 0.75rem; font-size: 0.95rem; }
+        .modal-mensagem .acoes { margin-top: 0.75rem; display: flex; gap: 0.75rem; justify-content: flex-end; }
+        .modal-mensagem .botao-primario { background: var(--botao); color: var(--branco); border: none; border-radius: 0.5rem; padding: 0.6rem 1rem; font-weight: 700; cursor: pointer; }
+        .modal-mensagem .botao-secundario { background: var(--vermelho); color: var(--branco); border: none; border-radius: 0.5rem; padding: 0.6rem 1rem; font-weight: 700; cursor: pointer; }
+
+        /* Botão para abrir lista de favoritos (à esquerda da barra de pesquisa) */
+        .BotaoFavoritosTrigger {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.6);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            margin-right: 0.75rem;
+        }
+        .BotaoFavoritosTrigger img { width: 1.25rem; height: 1.25rem; filter: invert(1); display: block; }
+
+        /* Modal de Favoritos */
+        .modal-favoritos { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-favoritos.ativo { display: flex; }
+        .modal-favoritos .conteudo { background: var(--caixas); color: var(--texto); width: 100%; max-width: 48rem; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.35); }
+        .modal-favoritos .cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 800; font-size: 1.15rem; }
+        .modal-favoritos button.fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto); }
+        .lista-favoritos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; max-height: 60vh; overflow-y: auto; }
+        .favorito-item { background: var(--branco); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 0.15rem 0.75rem rgba(0,0,0,0.25); color: #000; display: flex; flex-direction: column; }
+        .favorito-item img { width: 100%; height: 120px; object-fit: cover; }
+        .favorito-item .detalhes { padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
+        .favorito-item .titulo { font-weight: 700; font-size: 0.95rem; color: #000; }
+        .favorito-item .meta { font-size: 0.8rem; color: #333; }
+        .favorito-item a { text-decoration: none; color: inherit; }
     </style>
 </head>
 <body>
@@ -89,6 +165,10 @@
     <div id="main-content">
         <div class="section-title-wrapper">
             <div class="barra-pesquisa-container">
+                <!-- Botão de favoritos à esquerda da barra de pesquisa -->
+                <button type="button" class="BotaoFavoritosTrigger" id="btn-abrir-favoritos" title="Ver favoritos" aria-label="Ver favoritos">
+                    <img src="../Imagens/Medalha_preenchida.svg" alt="Favoritos">
+                </button>
                 <div class="barra-pesquisa">
                     <div class="campo-pesquisa-wrapper">
                         <input class="campo-pesquisa" type="text" id="busca-eventos" name="busca_eventos" placeholder="Procurar eventos" autocomplete="off" />
@@ -146,9 +226,21 @@
                         data-data="<?= $dataInicioISO ?>"
                         data-certificado="<?= $cert ?>"
                         data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
-                        <button type="button" class="BotaoCompartilharCard botao" title="Compartilhar" aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
-                            <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
-                        </button>
+                        <!-- Ações flutuantes: Inscrever, Favoritar, Mensagem, Compartilhar -->
+                        <div class="AcoesFlutuantes">
+                            <button type="button" class="BotaoAcaoCard BotaoInscreverCard" title="Inscrever-se rapidamente" aria-label="Inscrever" data-cod="<?= (int)$ev['cod_evento'] ?>" data-inscrito="0">
+                                <img src="../Imagens/Circulo_adicionar.svg" alt="Inscrever">
+                            </button>
+                            <button type="button" class="BotaoAcaoCard BotaoFavoritoCard" title="Favoritar" aria-label="Favoritar" data-cod="<?= (int)$ev['cod_evento'] ?>" data-favorito="0">
+                                <img src="../Imagens/Medalha_linha.svg" alt="Favoritar">
+                            </button>
+                            <button type="button" class="BotaoAcaoCard BotaoMensagemCard" title="Enviar mensagem ao organizador" aria-label="Mensagem" data-cod="<?= (int)$ev['cod_evento'] ?>">
+                                <img src="../Imagens/Carta.svg" alt="Mensagem">
+                            </button>
+                            <button type="button" class="BotaoCompartilharCard botao" title="Compartilhar" aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
+                                <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
+                            </button>
+                        </div>
                         <div class="EventoImagem">
                             <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
                         </div>
@@ -192,6 +284,17 @@
             <?php else: ?>
                 <p style="grid-column:1/-1;text-align:center;padding:20px;">Nenhum evento cadastrado.</p>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Modal Favoritos -->
+    <div id="modal-favoritos" class="modal-favoritos">
+        <div class="conteudo" onclick="event.stopPropagation()">
+            <div class="cabecalho">
+                <span>Meus favoritos</span>
+                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">×</button>
+            </div>
+            <div id="lista-favoritos" class="lista-favoritos"></div>
         </div>
     </div>
 
@@ -260,9 +363,65 @@
       </div>
     </div>
 
+    <!-- Modais de confirmação inscrição/desinscrição -->
+    <div class="modal-overlay" id="modalConfirmarInscricao">
+      <div class="modal-cancelamento" onclick="event.stopPropagation()">
+        <h2 class="modal-cancelamento-titulo">Deseja realmente se inscrever neste evento?</h2>
+        <div class="modal-cancelamento-botoes">
+          <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarInscricao(); event.stopPropagation();">Cancelar</button>
+          <button type="button" class="botao-cancelamento-continuar" onclick="confirmarInscricaoRapida(); event.stopPropagation();">Confirmar</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="modalConfirmarDesinscricao">
+      <div class="modal-cancelamento" onclick="event.stopPropagation()">
+        <h2 class="modal-cancelamento-titulo">Deseja realmente cancelar sua inscrição neste evento?</h2>
+        <div class="modal-cancelamento-botoes">
+          <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarDesinscricao(); event.stopPropagation();">Não</button>
+          <button type="button" class="botao-cancelamento-continuar" onclick="confirmarDesinscricaoRapida(); event.stopPropagation();">Sim, cancelar</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="modalInscricaoConfirmada">
+      <div class="modal-cancelamento" onclick="event.stopPropagation()">
+        <h2 class="modal-cancelamento-titulo">Inscrição realizada com sucesso!</h2>
+        <div class="modal-cancelamento-botoes">
+          <button type="button" class="botao-cancelamento-ok" onclick="fecharModalInscricaoConfirmada(); event.stopPropagation();">OK</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="modalDesinscricaoConfirmada">
+      <div class="modal-cancelamento" onclick="event.stopPropagation()">
+        <h2 class="modal-cancelamento-titulo">Inscrição cancelada com sucesso!</h2>
+        <div class="modal-cancelamento-botoes">
+          <button type="button" class="botao-cancelamento-ok" onclick="fecharModalDesinscricaoConfirmada(); event.stopPropagation();">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Mensagem ao Organizador -->
+    <div id="modal-mensagem" class="modal-mensagem">
+      <div class="conteudo" onclick="event.stopPropagation()">
+        <div class="cabecalho">
+          <span>Enviar mensagem ao organizador</span>
+          <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+        </div>
+        <div>
+          <textarea id="texto-mensagem-organizador" maxlength="500" placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
+          <div class="acoes">
+            <button class="botao-secundario" type="button" onclick="fecharModalMensagem()">Cancelar</button>
+            <button class="botao-primario" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       // Adaptação do código do CartaodoEventoParticipante para lista de cards
       let codEvento = null;
+      let codEventoAcao = null; // para inscrição/desinscrição
+      let btnInscreverAtual = null; // referência do botão clicado
+      const inscricaoCache = new Map();
 
       function bloquearScroll() {
         document.body.classList.add('modal-aberto');
@@ -344,18 +503,310 @@
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
       }
       document.getElementById('modal-compartilhar').onclick = function(e) { if (e.target === this) fecharModalCompartilhar(); };
-      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Esc') fecharModalCompartilhar(); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Esc') { fecharModalCompartilhar(); fecharModalMensagem(true); fecharTodosModaisConfirmacao(); } });
 
-      // Listeners para os botões de compartilhar nos cards
-      document.addEventListener('click', function(e){
-        const btn = e.target.closest('.BotaoCompartilharCard');
-        if (btn) {
+      // ====== Inscrição rápida ======
+      function atualizarIconeInscricao(btn, inscrito) {
+        if (!btn) return;
+        const img = btn.querySelector('img');
+        if (!img) return;
+        if (inscrito) {
+          img.src = '../Imagens/Circulo_check.svg';
+          img.alt = 'Inscrito';
+          btn.setAttribute('data-inscrito', '1');
+          btn.title = 'Cancelar inscrição';
+          btn.ariaLabel = 'Cancelar inscrição';
+        } else {
+          img.src = '../Imagens/Circulo_adicionar.svg';
+          img.alt = 'Inscrever';
+          btn.setAttribute('data-inscrito', '0');
+          btn.title = 'Inscrever-se rapidamente';
+          btn.ariaLabel = 'Inscrever';
+        }
+      }
+
+      async function verificarInscricao(cod) {
+        if (inscricaoCache.has(cod)) return inscricaoCache.get(cod);
+        try {
+          const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { credentials: 'include' });
+          const j = await r.json();
+          const val = !!j.inscrito;
+          inscricaoCache.set(cod, val);
+          return val;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function abrirModalConfirmarInscricao() {
+        document.getElementById('modalConfirmarInscricao').classList.add('ativo');
+        bloquearScroll();
+      }
+      function fecharModalConfirmarInscricao() {
+        document.getElementById('modalConfirmarInscricao').classList.remove('ativo');
+        desbloquearScroll();
+      }
+      function abrirModalConfirmarDesinscricao() {
+        document.getElementById('modalConfirmarDesinscricao').classList.add('ativo');
+        bloquearScroll();
+      }
+      function fecharModalConfirmarDesinscricao() {
+        document.getElementById('modalConfirmarDesinscricao').classList.remove('ativo');
+        desbloquearScroll();
+      }
+      function abrirModalInscricaoConfirmada() {
+        document.getElementById('modalInscricaoConfirmada').classList.add('ativo');
+        bloquearScroll();
+      }
+      function fecharModalInscricaoConfirmada() {
+        document.getElementById('modalInscricaoConfirmada').classList.remove('ativo');
+        desbloquearScroll();
+      }
+      function abrirModalDesinscricaoConfirmada() {
+        document.getElementById('modalDesinscricaoConfirmada').classList.add('ativo');
+        bloquearScroll();
+      }
+      function fecharModalDesinscricaoConfirmada() {
+        document.getElementById('modalDesinscricaoConfirmada').classList.remove('ativo');
+        desbloquearScroll();
+      }
+      function fecharTodosModaisConfirmacao() {
+        document.querySelectorAll('.modal-overlay.ativo').forEach(m => m.classList.remove('ativo'));
+        desbloquearScroll();
+      }
+
+      async function confirmarInscricaoRapida() {
+        if (!codEventoAcao) { fecharModalConfirmarInscricao(); return; }
+        try {
+          const r = await fetch('InscreverEvento.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            credentials: 'include',
+            body: new URLSearchParams({ cod_evento: codEventoAcao })
+          });
+          const j = await r.json();
+          fecharModalConfirmarInscricao();
+          if (j && j.sucesso) {
+            inscricaoCache.set(codEventoAcao, true);
+            atualizarIconeInscricao(btnInscreverAtual, true);
+            abrirModalInscricaoConfirmada();
+          } else {
+            alert(j.mensagem || 'Erro ao realizar inscrição.');
+          }
+        } catch (e) {
+          fecharModalConfirmarInscricao();
+          alert('Erro ao realizar inscrição.');
+        }
+      }
+
+      async function confirmarDesinscricaoRapida() {
+        if (!codEventoAcao) { fecharModalConfirmarDesinscricao(); return; }
+        try {
+          const r = await fetch('DesinscreverEvento.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            credentials: 'include',
+            body: new URLSearchParams({ cod_evento: codEventoAcao })
+          });
+          const j = await r.json();
+          fecharModalConfirmarDesinscricao();
+          if (j && j.sucesso) {
+            inscricaoCache.set(codEventoAcao, false);
+            atualizarIconeInscricao(btnInscreverAtual, false);
+            abrirModalDesinscricaoConfirmada();
+          } else {
+            alert(j.mensagem || 'Erro ao cancelar inscrição.');
+          }
+        } catch (e) {
+          fecharModalConfirmarDesinscricao();
+          alert('Erro ao cancelar inscrição.');
+        }
+      }
+
+      // ====== Modal de mensagem ao organizador ======
+      let codEventoMensagem = null;
+      function abrirModalMensagem() {
+        const m = document.getElementById('modal-mensagem');
+        document.getElementById('texto-mensagem-organizador').value = '';
+        m.classList.add('ativo');
+        bloquearScroll();
+      }
+      function fecharModalMensagem(skipUnlock) {
+        const m = document.getElementById('modal-mensagem');
+        m.classList.remove('ativo');
+        if (!skipUnlock) desbloquearScroll();
+      }
+      async function enviarMensagemOrganizador() {
+        const texto = (document.getElementById('texto-mensagem-organizador').value || '').trim();
+        if (!codEventoMensagem) { fecharModalMensagem(); return; }
+        if (texto.length === 0) { alert('Digite sua mensagem.'); return; }
+        try {
+          const r = await fetch('EnviarMensagemOrganizador.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            credentials: 'include',
+            body: new URLSearchParams({ cod_evento: codEventoMensagem, mensagem: texto })
+          });
+          const j = await r.json();
+          fecharModalMensagem();
+          if (j && j.sucesso) {
+            alert('Mensagem enviada ao organizador!');
+          } else {
+            alert(j.mensagem || 'Não foi possível enviar a mensagem.');
+          }
+        } catch (e) {
+          fecharModalMensagem();
+          alert('Erro ao enviar mensagem.');
+        }
+      }
+
+      // ====== Favoritos ======
+      const favoritosSet = new Set();
+      let favoritosDados = [];
+
+      function atualizarIconeFavorito(btn, fav) {
+        if (!btn) return;
+        const img = btn.querySelector('img');
+        if (!img) return;
+        if (fav) {
+          img.src = '../Imagens/Medalha_preenchida.svg';
+          img.alt = 'Desfavoritar';
+          btn.title = 'Remover dos favoritos';
+          btn.setAttribute('data-favorito', '1');
+        } else {
+          img.src = '../Imagens/Medalha_linha.svg';
+          img.alt = 'Favoritar';
+          btn.title = 'Adicionar aos favoritos';
+          btn.setAttribute('data-favorito', '0');
+        }
+      }
+
+      async function carregarFavoritos() {
+        try {
+          const r = await fetch('ListarFavoritos.php', { credentials: 'include' });
+          if (r.status === 401) { favoritosSet.clear(); favoritosDados = []; return; }
+          const j = await r.json();
+          if (j && j.sucesso) {
+            favoritosSet.clear();
+            favoritosDados = j.favoritos || [];
+            for (const f of favoritosDados) favoritosSet.add(Number(f.cod_evento));
+            // Atualiza ícones nos cards visíveis
+            document.querySelectorAll('.CaixaDoEvento').forEach(card => {
+              const cod = Number(card.getAttribute('data-cod-evento'));
+              const btn = card.querySelector('.BotaoFavoritoCard');
+              if (btn) atualizarIconeFavorito(btn, favoritosSet.has(cod));
+            });
+          }
+        } catch (e) {
+          // silencia
+        }
+      }
+
+      function abrirModalFavoritos() {
+        renderizarFavoritos();
+        document.getElementById('modal-favoritos').classList.add('ativo');
+        bloquearScroll();
+      }
+      function fecharModalFavoritos() {
+        document.getElementById('modal-favoritos').classList.remove('ativo');
+        desbloquearScroll();
+      }
+      function renderizarFavoritos() {
+        const cont = document.getElementById('lista-favoritos');
+        cont.innerHTML = '';
+        if (!favoritosDados || favoritosDados.length === 0) {
+          cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--texto);padding:1rem;">Nenhum evento favoritado.</div>';
+          return;
+        }
+        const frag = document.createDocumentFragment();
+        favoritosDados.forEach(ev => {
+          const a = document.createElement('a');
+          a.href = `ContainerParticipante.php?pagina=evento&id=${ev.cod_evento}`;
+          a.className = 'favorito-item';
+          const img = document.createElement('img');
+          const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/,'').replace(/^\//,'') : 'ImagensEventos/CEU-Logo.png');
+          img.src = caminho;
+          img.alt = ev.nome || 'Evento';
+          const det = document.createElement('div'); det.className = 'detalhes';
+          const t = document.createElement('div'); t.className = 'titulo'; t.textContent = ev.nome || 'Evento';
+          const m = document.createElement('div'); m.className = 'meta'; m.textContent = `${ev.categoria || ''} • ${ev.modalidade || ''}`;
+          det.appendChild(t); det.appendChild(m);
+          a.appendChild(img); a.appendChild(det);
+          frag.appendChild(a);
+        });
+        cont.appendChild(frag);
+      }
+
+      // Atualiza ícone do favorito ao passar o mouse no card (usa cache carregado)
+      document.addEventListener('mouseenter', function(e){
+        const card = e.target.closest('.CaixaDoEvento');
+        if (!card) return;
+        const cod = Number(card.getAttribute('data-cod-evento'));
+        const btn = card.querySelector('.BotaoFavoritoCard');
+        if (!btn || !cod) return;
+        atualizarIconeFavorito(btn, favoritosSet.has(cod));
+      }, true);
+
+      // Clique: compartilhar/inscrever/mensagem já existem; adiciona favorito e abrir modal
+      document.addEventListener('click', async function(e){
+        // Toggle favorito
+        const btnFav = e.target.closest('.BotaoFavoritoCard');
+        if (btnFav) {
           e.preventDefault(); e.stopPropagation();
-          codEvento = parseInt(btn.getAttribute('data-cod')) || null;
-          abrirModalCompartilhar();
+          const cod = Number(btnFav.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          try {
+            const r = await fetch('ToggleFavorito.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              credentials: 'include',
+              body: new URLSearchParams({ cod_evento: cod })
+            });
+            if (r.status === 401) { alert('Faça login para favoritar eventos.'); return; }
+            const j = await r.json();
+            if (j && j.sucesso) {
+              if (j.favoritado) { favoritosSet.add(cod); }
+              else { favoritosSet.delete(cod); }
+              atualizarIconeFavorito(btnFav, j.favoritado);
+              // Atualiza lista completa em memória (opcional: recarregar do servidor)
+              // Aqui, atualizamos localmente removendo/adicionando
+              if (j.favoritado) {
+                // Se não existir em favoritosDados, não vamos buscar tudo agora; mantém até abrir modal e sincronizar
+              } else {
+                favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+              }
+            } else {
+              alert(j.mensagem || 'Não foi possível atualizar favorito.');
+            }
+          } catch (err) {
+            alert('Erro ao atualizar favorito.');
+          }
+          return;
+        }
+
+        // Abrir modal de favoritos (botão no topo)
+        if (e.target.closest('#btn-abrir-favoritos')) {
+          e.preventDefault(); e.stopPropagation();
+          await carregarFavoritos();
+          abrirModalFavoritos();
+          return;
         }
       }, true);
+
+      // Fechar modal de favoritos ao clicar fora
+      const modalFav = document.getElementById('modal-favoritos');
+      if (modalFav) {
+        modalFav.onclick = function(e) {
+          if (e.target === this) fecharModalFavoritos();
+        };
+      }
+
+      // Carregar favoritos ao iniciar
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', carregarFavoritos);
+      } else {
+        setTimeout(carregarFavoritos, 50);
+      }
     </script>
 </body>
-
 </html>

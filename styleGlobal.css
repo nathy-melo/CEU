@@ -437,6 +437,7 @@ body.pagina-lista-eventos #conteudo-dinamico {
   font-weight: 500;
   z-index: 3;
   transform: translateY(100%);
+  width: 85%;
 }
 
 .EventoInfo br {
@@ -1131,6 +1132,7 @@ body.pagina-lista-eventos #conteudo-dinamico {
   height: 1.2em;
   background: url('Imagens/Seta_Direita_Menu.svg') center/contain no-repeat;
   transition: transform 0.3s ease;
+  filter: invert(100%);
 }
 
 /* Estado da seta quando o menu está expandido (<) */
