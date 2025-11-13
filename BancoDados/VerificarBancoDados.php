@@ -270,46 +270,63 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
     if (!file_exists($caminhoArquivo)) {
         return ['sucesso' => false, 'erro' => 'Arquivo SQL não encontrado: ' . $caminhoArquivo];
     }
-    
+
     $sql = file_get_contents($caminhoArquivo);
-    
+
     // Remove comentários
     $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
     $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
-    
+
     // Seleciona o banco
     mysqli_select_db($conexaoServidor, $nomeBanco);
-    
+
     // Separa comandos por ponto e vírgula
     $comandos = explode(';', $sql);
-    
+
     $erros = [];
     $executados = 0;
-    
+
     foreach ($comandos as $comando) {
         $comando = trim($comando);
-        
-        // Pula comandos vazios e comandos de estrutura (já tratados em aplicarDiferencas)
-        if (empty($comando) || 
-            stripos($comando, 'create database') !== false || 
-            stripos($comando, 'create table') !== false ||
-            stripos($comando, 'alter table') !== false ||
-            stripos($comando, 'drop table') !== false ||
-            stripos($comando, 'use ') === 0 ||
-            stripos($comando, 'show tables') !== false) {
+        if ($comando === '') continue;
+
+        $inicio = strtolower(ltrim($comando));
+
+        // Ignora DDL de tabela (tratadas em aplicarDiferencas)
+        $ehDDL = (
+            stripos($inicio, 'create table') === 0 ||
+            stripos($inicio, 'alter table') === 0 ||
+            stripos($inicio, 'drop table') === 0 ||
+            stripos($inicio, 'truncate table') === 0
+        );
+
+        // Ignora comandos de nível de banco/transação e meta
+        $ehNivelBancoOuTransacao = (
+            stripos($inicio, 'drop database') === 0 ||
+            stripos($inicio, 'create database') === 0 ||
+            stripos($inicio, 'use ') === 0 ||
+            stripos($inicio, 'show ') === 0 ||
+            stripos($inicio, 'start transaction') === 0 ||
+            stripos($inicio, 'commit') === 0 ||
+            stripos($inicio, 'rollback') === 0 ||
+            stripos($inicio, 'set ') === 0 ||
+            stripos($inicio, 'delimiter') === 0
+        );
+
+        if ($ehDDL || $ehNivelBancoOuTransacao) {
             continue;
         }
-        
+
         if (!@mysqli_query($conexaoServidor, $comando)) {
             $erro = mysqli_error($conexaoServidor);
-            
+
             // Ignora erros comuns que não são problemas reais
             $ignorarErros = [
                 'already exists',
                 'duplicate',
                 'multiple primary key'
             ];
-            
+
             $deveIgnorar = false;
             foreach ($ignorarErros as $textoIgnorar) {
                 if (stripos($erro, $textoIgnorar) !== false) {
@@ -317,20 +334,20 @@ function executarArquivoSQL($conexaoServidor, $nomeBanco, $caminhoArquivo) {
                     break;
                 }
             }
-            
-            // Só reporta erros críticos
+
             if (!$deveIgnorar && !empty($erro)) {
-                $erros[] = substr($comando, 0, 80) . '... → ' . $erro;
+                $preview = substr(preg_replace('/\s+/', ' ', $comando), 0, 120);
+                $erros[] = $preview . '... → ' . $erro;
             }
         } else {
             $executados++;
         }
     }
-    
+
     $GLOBALS['__EXECUTADOS_TOTAL__'] = $executados;
-    
+
     return [
-        'sucesso' => true,
+        'sucesso' => empty($erros),
         'executados' => $executados,
         'erros' => $erros
     ];
