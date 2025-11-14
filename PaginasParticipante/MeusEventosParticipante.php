@@ -1068,6 +1068,11 @@
                 const j = await r.json();
                 fecharModalConfirmarDesinscricao();
                 if (j && j.sucesso) {
+                    // IMPORTANTE: Atualizar cache e ícone ANTES de recarregar
+                    inscricaoCache.set(codEventoAcao, false);
+                    if (btnDesinscreverAtual) {
+                        atualizarIconeInscricao(btnDesinscreverAtual, false);
+                    }
                     abrirModalDesinscricaoConfirmada();
                     // Recarrega a lista de eventos após desinscrição
                     setTimeout(() => {
@@ -1096,6 +1101,11 @@
                 const j = await r.json();
                 fecharModalConfirmarInscricao();
                 if (j && j.sucesso) {
+                    // IMPORTANTE: Atualizar cache e ícone ANTES de recarregar
+                    inscricaoCache.set(codEventoAcao, true);
+                    if (btnDesinscreverAtual) {
+                        atualizarIconeInscricao(btnDesinscreverAtual, true);
+                    }
                     abrirModalInscricaoConfirmada();
                     // Recarrega a lista de eventos após inscrição
                     setTimeout(() => {
@@ -1176,8 +1186,12 @@
         }
         window.atualizarIconeInscricao = atualizarIconeInscricao;
 
-        async function verificarInscricao(cod) {
-            if (inscricaoCache.has(cod)) return inscricaoCache.get(cod);
+        async function verificarInscricao(cod, forcarAtualizacao = false) {
+            // Se não forçar atualização e tiver no cache, usar cache
+            if (!forcarAtualizacao && inscricaoCache.has(cod)) {
+                return inscricaoCache.get(cod);
+            }
+            // Sempre verificar do servidor quando forçar atualização ou não tiver cache
             try {
                 const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { credentials: 'include' });
                 const j = await r.json();
@@ -1185,7 +1199,8 @@
                 inscricaoCache.set(cod, val);
                 return val;
             } catch (e) {
-                return false;
+                // Se falhar, usar cache se existir, senão retornar false
+                return inscricaoCache.has(cod) ? inscricaoCache.get(cod) : false;
             }
         }
 
@@ -1229,7 +1244,7 @@
         function fecharModalFavoritos() {
             document.getElementById('modal-favoritos').classList.remove('ativo');
             desbloquearScroll();
-            // Restaurar o estado do menu após fechar o modal
+             // Restaurar o estado do menu após fechar o modal
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'meusEventos';
             if (typeof window.setMenuAtivoPorPagina === 'function') {
@@ -1435,7 +1450,10 @@
                 codEventoAcao = cod;
                 btnDesinscreverAtual = btnInscrever;
                 
-                const inscrito = await verificarInscricao(cod);
+                // IMPORTANTE: Forçar atualização do servidor para garantir dados corretos
+                const inscrito = await verificarInscricao(cod, true); // forçar atualização
+                
+                // Atualizar ícone com o valor correto do servidor
                 atualizarIconeInscricao(btnInscrever, inscrito);
                 
                 if (inscrito) {

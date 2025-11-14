@@ -21,6 +21,14 @@ function formatar(txt) {
 
 // Função para carregar eventos inscritos do servidor
 function carregarEventosDoServidor() {
+    // IMPORTANTE: Verificar se está na página correta antes de executar
+    const params = new URLSearchParams(window.location.search);
+    const pagina = params.get('pagina');
+    if (pagina !== 'meusEventos') {
+        // Não executar se não estiver na página de "meusEventos"
+        return;
+    }
+    
     console.log('carregarEventosDoServidor() chamado');
     const container = document.getElementById('eventos-container');
     if (!container) {
@@ -277,7 +285,12 @@ function inicializarFiltroEventos() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    carregarEventosDoServidor();
+    // Verificar se está na página correta antes de carregar
+    const params = new URLSearchParams(window.location.search);
+    const pagina = params.get('pagina');
+    if (pagina === 'meusEventos') {
+        carregarEventosDoServidor();
+    }
 });
 
 // Listener para recarregar quando houver mudança nas inscrições

@@ -18,37 +18,54 @@ if ($cod_evento <= 0) {
     exit;
 }
 
-// Verifica se está inscrito
-$sql_verifica = "SELECT status FROM inscricao WHERE CPF = ? AND cod_evento = ?";
+// Verifica se está inscrito com status ativo
+$sql_verifica = "SELECT status FROM inscricao WHERE CPF = ? AND cod_evento = ? AND status = 'ativa'";
 $stmt_verifica = mysqli_prepare($conexao, $sql_verifica);
 mysqli_stmt_bind_param($stmt_verifica, 'si', $cpf_usuario, $cod_evento);
 mysqli_stmt_execute($stmt_verifica);
 $resultado_verifica = mysqli_stmt_get_result($stmt_verifica);
 
 if (!$resultado_verifica || mysqli_num_rows($resultado_verifica) === 0) {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Você não está inscrito neste evento']);
-    exit;
+    // Verifica se existe uma inscrição cancelada
+    $sql_verifica_cancelada = "SELECT status FROM inscricao WHERE CPF = ? AND cod_evento = ? AND status = 'cancelada'";
+    $stmt_verifica_cancelada = mysqli_prepare($conexao, $sql_verifica_cancelada);
+    mysqli_stmt_bind_param($stmt_verifica_cancelada, 'si', $cpf_usuario, $cod_evento);
+    mysqli_stmt_execute($stmt_verifica_cancelada);
+    $resultado_cancelada = mysqli_stmt_get_result($stmt_verifica_cancelada);
+    
+    if ($resultado_cancelada && mysqli_num_rows($resultado_cancelada) > 0) {
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Sua inscrição já está cancelada']);
+        mysqli_stmt_close($stmt_verifica_cancelada);
+        mysqli_stmt_close($stmt_verifica);
+        mysqli_close($conexao);
+        exit;
+    } else {
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Você não está inscrito neste evento']);
+        if ($stmt_verifica_cancelada) mysqli_stmt_close($stmt_verifica_cancelada);
+        mysqli_stmt_close($stmt_verifica);
+        mysqli_close($conexao);
+        exit;
+    }
 }
 
-$inscricao = mysqli_fetch_assoc($resultado_verifica);
+mysqli_stmt_close($stmt_verifica);
 
-if ($inscricao['status'] === 'cancelada') {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Sua inscrição já está cancelada']);
-    exit;
-}
-
-// Cancelar inscrição (soft delete)
-$sql_cancelar = "UPDATE inscricao SET status = 'cancelada' WHERE CPF = ? AND cod_evento = ?";
+// Cancelar inscrição (soft delete) - Só cancela se status for 'ativa'
+$sql_cancelar = "UPDATE inscricao SET status = 'cancelada' WHERE CPF = ? AND cod_evento = ? AND status = 'ativa'";
 $stmt_cancelar = mysqli_prepare($conexao, $sql_cancelar);
 mysqli_stmt_bind_param($stmt_cancelar, 'si', $cpf_usuario, $cod_evento);
 
 if (mysqli_stmt_execute($stmt_cancelar)) {
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Inscrição cancelada com sucesso!']);
+    $linhas_afetadas = mysqli_stmt_affected_rows($stmt_cancelar);
+    if ($linhas_afetadas > 0) {
+        echo json_encode(['sucesso' => true, 'mensagem' => 'Inscrição cancelada com sucesso!']);
+    } else {
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Sua inscrição já está cancelada']);
+    }
 } else {
     echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao cancelar inscrição: ' . mysqli_error($conexao)]);
 }
 
 mysqli_stmt_close($stmt_cancelar);
-mysqli_stmt_close($stmt_verifica);
 mysqli_close($conexao);
 ?>
