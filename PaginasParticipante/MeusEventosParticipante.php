@@ -1229,6 +1229,12 @@
         function fecharModalFavoritos() {
             document.getElementById('modal-favoritos').classList.remove('ativo');
             desbloquearScroll();
+            // Restaurar o estado do menu após fechar o modal
+            const params = new URLSearchParams(window.location.search);
+            const pagina = params.get('pagina') || 'meusEventos';
+            if (typeof window.setMenuAtivoPorPagina === 'function') {
+                window.setMenuAtivoPorPagina(pagina);
+            }
         }
         
         function renderizarFavoritos() {
