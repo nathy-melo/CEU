@@ -613,7 +613,7 @@
           <button onclick="abrirModalCompartilhar()" class="botao">Compartilhar</button>
         </div>
         <div class="BotaoInscrever">
-          <button class="botao">Inscrever-se</button>
+          <button class="botao botao-inscrever">Inscrever-se</button>
         </div>
       </div>
     </main>

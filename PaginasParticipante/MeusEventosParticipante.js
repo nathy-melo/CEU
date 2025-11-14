@@ -101,6 +101,24 @@ function carregarEventosDoServidor() {
 
                 // Mantém a mesma estrutura visual dos cards da página de Início, com lista e ícones
                 div.innerHTML = `
+                    <div class="AcoesFlutuantes">
+                        <button type="button" class="BotaoAcaoCard BotaoDesinscreverCard botao" title="Cancelar inscrição"
+                            aria-label="Cancelar inscrição" data-cod="${evento.cod_evento}">
+                            <img src="../Imagens/Circulo_check.svg" alt="Inscrito">
+                        </button>
+                        <button type="button" class="BotaoAcaoCard BotaoFavoritoCard botao" title="Favoritar"
+                            aria-label="Favoritar" data-cod="${evento.cod_evento}" data-favorito="0">
+                            <img src="../Imagens/Medalha_linha.svg" alt="Favoritar">
+                        </button>
+                        <button type="button" class="BotaoAcaoCard BotaoMensagemCard botao" title="Enviar mensagem ao organizador"
+                            aria-label="Mensagem" data-cod="${evento.cod_evento}">
+                            <img src="../Imagens/Carta.svg" alt="Mensagem">
+                        </button>
+                        <button type="button" class="BotaoAcaoCard BotaoCompartilharCard botao" title="Compartilhar"
+                            aria-label="Compartilhar" data-cod="${evento.cod_evento}">
+                            <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar">
+                        </button>
+                    </div>
                     <div class="EventoImagem">
                         <img src="${caminhoImagem}" alt="${evento.nome}">
                     </div>
@@ -131,6 +149,20 @@ function carregarEventosDoServidor() {
 
                 container.appendChild(div);
             });
+
+            // Atualiza status de favoritos nos cards após carregar
+            setTimeout(async () => {
+                const cards = container.querySelectorAll('.CaixaDoEvento');
+                cards.forEach(card => {
+                    const cod = card.querySelector('.BotaoFavoritoCard')?.getAttribute('data-cod');
+                    if (cod && window.favoritosSet && window.favoritosSet.has(Number(cod))) {
+                        const btn = card.querySelector('.BotaoFavoritoCard');
+                        if (btn && typeof window.atualizarIconeFavorito === 'function') {
+                            window.atualizarIconeFavorito(btn, true);
+                        }
+                    }
+                });
+            }, 100);
 
             // Reinicializa os filtros após carregar
             if (typeof window.inicializarFiltroEventos === 'function') {

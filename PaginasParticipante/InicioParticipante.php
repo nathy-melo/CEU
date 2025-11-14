@@ -1554,10 +1554,14 @@
         e.preventDefault(); e.stopPropagation();
         const cod = Number(btnInscrever.getAttribute('data-cod')) || 0;
         if (!cod) return;
+        
+        // IMPORTANTE: Atualizar as variáveis ANTES de verificar status
         codEventoAcao = cod;
         btnInscreverAtual = btnInscrever;
+        
         const inscrito = await verificarInscricao(cod);
         atualizarIconeInscricao(btnInscrever, inscrito);
+        
         if (inscrito) {
           abrirModalConfirmarDesinscricao();
         } else {
