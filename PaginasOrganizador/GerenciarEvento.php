@@ -105,7 +105,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_codigo_certificado' &&
                                 FROM certificado 
                                 WHERE cpf = ? AND cod_evento = ?
                                 LIMIT 1";
-        
+
         $stmt = mysqli_prepare($conexao, $consultaCertificado);
         mysqli_stmt_bind_param($stmt, "si", $cpfParticipante, $codEvento);
         mysqli_stmt_execute($stmt);
@@ -279,6 +279,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
 
         // Garante que a coluna certificado_emitido existe
         mysqli_query($conexao, "ALTER TABLE colaboradores_evento ADD COLUMN IF NOT EXISTS certificado_emitido tinyint(1) DEFAULT 0");
+        mysqli_query($conexao, "ALTER TABLE colaboradores_evento ADD COLUMN IF NOT EXISTS presenca_confirmada tinyint(1) DEFAULT 0");
+
+        // Garante que a tabela organiza tem as colunas necessárias
+        mysqli_query($conexao, "ALTER TABLE organiza ADD COLUMN IF NOT EXISTS presenca_confirmada tinyint(1) DEFAULT 0");
+        mysqli_query($conexao, "ALTER TABLE organiza ADD COLUMN IF NOT EXISTS certificado_emitido tinyint(1) DEFAULT 0");
 
         // Busca organizador principal
         $consultaOrganizador = "SELECT 
@@ -287,10 +292,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
                                     u.Email,
                                     u.RA,
                                     'Organizador' as tipo,
-                                    NULL as presenca_confirmada,
-                                    NULL as certificado_emitido
+                                    o.presenca_confirmada,
+                                    o.certificado_emitido,
+                                    cert.cod_verificacao
                                   FROM organiza o
                                   INNER JOIN usuario u ON o.CPF = u.CPF
+                                  LEFT JOIN certificado cert ON cert.cpf = o.CPF AND cert.cod_evento = o.cod_evento
                                   WHERE o.cod_evento = ?";
 
         $stmtOrg = mysqli_prepare($conexao, $consultaOrganizador);
@@ -306,8 +313,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'buscar_organizacao' && isset(
                 'email' => $row['Email'],
                 'ra' => $row['RA'] ?? 'Não informado',
                 'tipo' => 'Organizador',
-                'presenca_confirmada' => false,
-                'certificado_emitido' => false
+                'presenca_confirmada' => (int)$row['presenca_confirmada'] === 1,
+                'certificado_emitido' => (int)$row['certificado_emitido'] === 1,
+                'cod_verificacao' => $row['cod_verificacao'] ?? null
             ];
         }
 
@@ -675,16 +683,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                SET presenca_confirmada = 1 
                                WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
             $mensagemSucesso = 'Presença confirmada com sucesso';
-            
+
             $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
-            
+
             if ($stmtUpdate) {
                 mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
-                
+
                 if (mysqli_stmt_execute($stmtUpdate)) {
                     $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
                     mysqli_stmt_close($stmtUpdate);
-                    
+
                     if ($linhasAfetadas > 0) {
                         echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
                     } else {
@@ -697,10 +705,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 echo json_encode(['sucesso' => false, 'erro' => 'falha_preparacao', 'detalhe' => mysqli_error($conexao)]);
             }
-            
+
             mysqli_close($conexao);
             exit;
-
         } elseif ($acao === 'emitir_certificado') {
             // Verifica se a presença está confirmada e busca dados do participante
             $consultaVerifica = "SELECT i.presenca_confirmada, u.Nome, u.Email 
@@ -794,7 +801,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'certificado_participante.odt',
                     'certificado_padrao.odt'
                 ];
-                
+
                 $templatePath = null;
                 foreach ($possiveisTemplates as $template) {
                     $caminho = $templatesPath . $template;
@@ -803,7 +810,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                     }
                 }
-                
+
                 if (!$templatePath) {
                     throw new Exception('Nenhum template de certificado encontrado na pasta templates/');
                 }
@@ -861,16 +868,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                SET status = 'cancelada' 
                                WHERE cod_evento = ? AND CPF = ? AND status = 'ativa'";
             $mensagemSucesso = 'Participante excluído com sucesso';
-            
+
             $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
-            
+
             if ($stmtUpdate) {
                 mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
-                
+
                 if (mysqli_stmt_execute($stmtUpdate)) {
                     $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
                     mysqli_stmt_close($stmtUpdate);
-                    
+
                     if ($linhasAfetadas > 0) {
                         echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
                     } else {
@@ -883,25 +890,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 echo json_encode(['sucesso' => false, 'erro' => 'falha_preparacao', 'detalhe' => mysqli_error($conexao)]);
             }
-            
+
             mysqli_close($conexao);
             exit;
-
         } elseif ($acao === 'confirmar_presenca_organizacao') {
-            $consultaUpdate = "UPDATE colaboradores_evento 
-                               SET presenca_confirmada = 1 
-                               WHERE cod_evento = ? AND CPF = ?";
+            // Verifica se é organizador ou colaborador
+            $tipoMembro = null;
+
+            // Verifica se é organizador principal
+            $sqlVerificaOrg = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?";
+            $stmtVerificaOrg = mysqli_prepare($conexao, $sqlVerificaOrg);
+            mysqli_stmt_bind_param($stmtVerificaOrg, "is", $codEvento, $cpfParticipante);
+            mysqli_stmt_execute($stmtVerificaOrg);
+            $resultVerificaOrg = mysqli_stmt_get_result($stmtVerificaOrg);
+
+            if (mysqli_fetch_assoc($resultVerificaOrg)) {
+                $tipoMembro = 'organizador';
+            } else {
+                $tipoMembro = 'colaborador';
+            }
+            mysqli_stmt_close($stmtVerificaOrg);
+
+            // Atualiza a tabela correta
+            if ($tipoMembro === 'organizador') {
+                $consultaUpdate = "UPDATE organiza 
+                                   SET presenca_confirmada = 1 
+                                   WHERE cod_evento = ? AND CPF = ?";
+            } else {
+                $consultaUpdate = "UPDATE colaboradores_evento 
+                                   SET presenca_confirmada = 1 
+                                   WHERE cod_evento = ? AND CPF = ?";
+            }
+
             $mensagemSucesso = 'Presença confirmada com sucesso';
-            
+
             $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
-            
+
             if ($stmtUpdate) {
                 mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
-                
+
                 if (mysqli_stmt_execute($stmtUpdate)) {
                     $linhasAfetadas = mysqli_stmt_affected_rows($stmtUpdate);
                     mysqli_stmt_close($stmtUpdate);
-                    
+
                     if ($linhasAfetadas > 0) {
                         echo json_encode(['sucesso' => true, 'mensagem' => $mensagemSucesso]);
                     } else {
@@ -914,24 +945,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 echo json_encode(['sucesso' => false, 'erro' => 'falha_preparacao', 'detalhe' => mysqli_error($conexao)]);
             }
-            
+
             mysqli_close($conexao);
             exit;
-
         } elseif ($acao === 'emitir_certificado_organizacao') {
-            // Verificar se a presença foi confirmada antes de emitir certificado
-            $consultaPresenca = "SELECT ce.presenca_confirmada, u.Nome, u.Email 
-                                FROM colaboradores_evento ce
-                                JOIN usuario u ON ce.CPF = u.CPF
-                                WHERE ce.cod_evento = ? AND ce.CPF = ?";
-            $stmtPresenca = mysqli_prepare($conexao, $consultaPresenca);
-            mysqli_stmt_bind_param($stmtPresenca, "is", $codEvento, $cpfParticipante);
-            mysqli_stmt_execute($stmtPresenca);
-            $resultPresenca = mysqli_stmt_get_result($stmtPresenca);
-            $dadosPresenca = mysqli_fetch_assoc($resultPresenca);
-            mysqli_stmt_close($stmtPresenca);
+            // Verifica se é organizador ou colaborador e busca dados
+            $tipoMembro = null;
+            $dadosPresenca = null;
 
-            if (!$dadosPresenca || !$dadosPresenca['presenca_confirmada']) {
+            // Primeiro verifica se é organizador principal
+            $consultaOrg = "SELECT o.presenca_confirmada, u.Nome, u.Email 
+                            FROM organiza o
+                            JOIN usuario u ON o.CPF = u.CPF
+                            WHERE o.cod_evento = ? AND o.CPF = ?";
+            $stmtOrg = mysqli_prepare($conexao, $consultaOrg);
+            mysqli_stmt_bind_param($stmtOrg, "is", $codEvento, $cpfParticipante);
+            mysqli_stmt_execute($stmtOrg);
+            $resultOrg = mysqli_stmt_get_result($stmtOrg);
+            $dadosOrg = mysqli_fetch_assoc($resultOrg);
+            mysqli_stmt_close($stmtOrg);
+
+            if ($dadosOrg) {
+                $tipoMembro = 'organizador';
+                $dadosPresenca = $dadosOrg;
+            } else {
+                // Se não for organizador, verifica se é colaborador
+                $consultaColab = "SELECT ce.presenca_confirmada, u.Nome, u.Email 
+                                  FROM colaboradores_evento ce
+                                  JOIN usuario u ON ce.CPF = u.CPF
+                                  WHERE ce.cod_evento = ? AND ce.CPF = ?";
+                $stmtColab = mysqli_prepare($conexao, $consultaColab);
+                mysqli_stmt_bind_param($stmtColab, "is", $codEvento, $cpfParticipante);
+                mysqli_stmt_execute($stmtColab);
+                $resultColab = mysqli_stmt_get_result($stmtColab);
+                $dadosColab = mysqli_fetch_assoc($resultColab);
+                mysqli_stmt_close($stmtColab);
+
+                if ($dadosColab) {
+                    $tipoMembro = 'colaborador';
+                    $dadosPresenca = $dadosColab;
+                }
+            }
+
+            if (!$dadosPresenca) {
+                echo json_encode(['sucesso' => false, 'erro' => 'membro_nao_encontrado', 'mensagem' => 'Membro da organização não encontrado']);
+                mysqli_close($conexao);
+                exit;
+            }
+
+            if (!$dadosPresenca['presenca_confirmada']) {
                 echo json_encode(['sucesso' => false, 'erro' => 'presenca_nao_confirmada', 'mensagem' => 'A presença precisa ser confirmada antes de emitir o certificado']);
                 mysqli_close($conexao);
                 exit;
@@ -981,7 +1043,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $dados = [
                     'NomeParticipante' => $dadosPresenca['Nome'],
                     'Email' => $dadosPresenca['Email'],
-                    'CPF' => $cpfOrganizador,
+                    'CPF' => $cpfParticipante,
                     'NomeEvento' => $dadosEvento['nome'],
                     'NomeOrganizador' => $dadosOrganizador['Nome'] ?? 'CEU',
                     'LocalEvento' => $dadosEvento['lugar'] ?? 'Online',
@@ -1006,7 +1068,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'certificado_organizador.odt',
                     'certificado_padrao.odt'
                 ];
-                
+
                 $templatePath = null;
                 foreach ($possiveisTemplates as $template) {
                     $caminho = $templatesPath . $template;
@@ -1015,7 +1077,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                     }
                 }
-                
+
                 if (!$templatePath) {
                     throw new Exception('Nenhum template de certificado encontrado na pasta templates/');
                 }
@@ -1045,10 +1107,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $codEvento
                     );
 
-                    // Atualizar status no banco
-                    $consultaUpdate = "UPDATE colaboradores_evento 
-                                       SET certificado_emitido = 1 
-                                       WHERE cod_evento = ? AND CPF = ?";
+                    // Atualizar status no banco - na tabela correta
+                    if ($tipoMembro === 'organizador') {
+                        $consultaUpdate = "UPDATE organiza 
+                                           SET certificado_emitido = 1 
+                                           WHERE cod_evento = ? AND CPF = ?";
+                    } else {
+                        $consultaUpdate = "UPDATE colaboradores_evento 
+                                           SET certificado_emitido = 1 
+                                           WHERE cod_evento = ? AND CPF = ?";
+                    }
+
                     $stmtUpdate = mysqli_prepare($conexao, $consultaUpdate);
                     mysqli_stmt_bind_param($stmtUpdate, "is", $codEvento, $cpfParticipante);
                     mysqli_stmt_execute($stmtUpdate);
@@ -2218,14 +2287,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Restaura a última aba ativa salva no localStorage
             const abaSalva = localStorage.getItem('gerenciar_evento_aba_ativa');
             const abaInicial = abaSalva || 'participantes';
-            
+
             // Ativa a aba correta
             trocarAba(abaInicial);
         }
 
         function trocarAba(nomeAba) {
             abaAtual = nomeAba;
-            
+
             // Salva a aba atual no localStorage para manter após reload
             localStorage.setItem('gerenciar_evento_aba_ativa', nomeAba);
 
@@ -2827,7 +2896,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function verificarCertificado(cpf) {
             // Buscar código de verificação do certificado deste participante no evento atual
             const codEvento = getCodigoEvento();
-            
+
             fetch(`GerenciarEvento.php?action=buscar_codigo_certificado&cpf=${cpf}&cod_evento=${codEvento}`)
                 .then(response => response.json())
                 .then(data => {

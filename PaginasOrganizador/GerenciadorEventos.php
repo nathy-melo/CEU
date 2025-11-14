@@ -391,7 +391,7 @@ try {
                 // Logo padrão
                 $imagens[] = [
                     'id' => 0,
-                    'caminho' => 'ImagensEventos/CEU-Logo.png',
+                    'caminho' => 'ImagensEventos/CEU-ImagemEvento.png',
                     'ordem' => 0,
                     'principal' => true
                 ];
