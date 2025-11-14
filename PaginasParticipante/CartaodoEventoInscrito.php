@@ -890,7 +890,7 @@
   <!-- Modais de Confirmação -->
   <div class="modal-overlay" id="modalConfirmarDesinscricao">
     <div class="modal-cancelamento" onclick="event.stopPropagation()">
-      <h2 class="modal-cancelamento-titulo">Deseja realmente cancelar sua inscrição neste evento?</h2>
+      <h2 class="modal-cancelamento-titulo">Deseja cancelar sua inscrição neste evento?</h2>
       <div class="modal-cancelamento-botoes">
         <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarDesinscricao(); event.stopPropagation();">Não</button>
         <button type="button" class="botao-cancelamento-continuar" onclick="confirmarDesinscricao(); event.stopPropagation();">Sim, cancelar</button>

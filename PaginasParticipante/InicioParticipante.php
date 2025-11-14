@@ -18,8 +18,10 @@
             gap: 0.35rem;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-0.2rem);
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+            transform: translateY(100%);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, 
+                        visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, 
+                        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
             z-index: 50;
         }
         .CaixaDoEvento:hover .AcoesFlutuantes {
@@ -28,8 +30,8 @@
             transform: translateY(0);
         }
         .BotaoAcaoCard {
-            width: 2.25rem;
-            height: 2.25rem;
+            width: 2rem;
+            height: 2rem;
             border-radius: 999px;
             background: rgba(0,0,0,0.6);
             display: flex;
@@ -38,27 +40,13 @@
             border: none;
             padding: 0;
             cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .BotaoAcaoCard:hover {
+            transform: scale(1.1);
+            background: rgba(0,0,0,0.8);
         }
         .BotaoAcaoCard img { width: 1.2rem; height: 1.2rem; filter: invert(1); display: block; }
-
-        /* Botão compartilhar no card (compat) */
-        .CaixaDoEvento { position: relative; }
-        .BotaoCompartilharCard {
-            position: relative; /* agora relativo dentro da pilha */
-            width: 2.25rem;
-            height: 2.25rem;
-            border-radius: 999px;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            transform: scale(1);
-            border: none;
-            padding: 0;
-            cursor: pointer;
-        }
-        .BotaoCompartilharCard img { width: 1.1rem; height: 1.1rem; display: block; filter: invert(1); }
 
         /* Modal de Compartilhar - mesmo padrão do CartaodoEventoParticipante */
         body.modal-aberto { overflow: hidden !important; }
@@ -109,32 +97,212 @@
 
         /* Botão para abrir lista de favoritos (à esquerda da barra de pesquisa) */
         .BotaoFavoritosTrigger {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 999px;
+            width: clamp(30px, 4vw, 48px);
+            height: clamp(30px, 4vw, 48px);
+            border-radius: 100%;
             background: rgba(0,0,0,0.6);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             border: none;
             cursor: pointer;
-            margin-right: 0.75rem;
         }
         .BotaoFavoritosTrigger img { width: 1.25rem; height: 1.25rem; filter: invert(1); display: block; }
 
         /* Modal de Favoritos */
         .modal-favoritos { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 1rem; }
         .modal-favoritos.ativo { display: flex; }
-        .modal-favoritos .conteudo { background: var(--caixas); color: var(--texto); width: 100%; max-width: 48rem; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.35); }
-        .modal-favoritos .cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 800; font-size: 1.15rem; }
-        .modal-favoritos button.fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto); }
-        .lista-favoritos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; max-height: 60vh; overflow-y: auto; }
-        .favorito-item { background: var(--branco); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 0.15rem 0.75rem rgba(0,0,0,0.25); color: #000; display: flex; flex-direction: column; }
-        .favorito-item img { width: 100%; height: 120px; object-fit: cover; }
-        .favorito-item .detalhes { padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
-        .favorito-item .titulo { font-weight: 700; font-size: 0.95rem; color: #000; }
-        .favorito-item .meta { font-size: 0.8rem; color: #333; }
-        .favorito-item a { text-decoration: none; color: inherit; }
+        .modal-favoritos .conteudo { background: var(--caixas); color: var(--texto); width: 100%; max-width: 60rem; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.35); }
+        .modal-favoritos .cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; font-weight: 800; font-size: 1.25rem; }
+        .modal-favoritos button.fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto); transition: opacity 0.2s; }
+        .modal-favoritos button.fechar:hover { opacity: 0.7; }
+        .lista-favoritos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; max-height: 65vh; overflow-y: auto; padding: 0.25rem; }
+        
+        /* Cards de favoritos - mesmo estilo do .CaixaDoEvento */
+        .favorito-item { 
+            background-color: var(--branco);
+            border-radius: 1cqi;
+            padding: 0;
+            box-shadow: 0.5cqi 0.5cqi 3cqi var(--sombra-forte);
+            display: grid;
+            aspect-ratio: 3 / 2;
+            position: relative;
+            overflow: hidden;
+            container-type: inline-size;
+            width: 100%;
+            min-width: 0;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        /* Botões de ação nos cards de favoritos */
+        .favorito-item .AcoesFlutuantes {
+            position: absolute;
+            bottom: 0.3rem;
+            right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(100%);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, 
+                        visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, 
+                        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            z-index: 50;
+        }
+        
+        .favorito-item:hover .AcoesFlutuantes {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .favorito-item-imagem {
+            width: 100%;
+            height: 100%;
+            border-radius: 2cqi 2cqi 0 0;
+            aspect-ratio: 3 / 2;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            transform: translateY(0);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--branco);
+        }
+        
+        .favorito-item:hover .favorito-item-imagem {
+            transform: translateY(-100%);
+        }
+        
+        .favorito-item-imagem img {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        
+        .favorito-item:hover .favorito-item-imagem img {
+            transform: scale(1.15);
+        }
+        
+        .favorito-item-titulo {
+            font-size: 5cqi;
+            font-weight: 800;
+            padding: 4cqi 3.5cqi 4cqi;
+            color: var(--branco);
+            background: var(--botao);
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            transform: translateY(0);
+            text-shadow: 0 0.5cqi 1cqi rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.05cqi;
+            grid-row: 2 / 3;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .favorito-item:hover .favorito-item-titulo {
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            transform: translateY(-380%);
+        }
+        
+        .favorito-item-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: var(--cinza-escuro);
+            line-height: 1.5;
+            padding: 0 3.5cqi 2.5cqi;
+            text-align: left;
+            overflow: visible;
+            word-wrap: break-word;
+            display: block;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            pointer-events: none;
+            font-weight: 500;
+            z-index: 3;
+            transform: translateY(100%);
+            width: 85%;
+        }
+        
+        .favorito-item:hover .favorito-item-info {
+            opacity: 1;
+            transform: translateY(0%);
+            pointer-events: auto;
+        }
+        
+        .favorito-item-info .evento-info-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5cqi;
+        }
+        
+        .favorito-item-info .evento-info-item {
+            display: flex;
+            align-items: center;
+            gap: 2cqi;
+            background: var(--tabela_participantes);
+            border-radius: 2cqi;
+            padding: 1cqi 1cqi;
+            box-shadow: 0 0.4cqi 1.2cqi var(--sombra-leve);
+        }
+        
+        .favorito-item-info .evento-info-icone {
+            width: 6cqi;
+            height: 6cqi;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--branco);
+            color: var(--botao);
+            box-shadow: 0 0.3cqi 0.8cqi var(--sombra-leve) inset;
+        }
+        
+        .favorito-item-info .evento-info-icone img {
+            width: 80%;
+            height: 80%;
+            display: block;
+        }
+        
+        .favorito-item-info .evento-info-texto {
+            font-size: 4cqi;
+            color: var(--cinza-escuro);
+            font-weight: 600;
+            display: inline-flex;
+            gap: 1cqi;
+            align-items: baseline;
+        }
+        
+        .favorito-item-info .evento-info-label {
+            color: var(--azul-escuro);
+            font-weight: 800;
+        }
+        
+        .lista-favoritos::-webkit-scrollbar { width: 0.5rem; }
+        .lista-favoritos::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 0.25rem; }
+        .lista-favoritos::-webkit-scrollbar-thumb { background: var(--botao); border-radius: 0.25rem; }
+        .lista-favoritos::-webkit-scrollbar-thumb:hover { background: var(--destaque); }
     </style>
 </head>
 <body>
@@ -166,7 +334,7 @@
         <div class="section-title-wrapper">
             <div class="barra-pesquisa-container">
                 <!-- Botão de favoritos à esquerda da barra de pesquisa -->
-                <button type="button" class="BotaoFavoritosTrigger" id="btn-abrir-favoritos" title="Ver favoritos" aria-label="Ver favoritos">
+                <button type="button" class="BotaoFavoritosTrigger botao" id="btn-abrir-favoritos" title="Ver favoritos" aria-label="Ver favoritos">
                     <img src="../Imagens/Medalha_preenchida.svg" alt="Favoritos">
                 </button>
                 <div class="barra-pesquisa">
@@ -211,7 +379,7 @@
                     // Certificado: simples sim/nao
                     $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
                     $certTexto = ($cert === 'sim') ? 'Sim' : 'Não';
-                    
+                  
                     // Preparar caminho da imagem
                     $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
                     $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
@@ -228,16 +396,16 @@
                         data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
                         <!-- Ações flutuantes: Inscrever, Favoritar, Mensagem, Compartilhar -->
                         <div class="AcoesFlutuantes">
-                            <button type="button" class="BotaoAcaoCard BotaoInscreverCard" title="Inscrever-se rapidamente" aria-label="Inscrever" data-cod="<?= (int)$ev['cod_evento'] ?>" data-inscrito="0">
+                            <button type="button" class="BotaoAcaoCard BotaoInscreverCard botao" title="Inscrever-se" aria-label="Inscrever" data-cod="<?= (int)$ev['cod_evento'] ?>" data-inscrito="0">
                                 <img src="../Imagens/Circulo_adicionar.svg" alt="Inscrever">
                             </button>
-                            <button type="button" class="BotaoAcaoCard BotaoFavoritoCard" title="Favoritar" aria-label="Favoritar" data-cod="<?= (int)$ev['cod_evento'] ?>" data-favorito="0">
+                            <button type="button" class="BotaoAcaoCard BotaoFavoritoCard botao" title="Favoritar" aria-label="Favoritar" data-cod="<?= (int)$ev['cod_evento'] ?>" data-favorito="0">
                                 <img src="../Imagens/Medalha_linha.svg" alt="Favoritar">
                             </button>
-                            <button type="button" class="BotaoAcaoCard BotaoMensagemCard" title="Enviar mensagem ao organizador" aria-label="Mensagem" data-cod="<?= (int)$ev['cod_evento'] ?>">
+                            <button type="button" class="BotaoAcaoCard BotaoMensagemCard botao" title="Enviar mensagem ao organizador" aria-label="Mensagem" data-cod="<?= (int)$ev['cod_evento'] ?>">
                                 <img src="../Imagens/Carta.svg" alt="Mensagem">
                             </button>
-                            <button type="button" class="BotaoCompartilharCard botao" title="Compartilhar" aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
+                            <button type="button" class="BotaoAcaoCard BotaoCompartilharCard botao" title="Compartilhar" aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
                                 <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
                             </button>
                         </div>
@@ -328,7 +496,7 @@
           <button class="btn-compartilhar-app" onclick="compartilharEmail()" title="Compartilhar por E-mail">
             <div class="icone-app icone-email">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                <path d="M20 4H4c-1.1 0-2 .9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
             </div>
             <span>E-mail</span>
@@ -366,19 +534,19 @@
     <!-- Modais de confirmação inscrição/desinscrição -->
     <div class="modal-overlay" id="modalConfirmarInscricao">
       <div class="modal-cancelamento" onclick="event.stopPropagation()">
-        <h2 class="modal-cancelamento-titulo">Deseja realmente se inscrever neste evento?</h2>
+        <h2 class="modal-cancelamento-titulo">Deseja se inscrever neste evento?</h2>
         <div class="modal-cancelamento-botoes">
-          <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarInscricao(); event.stopPropagation();">Cancelar</button>
-          <button type="button" class="botao-cancelamento-continuar" onclick="confirmarInscricaoRapida(); event.stopPropagation();">Confirmar</button>
+          <button type="button" class="botao-cancelamento-cancelar botao" onclick="fecharModalConfirmarInscricao(); event.stopPropagation();">Cancelar</button>
+          <button type="button" class="botao-cancelamento-continuar botao" onclick="confirmarInscricaoRapida(); event.stopPropagation();">Confirmar</button>
         </div>
       </div>
     </div>
     <div class="modal-overlay" id="modalConfirmarDesinscricao">
       <div class="modal-cancelamento" onclick="event.stopPropagation()">
-        <h2 class="modal-cancelamento-titulo">Deseja realmente cancelar sua inscrição neste evento?</h2>
+        <h2 class="modal-cancelamento-titulo">Deseja cancelar sua inscrição neste evento?</h2>
         <div class="modal-cancelamento-botoes">
-          <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarDesinscricao(); event.stopPropagation();">Não</button>
-          <button type="button" class="botao-cancelamento-continuar" onclick="confirmarDesinscricaoRapida(); event.stopPropagation();">Sim, cancelar</button>
+          <button type="button" class="botao-cancelamento-cancelar botao" onclick="fecharModalConfirmarDesinscricao(); event.stopPropagation();">Não</button>
+          <button type="button" class="botao-cancelamento-continuar botao" onclick="confirmarDesinscricaoRapida(); event.stopPropagation();">Sim, cancelar</button>
         </div>
       </div>
     </div>
@@ -386,7 +554,7 @@
       <div class="modal-cancelamento" onclick="event.stopPropagation()">
         <h2 class="modal-cancelamento-titulo">Inscrição realizada com sucesso!</h2>
         <div class="modal-cancelamento-botoes">
-          <button type="button" class="botao-cancelamento-ok" onclick="fecharModalInscricaoConfirmada(); event.stopPropagation();">OK</button>
+          <button type="button" class="botao-cancelamento-ok botao" onclick="fecharModalInscricaoConfirmada(); event.stopPropagation();">OK</button>
         </div>
       </div>
     </div>
@@ -394,7 +562,7 @@
       <div class="modal-cancelamento" onclick="event.stopPropagation()">
         <h2 class="modal-cancelamento-titulo">Inscrição cancelada com sucesso!</h2>
         <div class="modal-cancelamento-botoes">
-          <button type="button" class="botao-cancelamento-ok" onclick="fecharModalDesinscricaoConfirmada(); event.stopPropagation();">OK</button>
+          <button type="button" class="botao-cancelamento-ok botao" onclick="fecharModalDesinscricaoConfirmada(); event.stopPropagation();">OK</button>
         </div>
       </div>
     </div>
@@ -409,8 +577,8 @@
         <div>
           <textarea id="texto-mensagem-organizador" maxlength="500" placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
           <div class="acoes">
-            <button class="botao-secundario" type="button" onclick="fecharModalMensagem()">Cancelar</button>
-            <button class="botao-primario" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
+            <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
+            <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
           </div>
         </div>
       </div>
@@ -520,7 +688,7 @@
           img.src = '../Imagens/Circulo_adicionar.svg';
           img.alt = 'Inscrever';
           btn.setAttribute('data-inscrito', '0');
-          btn.title = 'Inscrever-se rapidamente';
+          btn.title = 'Inscrever-se';
           btn.ariaLabel = 'Inscrever';
         }
       }
@@ -535,6 +703,45 @@
           return val;
         } catch (e) {
           return false;
+        }
+      }
+
+      // Carregar status de inscrição de todos os eventos visíveis
+      async function carregarInscricoes() {
+        try {
+          const cards = document.querySelectorAll('.CaixaDoEvento');
+          const codigosEventos = Array.from(cards).map(card => Number(card.getAttribute('data-cod-evento'))).filter(cod => cod > 0);
+          
+          if (codigosEventos.length === 0) return;
+
+          // Buscar status de todas as inscrições de uma vez
+          const r = await fetch('VerificarInscricoes.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ eventos: codigosEventos })
+          });
+          
+          if (r.status === 401) return; // Não logado
+          
+          const j = await r.json();
+          if (j && j.sucesso && j.inscricoes) {
+            // Atualizar cache e ícones
+            for (const [codEvento, inscrito] of Object.entries(j.inscricoes)) {
+              const cod = Number(codEvento);
+              inscricaoCache.set(cod, inscrito);
+              
+              // Atualizar ícone do botão correspondente
+              cards.forEach(card => {
+                if (Number(card.getAttribute('data-cod-evento')) === cod) {
+                  const btn = card.querySelector('.BotaoInscreverCard');
+                  if (btn) atualizarIconeInscricao(btn, inscrito);
+                }
+              });
+            }
+          }
+        } catch (e) {
+          // Silenciar erro - não crítico
         }
       }
 
@@ -723,18 +930,232 @@
           const a = document.createElement('a');
           a.href = `ContainerParticipante.php?pagina=evento&id=${ev.cod_evento}`;
           a.className = 'favorito-item';
+          
+          // Botões de ação flutuantes
+          const divAcoes = document.createElement('div');
+          divAcoes.className = 'AcoesFlutuantes';
+          
+          // Botão Inscrever
+          const btnInscrever = document.createElement('button');
+          btnInscrever.type = 'button';
+          btnInscrever.className = 'BotaoAcaoCard BotaoInscreverCard botao';
+          btnInscrever.title = 'Inscrever-se';
+          btnInscrever.setAttribute('aria-label', 'Inscrever');
+          btnInscrever.setAttribute('data-cod', ev.cod_evento);
+          btnInscrever.setAttribute('data-inscrito', '0');
+          const imgInscrever = document.createElement('img');
+          imgInscrever.src = '../Imagens/Circulo_adicionar.svg';
+          imgInscrever.alt = 'Inscrever';
+          btnInscrever.appendChild(imgInscrever);
+          divAcoes.appendChild(btnInscrever);
+          
+          // Botão Favorito (já está favoritado, então mostra preenchido)
+          const btnFavorito = document.createElement('button');
+          btnFavorito.type = 'button';
+          btnFavorito.className = 'BotaoAcaoCard BotaoFavoritoCard botao';
+          btnFavorito.title = 'Remover dos favoritos';
+          btnFavorito.setAttribute('aria-label', 'Desfavoritar');
+          btnFavorito.setAttribute('data-cod', ev.cod_evento);
+          btnFavorito.setAttribute('data-favorito', '1');
+          const imgFavorito = document.createElement('img');
+          imgFavorito.src = '../Imagens/Medalha_preenchida.svg';
+          imgFavorito.alt = 'Desfavoritar';
+          btnFavorito.appendChild(imgFavorito);
+          divAcoes.appendChild(btnFavorito);
+          
+          // Botão Mensagem
+          const btnMensagem = document.createElement('button');
+          btnMensagem.type = 'button';
+          btnMensagem.className = 'BotaoAcaoCard BotaoMensagemCard botao';
+          btnMensagem.title = 'Enviar mensagem ao organizador';
+          btnMensagem.setAttribute('aria-label', 'Mensagem');
+          btnMensagem.setAttribute('data-cod', ev.cod_evento);
+          const imgMensagem = document.createElement('img');
+          imgMensagem.src = '../Imagens/Carta.svg';
+          imgMensagem.alt = 'Mensagem';
+          btnMensagem.appendChild(imgMensagem);
+          divAcoes.appendChild(btnMensagem);
+          
+          // Botão Compartilhar
+          const btnCompartilhar = document.createElement('button');
+          btnCompartilhar.type = 'button';
+          btnCompartilhar.className = 'BotaoAcaoCard BotaoCompartilharCard botao';
+          btnCompartilhar.title = 'Compartilhar';
+          btnCompartilhar.setAttribute('aria-label', 'Compartilhar');
+          btnCompartilhar.setAttribute('data-cod', ev.cod_evento);
+          const imgCompartilhar = document.createElement('img');
+          imgCompartilhar.src = '../Imagens/Icone_Compartilhar.svg';
+          imgCompartilhar.alt = 'Compartilhar';
+          btnCompartilhar.appendChild(imgCompartilhar);
+          divAcoes.appendChild(btnCompartilhar);
+          
+          // Imagem (mesmo estilo do EventoImagem)
+          const divImagem = document.createElement('div');
+          divImagem.className = 'favorito-item-imagem';
           const img = document.createElement('img');
           const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/,'').replace(/^\//,'') : 'ImagensEventos/CEU-Logo.png');
           img.src = caminho;
           img.alt = ev.nome || 'Evento';
-          const det = document.createElement('div'); det.className = 'detalhes';
-          const t = document.createElement('div'); t.className = 'titulo'; t.textContent = ev.nome || 'Evento';
-          const m = document.createElement('div'); m.className = 'meta'; m.textContent = `${ev.categoria || ''} • ${ev.modalidade || ''}`;
-          det.appendChild(t); det.appendChild(m);
-          a.appendChild(img); a.appendChild(det);
+          divImagem.appendChild(img);
+          
+          // Título (mesmo estilo do EventoTitulo)
+          const divTitulo = document.createElement('div');
+          divTitulo.className = 'favorito-item-titulo';
+          divTitulo.textContent = ev.nome || 'Evento';
+          
+          // Informações que aparecem no hover (mesmo estilo do EventoInfo)
+          const divInfo = document.createElement('div');
+          divInfo.className = 'favorito-item-info';
+          
+          const ul = document.createElement('ul');
+          ul.className = 'evento-info-list';
+          
+          // Categoria
+          const liCategoria = document.createElement('li');
+          liCategoria.className = 'evento-info-item';
+          const iconeCat = document.createElement('span');
+          iconeCat.className = 'evento-info-icone';
+          const imgCat = document.createElement('img');
+          imgCat.src = '../Imagens/info-categoria.svg';
+          imgCat.alt = '';
+          iconeCat.appendChild(imgCat);
+          const textoCat = document.createElement('span');
+          textoCat.className = 'evento-info-texto';
+          const labelCat = document.createElement('span');
+          labelCat.className = 'evento-info-label';
+          labelCat.textContent = 'Categoria:';
+          textoCat.appendChild(labelCat);
+          textoCat.appendChild(document.createTextNode(' ' + (ev.categoria || 'N/A')));
+          liCategoria.appendChild(iconeCat);
+          liCategoria.appendChild(textoCat);
+          ul.appendChild(liCategoria);
+          
+          // Modalidade
+          const liModalidade = document.createElement('li');
+          liModalidade.className = 'evento-info-item';
+          const iconeMod = document.createElement('span');
+          iconeMod.className = 'evento-info-icone';
+          const imgMod = document.createElement('img');
+          imgMod.src = '../Imagens/info-modalidade.svg';
+          imgMod.alt = '';
+          iconeMod.appendChild(imgMod);
+          const textoMod = document.createElement('span');
+          textoMod.className = 'evento-info-texto';
+          const labelMod = document.createElement('span');
+          labelMod.className = 'evento-info-label';
+          labelMod.textContent = 'Modalidade:';
+          textoMod.appendChild(labelMod);
+          textoMod.appendChild(document.createTextNode(' ' + (ev.modalidade || 'N/A')));
+          liModalidade.appendChild(iconeMod);
+          liModalidade.appendChild(textoMod);
+          ul.appendChild(liModalidade);
+          
+          // Data
+          if (ev.inicio) {
+            const liData = document.createElement('li');
+            liData.className = 'evento-info-item';
+            const iconeData = document.createElement('span');
+            iconeData.className = 'evento-info-icone';
+            const imgData = document.createElement('img');
+            imgData.src = '../Imagens/info-data.svg';
+            imgData.alt = '';
+            iconeData.appendChild(imgData);
+            const textoData = document.createElement('span');
+            textoData.className = 'evento-info-texto';
+            const labelData = document.createElement('span');
+            labelData.className = 'evento-info-label';
+            labelData.textContent = 'Data:';
+            textoData.appendChild(labelData);
+            const dataFormatada = new Date(ev.inicio).toLocaleDateString('pt-BR');
+            textoData.appendChild(document.createTextNode(' ' + dataFormatada));
+            liData.appendChild(iconeData);
+            liData.appendChild(textoData);
+            ul.appendChild(liData);
+          }
+          
+          // Local
+          if (ev.lugar) {
+            const liLocal = document.createElement('li');
+            liLocal.className = 'evento-info-item';
+            const iconeLocal = document.createElement('span');
+            iconeLocal.className = 'evento-info-icone';
+            const imgLocal = document.createElement('img');
+            imgLocal.src = '../Imagens/info-local.svg';
+            imgLocal.alt = '';
+            iconeLocal.appendChild(imgLocal);
+            const textoLocal = document.createElement('span');
+            textoLocal.className = 'evento-info-texto';
+            const labelLocal = document.createElement('span');
+            labelLocal.className = 'evento-info-label';
+            labelLocal.textContent = 'Local:';
+            textoLocal.appendChild(labelLocal);
+            textoLocal.appendChild(document.createTextNode(' ' + ev.lugar));
+            liLocal.appendChild(iconeLocal);
+            liLocal.appendChild(textoLocal);
+            ul.appendChild(liLocal);
+          }
+          
+          // Certificado
+          const liCert = document.createElement('li');
+          liCert.className = 'evento-info-item';
+          const iconeCert = document.createElement('span');
+          iconeCert.className = 'evento-info-icone';
+          const imgCert = document.createElement('img');
+          imgCert.src = '../Imagens/info-certificado.svg';
+          imgCert.alt = '';
+          iconeCert.appendChild(imgCert);
+          const textoCert = document.createElement('span');
+          textoCert.className = 'evento-info-texto';
+          const labelCert = document.createElement('span');
+          labelCert.className = 'evento-info-label';
+          labelCert.textContent = 'Certificado:';
+          textoCert.appendChild(labelCert);
+          textoCert.appendChild(document.createTextNode(' ' + (ev.certificado == 1 ? 'Sim' : 'Não')));
+          liCert.appendChild(iconeCert);
+          liCert.appendChild(textoCert);
+          ul.appendChild(liCert);
+          
+          divInfo.appendChild(ul);
+          
+          // Montar estrutura
+          a.appendChild(divAcoes);
+          a.appendChild(divImagem);
+          a.appendChild(divTitulo);
+          a.appendChild(divInfo);
           frag.appendChild(a);
         });
         cont.appendChild(frag);
+        
+        // Atualizar status de inscrição nos cards de favoritos
+        setTimeout(async () => {
+          const codigosFavoritos = favoritosDados.map(ev => ev.cod_evento);
+          if (codigosFavoritos.length === 0) return;
+          
+          try {
+            const r = await fetch('VerificarInscricoes.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ eventos: codigosFavoritos })
+            });
+            
+            if (r.status === 401) return;
+            
+            const j = await r.json();
+            if (j && j.sucesso && j.inscricoes) {
+              for (const [codEvento, inscrito] of Object.entries(j.inscricoes)) {
+                const cod = Number(codEvento);
+                inscricaoCache.set(cod, inscrito);
+                
+                // Atualizar ícone nos cards de favoritos
+                const btnInscrever = cont.querySelector(`.BotaoInscreverCard[data-cod="${cod}"]`);
+                if (btnInscrever) atualizarIconeInscricao(btnInscrever, inscrito);
+              }
+            }
+          } catch (e) {
+            // Silenciar erro
+          }
+        }, 100);
       }
 
       // Atualiza ícone do favorito ao passar o mouse no card (usa cache carregado)
@@ -749,6 +1170,46 @@
 
       // Clique: compartilhar/inscrever/mensagem já existem; adiciona favorito e abrir modal
       document.addEventListener('click', async function(e){
+        // Botão de inscrever
+        const btnInscrever = e.target.closest('.BotaoInscreverCard');
+        if (btnInscrever) {
+          e.preventDefault(); e.stopPropagation();
+          const cod = Number(btnInscrever.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          codEventoAcao = cod;
+          btnInscreverAtual = btnInscrever;
+          const inscrito = await verificarInscricao(cod);
+          atualizarIconeInscricao(btnInscrever, inscrito);
+          if (inscrito) {
+            abrirModalConfirmarDesinscricao();
+          } else {
+            abrirModalConfirmarInscricao();
+          }
+          return;
+        }
+
+        // Botão de mensagem
+        const btnMsg = e.target.closest('.BotaoMensagemCard');
+        if (btnMsg) {
+          e.preventDefault(); e.stopPropagation();
+          const cod = Number(btnMsg.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          codEventoMensagem = cod;
+          abrirModalMensagem();
+          return;
+        }
+
+        // Botão de compartilhar
+        const btnCompartilhar = e.target.closest('.BotaoCompartilharCard');
+        if (btnCompartilhar) {
+          e.preventDefault(); e.stopPropagation();
+          const cod = Number(btnCompartilhar.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          codEvento = cod;
+          abrirModalCompartilhar();
+          return;
+        }
+
         // Toggle favorito
         const btnFav = e.target.closest('.BotaoFavoritoCard');
         if (btnFav) {
@@ -799,6 +1260,18 @@
         modalFav.onclick = function(e) {
           if (e.target === this) fecharModalFavoritos();
         };
+        
+        // Permitir scroll dentro do modal de favoritos
+        const listaFavoritos = document.getElementById('lista-favoritos');
+        if (listaFavoritos) {
+          listaFavoritos.addEventListener('wheel', function(e) {
+            e.stopPropagation();
+          }, { passive: false });
+          
+          listaFavoritos.addEventListener('touchmove', function(e) {
+            e.stopPropagation();
+          }, { passive: false });
+        }
       }
 
       // Carregar favoritos ao iniciar
@@ -806,6 +1279,13 @@
         document.addEventListener('DOMContentLoaded', carregarFavoritos);
       } else {
         setTimeout(carregarFavoritos, 50);
+      }
+
+      // Carregar inscrições ao iniciar
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', carregarInscricoes);
+      } else {
+        setTimeout(carregarInscricoes, 50);
       }
     </script>
 </body>

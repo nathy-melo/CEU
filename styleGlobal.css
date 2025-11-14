@@ -172,7 +172,7 @@ body.pagina-lista-eventos #conteudo-dinamico {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(8px, 1.5vw, 10px);
+  gap: clamp(8px, 1.5vw, 20px);
   margin: clamp(12px, 3vw, 20px) auto;
   padding: 0 clamp(12px, 4vw, 40px);
 }
@@ -259,7 +259,6 @@ body.pagina-lista-eventos #conteudo-dinamico {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-left: clamp(10px, 2vw, 20px);
   font-size: clamp(12px, 1.5vw, 16px);
   color: var(--preto);
   box-sizing: border-box;

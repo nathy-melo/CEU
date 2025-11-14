@@ -661,7 +661,7 @@
     }
 
     async function excluirMembro(cpf) {
-        if (!confirm('Deseja realmente excluir este membro da organização?')) {
+        if (!confirm('Deseja excluir este membro da organização?')) {
             return;
         }
 

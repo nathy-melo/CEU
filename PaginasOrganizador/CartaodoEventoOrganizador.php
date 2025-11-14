@@ -1173,7 +1173,7 @@
   <!-- Modal Confirmar Inscrição -->
   <div class="modal-overlay" id="modalConfirmarInscricao">
     <div class="modal-cancelamento" onclick="event.stopPropagation()">
-      <h2 class="modal-cancelamento-titulo">Deseja realmente se inscrever neste evento?</h2>
+      <h2 class="modal-cancelamento-titulo">Deseja se inscrever neste evento?</h2>
       <div class="modal-cancelamento-botoes">
         <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarInscricao(); event.stopPropagation();">Cancelar</button>
         <button type="button" class="botao-cancelamento-continuar" onclick="confirmarInscricao(); event.stopPropagation();">Confirmar</button>
@@ -1184,7 +1184,7 @@
   <!-- Modal Confirmar Desinscrição -->
   <div class="modal-overlay" id="modalConfirmarDesinscricao">
     <div class="modal-cancelamento" onclick="event.stopPropagation()">
-      <h2 class="modal-cancelamento-titulo">Deseja realmente cancelar sua inscrição neste evento?</h2>
+      <h2 class="modal-cancelamento-titulo">Deseja cancelar sua inscrição neste evento?</h2>
       <div class="modal-cancelamento-botoes">
         <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarDesinscricao(); event.stopPropagation();">Não</button>
         <button type="button" class="botao-cancelamento-continuar" onclick="confirmarDesinscricao(); event.stopPropagation();">Sim</button>
