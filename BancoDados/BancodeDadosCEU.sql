@@ -152,12 +152,21 @@ CREATE TABLE solicitacoes_redefinicao_senha (
     observacoes TEXT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE favoritos_evento (
+    CPF VARCHAR(14) NOT NULL,
+    cod_evento INT NOT NULL,
+    data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (CPF, cod_evento),
+    FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
 ('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
 ('123', 'Caike', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
 ('1234', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0),
-('36528418080', 'Jean Victor Gonçalves Martins', 'jeanvictornet@gmail.com', '$2y$10$nUolUejxz5t.dJPFUbPIeOFpKufkXEv9EgySB3tn4KADiNywIv6mm', NULL, 0, 1),
-('59015506680', 'Jean Martins', 'j@gmail.com', '$2y$10$nUolUejxz5t.dJPFUbPIeOFpKufkXEv9EgySB3tn4KADiNywIv6mm', 'JEAN001', 1, 1);
+('36528418080', 'Jean Victor Gonçalves Martins', 'jeanvictornet@gmail.com', '$2y$10$nC1jU07miJxHZ2n1xP9RDe9Lco.wPGE1KlLeXt1ZKLTVJTmGrtTJq', NULL, 0, 1),
+('59015506680', 'Jean Martins', 'j@gmail.com', '$2y$10$nC1jU07miJxHZ2n1xP9RDe9Lco.wPGE1KlLeXt1ZKLTVJTmGrtTJq', 'JEAN001', 1, 1);
 
 INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes) VALUES 
 ('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora'),

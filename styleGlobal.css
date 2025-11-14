@@ -15,6 +15,17 @@
   --sombra-forte: rgba(0, 0, 0, 0.8);
   --sombra-leve: rgba(0, 0, 0, 0.5);
   --tabela_participantes: #deeaff;
+  --whatsapp: #25D366;
+  --instagram-inicio: #f09433;
+  --instagram-fim: #bc1888;
+  --email-vermelho: #EA4335;
+  --fundo-escuro-transparente: rgba(0, 0, 0, 0.6);
+  --fundo-hover-transparente: rgba(0, 0, 0, 0.8);
+  --borda-clara: rgba(255, 255, 255, 0.1);
+  --fundo-claro-transparente: rgba(255, 255, 255, 0.05);
+  --fundo-azul-info: rgba(66, 135, 245, 0.1);
+  --texto: var(--branco);
+  --destaque: var(--botao);
   /* Safe area dinâmica para barras de navegação (Samsung Internet, Safari etc.) */
   --ceu-safe-bottom: 0px;
 }
@@ -2083,6 +2094,16 @@ body[data-theme="dark"] .btn-toggle-senha img {
   .botao-solicitar-codigo {
     font-size: 0.85rem !important;
     padding: 0.5rem 0.8rem !important;
+  }
+  
+  .icone-solicitar-codigo {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+  }
+  
+  #erro-cadastro {
+    font-size: 0.8rem !important;
+    padding: 0.5rem !important;
   }
 }
 
