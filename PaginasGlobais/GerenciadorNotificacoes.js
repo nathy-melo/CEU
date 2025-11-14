@@ -86,6 +86,9 @@ class GerenciadorNotificacoes {
 
         // Fecha ao clicar fora
         document.addEventListener('click', (e) => {
+            // Verifica se e.target é um elemento antes de usar .closest()
+            if (!(e.target instanceof Element)) return;
+            
             const caixa = document.getElementById('notificacoes-caixa');
             if (!e.target.closest('#botao-notificacoes') && 
                 !e.target.closest('#notificacoes-caixa')) {

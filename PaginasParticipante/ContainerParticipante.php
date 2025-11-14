@@ -221,7 +221,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     newScript.src = url.toString();
                     newScript.async = false;
                 } else {
-                    newScript.textContent = oldScript.textContent || '';
+                    // Envolve o código inline em uma IIFE para evitar conflitos de escopo
+                    const codigo = oldScript.textContent || '';
+                    newScript.textContent = `(function() { ${codigo} })();`;
                 }
                 oldScript.parentNode.replaceChild(newScript, oldScript);
             });

@@ -71,6 +71,9 @@
             if (!isMobile()) return;
             if (!menu.classList.contains('expanded')) return;
             
+            // Verifica se e.target é um elemento antes de usar .closest()
+            if (!(e.target instanceof Element)) return;
+            
             // Se clicou fora do menu
             if (!menu.contains(e.target) && !e.target.closest('.menu-toggle')) {
                 menu.classList.remove('expanded');
@@ -134,6 +137,9 @@
         document.addEventListener('click', function(e) {
             if (!isMobile()) return;
             if (!filtro.classList.contains('ativo')) return;
+            
+            // Verifica se e.target é um elemento antes de usar .closest()
+            if (!(e.target instanceof Element)) return;
             
             // Se clicou fora do filtro
             if (!filtro.contains(e.target) && !e.target.closest('.botao-filtrar')) {
