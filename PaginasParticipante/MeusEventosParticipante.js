@@ -281,8 +281,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Listener para recarregar quando houver mudança nas inscrições
+// IMPORTANTE: Verifica se está na página correta antes de executar
 window.addEventListener('inscricaoAtualizada', function() {
-    carregarEventosDoServidor();
+    const params = new URLSearchParams(window.location.search);
+    const pagina = params.get('pagina');
+    // Só recarrega se estiver na página de "meusEventos"
+    if (pagina === 'meusEventos') {
+        carregarEventosDoServidor();
+    }
 });
 
 // Também recarregar quando a página voltar ao foco (navegação de volta)

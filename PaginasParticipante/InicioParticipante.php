@@ -1175,6 +1175,8 @@
           inscricaoCache.set(codEventoAcao, true);
           atualizarIconeInscricao(btnInscreverAtual, true);
           abrirModalInscricaoConfirmada();
+          // NÃO disparar evento inscricaoAtualizada aqui para evitar recarregamento indevido na página de início
+          // O evento só deve ser disparado em páginas específicas que precisam recarregar (ex: MeusEventos)
         } else {
           alert(j.mensagem || 'Erro ao realizar inscrição.');
         }
@@ -1199,6 +1201,8 @@
           inscricaoCache.set(codEventoAcao, false);
           atualizarIconeInscricao(btnInscreverAtual, false);
           abrirModalDesinscricaoConfirmada();
+          // NÃO disparar evento inscricaoAtualizada aqui para evitar recarregamento indevido na página de início
+          // O evento só deve ser disparado em páginas específicas que precisam recarregar (ex: MeusEventos)
         } else {
           alert(j.mensagem || 'Erro ao cancelar inscrição.');
         }
