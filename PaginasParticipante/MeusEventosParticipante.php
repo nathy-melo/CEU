@@ -1246,19 +1246,15 @@
             if (!btn) return;
             const img = btn.querySelector('img');
             if (!img) return;
-            // Usar cache-busting para forçar atualização da imagem
-            const timestamp = Date.now();
-            if (fav) {
-                img.src = `../Imagens/Medalha_preenchida.svg?t=${timestamp}`;
-                img.alt = 'Desfavoritar';
-                btn.title = 'Remover dos favoritos';
-                btn.setAttribute('data-favorito', '1');
-            } else {
-                img.src = `../Imagens/Medalha_linha.svg?t=${timestamp}`;
-                img.alt = 'Favoritar';
-                btn.title = 'Adicionar aos favoritos';
-                btn.setAttribute('data-favorito', '0');
-            }
+            
+            // Atualização INSTANTÂNEA - sem verificações adicionais
+            const novoSrc = fav ? '../Imagens/Medalha_preenchida.svg' : '../Imagens/Medalha_linha.svg';
+            
+            // Trocar imagem diretamente - navegador já tem em cache
+            img.src = novoSrc;
+            img.alt = fav ? 'Desfavoritar' : 'Favoritar';
+            btn.title = fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+            btn.setAttribute('data-favorito', fav ? '1' : '0');
         }
 
         async function carregarFavoritos() {
@@ -1270,6 +1266,13 @@
                     favoritosSet.clear();
                     favoritosDados = j.favoritos || [];
                     for (const f of favoritosDados) favoritosSet.add(Number(f.cod_evento));
+                    // Atualiza ícones nos cards visíveis IMEDIATAMENTE
+                    document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                        const cod = Number(btn.getAttribute('data-cod'));
+                        if (cod && !btn.dataset.processing) {
+                            atualizarIconeFavorito(btn, favoritosSet.has(cod));
+                        }
+                    });
                 }
             } catch (e) {
                 // silencia
@@ -1551,25 +1554,23 @@
 
             const btnFav = e.target.closest('.BotaoFavoritoCard');
             if (btnFav) {
-                e.preventDefault(); e.stopPropagation();
+                e.preventDefault(); 
+                e.stopPropagation();
                 
-                // Prevenir cliques múltiplos enquanto processa
-                if (btnFav.disabled || btnFav.dataset.processing === 'true') {
-                    return;
-                }
+                // Prevenir cliques múltiplos
+                if (btnFav.dataset.processing === 'true') return;
                 
                 const cod = Number(btnFav.getAttribute('data-cod')) || 0;
                 if (!cod) return;
                 
-                // ATUALIZAÇÃO OTIMISTA: Determinar estado atual e novo estado
-                const estadoAtual = btnFav.getAttribute('data-favorito') === '1';
-                const novoEstado = !estadoAtual; // Toggle
-                
-                // ATUALIZAR UI IMEDIATAMENTE (antes do fetch)
+                // Marcar como processando
                 btnFav.dataset.processing = 'true';
-                btnFav.dataset.recentlyUpdated = 'true';
                 
-                // Atualizar favoritosSet imediatamente
+                // Toggle imediato
+                const estadoAtual = btnFav.getAttribute('data-favorito') === '1';
+                const novoEstado = !estadoAtual;
+                
+                // Atualizar UI INSTANTANEAMENTE
                 if (novoEstado) { 
                     favoritosSet.add(cod); 
                 } else { 
@@ -1577,19 +1578,9 @@
                     favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
                 }
                 
-                // Atualizar ícone IMEDIATAMENTE
                 atualizarIconeFavorito(btnFav, novoEstado);
-                const img = btnFav.querySelector('img');
-                if (img) {
-                    const timestamp = Date.now();
-                    if (novoEstado) {
-                        img.src = `../Imagens/Medalha_preenchida.svg?t=${timestamp}`;
-                    } else {
-                        img.src = `../Imagens/Medalha_linha.svg?t=${timestamp}`;
-                    }
-                }
                 
-                // Fazer fetch em background
+                // Sincronizar com servidor em background
                 try {
                     const r = await fetch('ToggleFavorito.php', {
                         method: 'POST',
@@ -1599,33 +1590,18 @@
                     });
                     
                     if (r.status === 401) { 
-                        // Reverter mudança se não autenticado
+                        // Reverter se não autenticado
                         if (estadoAtual) { 
                             favoritosSet.add(cod); 
                         } else { 
                             favoritosSet.delete(cod); 
                         }
                         atualizarIconeFavorito(btnFav, estadoAtual);
-                        const imgRevert = btnFav.querySelector('img');
-                        if (imgRevert) {
-                            const timestampRevert = Date.now();
-                            if (estadoAtual) {
-                                imgRevert.src = `../Imagens/Medalha_preenchida.svg?t=${timestampRevert}`;
-                            } else {
-                                imgRevert.src = `../Imagens/Medalha_linha.svg?t=${timestampRevert}`;
-                            }
-                        }
-                        btnFav.dataset.recentlyUpdated = 'false';
                         alert('Faça login para favoritar eventos.'); 
-                        btnFav.dataset.processing = 'false';
-                        return; 
-                    }
-                    
-                    const j = await r.json();
-                    if (j && j.sucesso) {
-                        // Sincronizar com resposta do servidor (caso haja diferença)
-                        if (j.favoritado !== novoEstado) {
-                            // Se o servidor retornou um estado diferente, atualizar
+                    } else {
+                        const j = await r.json();
+                        if (j && j.sucesso) {
+                            // Garantir sincronização final
                             if (j.favoritado) { 
                                 favoritosSet.add(cod); 
                             } else { 
@@ -1633,82 +1609,27 @@
                                 favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
                             }
                             atualizarIconeFavorito(btnFav, j.favoritado);
-                            const imgSync = btnFav.querySelector('img');
-                            if (imgSync) {
-                                const timestampSync = Date.now();
-                                if (j.favoritado) {
-                                    imgSync.src = `../Imagens/Medalha_preenchida.svg?t=${timestampSync}`;
-                                } else {
-                                    imgSync.src = `../Imagens/Medalha_linha.svg?t=${timestampSync}`;
-                                }
+                        } else {
+                            // Reverter em caso de erro
+                            if (estadoAtual) { 
+                                favoritosSet.add(cod); 
+                            } else { 
+                                favoritosSet.delete(cod); 
                             }
+                            atualizarIconeFavorito(btnFav, estadoAtual);
+                            alert(j.mensagem || 'Não foi possível atualizar favorito.');
                         }
-                        
-                        // Remover a marcação após um delay para garantir que não seja sobrescrito
-                        setTimeout(() => {
-                            const estadoAtualBtn = btnFav.getAttribute('data-favorito') === '1';
-                            const estadoEsperadoSet = favoritosSet.has(cod);
-                            if (estadoAtualBtn === estadoEsperadoSet) {
-                                btnFav.dataset.recentlyUpdated = 'false';
-                            } else {
-                                // Se não estiver sincronizado, atualizar
-                                atualizarIconeFavorito(btnFav, estadoEsperadoSet);
-                                const imgSync2 = btnFav.querySelector('img');
-                                if (imgSync2) {
-                                    const timestampSync2 = Date.now();
-                                    if (estadoEsperadoSet) {
-                                        imgSync2.src = `../Imagens/Medalha_preenchida.svg?t=${timestampSync2}`;
-                                    } else {
-                                        imgSync2.src = `../Imagens/Medalha_linha.svg?t=${timestampSync2}`;
-                                    }
-                                }
-                                setTimeout(() => {
-                                    btnFav.dataset.recentlyUpdated = 'false';
-                                }, 500);
-                            }
-                        }, 1500);
-                    } else {
-                        // Reverter mudança se houver erro
-                        if (estadoAtual) { 
-                            favoritosSet.add(cod); 
-                        } else { 
-                            favoritosSet.delete(cod); 
-                        }
-                        atualizarIconeFavorito(btnFav, estadoAtual);
-                        const imgRevert = btnFav.querySelector('img');
-                        if (imgRevert) {
-                            const timestampRevert = Date.now();
-                            if (estadoAtual) {
-                                imgRevert.src = `../Imagens/Medalha_preenchida.svg?t=${timestampRevert}`;
-                            } else {
-                                imgRevert.src = `../Imagens/Medalha_linha.svg?t=${timestampRevert}`;
-                            }
-                        }
-                        btnFav.dataset.recentlyUpdated = 'false';
-                        alert(j.mensagem || 'Não foi possível atualizar favorito.');
                     }
                 } catch (err) {
-                    // Reverter mudança se houver erro de rede
-                    console.error('Erro ao atualizar favorito:', err);
+                    // Reverter em caso de erro de rede
                     if (estadoAtual) { 
                         favoritosSet.add(cod); 
                     } else { 
                         favoritosSet.delete(cod); 
                     }
                     atualizarIconeFavorito(btnFav, estadoAtual);
-                    const imgRevert = btnFav.querySelector('img');
-                    if (imgRevert) {
-                        const timestampRevert = Date.now();
-                        if (estadoAtual) {
-                            imgRevert.src = `../Imagens/Medalha_preenchida.svg?t=${timestampRevert}`;
-                        } else {
-                            imgRevert.src = `../Imagens/Medalha_linha.svg?t=${timestampRevert}`;
-                        }
-                    }
-                    btnFav.dataset.recentlyUpdated = 'false';
                     alert('Erro ao atualizar favorito.');
                 } finally {
-                    // Reabilitar botão após processamento
                     btnFav.dataset.processing = 'false';
                 }
                 return;
@@ -1722,34 +1643,6 @@
             }
         }, true);
         
-        // Garantir que o ícone não seja resetado quando o mouse sai do botão
-        document.addEventListener('mouseleave', function (e) {
-            const btn = e.target.closest('.BotaoFavoritoCard');
-            if (!btn) return;
-            // Se o botão foi atualizado recentemente, garantir que o estado seja mantido
-            if (btn.dataset.recentlyUpdated === 'true') {
-                const cod = Number(btn.getAttribute('data-cod')) || 0;
-                if (cod) {
-                    const estadoEsperado = favoritosSet.has(cod);
-                    const estadoAtual = btn.getAttribute('data-favorito') === '1';
-                    // Só atualizar se o estado estiver diferente
-                    if (estadoAtual !== estadoEsperado) {
-                        atualizarIconeFavorito(btn, estadoEsperado);
-                        // Forçar atualização visual
-                        const img = btn.querySelector('img');
-                        if (img) {
-                            const timestamp = Date.now();
-                            if (estadoEsperado) {
-                                img.src = `../Imagens/Medalha_preenchida.svg?t=${timestamp}`;
-                            } else {
-                                img.src = `../Imagens/Medalha_linha.svg?t=${timestamp}`;
-                            }
-                        }
-                    }
-                }
-            }
-        }, true);
-
         const modalFav = document.getElementById('modal-favoritos');
         if (modalFav) {
             modalFav.onclick = function (e) { if (e.target === this) fecharModalFavoritos(); };
