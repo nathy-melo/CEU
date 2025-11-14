@@ -10,6 +10,15 @@ Certificacao/certificados/
 # Backups de banco (usar .gitignore local também)
 Admin/Backups/
 
+# Imagens de eventos (upload de usuários)
+ImagensEventos/*
+!ImagensEventos/CEU-ImagemEvento.png
+!ImagensEventos/.gitkeep
+
+# Imagens de perfis (upload de usuários)
+ImagensPerfis/*
+!ImagensPerfis/.gitkeep
+
 # Composer local (caso exista na raiz)
 /vendor/
 /composer.phar

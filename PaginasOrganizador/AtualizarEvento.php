@@ -40,6 +40,7 @@ $categoriaEvento = $_POST['categoria'] ?? '';
 $modalidadeEvento = $_POST['modalidade'] ?? '';
 $certificadoEvento = $_POST['certificado'] ?? '';
 $descricaoEvento = $_POST['descricao'] ?? '';
+$imagensParaRemover = isset($_POST['imagens_remover']) ? json_decode($_POST['imagens_remover'], true) : [];
 
 // Validação básica dos campos obrigatórios
 if ($codigoEvento <= 0) {
@@ -56,7 +57,8 @@ if (
     exit;
 }
 
-// Verifica se o organizador tem permissão para editar este evento
+// Verifica se o usuário tem permissão para editar este evento (organizador ou colaborador)
+// Primeiro verifica se é organizador na tabela organiza
 $consultaVerificaPermissao = "SELECT COUNT(*) as total FROM organiza WHERE cod_evento = ? AND CPF = ?";
 $declaracaoVerificaPermissao = mysqli_prepare($conexao, $consultaVerificaPermissao);
 mysqli_stmt_bind_param($declaracaoVerificaPermissao, "is", $codigoEvento, $cpfOrganizadorLogado);
@@ -65,10 +67,25 @@ $resultadoVerificacao = mysqli_stmt_get_result($declaracaoVerificaPermissao);
 $linhaVerificacao = mysqli_fetch_assoc($resultadoVerificacao);
 mysqli_stmt_close($declaracaoVerificaPermissao);
 
-if ($linhaVerificacao['total'] == 0) {
-    echo json_encode(['erro' => 'Você não tem permissão para editar este evento']);
-    mysqli_close($conexao);
-    exit;
+$ehOrganizador = ($linhaVerificacao['total'] > 0);
+
+// Se não for organizador, verifica se é colaborador
+if (!$ehOrganizador) {
+    $consultaColaborador = "SELECT COUNT(*) as total FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?";
+    $declaracaoColaborador = mysqli_prepare($conexao, $consultaColaborador);
+    mysqli_stmt_bind_param($declaracaoColaborador, "is", $codigoEvento, $cpfOrganizadorLogado);
+    mysqli_stmt_execute($declaracaoColaborador);
+    $resultadoColaborador = mysqli_stmt_get_result($declaracaoColaborador);
+    $linhaColaborador = mysqli_fetch_assoc($resultadoColaborador);
+    mysqli_stmt_close($declaracaoColaborador);
+    
+    $ehColaborador = ($linhaColaborador['total'] > 0);
+    
+    if (!$ehColaborador) {
+        echo json_encode(['erro' => 'Você não tem permissão para editar este evento']);
+        mysqli_close($conexao);
+        exit;
+    }
 }
 
 // Combina data e hora para criar timestamps completos
@@ -94,13 +111,71 @@ $duracaoEmHoras = ($intervaloTempo->days * 24) + $intervaloTempo->h + ($interval
 // Converte certificado para formato booleano do banco
 $certificadoBooleano = ($certificadoEvento === 'Sim' || $certificadoEvento == 1) ? 1 : 0;
 
+// Processa remoção de imagens (se houver)
+if (!empty($imagensParaRemover) && is_array($imagensParaRemover)) {
+    foreach ($imagensParaRemover as $caminhoImagem) {
+        // Remove ../ do início se existir
+        $caminhoLimpo = str_replace('../', '', $caminhoImagem);
+        
+        // Remove do banco de dados
+        $sqlRemoveImg = "DELETE FROM imagens_evento WHERE cod_evento = ? AND caminho_imagem = ?";
+        $stmtRemoveImg = mysqli_prepare($conexao, $sqlRemoveImg);
+        mysqli_stmt_bind_param($stmtRemoveImg, "is", $codigoEvento, $caminhoLimpo);
+        mysqli_stmt_execute($stmtRemoveImg);
+        mysqli_stmt_close($stmtRemoveImg);
+        
+        // Remove arquivo físico
+        $caminhoFisico = '../' . $caminhoLimpo;
+        if (file_exists($caminhoFisico)) {
+            @unlink($caminhoFisico);
+        }
+        
+        // Se era a imagem principal da tabela evento, limpa
+        $sqlCheckPrincipal = "SELECT imagem FROM evento WHERE cod_evento = ? AND imagem = ?";
+        $stmtCheckPrincipal = mysqli_prepare($conexao, $sqlCheckPrincipal);
+        mysqli_stmt_bind_param($stmtCheckPrincipal, "is", $codigoEvento, $caminhoLimpo);
+        mysqli_stmt_execute($stmtCheckPrincipal);
+        $resultCheckPrincipal = mysqli_stmt_get_result($stmtCheckPrincipal);
+        if (mysqli_num_rows($resultCheckPrincipal) > 0) {
+            // Busca outra imagem para ser a principal
+            $sqlNovasPrincipais = "SELECT caminho_imagem FROM imagens_evento WHERE cod_evento = ? ORDER BY ordem ASC LIMIT 1";
+            $stmtNovasPrincipais = mysqli_prepare($conexao, $sqlNovasPrincipais);
+            mysqli_stmt_bind_param($stmtNovasPrincipais, "i", $codigoEvento);
+            mysqli_stmt_execute($stmtNovasPrincipais);
+            $resultNovasPrincipais = mysqli_stmt_get_result($stmtNovasPrincipais);
+            $novaPrincipal = mysqli_fetch_assoc($resultNovasPrincipais);
+            
+            if ($novaPrincipal) {
+                $sqlAtualizaPrincipal = "UPDATE evento SET imagem = ? WHERE cod_evento = ?";
+                $stmtAtualizaPrincipal = mysqli_prepare($conexao, $sqlAtualizaPrincipal);
+                mysqli_stmt_bind_param($stmtAtualizaPrincipal, "si", $novaPrincipal['caminho_imagem'], $codigoEvento);
+                mysqli_stmt_execute($stmtAtualizaPrincipal);
+                mysqli_stmt_close($stmtAtualizaPrincipal);
+            } else {
+                // Não há mais imagens, limpa a principal
+                $sqlLimpaPrincipal = "UPDATE evento SET imagem = NULL WHERE cod_evento = ?";
+                $stmtLimpaPrincipal = mysqli_prepare($conexao, $sqlLimpaPrincipal);
+                mysqli_stmt_bind_param($stmtLimpaPrincipal, "i", $codigoEvento);
+                mysqli_stmt_execute($stmtLimpaPrincipal);
+                mysqli_stmt_close($stmtLimpaPrincipal);
+            }
+            mysqli_stmt_close($stmtNovasPrincipais);
+        }
+        mysqli_stmt_close($stmtCheckPrincipal);
+    }
+}
+
 // Processa upload de múltiplas novas imagens (se houver)
 $novasImagens = [];
 $caminhoNovaImagemPrincipal = null;
 $deveAtualizarImagem = false;
 
+// Debug: Log de $_FILES
+error_log("DEBUG AtualizarEvento.php - FILES recebidos: " . print_r($_FILES, true));
+
 if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name'][0])) {
     $totalImagens = count($_FILES['imagens_evento']['name']);
+    error_log("DEBUG - Total de imagens para upload: " . $totalImagens);
     $tamanhoMaximo = 10 * 1024 * 1024; // 10MB em bytes
     $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     
@@ -136,6 +211,7 @@ if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name']
         
         if (move_uploaded_file($tmpName, $destino)) {
             $caminhoCompleto = 'ImagensEventos/' . $nomeUnico;
+            error_log("DEBUG - Imagem salva com sucesso: " . $destino);
             $novasImagens[] = [
                 'caminho' => $caminhoCompleto,
                 'ordem' => $i,
@@ -149,51 +225,46 @@ if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name']
             
             $deveAtualizarImagem = true;
         } else {
+            error_log("DEBUG - ERRO ao mover arquivo: " . $tmpName . " para " . $destino);
             echo json_encode(['erro' => "Erro ao fazer upload da imagem '{$nomeArquivo}'"]);
             mysqli_close($conexao);
             exit;
         }
     }
     
-    // Se há novas imagens, remove as antigas
+    // Se há novas imagens, adiciona às existentes
     if ($deveAtualizarImagem) {
-        // Remove imagem antiga da tabela evento
-        $consultaImagemAntiga = "SELECT imagem FROM evento WHERE cod_evento = ?";
-        $declaracaoImagemAntiga = mysqli_prepare($conexao, $consultaImagemAntiga);
-        mysqli_stmt_bind_param($declaracaoImagemAntiga, "i", $codigoEvento);
-        mysqli_stmt_execute($declaracaoImagemAntiga);
-        $resultadoImagemAntiga = mysqli_stmt_get_result($declaracaoImagemAntiga);
-        $linhaImagemAntiga = mysqli_fetch_assoc($resultadoImagemAntiga);
-        mysqli_stmt_close($declaracaoImagemAntiga);
+        // Busca a maior ordem atual para continuar a numeração
+        $consultaMaiorOrdem = "SELECT COALESCE(MAX(ordem), -1) as max_ordem FROM imagens_evento WHERE cod_evento = ?";
+        $stmtMaiorOrdem = mysqli_prepare($conexao, $consultaMaiorOrdem);
+        mysqli_stmt_bind_param($stmtMaiorOrdem, "i", $codigoEvento);
+        mysqli_stmt_execute($stmtMaiorOrdem);
+        $resultMaiorOrdem = mysqli_stmt_get_result($stmtMaiorOrdem);
+        $linhaMaiorOrdem = mysqli_fetch_assoc($resultMaiorOrdem);
+        $ordemInicial = $linhaMaiorOrdem['max_ordem'] + 1;
+        mysqli_stmt_close($stmtMaiorOrdem);
         
-        if ($linhaImagemAntiga && !empty($linhaImagemAntiga['imagem'])) {
-            $caminhoImagemAntiga = '../' . $linhaImagemAntiga['imagem'];
-            if (file_exists($caminhoImagemAntiga)) {
-                @unlink($caminhoImagemAntiga);
-            }
+        // Atualiza a ordem das novas imagens
+        foreach ($novasImagens as $idx => &$img) {
+            $img['ordem'] = $ordemInicial + $idx;
+            $img['principal'] = 0; // Nenhuma nova imagem será principal automaticamente
         }
+        unset($img);
         
-        // Remove imagens antigas da tabela imagens_evento
-        $consultaImagensAntigas = "SELECT caminho_imagem FROM imagens_evento WHERE cod_evento = ?";
-        $declaracaoImagensAntigas = mysqli_prepare($conexao, $consultaImagensAntigas);
-        mysqli_stmt_bind_param($declaracaoImagensAntigas, "i", $codigoEvento);
-        mysqli_stmt_execute($declaracaoImagensAntigas);
-        $resultadoImagensAntigas = mysqli_stmt_get_result($declaracaoImagensAntigas);
+        // Se for a primeira imagem do evento, define como principal e atualiza a tabela evento
+        $consultaContaImagens = "SELECT COUNT(*) as total FROM imagens_evento WHERE cod_evento = ?";
+        $stmtContaImagens = mysqli_prepare($conexao, $consultaContaImagens);
+        mysqli_stmt_bind_param($stmtContaImagens, "i", $codigoEvento);
+        mysqli_stmt_execute($stmtContaImagens);
+        $resultContaImagens = mysqli_stmt_get_result($stmtContaImagens);
+        $linhaContaImagens = mysqli_fetch_assoc($resultContaImagens);
+        mysqli_stmt_close($stmtContaImagens);
         
-        while ($linhaImg = mysqli_fetch_assoc($resultadoImagensAntigas)) {
-            $caminhoImg = '../' . $linhaImg['caminho_imagem'];
-            if (file_exists($caminhoImg)) {
-                @unlink($caminhoImg);
-            }
+        if ($linhaContaImagens['total'] == 0 && !empty($novasImagens)) {
+            // Primeira imagem do evento - marca como principal e atualiza tabela evento
+            $novasImagens[0]['principal'] = 1;
+            $caminhoNovaImagemPrincipal = $novasImagens[0]['caminho'];
         }
-        mysqli_stmt_close($declaracaoImagensAntigas);
-        
-        // Deleta registros antigos da tabela imagens_evento
-        $consultaDelete = "DELETE FROM imagens_evento WHERE cod_evento = ?";
-        $declaracaoDelete = mysqli_prepare($conexao, $consultaDelete);
-        mysqli_stmt_bind_param($declaracaoDelete, "i", $codigoEvento);
-        mysqli_stmt_execute($declaracaoDelete);
-        mysqli_stmt_close($declaracaoDelete);
     }
 }
 
@@ -299,11 +370,68 @@ if ($deveAtualizarImagem) {
     );
 }
 
+// Executa a atualização do evento
 if (mysqli_stmt_execute($declaracaoAtualizacao)) {
     mysqli_stmt_close($declaracaoAtualizacao);
+    
+    // Insere as novas imagens na tabela imagens_evento (sempre que houver novas imagens)
+    if (!empty($novasImagens)) {
+        error_log("DEBUG - Inserindo " . count($novasImagens) . " imagens no BD");
+        $sqlImagem = "INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES (?, ?, ?, ?)";
+        $stmtImagem = mysqli_prepare($conexao, $sqlImagem);
+        
+        foreach ($novasImagens as $img) {
+            error_log("DEBUG - Inserindo imagem: " . $img['caminho'] . " ordem: " . $img['ordem']);
+            mysqli_stmt_bind_param($stmtImagem, "isii", $codigoEvento, $img['caminho'], $img['ordem'], $img['principal']);
+            $resultado = mysqli_stmt_execute($stmtImagem);
+            if (!$resultado) {
+                error_log("DEBUG - ERRO ao inserir imagem no BD: " . mysqli_error($conexao));
+            }
+        }
+        mysqli_stmt_close($stmtImagem);
+    } else {
+        error_log("DEBUG - Nenhuma nova imagem para inserir no BD");
+    }
+    
+    $resposta = ['sucesso' => true, 'mensagem' => 'Evento atualizado com sucesso!'];
+    
+    // Busca todas as imagens atualizadas do evento
+    $sqlImagensAtualizadas = "SELECT caminho_imagem FROM imagens_evento WHERE cod_evento = ? ORDER BY principal DESC, ordem ASC";
+    $stmtImagensAtualizadas = mysqli_prepare($conexao, $sqlImagensAtualizadas);
+    mysqli_stmt_bind_param($stmtImagensAtualizadas, "i", $codigoEvento);
+    mysqli_stmt_execute($stmtImagensAtualizadas);
+    $resultImagensAtualizadas = mysqli_stmt_get_result($stmtImagensAtualizadas);
+    
+    $imagensAtualizadas = [];
+    while ($imgAtual = mysqli_fetch_assoc($resultImagensAtualizadas)) {
+        $imagensAtualizadas[] = '../' . $imgAtual['caminho_imagem'];
+    }
+    mysqli_stmt_close($stmtImagensAtualizadas);
+    
+    // Se não há imagens na tabela imagens_evento, tenta pegar da tabela evento
+    if (empty($imagensAtualizadas)) {
+        $sqlImagemEvento = "SELECT imagem FROM evento WHERE cod_evento = ?";
+        $stmtImagemEvento = mysqli_prepare($conexao, $sqlImagemEvento);
+        mysqli_stmt_bind_param($stmtImagemEvento, "i", $codigoEvento);
+        mysqli_stmt_execute($stmtImagemEvento);
+        $resultImagemEvento = mysqli_stmt_get_result($stmtImagemEvento);
+        $linhaImagemEvento = mysqli_fetch_assoc($resultImagemEvento);
+        mysqli_stmt_close($stmtImagemEvento);
+        
+        if ($linhaImagemEvento && !empty($linhaImagemEvento['imagem'])) {
+            $imagensAtualizadas[] = '../' . $linhaImagemEvento['imagem'];
+        }
+    }
+    
+    if (!empty($imagensAtualizadas)) {
+        $resposta['imagens'] = $imagensAtualizadas;
+    } else {
+        // Fallback para imagem padrão
+        $resposta['imagens'] = ['../ImagensEventos/CEU-ImagemEvento.png'];
+    }
+    
     mysqli_close($conexao);
-
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Evento atualizado com sucesso!']);
+    echo json_encode($resposta);
 } else {
     mysqli_stmt_close($declaracaoAtualizacao);
     mysqli_close($conexao);

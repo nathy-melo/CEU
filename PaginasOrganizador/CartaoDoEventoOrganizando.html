@@ -449,7 +449,12 @@
   }
 
   .campo-imagem-placeholder {
-    display: flex;
+    /* Exibe o placeholder como sobreposição central sobre a imagem do carrossel */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none; /* controlado por JS */
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -457,6 +462,8 @@
     color: #888;
     font-size: 0.95rem;
     padding: 1rem;
+    z-index: 3;
+    pointer-events: auto;
   }
 
   .campo-imagem-placeholder img {
@@ -540,7 +547,8 @@
     opacity: 0.8;
     z-index: 2;
     transition: background 0.2s;
-    display: flex;
+    /* Escondido por padrão; JS controla a aparição explicitamente */
+    display: none;
     align-items: center;
     justify-content: center;
   }
@@ -611,6 +619,7 @@
   .btn-adicionar-mais img {
     width: 1rem;
     height: 1rem;
+    filter: brightness(0) invert(1); /* Torna o ícone branco */
   }
 
   .modal-imagem {
@@ -1070,16 +1079,7 @@
         <div class="Categoria grupo-campo">
           <span class="rotulo-campo">Categoria:</span>
           <div id="category" class="caixa-valor">Oficina</div>
-          <select id="input-categoria" class="campo-select" autocomplete="off">
-            <option value="">Selecione</option>
-            <option value="Palestra">Palestra</option>
-            <option value="Workshop">Workshop</option>
-            <option value="Seminário">Seminário</option>
-            <option value="Conferência">Conferência</option>
-            <option value="Curso">Curso</option>
-            <option value="Treinamento">Treinamento</option>
-            <option value="Outro">Outro</option>
-          </select>
+          <input type="text" id="input-categoria" class="campo-input" placeholder="Ex: Palestra, Workshop, etc." autocomplete="off">
         </div>
         <div class="Modalidade grupo-campo">
           <span class="rotulo-campo">Modalidade:</span>
@@ -1106,20 +1106,16 @@
         </div>
         <div class="Imagem grupo-campo">
           <div class="campo-imagem" id="campo-imagem">
-            <div class="campo-imagem-placeholder" id="placeholder-imagem" style="display: none;">
-              <img src="../Imagens/AdicionarImagem.svg" alt="Adicionar imagem" />
-              <span>Clique para adicionar imagens</span>
-            </div>
             <div class="carrossel-imagens" id="carrossel-imagens">
-              <button type="button" class="btn-remover-imagem" id="btn-remover-imagem"
-                onclick="event.stopPropagation(); removerImagemAtual();">&times;</button>
-              <button type="button" class="carrossel-btn carrossel-anterior"
-                onclick="event.stopPropagation(); mudarImagem(-1)">⮜</button>
+              <button type="button" class="btn-remover-imagem" id="btn-remover-imagem">&times;</button>
+              <button type="button" class="carrossel-btn carrossel-anterior" id="btn-anterior">⮜</button>
               <img id="imagem-carrossel" src="../ImagensEventos/CEU-Logo.png" alt="Imagem do evento" />
-              <button type="button" class="carrossel-btn carrossel-proxima"
-                onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
-              <button type="button" class="btn-adicionar-mais"
-                onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
+              <div class="campo-imagem-placeholder" id="placeholder-imagem" style="display: none;">
+                <img src="../Imagens/AdicionarImagem.svg" alt="Adicionar imagem" />
+                <span>Clique para adicionar imagens</span>
+              </div>
+              <button type="button" class="carrossel-btn carrossel-proxima" id="btn-proxima">⮞</button>
+              <button type="button" class="btn-adicionar-mais" id="btn-adicionar-mais-imagens">
                 <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                 Adicionar mais imagens
               </button>

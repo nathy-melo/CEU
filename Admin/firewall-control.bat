@@ -14,14 +14,14 @@ set /p opcao="Escolha uma opcao (1-4): "
 if "%opcao%"=="1" (
     echo Permitindo Apache no firewall...
     netsh advfirewall firewall set rule name="Apache HTTP Server" new action=allow
-    echo ✅ Apache liberado! Acesse: http://SEU-IP-LOCAL/CEU/
+    echo Apache liberado! Acesse: http://SEU-IP-LOCAL/CEU/
     pause
 )
 
 if "%opcao%"=="2" (
     echo Bloqueando Apache no firewall...
     netsh advfirewall firewall set rule name="Apache HTTP Server" new action=block
-    echo 🚫 Apache bloqueado! Acesso externo desabilitado.
+    echo Apache bloqueado! Acesso externo desabilitado.
     pause
 )
 

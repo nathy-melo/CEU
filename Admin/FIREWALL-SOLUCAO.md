@@ -1,6 +1,6 @@
-# 🔥 CONFIGURAR FIREWALL WINDOWS - CEU PWA
+# CONFIGURAR FIREWALL WINDOWS - CEU PWA
 
-## ⚡ MÉTODO RÁPIDO (Recomendado)
+## MÉTODO RÁPIDO (Recomendado)
 
 ### 1. Abrir Firewall do Windows:
 ```
@@ -11,8 +11,8 @@ Windows + R → firewall.cpl → Enter
 - Clicar **"Permitir um app ou recurso através do Firewall do Windows"**
 - Clicar **"Alterar configurações"**
 - Procurar **"Apache HTTP Server"** na lista
-- ✅ Marcar **Privada** (rede doméstica)
-- ✅ Marcar **Pública** (se necessário)
+- Marcar **Privada** (rede doméstica)
+- Marcar **Pública** (se necessário)
 - Clicar **OK**
 
 ### 3. OU criar regra manual:
@@ -22,10 +22,10 @@ Windows + R → firewall.cpl → Enter
 - Protocolo: **TCP**
 - Porta: **80**
 - Ação: **Permitir conexão**
-- Perfis: ✅ **Domínio, Privado, Público**
+- Perfis: **Domínio, Privado, Público**
 - Nome: **"XAMPP Apache CEU"**
 
-## 🛠️ COMANDOS PRONTOS
+## COMANDOS PRONTOS
 
 ### Testar se firewall permite:
 ```bash
