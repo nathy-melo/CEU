@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="../styleGlobal.css" />
     <style>
         /* Botão compartilhar no card */
-        .CaixaDoEvento { position: relative; }
+        .CaixaDoEvento { 
+            position: relative;
+        }
+        .EventoInfo {
+            width: 100%;
+          }
         .BotaoCompartilharCard {
             position: absolute;
             top: 0.5rem;
