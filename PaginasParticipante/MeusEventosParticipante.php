@@ -1058,24 +1058,36 @@
 
         async function confirmarDesinscricaoRapida() {
             if (!codEventoAcao) { fecharModalConfirmarDesinscricao(); return; }
+            
+            // Salvar o código do evento antes de fazer a requisição
+            const codEventoParaDesinscrever = codEventoAcao;
+            const btnParaAtualizar = btnDesinscreverAtual;
+            
             try {
                 const r = await fetch('DesinscreverEvento.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     credentials: 'include',
-                    body: new URLSearchParams({ cod_evento: codEventoAcao })
+                    body: new URLSearchParams({ cod_evento: codEventoParaDesinscrever })
                 });
                 const j = await r.json();
                 fecharModalConfirmarDesinscricao();
                 if (j && j.sucesso) {
-                    // IMPORTANTE: Atualizar cache e ícone ANTES de recarregar
-                    inscricaoCache.set(codEventoAcao, false);
-                    if (btnDesinscreverAtual) {
-                        atualizarIconeInscricao(btnDesinscreverAtual, false);
+                    // IMPORTANTE: Limpar o cache deste evento específico para forçar atualização
+                    inscricaoCache.delete(codEventoParaDesinscrever);
+                    // Atualizar cache com o novo valor
+                    inscricaoCache.set(codEventoParaDesinscrever, false);
+                    
+                    if (btnParaAtualizar) {
+                        atualizarIconeInscricao(btnParaAtualizar, false);
                     }
                     abrirModalDesinscricaoConfirmada();
                     // Recarrega a lista de eventos após desinscrição
                     setTimeout(() => {
+                        // Limpar cache antes de recarregar para garantir dados atualizados
+                        if (window.inscricaoCache) {
+                            window.inscricaoCache.clear();
+                        }
                         if (typeof window.carregarEventosDoServidor === 'function') {
                             window.carregarEventosDoServidor();
                         }
@@ -1086,29 +1098,45 @@
             } catch (e) {
                 fecharModalConfirmarDesinscricao();
                 alert('Erro ao cancelar inscrição.');
+            } finally {
+                // Limpar variáveis após processamento
+                codEventoAcao = null;
+                btnDesinscreverAtual = null;
             }
         }
 
         async function confirmarInscricaoRapida() {
             if (!codEventoAcao) { fecharModalConfirmarInscricao(); return; }
+            
+            // Salvar o código do evento antes de fazer a requisição
+            const codEventoParaInscrever = codEventoAcao;
+            const btnParaAtualizar = btnDesinscreverAtual;
+            
             try {
                 const r = await fetch('InscreverEvento.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     credentials: 'include',
-                    body: new URLSearchParams({ cod_evento: codEventoAcao })
+                    body: new URLSearchParams({ cod_evento: codEventoParaInscrever })
                 });
                 const j = await r.json();
                 fecharModalConfirmarInscricao();
                 if (j && j.sucesso) {
-                    // IMPORTANTE: Atualizar cache e ícone ANTES de recarregar
-                    inscricaoCache.set(codEventoAcao, true);
-                    if (btnDesinscreverAtual) {
-                        atualizarIconeInscricao(btnDesinscreverAtual, true);
+                    // IMPORTANTE: Limpar o cache deste evento específico para forçar atualização
+                    inscricaoCache.delete(codEventoParaInscrever);
+                    // Atualizar cache com o novo valor
+                    inscricaoCache.set(codEventoParaInscrever, true);
+                    
+                    if (btnParaAtualizar) {
+                        atualizarIconeInscricao(btnParaAtualizar, true);
                     }
                     abrirModalInscricaoConfirmada();
                     // Recarrega a lista de eventos após inscrição
                     setTimeout(() => {
+                        // Limpar cache antes de recarregar para garantir dados atualizados
+                        if (window.inscricaoCache) {
+                            window.inscricaoCache.clear();
+                        }
                         if (typeof window.carregarEventosDoServidor === 'function') {
                             window.carregarEventosDoServidor();
                         }
@@ -1119,6 +1147,10 @@
             } catch (e) {
                 fecharModalConfirmarInscricao();
                 alert('Erro ao realizar inscrição.');
+            } finally {
+                // Limpar variáveis após processamento
+                codEventoAcao = null;
+                btnDesinscreverAtual = null;
             }
         }
 
@@ -1187,10 +1219,16 @@
         window.atualizarIconeInscricao = atualizarIconeInscricao;
 
         async function verificarInscricao(cod, forcarAtualizacao = false) {
+            // Sempre limpar o cache do evento específico antes de verificar para garantir dados atualizados
+            if (forcarAtualizacao) {
+                inscricaoCache.delete(cod);
+            }
+            
             // Se não forçar atualização e tiver no cache, usar cache
             if (!forcarAtualizacao && inscricaoCache.has(cod)) {
                 return inscricaoCache.get(cod);
             }
+            
             // Sempre verificar do servidor quando forçar atualização ou não tiver cache
             try {
                 const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { credentials: 'include' });
@@ -1208,13 +1246,15 @@
             if (!btn) return;
             const img = btn.querySelector('img');
             if (!img) return;
+            // Usar cache-busting para forçar atualização da imagem
+            const timestamp = Date.now();
             if (fav) {
-                img.src = '../Imagens/Medalha_preenchida.svg';
+                img.src = `../Imagens/Medalha_preenchida.svg?t=${timestamp}`;
                 img.alt = 'Desfavoritar';
                 btn.title = 'Remover dos favoritos';
                 btn.setAttribute('data-favorito', '1');
             } else {
-                img.src = '../Imagens/Medalha_linha.svg';
+                img.src = `../Imagens/Medalha_linha.svg?t=${timestamp}`;
                 img.alt = 'Favoritar';
                 btn.title = 'Adicionar aos favoritos';
                 btn.setAttribute('data-favorito', '0');
@@ -1244,12 +1284,22 @@
         function fecharModalFavoritos() {
             document.getElementById('modal-favoritos').classList.remove('ativo');
             desbloquearScroll();
-             // Restaurar o estado do menu após fechar o modal
-            const params = new URLSearchParams(window.location.search);
-            const pagina = params.get('pagina') || 'meusEventos';
-            if (typeof window.setMenuAtivoPorPagina === 'function') {
-                window.setMenuAtivoPorPagina(pagina);
-            }
+            // Restaurar o estado do menu após fechar o modal
+            // Usar setTimeout para garantir que o DOM foi atualizado
+            setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const pagina = params.get('pagina') || 'meusEventos';
+                if (typeof window.setMenuAtivoPorPagina === 'function') {
+                    window.setMenuAtivoPorPagina(pagina);
+                } else {
+                    // Fallback: tentar novamente após um pequeno delay
+                    setTimeout(() => {
+                        if (typeof window.setMenuAtivoPorPagina === 'function') {
+                            window.setMenuAtivoPorPagina(pagina);
+                        }
+                    }, 100);
+                }
+            }, 50);
         }
         
         function renderizarFavoritos() {
@@ -1502,8 +1552,44 @@
             const btnFav = e.target.closest('.BotaoFavoritoCard');
             if (btnFav) {
                 e.preventDefault(); e.stopPropagation();
+                
+                // Prevenir cliques múltiplos enquanto processa
+                if (btnFav.disabled || btnFav.dataset.processing === 'true') {
+                    return;
+                }
+                
                 const cod = Number(btnFav.getAttribute('data-cod')) || 0;
                 if (!cod) return;
+                
+                // ATUALIZAÇÃO OTIMISTA: Determinar estado atual e novo estado
+                const estadoAtual = btnFav.getAttribute('data-favorito') === '1';
+                const novoEstado = !estadoAtual; // Toggle
+                
+                // ATUALIZAR UI IMEDIATAMENTE (antes do fetch)
+                btnFav.dataset.processing = 'true';
+                btnFav.dataset.recentlyUpdated = 'true';
+                
+                // Atualizar favoritosSet imediatamente
+                if (novoEstado) { 
+                    favoritosSet.add(cod); 
+                } else { 
+                    favoritosSet.delete(cod);
+                    favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+                }
+                
+                // Atualizar ícone IMEDIATAMENTE
+                atualizarIconeFavorito(btnFav, novoEstado);
+                const img = btnFav.querySelector('img');
+                if (img) {
+                    const timestamp = Date.now();
+                    if (novoEstado) {
+                        img.src = `../Imagens/Medalha_preenchida.svg?t=${timestamp}`;
+                    } else {
+                        img.src = `../Imagens/Medalha_linha.svg?t=${timestamp}`;
+                    }
+                }
+                
+                // Fazer fetch em background
                 try {
                     const r = await fetch('ToggleFavorito.php', {
                         method: 'POST',
@@ -1511,17 +1597,119 @@
                         credentials: 'include',
                         body: new URLSearchParams({ cod_evento: cod })
                     });
-                    if (r.status === 401) { alert('Faça login para favoritar eventos.'); return; }
+                    
+                    if (r.status === 401) { 
+                        // Reverter mudança se não autenticado
+                        if (estadoAtual) { 
+                            favoritosSet.add(cod); 
+                        } else { 
+                            favoritosSet.delete(cod); 
+                        }
+                        atualizarIconeFavorito(btnFav, estadoAtual);
+                        const imgRevert = btnFav.querySelector('img');
+                        if (imgRevert) {
+                            const timestampRevert = Date.now();
+                            if (estadoAtual) {
+                                imgRevert.src = `../Imagens/Medalha_preenchida.svg?t=${timestampRevert}`;
+                            } else {
+                                imgRevert.src = `../Imagens/Medalha_linha.svg?t=${timestampRevert}`;
+                            }
+                        }
+                        btnFav.dataset.recentlyUpdated = 'false';
+                        alert('Faça login para favoritar eventos.'); 
+                        btnFav.dataset.processing = 'false';
+                        return; 
+                    }
+                    
                     const j = await r.json();
                     if (j && j.sucesso) {
-                        if (j.favoritado) { favoritosSet.add(cod); }
-                        else { favoritosSet.delete(cod); favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod); }
-                        atualizarIconeFavorito(btnFav, j.favoritado);
+                        // Sincronizar com resposta do servidor (caso haja diferença)
+                        if (j.favoritado !== novoEstado) {
+                            // Se o servidor retornou um estado diferente, atualizar
+                            if (j.favoritado) { 
+                                favoritosSet.add(cod); 
+                            } else { 
+                                favoritosSet.delete(cod);
+                                favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+                            }
+                            atualizarIconeFavorito(btnFav, j.favoritado);
+                            const imgSync = btnFav.querySelector('img');
+                            if (imgSync) {
+                                const timestampSync = Date.now();
+                                if (j.favoritado) {
+                                    imgSync.src = `../Imagens/Medalha_preenchida.svg?t=${timestampSync}`;
+                                } else {
+                                    imgSync.src = `../Imagens/Medalha_linha.svg?t=${timestampSync}`;
+                                }
+                            }
+                        }
+                        
+                        // Remover a marcação após um delay para garantir que não seja sobrescrito
+                        setTimeout(() => {
+                            const estadoAtualBtn = btnFav.getAttribute('data-favorito') === '1';
+                            const estadoEsperadoSet = favoritosSet.has(cod);
+                            if (estadoAtualBtn === estadoEsperadoSet) {
+                                btnFav.dataset.recentlyUpdated = 'false';
+                            } else {
+                                // Se não estiver sincronizado, atualizar
+                                atualizarIconeFavorito(btnFav, estadoEsperadoSet);
+                                const imgSync2 = btnFav.querySelector('img');
+                                if (imgSync2) {
+                                    const timestampSync2 = Date.now();
+                                    if (estadoEsperadoSet) {
+                                        imgSync2.src = `../Imagens/Medalha_preenchida.svg?t=${timestampSync2}`;
+                                    } else {
+                                        imgSync2.src = `../Imagens/Medalha_linha.svg?t=${timestampSync2}`;
+                                    }
+                                }
+                                setTimeout(() => {
+                                    btnFav.dataset.recentlyUpdated = 'false';
+                                }, 500);
+                            }
+                        }, 1500);
                     } else {
+                        // Reverter mudança se houver erro
+                        if (estadoAtual) { 
+                            favoritosSet.add(cod); 
+                        } else { 
+                            favoritosSet.delete(cod); 
+                        }
+                        atualizarIconeFavorito(btnFav, estadoAtual);
+                        const imgRevert = btnFav.querySelector('img');
+                        if (imgRevert) {
+                            const timestampRevert = Date.now();
+                            if (estadoAtual) {
+                                imgRevert.src = `../Imagens/Medalha_preenchida.svg?t=${timestampRevert}`;
+                            } else {
+                                imgRevert.src = `../Imagens/Medalha_linha.svg?t=${timestampRevert}`;
+                            }
+                        }
+                        btnFav.dataset.recentlyUpdated = 'false';
                         alert(j.mensagem || 'Não foi possível atualizar favorito.');
                     }
                 } catch (err) {
+                    // Reverter mudança se houver erro de rede
+                    console.error('Erro ao atualizar favorito:', err);
+                    if (estadoAtual) { 
+                        favoritosSet.add(cod); 
+                    } else { 
+                        favoritosSet.delete(cod); 
+                    }
+                    atualizarIconeFavorito(btnFav, estadoAtual);
+                    const imgRevert = btnFav.querySelector('img');
+                    if (imgRevert) {
+                        const timestampRevert = Date.now();
+                        if (estadoAtual) {
+                            imgRevert.src = `../Imagens/Medalha_preenchida.svg?t=${timestampRevert}`;
+                        } else {
+                            imgRevert.src = `../Imagens/Medalha_linha.svg?t=${timestampRevert}`;
+                        }
+                    }
+                    btnFav.dataset.recentlyUpdated = 'false';
                     alert('Erro ao atualizar favorito.');
+                } finally {
+                    // Reabilitar botão após processamento
+                    btnFav.dataset.processing = 'false';
                 }
                 return;
             }
@@ -1531,6 +1719,34 @@
                 await carregarFavoritos();
                 abrirModalFavoritos();
                 return;
+            }
+        }, true);
+        
+        // Garantir que o ícone não seja resetado quando o mouse sai do botão
+        document.addEventListener('mouseleave', function (e) {
+            const btn = e.target.closest('.BotaoFavoritoCard');
+            if (!btn) return;
+            // Se o botão foi atualizado recentemente, garantir que o estado seja mantido
+            if (btn.dataset.recentlyUpdated === 'true') {
+                const cod = Number(btn.getAttribute('data-cod')) || 0;
+                if (cod) {
+                    const estadoEsperado = favoritosSet.has(cod);
+                    const estadoAtual = btn.getAttribute('data-favorito') === '1';
+                    // Só atualizar se o estado estiver diferente
+                    if (estadoAtual !== estadoEsperado) {
+                        atualizarIconeFavorito(btn, estadoEsperado);
+                        // Forçar atualização visual
+                        const img = btn.querySelector('img');
+                        if (img) {
+                            const timestamp = Date.now();
+                            if (estadoEsperado) {
+                                img.src = `../Imagens/Medalha_preenchida.svg?t=${timestamp}`;
+                            } else {
+                                img.src = `../Imagens/Medalha_linha.svg?t=${timestamp}`;
+                            }
+                        }
+                    }
+                }
             }
         }, true);
 
