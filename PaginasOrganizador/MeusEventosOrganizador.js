@@ -11,11 +11,29 @@ function carregarEventosDoServidor() {
     window.carregandoEventos = true;
 
     const containerEventos = document.getElementById('eventos-container');
+    if (!containerEventos) {
+        window.carregandoEventos = false;
+        return;
+    }
+    
     const botaoAdicionarEvento = containerEventos.querySelector('.CaixaDoEventoAdicionar');
 
+    // Verifica se já existem eventos renderizados pelo PHP
+    const eventosExistentes = containerEventos.querySelectorAll('.CaixaDoEvento');
+    const temEventosPHP = eventosExistentes.length > 0;
+    
+    // Se já tem eventos do PHP e eles têm EventoImagem, não recarrega
+    if (temEventosPHP) {
+        const primeiroEvento = eventosExistentes[0];
+        const temImagem = primeiroEvento.querySelector('.EventoImagem');
+        if (temImagem) {
+            window.carregandoEventos = false;
+            return; // Eventos já estão renderizados corretamente pelo PHP
+        }
+    }
+
     // Limpa eventos existentes (mantém apenas o botão adicionar)
-    const eventosAntigos = containerEventos.querySelectorAll('.CaixaDoEvento');
-    eventosAntigos.forEach(eventoAntigo => eventoAntigo.remove());
+    eventosExistentes.forEach(eventoAntigo => eventoAntigo.remove());
 
     // Remove TODAS as mensagens antigas (loading, sem eventos, sem resultados)
     const todasMensagens = Array.from(containerEventos.children).filter(child => {
@@ -61,6 +79,62 @@ function carregarEventosDoServidor() {
                         carregarPagina('eventoOrganizado', dadosEvento.cod_evento);
                     };
 
+                    // Ações flutuantes: Favoritar, Mensagem, Compartilhar
+                    const divAcoes = document.createElement('div');
+                    divAcoes.className = 'AcoesFlutuantes';
+                    
+                    const btnFavorito = document.createElement('button');
+                    btnFavorito.type = 'button';
+                    btnFavorito.className = 'BotaoAcaoCard BotaoFavoritoCard botao';
+                    btnFavorito.title = 'Favoritar';
+                    btnFavorito.setAttribute('aria-label', 'Favoritar');
+                    btnFavorito.setAttribute('data-cod', dadosEvento.cod_evento);
+                    btnFavorito.setAttribute('data-favorito', '0');
+                    btnFavorito.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+                    const imgFav = document.createElement('img');
+                    imgFav.src = '../Imagens/Medalha_linha.svg';
+                    imgFav.alt = 'Favoritar';
+                    btnFavorito.appendChild(imgFav);
+                    divAcoes.appendChild(btnFavorito);
+
+                    const btnMensagem = document.createElement('button');
+                    btnMensagem.type = 'button';
+                    btnMensagem.className = 'BotaoAcaoCard BotaoMensagemCard botao';
+                    btnMensagem.title = 'Enviar mensagem ao organizador';
+                    btnMensagem.setAttribute('aria-label', 'Mensagem');
+                    btnMensagem.setAttribute('data-cod', dadosEvento.cod_evento);
+                    btnMensagem.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+                    const imgMsg = document.createElement('img');
+                    imgMsg.src = '../Imagens/Carta.svg';
+                    imgMsg.alt = 'Mensagem';
+                    btnMensagem.appendChild(imgMsg);
+                    divAcoes.appendChild(btnMensagem);
+
+                    const btnCompartilhar = document.createElement('button');
+                    btnCompartilhar.type = 'button';
+                    btnCompartilhar.className = 'BotaoAcaoCard BotaoCompartilharCard botao';
+                    btnCompartilhar.title = 'Compartilhar';
+                    btnCompartilhar.setAttribute('aria-label', 'Compartilhar');
+                    btnCompartilhar.setAttribute('data-cod', dadosEvento.cod_evento);
+                    btnCompartilhar.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+                    const imgComp = document.createElement('img');
+                    imgComp.src = '../Imagens/Icone_Compartilhar.svg';
+                    imgComp.alt = 'Compartilhar';
+                    btnCompartilhar.appendChild(imgComp);
+                    divAcoes.appendChild(btnCompartilhar);
+
+                    // EventoImagem - adiciona a imagem do evento
+                    const divImagem = document.createElement('div');
+                    divImagem.className = 'EventoImagem';
+                    const imgEvento = document.createElement('img');
+                    const caminhoImagem = dadosEvento.imagem && dadosEvento.imagem !== '' 
+                        ? '../' + dadosEvento.imagem.replace(/^[\/\\]/, '') 
+                        : '../ImagensEventos/CEU-ImagemEvento.png';
+                    imgEvento.src = caminhoImagem;
+                    imgEvento.alt = dadosEvento.nome;
+                    imgEvento.onerror = function() { this.src = '../ImagensEventos/CEU-ImagemEvento.png'; };
+                    divImagem.appendChild(imgEvento);
+
                     const tituloEvento = document.createElement('div');
                     tituloEvento.className = 'EventoTitulo';
                     tituloEvento.textContent = dadosEvento.nome;
@@ -91,6 +165,7 @@ function carregarEventosDoServidor() {
                     `;
 
                     caixaEventoHTML.appendChild(divAcoes);
+                    caixaEventoHTML.appendChild(divImagem);
                     caixaEventoHTML.appendChild(tituloEvento);
                     caixaEventoHTML.appendChild(informacoesEvento);
                     containerEventos.appendChild(caixaEventoHTML);
@@ -122,10 +197,34 @@ function carregarEventosDoServidor() {
 }
 
 function inicializarFiltroEventos() {
+    // Proteção contra inicialização múltipla
+    if (window.filtroEventosInicializado) {
+        return;
+    }
+    window.filtroEventosInicializado = true;
+
     const campoInputPesquisa = document.querySelector('.campo-pesquisa');
     const botaoPesquisar = document.querySelector('.botao-pesquisa');
     const containerEventos = document.getElementById('eventos-container');
     const containerColaboracao = document.getElementById('colaboracao-container');
+    
+    // Garante que o botão de adicionar evento funcione (fallback para AJAX)
+    const botaoAdicionar = containerEventos ? containerEventos.querySelector('.CaixaDoEventoAdicionar') : null;
+    if (botaoAdicionar) {
+        // Remove listeners antigos se existirem
+        const novoBotao = botaoAdicionar.cloneNode(true);
+        botaoAdicionar.parentNode.replaceChild(novoBotao, botaoAdicionar);
+        // Adiciona listener como fallback
+        novoBotao.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof window.adicionarNovoEvento === 'function') {
+                window.adicionarNovoEvento();
+            } else if (typeof adicionarNovoEvento === 'function') {
+                adicionarNovoEvento();
+            }
+        });
+    }
 
     // Elementos que devem ser ocultados durante a pesquisa
     const tituloMeusEventos = document.querySelector('.titulo-meus-eventos');
@@ -133,7 +232,7 @@ function inicializarFiltroEventos() {
     const wrapperMeusEventos = tituloMeusEventos ? tituloMeusEventos.closest('.section-title-wrapper') : null;
     const wrapperOrganizacao = document.querySelector('.secao-colaboracao');
     const divisoria = document.querySelector('.divisoria-secoes');
-    const botaoAdicionar = containerEventos.querySelector('.CaixaDoEventoAdicionar');
+    // botaoAdicionar já foi declarado acima, reutiliza a mesma variável
 
     // Cria mensagem de "Sem resultados"
     let mensagemSemResultados = document.createElement('div');
@@ -259,6 +358,7 @@ function inicializarFiltroEventos() {
     }
 
     // Carrega eventos do servidor automaticamente
+    // As funções internas verificam se já existem eventos do PHP antes de recarregar
     carregarEventosDoServidor();
     carregarEventosColaboracao();
 }
@@ -273,9 +373,22 @@ function carregarEventosColaboracao() {
         return;
     }
 
+    // Verifica se já existem eventos renderizados pelo PHP
+    const eventosExistentes = containerColaboracao.querySelectorAll('.CaixaDoEvento');
+    const temEventosPHP = eventosExistentes.length > 0;
+    
+    // Se já tem eventos do PHP e eles têm EventoImagem, não recarrega
+    if (temEventosPHP) {
+        const primeiroEvento = eventosExistentes[0];
+        const temImagem = primeiroEvento.querySelector('.EventoImagem');
+        if (temImagem) {
+            window.carregandoColaboracao = false;
+            return; // Eventos já estão renderizados corretamente pelo PHP
+        }
+    }
+
     // Limpa eventos existentes
-    const eventosAntigos = containerColaboracao.querySelectorAll('.CaixaDoEvento');
-    eventosAntigos.forEach(eventoAntigo => eventoAntigo.remove());
+    eventosExistentes.forEach(eventoAntigo => eventoAntigo.remove());
 
     // Remove mensagens antigas
     const mensagensAntigas = Array.from(containerColaboracao.children).filter(child => {
@@ -370,6 +483,18 @@ function carregarEventosColaboracao() {
                     btnCompartilhar.appendChild(imgComp);
                     divAcoes.appendChild(btnCompartilhar);
 
+                    // EventoImagem - adiciona a imagem do evento
+                    const divImagem = document.createElement('div');
+                    divImagem.className = 'EventoImagem';
+                    const imgEvento = document.createElement('img');
+                    const caminhoImagem = dadosEvento.imagem && dadosEvento.imagem !== '' 
+                        ? '../' + dadosEvento.imagem.replace(/^[\/\\]/, '') 
+                        : '../ImagensEventos/CEU-ImagemEvento.png';
+                    imgEvento.src = caminhoImagem;
+                    imgEvento.alt = dadosEvento.nome;
+                    imgEvento.onerror = function() { this.src = '../ImagensEventos/CEU-ImagemEvento.png'; };
+                    divImagem.appendChild(imgEvento);
+
                     const tituloEvento = document.createElement('div');
                     tituloEvento.className = 'EventoTitulo';
                     tituloEvento.textContent = dadosEvento.nome;
@@ -400,6 +525,7 @@ function carregarEventosColaboracao() {
                     `;
 
                     caixaEventoHTML.appendChild(divAcoes);
+                    caixaEventoHTML.appendChild(divImagem);
                     caixaEventoHTML.appendChild(tituloEvento);
                     caixaEventoHTML.appendChild(informacoesEvento);
                     containerColaboracao.appendChild(caixaEventoHTML);
@@ -440,10 +566,37 @@ function adicionarNovoEvento() {
 window.adicionarNovoEvento = adicionarNovoEvento;
 window.carregarEventosDoServidor = carregarEventosDoServidor;
 window.carregarEventosColaboracao = carregarEventosColaboracao;
-
-document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);
-// Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML
 window.inicializarFiltroEventos = inicializarFiltroEventos;
+
+// Inicialização: funciona tanto no carregamento inicial quanto via AJAX
+// Reseta flags quando a página é carregada via AJAX
+if (typeof window.resetarInicializacaoMeusEventos === 'undefined') {
+    window.resetarInicializacaoMeusEventos = function() {
+        window.filtroEventosInicializado = false;
+        window.carregandoEventos = false;
+        window.carregandoColaboracao = false;
+    };
+}
+
+if (document.readyState === 'loading') {
+    // DOM ainda não está pronto, aguarda DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Verifica se estamos na página correta antes de inicializar
+        if (document.getElementById('eventos-container')) {
+            window.resetarInicializacaoMeusEventos();
+            inicializarFiltroEventos();
+        }
+    });
+} else {
+    // DOM já está pronto (carregamento via AJAX ou página já carregada)
+    // Usa setTimeout para garantir que o HTML foi inserido
+    setTimeout(function() {
+        if (document.getElementById('eventos-container')) {
+            window.resetarInicializacaoMeusEventos();
+            inicializarFiltroEventos();
+        }
+    }, 50);
+}
 
 // ====== Sistema de Favoritos, Mensagens e Compartilhar ======
 // Variáveis globais
@@ -470,6 +623,14 @@ function fecharModalCompartilhar() {
     if (!modal) return;
     modal.classList.remove('ativo');
     desbloquearScroll();
+    // Garantir que o menu permaneça ativo após fechar o modal
+    setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        const pagina = params.get('pagina') || 'meusEventos';
+        if (typeof window.setMenuAtivoPorPagina === 'function') {
+            window.setMenuAtivoPorPagina(pagina);
+        }
+    }, 10);
 }
 function copiarLink() {
     const input = document.getElementById('link-inscricao');
@@ -535,10 +696,7 @@ function compartilharX() {
     const texto = `Confira este evento!`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
 }
-const modalCompartilhar = document.getElementById('modal-compartilhar');
-if (modalCompartilhar) {
-    modalCompartilhar.onclick = function (e) { if (e.target === this) fecharModalCompartilhar(); };
-}
+// Inicialização do modal de compartilhar movida para função inicializarModais()
 
 // Funções de bloqueio/desbloqueio de scroll
 function bloquearScroll() {
@@ -575,13 +733,14 @@ function fecharModalMensagem(skipUnlock) {
         m.classList.remove('ativo');
         if (!skipUnlock) {
             desbloquearScroll();
+            // Garantir que o menu permaneça ativo após fechar o modal
             setTimeout(() => {
                 const params = new URLSearchParams(window.location.search);
                 const pagina = params.get('pagina') || 'meusEventos';
                 if (typeof window.setMenuAtivoPorPagina === 'function') {
                     window.setMenuAtivoPorPagina(pagina);
                 }
-            }, 50);
+            }, 10);
         }
     }
 }
@@ -690,13 +849,14 @@ function fecharModalFavoritos() {
     if (modal) {
         modal.classList.remove('ativo');
         desbloquearScroll();
+        // Garantir que o menu permaneça ativo após fechar o modal
         setTimeout(() => {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'meusEventos';
             if (typeof window.setMenuAtivoPorPagina === 'function') {
                 window.setMenuAtivoPorPagina(pagina);
             }
-        }, 50);
+        }, 10);
     }
 }
 
@@ -714,25 +874,132 @@ function renderizarFavoritos() {
         const a = document.createElement('a');
         a.href = `ContainerOrganizador.php?pagina=eventoOrganizado&id=${ev.cod_evento}`;
         a.className = 'favorito-item';
-        a.style.cssText = 'background-color:var(--branco);border-radius:1cqi;padding:0;box-shadow:0.5cqi 0.5cqi 3cqi var(--sombra-forte);display:grid;aspect-ratio:3/2;position:relative;overflow:hidden;text-decoration:none;color:inherit;';
-        
+        a.onclick = function(e) {
+            if (e.target.closest('.BotaoAcaoCard')) {
+                e.preventDefault();
+                return false;
+            }
+        };
+
+        const divAcoes = document.createElement('div');
+        divAcoes.className = 'AcoesFlutuantes';
+
+        const btnFavorito = document.createElement('button');
+        btnFavorito.type = 'button';
+        btnFavorito.className = 'BotaoAcaoCard BotaoFavoritoCard botao';
+        btnFavorito.title = 'Remover dos favoritos';
+        btnFavorito.setAttribute('aria-label', 'Desfavoritar');
+        btnFavorito.setAttribute('data-cod', ev.cod_evento);
+        btnFavorito.setAttribute('data-favorito', '1');
+        btnFavorito.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        };
+        const imgFavorito = document.createElement('img');
+        imgFavorito.src = '../Imagens/Medalha_preenchida.svg';
+        imgFavorito.alt = 'Desfavoritar';
+        btnFavorito.appendChild(imgFavorito);
+        divAcoes.appendChild(btnFavorito);
+
+        const btnMensagem = document.createElement('button');
+        btnMensagem.type = 'button';
+        btnMensagem.className = 'BotaoAcaoCard BotaoMensagemCard botao';
+        btnMensagem.title = 'Enviar mensagem ao organizador';
+        btnMensagem.setAttribute('aria-label', 'Mensagem');
+        btnMensagem.setAttribute('data-cod', ev.cod_evento);
+        btnMensagem.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        };
+        const imgMensagem = document.createElement('img');
+        imgMensagem.src = '../Imagens/Carta.svg';
+        imgMensagem.alt = 'Mensagem';
+        btnMensagem.appendChild(imgMensagem);
+        divAcoes.appendChild(btnMensagem);
+
+        const btnCompartilhar = document.createElement('button');
+        btnCompartilhar.type = 'button';
+        btnCompartilhar.className = 'BotaoAcaoCard BotaoCompartilharCard botao';
+        btnCompartilhar.title = 'Compartilhar';
+        btnCompartilhar.setAttribute('aria-label', 'Compartilhar');
+        btnCompartilhar.setAttribute('data-cod', ev.cod_evento);
+        btnCompartilhar.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        };
+        const imgCompartilhar = document.createElement('img');
+        imgCompartilhar.src = '../Imagens/Icone_Compartilhar.svg';
+        imgCompartilhar.alt = 'Compartilhar';
+        btnCompartilhar.appendChild(imgCompartilhar);
+        divAcoes.appendChild(btnCompartilhar);
+
         const divImagem = document.createElement('div');
-        divImagem.style.cssText = 'width:100%;height:100%;border-radius:2cqi 2cqi 0 0;aspect-ratio:3/2;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;background-color:var(--branco);';
+        divImagem.className = 'favorito-item-imagem';
         const img = document.createElement('img');
-        const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
+        const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-ImagemEvento.png');
         img.src = caminho;
         img.alt = (ev.nome || 'Evento').substring(0, 100);
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center;display:block;';
-        img.onerror = function() { this.src = '../ImagensEventos/CEU-Logo.png'; };
+        img.onerror = function() { this.src = '../ImagensEventos/CEU-ImagemEvento.png'; };
         divImagem.appendChild(img);
 
         const divTitulo = document.createElement('div');
-        divTitulo.className = 'EventoTitulo';
+        divTitulo.className = 'favorito-item-titulo';
         divTitulo.textContent = (ev.nome || 'Evento').substring(0, 100);
-        divTitulo.style.cssText = 'font-size:5cqi;font-weight:800;padding:4cqi 3.5cqi;color:var(--branco);background:var(--botao);line-height:1.2;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;';
 
+        const divInfo = document.createElement('div');
+        divInfo.className = 'favorito-item-info';
+        const ul = document.createElement('ul');
+        ul.className = 'evento-info-list';
+
+        const liCategoria = document.createElement('li');
+        liCategoria.className = 'evento-info-item';
+        const categoria = (ev.categoria || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        liCategoria.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-categoria.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Categoria:</span> ${categoria}</span>`;
+        ul.appendChild(liCategoria);
+
+        const liModalidade = document.createElement('li');
+        liModalidade.className = 'evento-info-item';
+        const modalidade = (ev.modalidade || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        liModalidade.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-modalidade.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Modalidade:</span> ${modalidade}</span>`;
+        ul.appendChild(liModalidade);
+
+        if (ev.inicio) {
+            const liData = document.createElement('li');
+            liData.className = 'evento-info-item';
+            let dataFormatada = 'N/A';
+            try {
+                const data = new Date(ev.inicio);
+                if (!isNaN(data.getTime())) {
+                    dataFormatada = data.toLocaleDateString('pt-BR');
+                }
+            } catch (e) {
+                console.error('Erro ao formatar data:', e);
+            }
+            liData.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-data.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Data:</span> ${dataFormatada}</span>`;
+            ul.appendChild(liData);
+        }
+
+        if (ev.lugar) {
+            const liLocal = document.createElement('li');
+            liLocal.className = 'evento-info-item';
+            const lugar = (ev.lugar || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            liLocal.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-local.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Local:</span> ${lugar}</span>`;
+            ul.appendChild(liLocal);
+        }
+
+        const liCert = document.createElement('li');
+        liCert.className = 'evento-info-item';
+        liCert.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-certificado.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> ${ev.certificado == 1 ? 'Sim' : 'Não'}</span>`;
+        ul.appendChild(liCert);
+
+        divInfo.appendChild(ul);
+        a.appendChild(divAcoes);
         a.appendChild(divImagem);
         a.appendChild(divTitulo);
+        a.appendChild(divInfo);
         frag.appendChild(a);
     });
     cont.appendChild(frag);
@@ -932,17 +1199,41 @@ document.addEventListener('click', async function (e) {
     }
 }, true);
 
-// Fechar modal de favoritos ao clicar fora
-const modalFav = document.getElementById('modal-favoritos');
-if (modalFav) {
-    modalFav.onclick = function (e) {
-        if (e.target === this) fecharModalFavoritos();
-    };
-    const listaFavoritos = document.getElementById('lista-favoritos');
-    if (listaFavoritos) {
-        listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
-        listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+// Função para inicializar modais (chamada após carregamento via AJAX)
+function inicializarModais() {
+    // Fechar modal de favoritos ao clicar fora
+    const modalFav = document.getElementById('modal-favoritos');
+    if (modalFav) {
+        modalFav.onclick = function (e) {
+            if (e.target === this) fecharModalFavoritos();
+        };
+        const listaFavoritos = document.getElementById('lista-favoritos');
+        if (listaFavoritos) {
+            listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
+            listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+        }
     }
+    
+    // Fechar modal de compartilhar ao clicar fora
+    const modalCompartilhar = document.getElementById('modal-compartilhar');
+    if (modalCompartilhar) {
+        modalCompartilhar.onclick = function (e) {
+            if (e.target === this) {
+                e.stopPropagation();
+                fecharModalCompartilhar();
+            }
+        };
+    }
+}
+
+// Inicializa modais imediatamente se já existirem
+inicializarModais();
+
+// Re-inicializa modais após carregamento via AJAX
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarModais);
+} else {
+    setTimeout(inicializarModais, 50);
 }
 
 // Fechar modais com ESC
@@ -951,13 +1242,6 @@ document.addEventListener('keydown', function (e) {
         fecharModalCompartilhar();
         fecharModalMensagem(true); 
         fecharModalFavoritos();
-        setTimeout(() => {
-            const params = new URLSearchParams(window.location.search);
-            const pagina = params.get('pagina') || 'meusEventos';
-            if (typeof window.setMenuAtivoPorPagina === 'function') {
-                window.setMenuAtivoPorPagina(pagina);
-            }
-        }, 50);
     } 
 });
 
@@ -979,6 +1263,7 @@ setTimeout(inicializarBotaoFavoritos, 100);
 // Expor funções globalmente para serem chamadas após carregamento via AJAX
 window.carregarFavoritos = carregarFavoritos;
 window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
+window.inicializarModais = inicializarModais;
 window.fecharModalFavoritos = fecharModalFavoritos;
 window.fecharModalMensagem = fecharModalMensagem;
 window.enviarMensagemOrganizador = enviarMensagemOrganizador;

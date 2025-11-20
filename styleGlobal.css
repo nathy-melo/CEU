@@ -135,14 +135,14 @@ body.js-ready #conteudo-dinamico {
   transition: opacity 0.2s ease-in;
 }
 
-/* Mantém o conteúdo FIXO no topo somente na página pública de Início */
-body.pagina-inicio {
+/* Mantém o conteúdo FIXO no topo em páginas com barra de pesquisa */
+body.pagina-com-barra-pesquisa {
   justify-content: center;
   align-items: flex-start;
 }
 
 /* Páginas de login/cadastro precisam estar centralizadas */
-body.js-ready:not(.pagina-inicio):not(.pagina-lista-eventos) #conteudo-dinamico {
+body.js-ready:not(.pagina-com-barra-pesquisa):not(.pagina-inicio):not(.pagina-lista-eventos) #conteudo-dinamico {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -158,6 +158,21 @@ body.js-ready:not(.pagina-inicio):not(.pagina-lista-eventos) #conteudo-dinamico 
 body.pagina-lista-eventos #conteudo-dinamico {
   display: block;
   padding-top: 1rem;
+}
+
+/* Páginas com barra de pesquisa não devem ter padding-top no conteúdo */
+body.pagina-com-barra-pesquisa #conteudo-dinamico {
+  padding-top: 0 !important;
+}
+
+body.pagina-com-barra-pesquisa #main-content {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Remove margem superior da barra de pesquisa em páginas com barra de pesquisa */
+body.pagina-com-barra-pesquisa .barra-pesquisa-container {
+  margin-top: 0 !important;
 }
 
 /* ====== Botões ====== */

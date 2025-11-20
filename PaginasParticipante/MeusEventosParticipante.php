@@ -74,7 +74,7 @@
             position: fixed;
             inset: 0;
             background: var(--fundo-escuro-transparente);
-            z-index: 10000;
+            z-index: 10010;
             align-items: center;
             justify-content: center;
             padding: 1rem;
@@ -653,6 +653,7 @@
         .lista-favoritos::-webkit-scrollbar-thumb:hover {
             background: var(--destaque);
         }
+
     </style>
 </head>
 
@@ -995,6 +996,14 @@
             if (!modal) return;
             modal.classList.remove('ativo');
             desbloquearScroll();
+            // Garantir que o menu permaneça ativo após fechar o modal
+            setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const pagina = params.get('pagina') || 'meusEventos';
+                if (typeof window.setMenuAtivoPorPagina === 'function') {
+                    window.setMenuAtivoPorPagina(pagina);
+                }
+            }, 10);
         }
         function copiarLink() {
             const input = document.getElementById('link-inscricao');
@@ -1153,15 +1162,20 @@
                         atualizarIconeInscricao(btnParaAtualizar, false);
                     }
                     abrirModalDesinscricaoConfirmada();
-                    // Recarrega a lista de eventos após desinscrição
+                    // Recarrega a lista de eventos após desinscrição - mesmo padrão do EventosInscritosOrganizador.php
                     setTimeout(() => {
                         // Limpar cache antes de recarregar para garantir dados atualizados
                         if (window.inscricaoCache) {
                             window.inscricaoCache.clear();
                         }
-                        if (typeof window.carregarEventosDoServidor === 'function') {
+                        // Verificar se está na página de meus eventos antes de recarregar
+                        const params = new URLSearchParams(window.location.search);
+                        const pagina = params.get('pagina');
+                        if (pagina === 'meusEventos' && typeof window.carregarEventosDoServidor === 'function') {
                             window.carregarEventosDoServidor();
                         }
+                        // Disparar evento customizado para atualizar outras partes da aplicação
+                        window.dispatchEvent(new CustomEvent('inscricaoAtualizada', { detail: { codEvento: codEventoParaDesinscrever, inscrito: false } }));
                     }, 500);
                 } else {
                     alert(j.mensagem || 'Erro ao cancelar inscrição.');
@@ -1202,15 +1216,20 @@
                         atualizarIconeInscricao(btnParaAtualizar, true);
                     }
                     abrirModalInscricaoConfirmada();
-                    // Recarrega a lista de eventos após inscrição
+                    // Recarrega a lista de eventos após inscrição - mesmo padrão do EventosInscritosOrganizador.php
                     setTimeout(() => {
                         // Limpar cache antes de recarregar para garantir dados atualizados
                         if (window.inscricaoCache) {
                             window.inscricaoCache.clear();
                         }
-                        if (typeof window.carregarEventosDoServidor === 'function') {
+                        // Verificar se está na página de meus eventos antes de recarregar
+                        const params = new URLSearchParams(window.location.search);
+                        const pagina = params.get('pagina');
+                        if (pagina === 'meusEventos' && typeof window.carregarEventosDoServidor === 'function') {
                             window.carregarEventosDoServidor();
                         }
+                        // Disparar evento customizado para atualizar outras partes da aplicação
+                        window.dispatchEvent(new CustomEvent('inscricaoAtualizada', { detail: { codEvento: codEventoParaInscrever, inscrito: true } }));
                     }, 500);
                 } else {
                     alert(j.mensagem || 'Erro ao realizar inscrição.');
@@ -1240,14 +1259,14 @@
                 m.classList.remove('ativo');
                 if (!skipUnlock) {
                     desbloquearScroll();
-                    // Restaurar o estado do menu após fechar o modal
+                    // Garantir que o menu permaneça ativo após fechar o modal
                     setTimeout(() => {
                         const params = new URLSearchParams(window.location.search);
                         const pagina = params.get('pagina') || 'meusEventos';
                         if (typeof window.setMenuAtivoPorPagina === 'function') {
                             window.setMenuAtivoPorPagina(pagina);
                         }
-                    }, 50);
+                    }, 10);
                 }
             }
         }
@@ -1289,39 +1308,46 @@
             if (!btn) return;
             const img = btn.querySelector('img');
             if (!img) return;
+            
+            // Atualizar classe do botão se necessário (BotaoDesinscreverCard <-> BotaoInscreverCard)
+            const isDesinscrever = btn.classList.contains('BotaoDesinscreverCard');
+            const isInscrever = btn.classList.contains('BotaoInscreverCard');
+            
             if (inscrito) {
                 img.src = '../Imagens/Circulo_check.svg';
                 img.alt = 'Inscrito';
                 btn.setAttribute('data-inscrito', '1');
                 btn.title = 'Cancelar inscrição';
                 btn.ariaLabel = 'Cancelar inscrição';
+                // Se for BotaoInscreverCard e estiver inscrito, mudar para BotaoDesinscreverCard
+                if (isInscrever) {
+                    btn.classList.remove('BotaoInscreverCard');
+                    btn.classList.add('BotaoDesinscreverCard');
+                }
             } else {
                 img.src = '../Imagens/Circulo_adicionar.svg';
                 img.alt = 'Inscrever';
                 btn.setAttribute('data-inscrito', '0');
                 btn.title = 'Inscrever-se';
                 btn.ariaLabel = 'Inscrever';
+                // Se for BotaoDesinscreverCard e não estiver inscrito, mudar para BotaoInscreverCard
+                if (isDesinscrever) {
+                    btn.classList.remove('BotaoDesinscreverCard');
+                    btn.classList.add('BotaoInscreverCard');
+                }
             }
         }
         window.atualizarIconeInscricao = atualizarIconeInscricao;
 
         async function verificarInscricao(cod, forcarAtualizacao = false) {
-            if (!cod || cod <= 0) return false; // Validar código do evento
-            // Sempre limpar o cache do evento específico antes de verificar para garantir dados atualizados
-            if (forcarAtualizacao) {
-                inscricaoCache.delete(cod);
-            }
-            
-            // Se não forçar atualização e tiver no cache, usar cache
+            if (!cod || cod <= 0) return false;
             if (!forcarAtualizacao && inscricaoCache.has(cod)) {
                 return inscricaoCache.get(cod);
             }
-            
-            // Sempre verificar do servidor quando forçar atualização ou não tiver cache
             let timeoutId = null;
             try {
                 const controller = new AbortController();
-                timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout de 10 segundos
+                timeoutId = setTimeout(() => controller.abort(), 10000);
                 const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { 
                     credentials: 'include',
                     signal: controller.signal
@@ -1339,11 +1365,60 @@
                 return false;
             } catch (e) {
                 if (timeoutId) clearTimeout(timeoutId);
-                // Se falhar, usar cache se existir, senão retornar false
                 if (e.name !== 'AbortError') {
                     console.warn('Erro ao verificar inscrição:', e);
                 }
                 return inscricaoCache.has(cod) ? inscricaoCache.get(cod) : false;
+            }
+        }
+
+        async function carregarInscricoes() {
+            let timeoutId = null;
+            try {
+                const cards = document.querySelectorAll('.CaixaDoEvento');
+                if (!cards || cards.length === 0) return;
+                const codigosEventos = Array.from(cards)
+                    .map(card => {
+                        const cod = card.getAttribute('data-cod-evento');
+                        return cod ? Number(cod) : 0;
+                    })
+                    .filter(cod => cod > 0);
+                if (codigosEventos.length === 0) return;
+                const controller = new AbortController();
+                timeoutId = setTimeout(() => controller.abort(), 15000);
+                const r = await fetch('VerificarInscricoes.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ eventos: codigosEventos }),
+                    signal: controller.signal
+                });
+                if (timeoutId) clearTimeout(timeoutId);
+                if (r.status === 401) return;
+                if (!r.ok) {
+                    throw new Error(`HTTP error! status: ${r.status}`);
+                }
+                const j = await r.json();
+                if (j && j.sucesso && j.inscricoes && typeof j.inscricoes === 'object') {
+                    for (const [codEvento, inscrito] of Object.entries(j.inscricoes)) {
+                        const cod = Number(codEvento);
+                        if (cod > 0 && typeof inscrito === 'boolean') {
+                            inscricaoCache.set(cod, inscrito);
+                            cards.forEach(card => {
+                                if (Number(card.getAttribute('data-cod-evento')) === cod) {
+                                    const btn = card.querySelector('.BotaoInscreverCard, .BotaoDesinscreverCard');
+                                    if (btn) atualizarIconeInscricao(btn, inscrito);
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    console.warn('Erro ao carregar inscrições:', e);
+                }
+            } finally {
+                if (typeof timeoutId !== 'undefined' && timeoutId) clearTimeout(timeoutId);
             }
         }
 
@@ -1437,21 +1512,14 @@
             if (modal) {
                 modal.classList.remove('ativo');
                 desbloquearScroll();
-                // Restaurar o estado do menu após fechar o modal
+                // Garantir que o menu permaneça ativo após fechar o modal
                 setTimeout(() => {
                     const params = new URLSearchParams(window.location.search);
                     const pagina = params.get('pagina') || 'meusEventos';
                     if (typeof window.setMenuAtivoPorPagina === 'function') {
                         window.setMenuAtivoPorPagina(pagina);
-                    } else {
-                        // Fallback: tentar novamente após um pequeno delay
-                        setTimeout(() => {
-                            if (typeof window.setMenuAtivoPorPagina === 'function') {
-                                window.setMenuAtivoPorPagina(pagina);
-                            }
-                        }, 100);
                     }
-                }, 50);
+                }, 10);
             }
         }
         
@@ -1555,11 +1623,11 @@
                 const divImagem = document.createElement('div');
                 divImagem.className = 'favorito-item-imagem';
                 const img = document.createElement('img');
-                const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
+                const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-ImagemEvento.png');
                 img.src = caminho;
                 img.alt = (ev.nome || 'Evento').substring(0, 100); // Limitar tamanho do alt
                 img.onerror = function() {
-                    this.src = '../ImagensEventos/CEU-Logo.png'; // Fallback se imagem não carregar
+                    this.src = '../ImagensEventos/CEU-ImagemEvento.png'; // Fallback se imagem não carregar
                 };
                 divImagem.appendChild(img);
 
@@ -1656,45 +1724,50 @@
             }, 100);
         }
 
-        // Listeners de clique
+        // Listeners de clique - usando o mesmo padrão do EventosInscritosOrganizador.php
         document.addEventListener('click', async function (e) {
-            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO InicioParticipante
+            // Ignorar cliques dentro de modais de confirmação - verificar se o clique foi em um botão de modal
+            const target = e.target;
+            if (target.closest('.modal-overlay') || 
+                target.closest('.modal-cancelamento') ||
+                target.classList.contains('botao-cancelamento-cancelar') ||
+                target.classList.contains('botao-cancelamento-continuar') ||
+                target.classList.contains('botao-cancelamento-ok')) {
+                return;
+            }
+            
+            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO EventosInscritosOrganizador
             const btnInscrever = e.target.closest('.BotaoInscreverCard');
-            if (btnInscrever) {
-                e.preventDefault(); e.stopPropagation();
-                const cod = Number(btnInscrever.getAttribute('data-cod')) || 0;
+            const btnDesinscrever = e.target.closest('.BotaoDesinscreverCard');
+            const btnAcao = btnInscrever || btnDesinscrever;
+            
+            if (btnAcao) {
+                e.preventDefault(); 
+                e.stopPropagation();
+                const cod = Number(btnAcao.getAttribute('data-cod')) || 0;
                 if (!cod) return;
                 
                 // IMPORTANTE: Atualizar as variáveis ANTES de verificar status
                 codEventoAcao = cod;
-                btnDesinscreverAtual = btnInscrever;
+                btnDesinscreverAtual = btnAcao;
+                
+                // Se for BotaoDesinscreverCard, já sabemos que está inscrito
+                if (btnDesinscrever) {
+                    abrirModalConfirmarDesinscricao();
+                    return;
+                }
                 
                 // IMPORTANTE: Forçar atualização do servidor para garantir dados corretos
                 const inscrito = await verificarInscricao(cod, true); // forçar atualização
                 
                 // Atualizar ícone com o valor correto do servidor
-                atualizarIconeInscricao(btnInscrever, inscrito);
+                atualizarIconeInscricao(btnAcao, inscrito);
                 
                 if (inscrito) {
                     abrirModalConfirmarDesinscricao();
                 } else {
                     abrirModalConfirmarInscricao();
                 }
-                return;
-            }
-
-            // Botão de desinscrição
-            const btnDesinscrever = e.target.closest('.BotaoDesinscreverCard');
-            if (btnDesinscrever) {
-                e.preventDefault(); e.stopPropagation();
-                const cod = Number(btnDesinscrever.getAttribute('data-cod')) || 0;
-                if (!cod) return;
-                
-                // IMPORTANTE: Atualizar as variáveis ANTES de abrir modal
-                codEventoAcao = cod;
-                btnDesinscreverAtual = btnDesinscrever;
-                
-                abrirModalConfirmarDesinscricao();
                 return;
             }
 
@@ -1889,6 +1962,41 @@
             }
         }, true);
         
+        // Prevenir navegação do link quando clicar nos botões de ação - mesmo padrão do EventosInscritosOrganizador.php
+        function prevenirNavegacaoCards() {
+            document.querySelectorAll('.CaixaDoEvento').forEach(link => {
+                // Remover listener anterior se existir para evitar duplicatas
+                if (link.dataset.listenerNavegacao === 'true') return;
+                link.addEventListener('click', function(e) {
+                    // Se o clique foi em qualquer botão de ação ou dentro de AcoesFlutuantes, prevenir navegação
+                    if (e.target.closest('.AcoesFlutuantes') || 
+                        e.target.closest('.BotaoAcaoCard') ||
+                        e.target.closest('.BotaoInscreverCard') ||
+                        e.target.closest('.BotaoDesinscreverCard') ||
+                        e.target.closest('.BotaoFavoritoCard') ||
+                        e.target.closest('.BotaoMensagemCard') ||
+                        e.target.closest('.BotaoCompartilharCard')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }, true);
+                link.dataset.listenerNavegacao = 'true';
+            });
+        }
+        
+        // Inicializar prevenção de navegação
+        prevenirNavegacaoCards();
+        
+        // Re-inicializar após carregamento dinâmico de eventos
+        if (typeof window.carregarEventosDoServidor === 'function') {
+            const originalCarregarEventos = window.carregarEventosDoServidor;
+            window.carregarEventosDoServidor = function() {
+                const result = originalCarregarEventos.apply(this, arguments);
+                setTimeout(prevenirNavegacaoCards, 100);
+                return result;
+            };
+        }
+        
         const modalFav = document.getElementById('modal-favoritos');
         if (modalFav) {
             modalFav.onclick = function (e) { if (e.target === this) fecharModalFavoritos(); };
@@ -1922,12 +2030,24 @@
             setTimeout(carregarFavoritos, 50);
         }
 
+        // Carregar inscrições ao iniciar - mesmo padrão do EventosInscritosOrganizador.php
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', carregarInscricoes);
+        } else {
+            setTimeout(carregarInscricoes, 50);
+        }
+        
+        // Garantir que carregarInscricoes seja chamada mesmo se o DOM já estiver pronto
+        setTimeout(carregarInscricoes, 100);
+
         // Garantir inicialização do botão de favoritos após carregamento
         setTimeout(inicializarBotaoFavoritos, 100);
         
         // Expor funções globalmente para serem chamadas após carregamento via AJAX
         window.carregarFavoritos = carregarFavoritos;
         window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
+        window.carregarInscricoes = carregarInscricoes;
+        window.prevenirNavegacaoCards = prevenirNavegacaoCards;
     </script>
 
     <script src="MeusEventosParticipante.js?v=<?= time() ?>"></script>

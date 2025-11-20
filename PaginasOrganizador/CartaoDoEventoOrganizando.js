@@ -174,6 +174,131 @@
     preencherInputsEdicao();
   }
 
+  function carregarImagensEvento(codEvento) {
+    fetch('BuscarImagensEvento.php?cod_evento=' + codEvento)
+      .then(res => res.json())
+      .then(dataImgs => {
+        if (dataImgs.sucesso && dataImgs.imagens && dataImgs.imagens.length > 0) {
+          // Filtra imagens padrão - se só tem imagem padrão, considera como sem imagens
+          const imagensFiltradas = dataImgs.imagens.filter(img => 
+            !img.caminho.includes('CEU-ImagemEvento.png') && 
+            !img.caminho.includes('CEU-Logo.png')
+          );
+          
+          if (imagensFiltradas.length > 0) {
+            // Tem imagens reais
+            listaImagensEvento = imagensFiltradas.map(img => '../' + img.caminho);
+            indiceImagemAtual = 0;
+            const imgCarrossel = document.getElementById('imagem-carrossel');
+            if (imgCarrossel) {
+              imgCarrossel.src = listaImagensEvento[indiceImagemAtual];
+            }
+          } else {
+            // Só tem imagem padrão - lista fica vazia para que em modo edição mostre placeholder
+            listaImagensEvento = [];
+            // Em modo visualização, a imagem padrão já está no elemento HTML, não precisa alterar
+          }
+        } else {
+          // Se não há imagens retornadas, lista fica vazia
+          listaImagensEvento = [];
+        }
+        atualizarVisibilidadeSetas();
+      })
+      .catch(err => {
+        console.error('Erro ao carregar imagens:', err);
+        // Em caso de erro, tenta usar a imagem atual do elemento
+        const imgAtual = document.getElementById('imagem-carrossel');
+        if (imgAtual && imgAtual.src && 
+            !imgAtual.src.includes('CEU-ImagemEvento.png') && 
+            !imgAtual.src.includes('CEU-Logo.png')) {
+          listaImagensEvento = [imgAtual.src];
+          indiceImagemAtual = 0;
+        } else {
+          listaImagensEvento = [];
+        }
+        atualizarVisibilidadeSetas();
+      });
+  }
+
+  function inicializarDadosOriginaisDaPagina() {
+    // Extrai dados dos elementos da página já preenchidos pelo PHP
+    const eventNameEl = document.getElementById('event-name');
+    const eventLocalEl = document.getElementById('event-local');
+    const startDateEl = document.getElementById('start-date');
+    const endDateEl = document.getElementById('end-date');
+    const startTimeEl = document.getElementById('start-time');
+    const endTimeEl = document.getElementById('end-time');
+    const inicioInscricaoEl = document.getElementById('inicio-inscricao');
+    const fimInscricaoEl = document.getElementById('fim-inscricao');
+    const horarioInicioInscricaoEl = document.getElementById('horario-inicio-inscricao');
+    const horarioFimInscricaoEl = document.getElementById('horario-fim-inscricao');
+    const audienceEl = document.getElementById('audience');
+    const categoryEl = document.getElementById('category');
+    const modalityEl = document.getElementById('modality');
+    const certificateEl = document.getElementById('certificate');
+    const descriptionEl = document.getElementById('description');
+    
+    const inputNome = document.getElementById('input-nome');
+    const inputLocal = document.getElementById('input-local');
+    const inputDataInicio = document.getElementById('input-data-inicio');
+    const inputDataFim = document.getElementById('input-data-fim');
+    const inputHorarioInicio = document.getElementById('input-horario-inicio');
+    const inputHorarioFim = document.getElementById('input-horario-fim');
+    const inputDataInicioInscricao = document.getElementById('input-data-inicio-inscricao');
+    const inputDataFimInscricao = document.getElementById('input-data-fim-inscricao');
+    const inputHorarioInicioInscricao = document.getElementById('input-horario-inicio-inscricao');
+    const inputHorarioFimInscricao = document.getElementById('input-horario-fim-inscricao');
+    const inputPublicoAlvo = document.getElementById('input-publico-alvo');
+    const inputCategoria = document.getElementById('input-categoria');
+    const inputModalidade = document.getElementById('input-modalidade');
+    const inputCertificado = document.getElementById('input-certificado');
+    const inputDescricao = document.getElementById('input-descricao');
+
+    // Preservar imagem atual se listaImagensEvento estiver vazia
+    // Mas não salvar imagem padrão como "imagem real"
+    let imagensParaSalvar = [...listaImagensEvento];
+    if (imagensParaSalvar.length === 0) {
+      const imgCarrossel = document.getElementById('imagem-carrossel');
+      if (imgCarrossel && imgCarrossel.src && 
+          !imgCarrossel.src.includes('CEU-ImagemEvento.png') && 
+          !imgCarrossel.src.includes('CEU-Logo.png')) {
+        imagensParaSalvar = [imgCarrossel.src];
+      } else {
+        // Se só tem imagem padrão, lista fica vazia
+        imagensParaSalvar = [];
+      }
+    }
+
+    // Salva cópia dos dados originais
+    dadosOriginaisEvento = {
+      cod_evento: codigoEventoAtual,
+      nome: eventNameEl ? eventNameEl.textContent.trim() : '',
+      local: eventLocalEl ? eventLocalEl.textContent.trim() : '',
+      dataInicio: startDateEl ? startDateEl.textContent.trim() : '',
+      dataFim: endDateEl ? endDateEl.textContent.trim() : '',
+      dataInicioParaInput: inputDataInicio ? inputDataInicio.value : '',
+      dataFimParaInput: inputDataFim ? inputDataFim.value : '',
+      horarioInicio: startTimeEl ? startTimeEl.textContent.trim() : '',
+      horarioFim: endTimeEl ? endTimeEl.textContent.trim() : '',
+      dataInicioInscricao: inicioInscricaoEl ? inicioInscricaoEl.textContent.trim() : '-',
+      dataFimInscricao: fimInscricaoEl ? fimInscricaoEl.textContent.trim() : '-',
+      dataInicioInscricaoParaInput: inputDataInicioInscricao ? inputDataInicioInscricao.value : '',
+      dataFimInscricaoParaInput: inputDataFimInscricao ? inputDataFimInscricao.value : '',
+      horarioInicioInscricao: horarioInicioInscricaoEl ? horarioInicioInscricaoEl.textContent.trim() : '-',
+      horarioFimInscricao: horarioFimInscricaoEl ? horarioFimInscricaoEl.textContent.trim() : '-',
+      publicoAlvo: audienceEl ? audienceEl.textContent.trim() : '',
+      categoria: categoryEl ? categoryEl.textContent.trim() : '',
+      modalidade: modalityEl ? modalityEl.textContent.trim() : '',
+      certificado: certificateEl ? certificateEl.textContent.trim() : '',
+      certificadoNumerico: certificateEl && certificateEl.textContent.trim() !== 'Não' ? 1 : 0,
+      descricao: descriptionEl ? descriptionEl.textContent.trim() : '',
+      imagens: imagensParaSalvar
+    };
+
+    // Preenche os campos de input
+    preencherInputsEdicao();
+  }
+
   function preencherInputsEdicao() {
     // Verifica se dadosOriginaisEvento existe
     if (!dadosOriginaisEvento || Object.keys(dadosOriginaisEvento).length === 0) {
@@ -234,25 +359,14 @@
     if (inputModalidade) inputModalidade.value = dadosOriginaisEvento.modalidade || '';
     
     if (inputCertificado) {
-      // Converter valor numérico para texto
-      const certNumerico = dadosOriginaisEvento.certificadoNumerico;
-      let certTexto = '';
+      // Usar o valor de texto do certificado
+      let certTexto = dadosOriginaisEvento.certificado || '';
       
-      if (certNumerico === 0 || certNumerico === '0') {
-        certTexto = 'Não';
-      } else if (certNumerico === 1 || certNumerico === '1') {
-        certTexto = 'Sim';
-      } else if (certNumerico === 2 || certNumerico === '2') {
-        certTexto = 'Ensino';
-      } else if (certNumerico === 3 || certNumerico === '3') {
-        certTexto = 'Pesquisa';
-      } else if (certNumerico === 4 || certNumerico === '4') {
-        certTexto = 'Extensão';
-      } else if (certNumerico === 5 || certNumerico === '5') {
-        certTexto = 'Outro';
-      } else if (dadosOriginaisEvento.certificado) {
-        // Fallback: usa o valor de texto se existir
-        certTexto = dadosOriginaisEvento.certificado;
+      // Mapear valores antigos para novos
+      if (certTexto === 'Não' || certTexto === 'Sim') {
+        certTexto = 'Sem certificacao';
+      } else if (certTexto === 'Extensão') {
+        certTexto = 'Extensao'; // Sem acento para o valor do select
       }
       
       inputCertificado.value = certTexto;
@@ -547,14 +661,23 @@
       trocarParaBotoesEdicao();
 
       // DEPOIS: Alterar os campos
-      document.querySelectorAll('.caixa-valor:not(.caixa-descricao)').forEach(el => {
+      // Esconder campos de visualização (incluindo descrição)
+      document.querySelectorAll('.caixa-valor').forEach(el => {
         if (el) el.style.display = 'none';
       });
 
-      const descriptionEl = document.getElementById('description');
-      if (descriptionEl) descriptionEl.style.display = 'none';
+      // Esconder divs de visualização de data/horário
+      document.querySelectorAll('[id$="-visualizacao"]').forEach(el => {
+        if (el) el.style.display = 'none';
+      });
 
+      // Mostrar campos de edição
       document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
+        if (el) el.style.display = 'flex';
+      });
+
+      // Mostrar divs de edição de data/horário
+      document.querySelectorAll('[id$="-edicao"]').forEach(el => {
         if (el) el.style.display = 'flex';
       });
 
@@ -565,7 +688,7 @@
       const campoImagem = document.getElementById('campo-imagem');
       const placeholderImagem = document.getElementById('placeholder-imagem');
       const btnRemoverImagem = document.getElementById('btn-remover-imagem');
-      const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
+      const btnAdicionarMais = document.getElementById('btn-adicionar-mais-imagens');
 
       // No modo edição, clicar na imagem ou placeholder abre seletor
       const abrirSeletor = function () {
@@ -582,22 +705,7 @@
         placeholderImagem.style.cursor = 'pointer';
       }
 
-      // Mostra botões de edição de imagem no modo edição
-      if (btnRemoverImagem) btnRemoverImagem.style.display = 'flex';
-      if (btnAdicionarMais) btnAdicionarMais.style.display = 'flex';
-      
-      // Garante que a imagem está visível se houver imagens
-      const imgCarrossel = document.getElementById('imagem-carrossel');
-      if (imgCarrossel && listaImagensEvento.length > 0) {
-        imgCarrossel.style.display = 'block';
-        if (placeholderImagem) placeholderImagem.style.display = 'none';
-      } else if (placeholderImagem && listaImagensEvento.length === 0) {
-        // Se não há imagens, mostra placeholder
-        if (imgCarrossel) imgCarrossel.style.display = 'none';
-        placeholderImagem.style.display = 'flex';
-      }
-      
-      // Atualiza visibilidade (mostra setas se houver múltiplas imagens)
+      // Atualiza visibilidade (mostra/esconde botões, placeholder e carrossel baseado em imagens)
       atualizarVisibilidadeSetas();
     } catch (error) {
       console.error('Erro ao editar evento:', error);
@@ -705,9 +813,20 @@
       if (certificate) certificate.textContent = dadosOriginaisEvento.certificado;
       if (description) description.textContent = dadosOriginaisEvento.descricao;
 
-      listaImagensEvento = [...dadosOriginaisEvento.imagens];
-      indiceImagemAtual = 0;
-      if (imagemCarrossel) imagemCarrossel.src = listaImagensEvento[indiceImagemAtual];
+      // Restaurar imagens: se não há imagens reais, usa imagem padrão para visualização
+      if (dadosOriginaisEvento.imagens && dadosOriginaisEvento.imagens.length > 0) {
+        listaImagensEvento = [...dadosOriginaisEvento.imagens];
+        indiceImagemAtual = 0;
+        if (imagemCarrossel) {
+          imagemCarrossel.src = listaImagensEvento[indiceImagemAtual];
+        }
+      } else {
+        // Se não há imagens reais, restaura imagem padrão para visualização
+        listaImagensEvento = [];
+        if (imagemCarrossel) {
+          imagemCarrossel.src = '../ImagensEventos/CEU-ImagemEvento.png';
+        }
+      }
       
       // Limpa a lista de imagens para remover
       window.imagensParaRemover = [];
@@ -717,18 +836,27 @@
         if (el) el.style.display = 'flex';
       });
 
+      // Mostrar divs de visualização de data/horário
+      document.querySelectorAll('[id$="-visualizacao"]').forEach(el => {
+        if (el) el.style.display = 'flex';
+      });
+
+      // Esconder campos de edição
       document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
+        if (el) el.style.display = 'none';
+      });
+
+      // Esconder divs de edição de data/horário
+      document.querySelectorAll('[id$="-edicao"]').forEach(el => {
         if (el) el.style.display = 'none';
       });
 
       // Desabilitar edição de imagem
       const campoImagem = document.getElementById('campo-imagem');
-      const btnRemoverImagem = document.getElementById('btn-remover-imagem');
-      const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
-
       if (campoImagem) campoImagem.onclick = null;
-      if (btnRemoverImagem) btnRemoverImagem.style.display = 'none';
-      if (btnAdicionarMais) btnAdicionarMais.style.display = 'none';
+
+      // Atualiza visibilidade (esconde botões de edição, mostra/esconde placeholder/carrossel)
+      atualizarVisibilidadeSetas();
 
       // Restaurar botões
       trocarParaBotoesVisualizacao();
@@ -942,9 +1070,12 @@
             dadosOriginaisEvento.horarioFimInscricao = inputHorarioFimInscricao.value || '-';
             
             // Atualizar imagens se foram alteradas
-            if (inputImagem.files.length > 0) {
+            // Se há novas imagens no input, atualiza a lista
+            // Caso contrário, preserva as imagens originais
+            if (inputImagem.files.length > 0 || listaImagensEvento.length > 0) {
               dadosOriginaisEvento.imagens = [...listaImagensEvento];
             }
+            // Se não há imagens e não havia imagens originais, mantém o estado atual
 
             modoEdicao = false;
 
@@ -953,29 +1084,46 @@
               if (el) el.style.display = 'flex';
             });
 
+            // Mostrar divs de visualização de data/horário
+            document.querySelectorAll('[id$="-visualizacao"]').forEach(el => {
+              if (el) el.style.display = 'flex';
+            });
+
+            // Esconder campos de edição
             document.querySelectorAll('.campo-input, .campo-select, .campo-textarea').forEach(el => {
+              if (el) el.style.display = 'none';
+            });
+
+            // Esconder divs de edição de data/horário
+            document.querySelectorAll('[id$="-edicao"]').forEach(el => {
               if (el) el.style.display = 'none';
             });
 
             // Desabilitar edição de imagem
             const campoImagem = document.getElementById('campo-imagem');
-            const btnRemoverImagem = document.getElementById('btn-remover-imagem');
-            const btnAdicionarMais = document.getElementById('btn-adicionar-mais');
-
             if (campoImagem) campoImagem.onclick = null;
-            if (btnRemoverImagem) btnRemoverImagem.style.display = 'none';
-            if (btnAdicionarMais) btnAdicionarMais.style.display = 'none';
             
-            // Mostra primeira imagem
-            indiceImagemAtual = 0;
+            // Restaurar imagem: se não há imagens reais, usa imagem padrão para visualização
+            const imgCarrossel = document.getElementById('imagem-carrossel');
             if (listaImagensEvento.length > 0) {
-              document.getElementById('imagem-carrossel').src = listaImagensEvento[0];
+              // Se há imagens na lista atual, usa elas
+              indiceImagemAtual = 0;
+              if (imgCarrossel) {
+                imgCarrossel.src = listaImagensEvento[0];
+              }
+            } else {
+              // Se não há imagens reais, restaura imagem padrão para visualização
+              if (imgCarrossel) {
+                imgCarrossel.src = '../ImagensEventos/CEU-ImagemEvento.png';
+              }
+              // Lista fica vazia para que em modo de edição mostre placeholder
+              listaImagensEvento = [];
             }
             
             // Limpar input de imagem para permitir nova seleção futura
             inputImagem.value = '';
             
-            // Atualiza visibilidade (esconde setas)
+            // Atualiza visibilidade (esconde botões de edição, mostra/esconde placeholder/carrossel)
             atualizarVisibilidadeSetas();
 
             // Restaurar botões
@@ -1051,19 +1199,9 @@
       reader.onload = function (e) {
         listaImagensEvento.push(e.target.result);
         
-        // Se era a primeira imagem, mostra ela e esconde o placeholder
+        // Se era a primeira imagem, mostra o carrossel
         if (listaImagensEvento.length === 1) {
-          const imgCarrossel = document.getElementById('imagem-carrossel');
-          const placeholderDiv = document.getElementById('placeholder-imagem');
-          
-          if (imgCarrossel) {
-            imgCarrossel.src = e.target.result;
-            imgCarrossel.style.display = 'block';
-          }
-          if (placeholderDiv) {
-            placeholderDiv.style.display = 'none';
-          }
-          indiceImagemAtual = 0;
+          mostrarCarrossel();
         }
         
         atualizarVisibilidadeSetas();
@@ -1101,14 +1239,9 @@
       
       listaImagensEvento.splice(indiceImagemAtual, 1);
       if (listaImagensEvento.length === 0) {
-        // Quando não há mais imagens, mostra o placeholder
-        const imgCarrossel = document.getElementById('imagem-carrossel');
-        const placeholderDiv = document.getElementById('placeholder-imagem');
-        
-        if (imgCarrossel) imgCarrossel.style.display = 'none';
-        if (placeholderDiv) placeholderDiv.style.display = 'flex';
-        
+        // Quando não há mais imagens, mostra o placeholder e esconde carrossel
         document.getElementById('input-imagem').value = '';
+        atualizarVisibilidadeSetas(); // Isso vai esconder o carrossel e mostrar o placeholder
       } else {
         if (indiceImagemAtual >= listaImagensEvento.length) {
           indiceImagemAtual = listaImagensEvento.length - 1;
@@ -1120,9 +1253,34 @@
   }
 
   function atualizarVisibilidadeSetas() {
-    // Mostra setas quando há múltiplas imagens (em qualquer modo)
+    const temImagens = listaImagensEvento.length > 0;
     const deveExibirSetas = listaImagensEvento.length > 1;
+    const placeholderDiv = document.getElementById('placeholder-imagem');
+    const carrosselDiv = document.getElementById('carrossel-imagens');
     
+    // Verifica se a única imagem é a padrão
+    const soTemImagemPadrao = temImagens && listaImagensEvento.length === 1 && 
+      (listaImagensEvento[0].includes('CEU-ImagemEvento.png') || 
+       listaImagensEvento[0].includes('CEU-Logo.png'));
+    
+    // Em modo de visualização, sempre mostra o carrossel (mesmo com imagem padrão)
+    // Em modo de edição, mostra placeholder se não há imagens OU se só tem imagem padrão
+    if (modoEdicao) {
+      // Modo edição: mostra placeholder se não há imagens ou se só tem imagem padrão
+      if (temImagens && !soTemImagemPadrao) {
+        if (placeholderDiv) placeholderDiv.style.display = 'none';
+        if (carrosselDiv) carrosselDiv.style.display = 'flex';
+      } else {
+        if (placeholderDiv) placeholderDiv.style.display = 'flex';
+        if (carrosselDiv) carrosselDiv.style.display = 'none';
+      }
+    } else {
+      // Modo visualização: sempre mostra carrossel (mesmo com imagem padrão)
+      if (placeholderDiv) placeholderDiv.style.display = 'none';
+      if (carrosselDiv) carrosselDiv.style.display = 'flex';
+    }
+    
+    // Mostra setas quando há múltiplas imagens (em qualquer modo)
     document.querySelectorAll('.carrossel-anterior, .carrossel-proxima').forEach(el => {
       el.style.display = deveExibirSetas ? 'flex' : 'none';
     });
@@ -1132,11 +1290,16 @@
       el.style.display = deveExibirSetas ? '' : 'none';
     });
 
-    // Controla o botão de remover/adicionar apenas no modo edição
+    // Controla o botão de remover/adicionar apenas no modo edição E quando há imagens reais (não só padrão)
+    const temImagensReais = temImagens && !soTemImagemPadrao;
     const btnRemover = document.getElementById('btn-remover-imagem');
-    const btnAdicionar = document.querySelector('.btn-adicionar-mais');
-    if (btnRemover) btnRemover.style.display = modoEdicao ? 'flex' : 'none';
-    if (btnAdicionar) btnAdicionar.style.display = modoEdicao ? 'flex' : 'none';
+    const btnAdicionar = document.getElementById('btn-adicionar-mais-imagens');
+    if (btnRemover) {
+      btnRemover.style.display = (modoEdicao && temImagensReais) ? 'flex' : 'none';
+    }
+    if (btnAdicionar) {
+      btnAdicionar.style.display = (modoEdicao && temImagensReais) ? 'flex' : 'none';
+    }
   }
 
   function mudarImagem(direcao) {
@@ -1351,15 +1514,53 @@
 
     // Carrega dados do evento se o código foi passado
     const urlParams = new URLSearchParams(window.location.search);
-    let codEvento = urlParams.get('cod_evento');
+    let codEvento = urlParams.get('cod_evento') || urlParams.get('id');
 
-    // Se não vier da URL, tenta pegar da variável global (quando carregado via AJAX)
+    // Se não vier da URL, tenta pegar da variável global (quando carregado via AJAX ou PHP)
     if (!codEvento && window.codigoEventoParaGerenciar) {
       codEvento = window.codigoEventoParaGerenciar;
     }
+    
+    // Se não vier da URL, tenta pegar da variável global definida pelo PHP
+    if (!codEvento && window.codEventoAtual) {
+      codEvento = window.codEventoAtual;
+    }
 
-    if (codEvento) {
+    // Verifica se os dados já estão carregados na página (quando vem do PHP)
+    const eventNameEl = document.getElementById('event-name');
+    const eventLocalEl = document.getElementById('event-local');
+    // Verifica se os elementos existem e têm conteúdo real (não são valores padrão)
+    const dadosJaCarregados = eventNameEl && eventNameEl.textContent.trim() !== '' && 
+                              eventNameEl.textContent.trim() !== 'Evento X' && 
+                              eventLocalEl && eventLocalEl.textContent.trim() !== '' &&
+                              eventLocalEl.textContent.trim() !== 'Auditório';
+
+    if (dadosJaCarregados && codEvento) {
+      // Dados já vêm do PHP, apenas carrega imagens e inicializa
+      codigoEventoAtual = codEvento;
+      // Pequeno delay para garantir que o DOM está totalmente renderizado
+      setTimeout(() => {
+        carregarImagensEvento(codEvento);
+        // Aguarda carregarImagensEvento terminar antes de inicializar dados
+        setTimeout(() => {
+          inicializarDadosOriginaisDaPagina();
+        }, 100);
+      }, 50);
+    } else if (codEvento) {
+      // Dados não estão na página, carrega via AJAX
       carregarDadosEventoDoServidor(codEvento);
+    } else {
+      // Se não há código do evento, tenta carregar imagens da imagem atual
+      const imgCarrossel = document.getElementById('imagem-carrossel');
+      if (imgCarrossel && imgCarrossel.src && 
+          !imgCarrossel.src.includes('CEU-ImagemEvento.png') && 
+          !imgCarrossel.src.includes('CEU-Logo.png')) {
+        listaImagensEvento = [imgCarrossel.src];
+      } else {
+        // Se a imagem é padrão, lista fica vazia
+        listaImagensEvento = [];
+      }
+      atualizarVisibilidadeSetas();
     }
   }
 

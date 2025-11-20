@@ -166,7 +166,6 @@ function formatar($txt) {
     <style>
         body {
             align-items: flex-start;
-            padding-top: 1rem;
         }
 
         /* Container principal com posição relativa */
@@ -191,6 +190,7 @@ function formatar($txt) {
             padding-left: 0 !important;
             padding-right: 0 !important;
         }
+
 
         /* Container de conteúdo com padding-top para compensar a barra */
         .conteudo-eventos {
@@ -397,7 +397,7 @@ function formatar($txt) {
             position: fixed;
             inset: 0;
             background: var(--fundo-escuro-transparente);
-            z-index: 10000;
+            z-index: 10010;
             align-items: center;
             justify-content: center;
             padding: 1rem;
@@ -500,6 +500,170 @@ function formatar($txt) {
             line-height: 1.4;
         }
         .aviso-compartilhar strong { color: var(--botao); }
+
+        /* Cards de favoritos - mesmo estilo do InicioParticipante.php */
+        .favorito-item {
+            background-color: var(--branco);
+            border-radius: 1cqi;
+            padding: 0;
+            box-shadow: 0.5cqi 0.5cqi 3cqi var(--sombra-forte);
+            display: grid;
+            aspect-ratio: 3 / 2;
+            position: relative;
+            overflow: hidden;
+            container-type: inline-size;
+            width: 100%;
+            min-width: 0;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .favorito-item .AcoesFlutuantes {
+            position: absolute;
+            bottom: 0.3rem;
+            right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(100%);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
+                visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            z-index: 50;
+        }
+        .favorito-item:hover .AcoesFlutuantes {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .favorito-item-imagem {
+            width: 100%;
+            height: 100%;
+            border-radius: 2cqi 2cqi 0 0;
+            aspect-ratio: 3 / 2;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            transform: translateY(0);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--branco);
+        }
+        .favorito-item:hover .favorito-item-imagem {
+            transform: translateY(-100%);
+        }
+        .favorito-item-imagem img {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        .favorito-item:hover .favorito-item-imagem img {
+            transform: scale(1.15);
+        }
+        .favorito-item-titulo {
+            font-size: 5cqi;
+            font-weight: 800;
+            padding: 4cqi 3.5cqi 4cqi;
+            color: var(--branco);
+            background: var(--botao);
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            transform: translateY(0);
+            text-shadow: 0 0.5cqi 1cqi rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.05cqi;
+            grid-row: 2 / 3;
+            position: relative;
+            z-index: 2;
+        }
+        .favorito-item:hover .favorito-item-titulo {
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            transform: translateY(-380%);
+        }
+        .favorito-item-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: var(--cinza-escuro);
+            line-height: 1.5;
+            padding: 0 3.5cqi 2.5cqi;
+            text-align: left;
+            overflow: visible;
+            word-wrap: break-word;
+            display: block;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            pointer-events: none;
+            font-weight: 500;
+            z-index: 3;
+            transform: translateY(100%);
+            width: 85%;
+        }
+        .favorito-item:hover .favorito-item-info {
+            opacity: 1;
+            transform: translateY(0%);
+            pointer-events: auto;
+        }
+        .favorito-item-info .evento-info-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5cqi;
+        }
+        .favorito-item-info .evento-info-item {
+            display: flex;
+            align-items: center;
+            gap: 2cqi;
+            background: var(--tabela_participantes);
+            border-radius: 2cqi;
+            padding: 1cqi 1cqi;
+            box-shadow: 0 0.4cqi 1.2cqi var(--sombra-leve);
+        }
+        .favorito-item-info .evento-info-icone {
+            width: 6cqi;
+            height: 6cqi;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--branco);
+            color: var(--botao);
+            box-shadow: 0 0.3cqi 0.8cqi var(--sombra-leve) inset;
+        }
+        .favorito-item-info .evento-info-icone img {
+            width: 80%;
+            height: 80%;
+            display: block;
+        }
+        .favorito-item-info .evento-info-texto {
+            font-size: 4cqi;
+            color: var(--cinza-escuro);
+            font-weight: 600;
+            display: inline-flex;
+            gap: 1cqi;
+            align-items: baseline;
+        }
+        .favorito-item-info .evento-info-label {
+            color: var(--azul-escuro);
+            font-weight: 800;
+        }
     </style>
 </head>
 <body>
@@ -554,7 +718,7 @@ function formatar($txt) {
                         $local = formatar($ev['lugar']);
                         $modalidadeAttr = formatar($ev['modalidade'] ?? '');
                         $cert = ($ev['certificado'] === 'Sim') ? 'sim' : 'nao';
-                        $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                        $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
                         $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                     ?>
                         <div class="botao CaixaDoEvento" 
@@ -579,6 +743,9 @@ function formatar($txt) {
                                     aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
                                     <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
                                 </button>
+                            </div>
+                            <div class="EventoImagem">
+                                <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
                             </div>
                             <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                             <div class="EventoInfo">
@@ -630,7 +797,7 @@ function formatar($txt) {
                         $local = formatar($ev['lugar']);
                         $modalidadeAttr = formatar($ev['modalidade'] ?? '');
                         $cert = ($ev['certificado'] === 'Sim') ? 'sim' : 'nao';
-                        $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                        $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
                         $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                     ?>
                         <div class="botao CaixaDoEvento" 
@@ -655,6 +822,9 @@ function formatar($txt) {
                                     aria-label="Compartilhar" data-cod="<?= (int)$ev['cod_evento'] ?>">
                                     <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
                                 </button>
+                            </div>
+                            <div class="EventoImagem">
+                                <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
                             </div>
                             <div class="EventoTitulo"><?= htmlspecialchars($ev['nome']) ?></div>
                             <div class="EventoInfo">
@@ -724,7 +894,7 @@ function formatar($txt) {
         <div class="conteudo">
             <div class="cabecalho">
                 <span>Compartilhar</span>
-                <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
             </div>
             <div class="opcoes-compartilhamento">
                 <button class="btn-compartilhar-app" onclick="compartilharWhatsApp()" title="Compartilhar no WhatsApp">

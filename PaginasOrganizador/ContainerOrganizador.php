@@ -77,8 +77,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 <body <?php 
         $paginaAtual = $pagina ?? ($_GET['pagina'] ?? 'inicio');
         $classes = [];
-        if ($paginaAtual === 'inicio') {
-            $classes[] = 'pagina-inicio';
+        // Páginas com barra de pesquisa precisam começar do topo
+        if (in_array($paginaAtual, ['inicio', 'eventosInscritos', 'meusEventos'])) {
+            $classes[] = 'pagina-com-barra-pesquisa';
         }
         if ($paginaAtual === 'eventosInscritos') {
             $classes[] = 'pagina-lista-eventos';
@@ -94,7 +95,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'eventosInscritos' => 'EventosInscritosOrganizador.php',
         'evento' => 'CartaodoEventoOrganizador.php',
         'eventoInscrito' => 'CartaoDoEventoInscritoOrganizador.php',
-        'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
+        'eventoOrganizado' => 'CartaoDoEventoOrganizando.php',
         'meusEventos' => 'MeusEventosOrganizador.php',
         'adicionarEvento' => 'AdicionarEvento.php',
         'gerenciarEvento' => 'GerenciarEvento.php',
@@ -221,10 +222,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         function atualizarClasseBody(pagina) {
             const b = document.body;
             if (!b) return;
-            if (pagina === 'inicio') {
-                b.classList.add('pagina-inicio');
+            
+            // Páginas com barra de pesquisa precisam começar do topo
+            const paginasComBarraPesquisa = ['inicio', 'eventosInscritos', 'meusEventos'];
+            if (paginasComBarraPesquisa.includes(pagina)) {
+                b.classList.add('pagina-com-barra-pesquisa');
             } else {
-                b.classList.remove('pagina-inicio');
+                b.classList.remove('pagina-com-barra-pesquisa');
             }
             
             // Páginas que precisam começar do topo (não centralizadas)
@@ -244,6 +248,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 js: ['../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Inicializar modais (incluindo listener para fechar ao clicar fora)
+                    if (typeof window.inicializarModais === 'function') {
+                        window.inicializarModais();
+                    }
                     // Carregar inscrições e favoritos após carregamento via AJAX
                     setTimeout(() => {
                         if (typeof window.carregarInscricoes === 'function') {
@@ -251,6 +259,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         }
                         if (typeof window.carregarFavoritos === 'function') {
                             window.carregarFavoritos();
+                        }
+                        // Re-inicializar modais após carregar conteúdo
+                        if (typeof window.inicializarModais === 'function') {
+                            window.inicializarModais();
                         }
                     }, 150);
                 }
@@ -260,6 +272,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 js: ['../PaginasGlobais/Filtro.js', 'EventosInscritosOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Inicializar modais (incluindo listener para fechar ao clicar fora)
+                    if (typeof window.inicializarModais === 'function') {
+                        window.inicializarModais();
+                    }
                     // Carregar inscrições e favoritos após carregamento via AJAX
                     setTimeout(() => {
                         if (typeof window.carregarInscricoes === 'function') {
@@ -268,6 +284,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         if (typeof window.carregarFavoritos === 'function') {
                             window.carregarFavoritos();
                         }
+                        // Re-inicializar modais após carregar conteúdo
+                        if (typeof window.inicializarModais === 'function') {
+                            window.inicializarModais();
+                        }
                     }, 150);
                 }
             },
@@ -275,12 +295,38 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: 'MeusEventosOrganizador.php',
                 js: ['../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
                 init: () => {
-                    if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
-                    // Carregar favoritos após carregamento via AJAX
+                    // Reseta flags de inicialização ao carregar via AJAX
+                    if (typeof window.resetarInicializacaoMeusEventos === 'function') {
+                        window.resetarInicializacaoMeusEventos();
+                    }
+                    // Garante que a função está disponível e inicializa após um pequeno delay
+                    // para permitir que o script seja completamente carregado
                     setTimeout(() => {
-                        if (typeof window.carregarFavoritos === 'function') {
-                            window.carregarFavoritos();
+                        // Inicializa modais primeiro
+                        if (typeof window.inicializarModais === 'function') {
+                            window.inicializarModais();
                         }
+                        // Inicializa botão de favoritos
+                        if (typeof window.inicializarBotaoFavoritos === 'function') {
+                            window.inicializarBotaoFavoritos();
+                        }
+                        // Inicializa filtro e carrega eventos
+                        if (typeof window.inicializarFiltroEventos === 'function') {
+                            window.inicializarFiltroEventos();
+                        } else {
+                            // Se ainda não estiver disponível, tenta novamente
+                            setTimeout(() => {
+                                if (typeof window.inicializarFiltroEventos === 'function') {
+                                    window.inicializarFiltroEventos();
+                                }
+                            }, 100);
+                        }
+                        // Carregar favoritos após carregamento via AJAX
+                        setTimeout(() => {
+                            if (typeof window.carregarFavoritos === 'function') {
+                                window.carregarFavoritos();
+                            }
+                        }, 200);
                     }, 150);
                 }
             },
@@ -299,7 +345,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'eventoOrganizado': {
-                html: 'CartaoDoEventoOrganizando.html',
+                html: 'CartaoDoEventoOrganizando.php',
                 js: ['CartaoDoEventoOrganizando.js'],
                 init: () => {}
             },
@@ -473,14 +519,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                             window.gerenciadorNotificacoes.reinicializar();
                         }
 
-                        // Se for página de evento organizado, carrega dados do evento
-                        if (pagina === 'eventoOrganizado' && codEvento) {
-                            setTimeout(() => {
-                                if (typeof window.carregarDadosEvento === 'function') {
-                                    window.carregarDadosEvento(codEvento);
-                                }
-                            }, 100);
-                        }
+                        // Se for página de evento organizado, o JavaScript já detecta automaticamente
+                        // se os dados vêm do PHP ou precisa carregar via AJAX
+                        // Não precisa chamar manualmente aqui
 
                         // Reinicia verificação de sessão para nova página (5 minutos)
                         if (typeof window.reiniciarVerificacaoSessao === 'function') {

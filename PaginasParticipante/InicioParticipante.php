@@ -74,7 +74,7 @@
       position: fixed;
       inset: 0;
       background: var(--fundo-escuro-transparente);
-      z-index: 10000;
+      z-index: 10010;
       align-items: center;
       justify-content: center;
       padding: 1rem;
@@ -654,6 +654,7 @@
     .lista-favoritos::-webkit-scrollbar-thumb:hover {
       background: var(--destaque);
     }
+
   </style>
 </head>
 
@@ -735,7 +736,7 @@
                     $certTexto = ($cert === 'sim') ? 'Sim' : 'Não';
                   
                     // Preparar caminho da imagem
-                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
                     $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                 ?>
       <a class="botao CaixaDoEvento" style="text-decoration:none;color:inherit;display:block;"
@@ -1003,6 +1004,14 @@
       if (!modal) return;
       modal.classList.remove('ativo');
       desbloquearScroll();
+      // Garantir que o menu permaneça ativo após fechar o modal
+      setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        const pagina = params.get('pagina') || 'inicio';
+        if (typeof window.setMenuAtivoPorPagina === 'function') {
+          window.setMenuAtivoPorPagina(pagina);
+        }
+      }, 10);
     }
     function copiarLink() {
       const input = document.getElementById('link-inscricao');
@@ -1331,14 +1340,14 @@
       m.classList.remove('ativo');
       if (!skipUnlock) {
         desbloquearScroll();
-        // Restaurar o estado do menu após fechar o modal
+        // Garantir que o menu permaneça ativo após fechar o modal
         setTimeout(() => {
           const params = new URLSearchParams(window.location.search);
           const pagina = params.get('pagina') || 'inicio';
           if (typeof window.setMenuAtivoPorPagina === 'function') {
             window.setMenuAtivoPorPagina(pagina);
           }
-        }, 50);
+        }, 10);
       }
     }
     async function enviarMensagemOrganizador() {
@@ -1442,14 +1451,14 @@
       if (modal) {
         modal.classList.remove('ativo');
         desbloquearScroll();
-        // Restaurar o estado do menu após fechar o modal
+        // Garantir que o menu permaneça ativo após fechar o modal
         setTimeout(() => {
           const params = new URLSearchParams(window.location.search);
           const pagina = params.get('pagina') || 'inicio';
           if (typeof window.setMenuAtivoPorPagina === 'function') {
             window.setMenuAtivoPorPagina(pagina);
           }
-        }, 50);
+        }, 10);
       }
     }
 
@@ -1550,11 +1559,11 @@
         const divImagem = document.createElement('div');
         divImagem.className = 'favorito-item-imagem';
         const img = document.createElement('img');
-        const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
+        const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-ImagemEvento.png');
         img.src = caminho;
         img.alt = (ev.nome || 'Evento').substring(0, 100); // Limitar tamanho do alt
         img.onerror = function() {
-          this.src = '../ImagensEventos/CEU-Logo.png'; // Fallback se imagem não carregar
+          this.src = '../ImagensEventos/CEU-ImagemEvento.png'; // Fallback se imagem não carregar
         };
         divImagem.appendChild(img);
 

@@ -91,7 +91,7 @@ function carregarEventosDoServidor() {
                 // Caminho da imagem do evento, com fallback para imagem padrão
                 const imagemEvento = (evento.imagem && String(evento.imagem).trim() !== '')
                     ? String(evento.imagem).replace(/^\/+/, '')
-                    : 'ImagensEventos/CEU-Logo.png';
+                    : 'ImagensEventos/CEU-ImagemEvento.png';
                 const caminhoImagem = `../${imagemEvento}`;
 
                 const div = document.createElement('a');
@@ -106,6 +106,7 @@ function carregarEventosDoServidor() {
                 div.dataset.duracao = duracaoFaixa;
                 div.dataset.data = dataISO;
                 div.dataset.certificado = cert;
+                div.setAttribute('data-cod-evento', evento.cod_evento);
 
                 // Mantém a mesma estrutura visual dos cards da página de Início, com lista e ícones
                 div.innerHTML = `
@@ -164,6 +165,20 @@ function carregarEventosDoServidor() {
                     await window.carregarFavoritos();
                 }
             }, 100);
+
+            // Carregar inscrições após carregar eventos para atualizar ícones - mesmo padrão do EventosInscritosOrganizador.php
+            setTimeout(() => {
+                if (typeof window.carregarInscricoes === 'function') {
+                    window.carregarInscricoes();
+                }
+            }, 150);
+
+            // Aplicar listener de prevenção de navegação nos novos cards
+            setTimeout(() => {
+                if (typeof window.prevenirNavegacaoCards === 'function') {
+                    window.prevenirNavegacaoCards();
+                }
+            }, 200);
 
             // Reinicializa os filtros após carregar
             if (typeof window.inicializarFiltroEventos === 'function') {

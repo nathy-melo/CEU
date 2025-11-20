@@ -7,13 +7,13 @@
     <title>Eventos inscritos</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
     <style>
-        /* Modal de Compartilhar */
+        /* Modal de Compartilhar - mesmo padrão do InicioParticipante.php */
         .modal-compartilhar {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 10000;
+            background: var(--fundo-escuro-transparente);
+            z-index: 10010;
             align-items: center;
             justify-content: center;
             padding: 1rem;
@@ -92,19 +92,19 @@
         }
 
         .icone-whatsapp {
-            background: #25D366;
+            background: var(--whatsapp);
         }
 
         .icone-instagram {
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            background: linear-gradient(45deg, var(--instagram-inicio) 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, var(--instagram-fim) 100%);
         }
 
         .icone-email {
-            background: #EA4335;
+            background: var(--email-vermelho);
         }
 
         .icone-x {
-            background: #000000;
+            background: var(--preto);
         }
 
         .icone-copiar {
@@ -118,8 +118,8 @@
         }
 
         .campo-link {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--fundo-claro-transparente);
+            border: 1px solid var(--borda-clara);
             border-radius: 0.5rem;
             padding: 0.75rem;
             display: flex;
@@ -139,7 +139,7 @@
         }
 
         .aviso-compartilhar {
-            background: rgba(66, 135, 245, 0.1);
+            background: var(--fundo-azul-info);
             border-left: 3px solid var(--botao);
             padding: 0.75rem;
             border-radius: 0.5rem;
@@ -581,6 +581,7 @@
             color: var(--branco);
             width: 100%;
         }
+
     </style>
 </head>
 
@@ -718,7 +719,7 @@
 
                     $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
                     $certTexto = ($cert === 'sim') ? 'Sim' : 'Não';
-                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
                     $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                 ?>
                     <a class="botao CaixaDoEvento"
@@ -799,7 +800,7 @@
         <div class="conteudo">
             <div class="cabecalho">
                 <span>Compartilhar</span>
-                <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
             </div>
 
             <div class="opcoes-compartilhamento">
@@ -977,6 +978,14 @@
             if (!modal) return;
             modal.classList.remove('ativo');
             desbloquearScroll();
+            // Garantir que o menu permaneça ativo após fechar o modal
+            setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const pagina = params.get('pagina') || 'eventosInscritos';
+                if (typeof window.setMenuAtivoPorPagina === 'function') {
+                    window.setMenuAtivoPorPagina(pagina);
+                }
+            }, 10);
         }
         function copiarLink() {
             const input = document.getElementById('link-inscricao');
@@ -1044,7 +1053,12 @@
         }
         const modalCompartilhar = document.getElementById('modal-compartilhar');
         if (modalCompartilhar) {
-            modalCompartilhar.onclick = function (e) { if (e.target === this) fecharModalCompartilhar(); };
+            modalCompartilhar.onclick = function (e) { 
+                if (e.target === this) {
+                    e.stopPropagation();
+                    fecharModalCompartilhar();
+                }
+            };
         }
 
         // ====== Modal de Mensagem ======
@@ -1062,13 +1076,14 @@
                 m.classList.remove('ativo');
                 if (!skipUnlock) {
                     desbloquearScroll();
+                    // Garantir que o menu permaneça ativo após fechar o modal
                     setTimeout(() => {
                         const params = new URLSearchParams(window.location.search);
                         const pagina = params.get('pagina') || 'eventosInscritos';
                         if (typeof window.setMenuAtivoPorPagina === 'function') {
                             window.setMenuAtivoPorPagina(pagina);
                         }
-                    }, 50);
+                    }, 10);
                 }
             }
         }
@@ -1177,13 +1192,14 @@
             if (modal) {
                 modal.classList.remove('ativo');
                 desbloquearScroll();
+                // Garantir que o menu permaneça ativo após fechar o modal
                 setTimeout(() => {
                     const params = new URLSearchParams(window.location.search);
                     const pagina = params.get('pagina') || 'eventosInscritos';
                     if (typeof window.setMenuAtivoPorPagina === 'function') {
                         window.setMenuAtivoPorPagina(pagina);
                     }
-                }, 50);
+                }, 10);
             }
         }
 
@@ -1284,10 +1300,10 @@
                 const divImagem = document.createElement('div');
                 divImagem.className = 'favorito-item-imagem';
                 const img = document.createElement('img');
-                const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
+                const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-ImagemEvento.png');
                 img.src = caminho;
                 img.alt = (ev.nome || 'Evento').substring(0, 100);
-                img.onerror = function() { this.src = '../ImagensEventos/CEU-Logo.png'; };
+                img.onerror = function() { this.src = '../ImagensEventos/CEU-ImagemEvento.png'; };
                 divImagem.appendChild(img);
 
                 const divTitulo = document.createElement('div');
@@ -1581,6 +1597,16 @@
                         atualizarIconeInscricao(btnParaAtualizar, true);
                     }
                     abrirModalInscricaoConfirmada();
+                    // Recarrega a lista de eventos após inscrição
+                    setTimeout(() => {
+                        // Limpar cache antes de recarregar para garantir dados atualizados
+                        if (window.inscricaoCache) {
+                            window.inscricaoCache.clear();
+                        }
+                        if (typeof window.carregarEventosDoServidor === 'function') {
+                            window.carregarEventosDoServidor();
+                        }
+                    }, 500);
                 } else {
                     alert(j.mensagem || 'Erro ao realizar inscrição.');
                 }
@@ -1620,6 +1646,16 @@
                         atualizarIconeInscricao(btnParaAtualizar, false);
                     }
                     abrirModalDesinscricaoConfirmada();
+                    // Recarrega a lista de eventos após desinscrição
+                    setTimeout(() => {
+                        // Limpar cache antes de recarregar para garantir dados atualizados
+                        if (window.inscricaoCache) {
+                            window.inscricaoCache.clear();
+                        }
+                        if (typeof window.carregarEventosDoServidor === 'function') {
+                            window.carregarEventosDoServidor();
+                        }
+                    }, 500);
                 } else {
                     alert(j.mensagem || 'Erro ao cancelar inscrição.');
                 }
@@ -1862,17 +1898,30 @@
             }
         }, true);
 
-        // Fechar modal de favoritos ao clicar fora
-        const modalFav = document.getElementById('modal-favoritos');
-        if (modalFav) {
-            modalFav.onclick = function (e) {
-                if (e.target === this) fecharModalFavoritos();
-            };
-            const listaFavoritos = document.getElementById('lista-favoritos');
-            if (listaFavoritos) {
-                listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
-                listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+        // Função para inicializar modais (chamada após carregamento via AJAX)
+        function inicializarModais() {
+            // Fechar modal de favoritos ao clicar fora
+            const modalFav = document.getElementById('modal-favoritos');
+            if (modalFav) {
+                modalFav.onclick = function (e) {
+                    if (e.target === this) fecharModalFavoritos();
+                };
+                const listaFavoritos = document.getElementById('lista-favoritos');
+                if (listaFavoritos) {
+                    listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
+                    listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+                }
             }
+        }
+        
+        // Inicializa modais imediatamente se já existirem
+        inicializarModais();
+        
+        // Re-inicializa modais após carregamento via AJAX
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarModais);
+        } else {
+            setTimeout(inicializarModais, 50);
         }
 
         // Fechar modais com ESC
@@ -1882,13 +1931,6 @@
                 fecharModalMensagem(true); 
                 fecharModalFavoritos();
                 fecharTodosModaisConfirmacao();
-                setTimeout(() => {
-                    const params = new URLSearchParams(window.location.search);
-                    const pagina = params.get('pagina') || 'eventosInscritos';
-                    if (typeof window.setMenuAtivoPorPagina === 'function') {
-                        window.setMenuAtivoPorPagina(pagina);
-                    }
-                }, 50);
             } 
         });
 
@@ -1940,6 +1982,7 @@
         window.carregarInscricoes = carregarInscricoes;
         window.carregarFavoritos = carregarFavoritos;
         window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
+        window.inicializarModais = inicializarModais;
     </script>
 </body>
 

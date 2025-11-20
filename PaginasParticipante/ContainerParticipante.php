@@ -75,8 +75,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 <body <?php 
         $paginaAtual = $pagina ?? ($_GET['pagina'] ?? 'inicio');
         $classes = [];
-        if ($paginaAtual === 'inicio') {
-            $classes[] = 'pagina-inicio';
+        // Páginas com barra de pesquisa precisam começar do topo
+        if (in_array($paginaAtual, ['inicio', 'meusEventos'])) {
+            $classes[] = 'pagina-com-barra-pesquisa';
         }
         if ($paginaAtual === 'meusEventos') {
             $classes[] = 'pagina-lista-eventos';
@@ -233,10 +234,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         function atualizarClasseBody(pagina) {
             const b = document.body;
             if (!b) return;
-            if (pagina === 'inicio') {
-                b.classList.add('pagina-inicio');
+            
+            // Páginas com barra de pesquisa precisam começar do topo
+            const paginasComBarraPesquisa = ['inicio', 'meusEventos'];
+            if (paginasComBarraPesquisa.includes(pagina)) {
+                b.classList.add('pagina-com-barra-pesquisa');
             } else {
-                b.classList.remove('pagina-inicio');
+                b.classList.remove('pagina-com-barra-pesquisa');
             }
             
             // Páginas que precisam começar do topo (não centralizadas)

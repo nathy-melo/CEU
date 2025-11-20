@@ -136,7 +136,7 @@
                     $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
                     
                     // Preparar caminho da imagem
-                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
                     $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                 ?>
                     <a class="botao CaixaDoEvento"

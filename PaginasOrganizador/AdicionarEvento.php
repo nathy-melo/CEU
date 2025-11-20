@@ -1,4 +1,7 @@
 <?php
+// Limpa qualquer output anterior
+ob_start();
+
 // Inicia a sessão se ainda não foi iniciada
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -6,6 +9,8 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 // Processa o formulário quando enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Limpa qualquer output anterior
+    ob_clean();
     header('Content-Type: application/json; charset=utf-8');
 
     require_once('../BancoDados/conexao.php');
@@ -57,6 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($dataFimInscricao) && !empty($horarioFimInscricao)) {
         $fimInscricao = $dataFimInscricao . ' ' . $horarioFimInscricao . ':00';
     }
+    
+    // Converte NULL para string vazia para bind_param (será tratado como NULL no banco)
+    $inicioInscricaoStr = $inicioInscricao ?? '';
+    $fimInscricaoStr = $fimInscricao ?? '';
 
     // Calcula duração em horas
     $dataInicioObj = new DateTime($inicio);
@@ -69,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Processa upload de múltiplas imagens
     $imagensUpload = [];
-    $caminhoImagemPrincipal = null;
+    // Se não houver imagens, usa a imagem padrão
+    $caminhoImagemPrincipal = 'ImagensEventos/CEU-ImagemEvento.png';
 
     if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name'][0])) {
         $totalImagens = count($_FILES['imagens_evento']['name']);
@@ -151,6 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
         // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s)
+        // Para campos NULL, usa string vazia (será tratado como NULL no banco se o campo aceitar NULL)
+        $inicioInscricaoFinal = (!empty($inicioInscricaoStr)) ? $inicioInscricaoStr : '';
+        $fimInscricaoFinal = (!empty($fimInscricaoStr)) ? $fimInscricaoStr : '';
+        
         mysqli_stmt_bind_param(
             $stmtEvento,
             "isssssssdissss",
@@ -166,8 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $certificadoBool,
             $modalidade,
             $caminhoImagemPrincipal,
-            $inicioInscricao,
-            $fimInscricao
+            $inicioInscricaoFinal,
+            $fimInscricaoFinal
         );
 
         if (!mysqli_stmt_execute($stmtEvento)) {
@@ -1205,10 +1219,10 @@ mysqli_close($conexao);
                 <textarea id="descricao" name="descricao" class="campo-textarea" placeholder="Descreva o evento, incluindo detalhes, objetivos, público alvo, estrutura, palestrantes, etc." required autocomplete="off"></textarea>
             </div>
             <div class="BotaoVoltar">
-                <button type="button" class="botao" onclick="history.back()">Voltar</button>
+                <button type="button" class="botao" onclick="if (typeof carregarPagina === 'function') { carregarPagina('meusEventos'); } else { window.location.href = 'ContainerOrganizador.php?pagina=meusEventos'; }">Voltar</button>
             </div>
             <div class="BotaoCriar">
-                <button type="submit" class="botao" id="btn-criar" disabled>Criar evento</button>
+                <button type="submit" class="botao" id="btn-criar">Criar evento</button>
             </div>
         </form>
         <div id="modal-imagem" class="modal-imagem">
@@ -1271,7 +1285,58 @@ mysqli_close($conexao);
                 horarioInicio && horarioFim && publicoAlvo &&
                 categoria && certificado && modalidade && descricao;
 
-            document.getElementById('btn-criar').disabled = !todosPreenchidos;
+        }
+
+        function validarCamposObrigatorios() {
+            const campos = [
+                { id: 'nome', nome: 'Nome', elemento: document.getElementById('nome') },
+                { id: 'local', nome: 'Local', elemento: document.getElementById('local') },
+                { id: 'data-inicio', nome: 'Data de Início', elemento: document.getElementById('data-inicio') },
+                { id: 'horario-inicio', nome: 'Horário de Início', elemento: document.getElementById('horario-inicio') },
+                { id: 'data-fim', nome: 'Data de Fim', elemento: document.getElementById('data-fim') },
+                { id: 'horario-fim', nome: 'Horário de Fim', elemento: document.getElementById('horario-fim') },
+                { id: 'publico-alvo', nome: 'Público Alvo', elemento: document.getElementById('publico-alvo') },
+                { id: 'categoria', nome: 'Categoria', elemento: document.getElementById('categoria') },
+                { id: 'modalidade', nome: 'Modalidade', elemento: document.getElementById('modalidade') },
+                { id: 'certificado', nome: 'Tipo de Certificado', elemento: document.getElementById('certificado') },
+                { id: 'descricao', nome: 'Descrição', elemento: document.getElementById('descricao') }
+            ];
+
+            const camposFaltantes = [];
+            const elementosFaltantes = [];
+
+            campos.forEach(campo => {
+                let valor = '';
+                if (campo.elemento) {
+                    if (campo.elemento.tagName === 'SELECT') {
+                        valor = campo.elemento.value;
+                    } else {
+                        valor = campo.elemento.value.trim();
+                    }
+                    
+                    if (!valor) {
+                        camposFaltantes.push(campo.nome);
+                        elementosFaltantes.push(campo.elemento);
+                    } else {
+                        // Remove destaque se o campo foi preenchido
+                        campo.elemento.style.borderColor = '';
+                        campo.elemento.style.boxShadow = '';
+                    }
+                }
+            });
+
+            // Destaca visualmente os campos faltantes
+            elementosFaltantes.forEach(elemento => {
+                elemento.style.borderColor = '#f44336';
+                elemento.style.boxShadow = '0 0 0 3px rgba(244, 67, 54, 0.2)';
+                // Scroll suave até o primeiro campo faltante
+                if (elemento === elementosFaltantes[0]) {
+                    elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    elemento.focus();
+                }
+            });
+
+            return camposFaltantes;
         }
 
         // ==== FUNÇÕES DE COLABORADORES ====
@@ -1418,8 +1483,22 @@ mysqli_close($conexao);
 
         // Adicionar listeners para validar em tempo real
         document.querySelectorAll('input, select, textarea').forEach(element => {
-            element.addEventListener('input', validarFormulario);
-            element.addEventListener('change', validarFormulario);
+            element.addEventListener('input', function() {
+                validarFormulario();
+                // Remove destaque quando o campo é preenchido
+                if (element.value && element.value.trim()) {
+                    element.style.borderColor = '';
+                    element.style.boxShadow = '';
+                }
+            });
+            element.addEventListener('change', function() {
+                validarFormulario();
+                // Remove destaque quando o campo é preenchido
+                if (element.value && element.value.trim()) {
+                    element.style.borderColor = '';
+                    element.style.boxShadow = '';
+                }
+            });
         });
 
         // Chama validação inicial ao carregar a página
@@ -1530,6 +1609,19 @@ mysqli_close($conexao);
         document.getElementById('form-evento').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Valida campos obrigatórios antes de enviar
+            const camposFaltantes = validarCamposObrigatorios();
+            
+            if (camposFaltantes.length > 0) {
+                let mensagem = 'Por favor, preencha os seguintes campos obrigatórios:\n\n';
+                camposFaltantes.forEach((campo, index) => {
+                    mensagem += `${index + 1}. ${campo}\n`;
+                });
+                mensagem += '\nOs campos faltantes foram destacados em vermelho.';
+                alert(mensagem);
+                return;
+            }
+
             const formData = new FormData(this);
 
             // Adiciona colaboradores ao FormData
@@ -1546,9 +1638,24 @@ mysqli_close($conexao);
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    // Verifica se a resposta é OK
+                    if (!response.ok) {
+                        throw new Error('Erro HTTP: ' + response.status);
+                    }
+                    // Verifica o tipo de conteúdo
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('Resposta não é JSON:', text);
+                            throw new Error('Resposta do servidor não é JSON válido');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (data.sucesso) {
+                    console.log('Resposta do servidor:', data);
+                    if (data.sucesso === true) {
                         alert(data.mensagem || 'Evento criado com sucesso!');
                         // Redireciona para a página de meus eventos
                         if (typeof carregarPagina === 'function') {
@@ -1563,8 +1670,8 @@ mysqli_close($conexao);
                     }
                 })
                 .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao criar evento. Por favor, tente novamente.');
+                    console.error('Erro completo:', error);
+                    alert('Erro ao criar evento: ' + error.message + '. Verifique o console para mais detalhes.');
                     btnCriar.disabled = false;
                     btnCriar.textContent = 'Criar evento';
                 });

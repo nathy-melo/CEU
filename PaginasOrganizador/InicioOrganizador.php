@@ -53,29 +53,133 @@
             display: block;
         }
 
-        /* Modal de Compartilhar - mesmo padrão do CartaodoEventoParticipante */
+        /* Modal de Compartilhar - mesmo padrão do InicioParticipante.php */
         body.modal-aberto { overflow: hidden !important; }
         body.modal-aberto #main-content { overflow: hidden !important; }
-        .modal-compartilhar { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 10000; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-compartilhar.ativo { display: flex; }
-        .modal-compartilhar .conteudo { background: var(--caixas); color: var(--texto); width: 100%; max-width: 32rem; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35); }
-        .modal-compartilhar .cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; font-weight: 800; font-size: 1.25rem; }
-        .modal-compartilhar button.fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto); transition: opacity 0.2s; }
-        .modal-compartilhar button.fechar:hover { opacity: 0.7; }
-        .opcoes-compartilhamento { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        .btn-compartilhar-app { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; background: none; border: none; cursor: pointer; transition: transform 0.2s; padding: 0.5rem; }
-        .btn-compartilhar-app:hover { transform: translateY(-3px); }
-        .icone-app { width: 3.5rem; height: 3.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
-        .icone-whatsapp { background: #25D366; }
-        .icone-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-        .icone-email { background: #EA4335; }
-        .icone-x { background: #000000; }
-        .icone-copiar { background: var(--botao); }
-        .btn-compartilhar-app span { font-size: 0.75rem; color: var(--branco); font-weight: 500; }
-        .campo-link { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-        .campo-link input { flex: 1; background: transparent; border: none; color: var(--texto); font-size: 0.85rem; outline: none; font-family: monospace; }
-        .aviso-compartilhar { background: rgba(66, 135, 245, 0.1); border-left: 3px solid var(--botao); padding: 0.75rem; border-radius: 0.5rem; font-size: 0.8rem; color: var(--texto); line-height: 1.4; }
-        .aviso-compartilhar strong { color: var(--botao); }
+        .modal-compartilhar {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--fundo-escuro-transparente);
+            z-index: 10010;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-compartilhar.ativo {
+            display: flex;
+        }
+        .modal-compartilhar .conteudo {
+            background: var(--caixas);
+            color: var(--texto);
+            width: 100%;
+            max-width: 32rem;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
+        }
+        .modal-compartilhar .cabecalho {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+        .modal-compartilhar button.fechar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--texto);
+            transition: opacity 0.2s;
+        }
+        .modal-compartilhar button.fechar:hover {
+            opacity: 0.7;
+        }
+        .opcoes-compartilhamento {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-compartilhar-app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.5rem;
+        }
+        .btn-compartilhar-app:hover {
+            transform: translateY(-3px);
+        }
+        .icone-app {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .icone-whatsapp {
+            background: var(--whatsapp);
+        }
+        .icone-instagram {
+            background: linear-gradient(45deg, var(--instagram-inicio) 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, var(--instagram-fim) 100%);
+        }
+        .icone-email {
+            background: var(--email-vermelho);
+        }
+        .icone-x {
+            background: var(--preto);
+        }
+        .icone-copiar {
+            background: var(--botao);
+        }
+        .btn-compartilhar-app span {
+            font-size: 0.75rem;
+            color: var(--branco);
+            font-weight: 500;
+        }
+        .campo-link {
+            background: var(--fundo-claro-transparente);
+            border: 1px solid var(--borda-clara);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .campo-link input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--texto);
+            font-size: 0.85rem;
+            outline: none;
+            font-family: monospace;
+        }
+        .aviso-compartilhar {
+            background: var(--fundo-azul-info);
+            border-left: 3px solid var(--botao);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--texto);
+            line-height: 1.4;
+        }
+        .aviso-compartilhar strong {
+            color: var(--botao);
+        }
 
         /* Botão para abrir lista de favoritos */
         .BotaoFavoritosTrigger {
@@ -537,7 +641,7 @@
                     $certTexto = ($cert === 'sim') ? 'Sim' : 'Não';
                     
                     // Preparar caminho da imagem
-                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-Logo.png';
+                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
                     $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
                 ?>
                     <a class="botao CaixaDoEvento" 
@@ -620,7 +724,7 @@
       <div class="conteudo">
         <div class="cabecalho">
           <span>Compartilhar</span>
-          <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
+          <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
         </div>
 
         <div class="opcoes-compartilhamento">
@@ -798,6 +902,14 @@
             if (!modal) return;
             modal.classList.remove('ativo');
             desbloquearScroll();
+            // Garantir que o menu permaneça ativo após fechar o modal
+            setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const pagina = params.get('pagina') || 'inicio';
+                if (typeof window.setMenuAtivoPorPagina === 'function') {
+                    window.setMenuAtivoPorPagina(pagina);
+                }
+            }, 10);
         }
         function copiarLink() {
             const input = document.getElementById('link-inscricao');
@@ -863,9 +975,41 @@
             const texto = `Confira este evento!`;
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
         }
-        const modalCompartilhar = document.getElementById('modal-compartilhar');
-        if (modalCompartilhar) {
-            modalCompartilhar.onclick = function (e) { if (e.target === this) fecharModalCompartilhar(); };
+        // Função para inicializar modais (chamada após carregamento via AJAX)
+        function inicializarModais() {
+            // Fechar modal de compartilhar ao clicar fora
+            const modalCompartilhar = document.getElementById('modal-compartilhar');
+            if (modalCompartilhar) {
+                modalCompartilhar.onclick = function (e) { 
+                    if (e.target === this) {
+                        e.stopPropagation();
+                        fecharModalCompartilhar();
+                    }
+                };
+            }
+            
+            // Fechar modal de favoritos ao clicar fora
+            const modalFav = document.getElementById('modal-favoritos');
+            if (modalFav) {
+                modalFav.onclick = function (e) {
+                    if (e.target === this) fecharModalFavoritos();
+                };
+                const listaFavoritos = document.getElementById('lista-favoritos');
+                if (listaFavoritos) {
+                    listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
+                    listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+                }
+            }
+        }
+        
+        // Inicializa modais imediatamente se já existirem
+        inicializarModais();
+        
+        // Re-inicializa modais após carregamento via AJAX
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarModais);
+        } else {
+            setTimeout(inicializarModais, 50);
         }
 
         // ====== Modal de Mensagem ======
@@ -883,13 +1027,14 @@
                 m.classList.remove('ativo');
                 if (!skipUnlock) {
                     desbloquearScroll();
+                    // Garantir que o menu permaneça ativo após fechar o modal
                     setTimeout(() => {
                         const params = new URLSearchParams(window.location.search);
                         const pagina = params.get('pagina') || 'inicio';
                         if (typeof window.setMenuAtivoPorPagina === 'function') {
                             window.setMenuAtivoPorPagina(pagina);
                         }
-                    }, 50);
+                    }, 10);
                 }
             }
         }
@@ -998,13 +1143,14 @@
             if (modal) {
                 modal.classList.remove('ativo');
                 desbloquearScroll();
+                // Garantir que o menu permaneça ativo após fechar o modal
                 setTimeout(() => {
                     const params = new URLSearchParams(window.location.search);
                     const pagina = params.get('pagina') || 'inicio';
                     if (typeof window.setMenuAtivoPorPagina === 'function') {
                         window.setMenuAtivoPorPagina(pagina);
                     }
-                }, 50);
+                }, 10);
             }
         }
 
@@ -1105,10 +1251,10 @@
                 const divImagem = document.createElement('div');
                 divImagem.className = 'favorito-item-imagem';
                 const img = document.createElement('img');
-                const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
+                const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-ImagemEvento.png');
                 img.src = caminho;
                 img.alt = (ev.nome || 'Evento').substring(0, 100);
-                img.onerror = function() { this.src = '../ImagensEventos/CEU-Logo.png'; };
+                img.onerror = function() { this.src = '../ImagensEventos/CEU-ImagemEvento.png'; };
                 divImagem.appendChild(img);
 
                 const divTitulo = document.createElement('div');
@@ -1697,13 +1843,6 @@
                 fecharModalMensagem(true); 
                 fecharModalFavoritos();
                 fecharTodosModaisConfirmacao();
-                setTimeout(() => {
-                    const params = new URLSearchParams(window.location.search);
-                    const pagina = params.get('pagina') || 'inicio';
-                    if (typeof window.setMenuAtivoPorPagina === 'function') {
-                        window.setMenuAtivoPorPagina(pagina);
-                    }
-                }, 50);
             } 
         });
 
@@ -1803,6 +1942,7 @@
         window.carregarInscricoes = carregarInscricoes;
         window.carregarFavoritos = carregarFavoritos;
         window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
+        window.inicializarModais = inicializarModais;
     </script>
 </body>
 

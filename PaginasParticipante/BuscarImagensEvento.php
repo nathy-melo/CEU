@@ -54,7 +54,7 @@ if (empty($imagens)) {
         // Se não houver imagem, usa a logo padrão do CEU
         $imagens[] = [
             'id' => 0,
-            'caminho' => 'ImagensEventos/CEU-Logo.png',
+            'caminho' => 'ImagensEventos/CEU-ImagemEvento.png',
             'ordem' => 0,
             'principal' => true
         ];
