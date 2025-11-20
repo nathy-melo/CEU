@@ -98,3 +98,4 @@ try {
     http_response_code(500);
     echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno', 'detalhe' => $e->getMessage()]);
 }
+

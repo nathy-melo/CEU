@@ -90,10 +90,18 @@ function carregarEventosDoServidor() {
                         </ul>
                     `;
 
+                    caixaEventoHTML.appendChild(divAcoes);
                     caixaEventoHTML.appendChild(tituloEvento);
                     caixaEventoHTML.appendChild(informacoesEvento);
                     containerEventos.appendChild(caixaEventoHTML);
                 });
+                
+                // Carregar favoritos após carregar eventos para atualizar ícones
+                setTimeout(async () => {
+                    if (typeof window.carregarFavoritos === 'function') {
+                        await window.carregarFavoritos();
+                    }
+                }, 100);
             } else {
                 const mensagemSemEventos = document.createElement('div');
                 mensagemSemEventos.textContent = 'Você ainda não criou nenhum evento';
@@ -318,6 +326,50 @@ function carregarEventosColaboracao() {
                         carregarPagina('eventoOrganizado', dadosEvento.cod_evento);
                     };
 
+                    // Ações flutuantes: Favoritar, Mensagem, Compartilhar
+                    const divAcoes = document.createElement('div');
+                    divAcoes.className = 'AcoesFlutuantes';
+                    
+                    const btnFavorito = document.createElement('button');
+                    btnFavorito.type = 'button';
+                    btnFavorito.className = 'BotaoAcaoCard BotaoFavoritoCard botao';
+                    btnFavorito.title = 'Favoritar';
+                    btnFavorito.setAttribute('aria-label', 'Favoritar');
+                    btnFavorito.setAttribute('data-cod', dadosEvento.cod_evento);
+                    btnFavorito.setAttribute('data-favorito', '0');
+                    btnFavorito.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+                    const imgFav = document.createElement('img');
+                    imgFav.src = '../Imagens/Medalha_linha.svg';
+                    imgFav.alt = 'Favoritar';
+                    btnFavorito.appendChild(imgFav);
+                    divAcoes.appendChild(btnFavorito);
+
+                    const btnMensagem = document.createElement('button');
+                    btnMensagem.type = 'button';
+                    btnMensagem.className = 'BotaoAcaoCard BotaoMensagemCard botao';
+                    btnMensagem.title = 'Enviar mensagem ao organizador';
+                    btnMensagem.setAttribute('aria-label', 'Mensagem');
+                    btnMensagem.setAttribute('data-cod', dadosEvento.cod_evento);
+                    btnMensagem.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+                    const imgMsg = document.createElement('img');
+                    imgMsg.src = '../Imagens/Carta.svg';
+                    imgMsg.alt = 'Mensagem';
+                    btnMensagem.appendChild(imgMsg);
+                    divAcoes.appendChild(btnMensagem);
+
+                    const btnCompartilhar = document.createElement('button');
+                    btnCompartilhar.type = 'button';
+                    btnCompartilhar.className = 'BotaoAcaoCard BotaoCompartilharCard botao';
+                    btnCompartilhar.title = 'Compartilhar';
+                    btnCompartilhar.setAttribute('aria-label', 'Compartilhar');
+                    btnCompartilhar.setAttribute('data-cod', dadosEvento.cod_evento);
+                    btnCompartilhar.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+                    const imgComp = document.createElement('img');
+                    imgComp.src = '../Imagens/Icone_Compartilhar.svg';
+                    imgComp.alt = 'Compartilhar';
+                    btnCompartilhar.appendChild(imgComp);
+                    divAcoes.appendChild(btnCompartilhar);
+
                     const tituloEvento = document.createElement('div');
                     tituloEvento.className = 'EventoTitulo';
                     tituloEvento.textContent = dadosEvento.nome;
@@ -347,6 +399,7 @@ function carregarEventosColaboracao() {
                         </ul>
                     `;
 
+                    caixaEventoHTML.appendChild(divAcoes);
                     caixaEventoHTML.appendChild(tituloEvento);
                     caixaEventoHTML.appendChild(informacoesEvento);
                     containerColaboracao.appendChild(caixaEventoHTML);
@@ -391,3 +444,548 @@ window.carregarEventosColaboracao = carregarEventosColaboracao;
 document.addEventListener('DOMContentLoaded', inicializarFiltroEventos);
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML
 window.inicializarFiltroEventos = inicializarFiltroEventos;
+
+// ====== Sistema de Favoritos, Mensagens e Compartilhar ======
+// Variáveis globais
+if (typeof window.codEventoOrganizador === 'undefined') {
+    window.codEventoOrganizador = null;
+    window.codEventoMensagemOrganizador = null;
+    window.favoritosSetOrganizador = new Set();
+    window.favoritosDadosOrganizador = [];
+}
+
+// ====== Modal de Compartilhar ======
+function abrirModalCompartilhar() {
+    if (!window.codEventoOrganizador) return;
+    const modal = document.getElementById('modal-compartilhar');
+    if (!modal) return;
+    const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${window.codEventoOrganizador}`;
+    const input = document.getElementById('link-inscricao');
+    if (input) input.value = linkEvento;
+    modal.classList.add('ativo');
+    bloquearScroll();
+}
+function fecharModalCompartilhar() {
+    const modal = document.getElementById('modal-compartilhar');
+    if (!modal) return;
+    modal.classList.remove('ativo');
+    desbloquearScroll();
+}
+function copiarLink() {
+    const input = document.getElementById('link-inscricao');
+    if (!input) return;
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+        const iconeCopiar = document.getElementById('icone-copiar');
+        const textoCopiar = document.getElementById('texto-copiar');
+        if (iconeCopiar) {
+            iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+        }
+        if (textoCopiar) {
+            textoCopiar.textContent = 'Copiado!';
+        }
+        setTimeout(() => {
+            if (iconeCopiar) {
+                iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+            }
+            if (textoCopiar) {
+                textoCopiar.textContent = 'Copiar';
+            }
+        }, 2000);
+    }).catch(() => {
+        try {
+            input.select();
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Erro ao copiar link:', err);
+        }
+    });
+}
+function compartilharWhatsApp() {
+    if (!window.codEventoOrganizador) return;
+    const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${window.codEventoOrganizador}`;
+    const texto = `Confira este evento: ${linkEvento}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+}
+function compartilharInstagram() {
+    if (!window.codEventoOrganizador) return;
+    const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${window.codEventoOrganizador}`;
+    navigator.clipboard.writeText(linkEvento).then(() => {
+        alert('Link copiado! Cole no Instagram para compartilhar.');
+    }).catch(() => {
+        const input = document.getElementById('link-inscricao');
+        if (input) {
+            input.select();
+            document.execCommand('copy');
+            alert('Link copiado! Cole no Instagram para compartilhar.');
+        }
+    });
+}
+function compartilharEmail() {
+    if (!window.codEventoOrganizador) return;
+    const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${window.codEventoOrganizador}`;
+    const assunto = 'Confira este evento!';
+    const corpo = `Olá! Gostaria de compartilhar este evento com você: ${linkEvento}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+}
+function compartilharX() {
+    if (!window.codEventoOrganizador) return;
+    const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${window.codEventoOrganizador}`;
+    const texto = `Confira este evento!`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
+}
+const modalCompartilhar = document.getElementById('modal-compartilhar');
+if (modalCompartilhar) {
+    modalCompartilhar.onclick = function (e) { if (e.target === this) fecharModalCompartilhar(); };
+}
+
+// Funções de bloqueio/desbloqueio de scroll
+function bloquearScroll() {
+    document.body.classList.add('modal-aberto');
+    document.addEventListener('wheel', prevenirScroll, { passive: false });
+    document.addEventListener('touchmove', prevenirScroll, { passive: false });
+    document.addEventListener('keydown', prevenirScrollTeclado, false);
+}
+function desbloquearScroll() {
+    document.body.classList.remove('modal-aberto');
+    document.removeEventListener('wheel', prevenirScroll);
+    document.removeEventListener('touchmove', prevenirScroll);
+    document.removeEventListener('keydown', prevenirScrollTeclado);
+}
+function prevenirScroll(e) { if (document.body.classList.contains('modal-aberto')) { e.preventDefault(); } }
+function prevenirScrollTeclado(e) {
+    if (!document.body.classList.contains('modal-aberto')) return;
+    const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    if (teclas.includes(e.keyCode)) e.preventDefault();
+}
+
+// ====== Modal de Mensagem ======
+function abrirModalMensagem() {
+    const m = document.getElementById('modal-mensagem');
+    if (!m) return;
+    const textarea = document.getElementById('texto-mensagem-organizador');
+    if (textarea) textarea.value = '';
+    m.classList.add('ativo');
+    bloquearScroll();
+}
+function fecharModalMensagem(skipUnlock) {
+    const m = document.getElementById('modal-mensagem');
+    if (m) {
+        m.classList.remove('ativo');
+        if (!skipUnlock) {
+            desbloquearScroll();
+            setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const pagina = params.get('pagina') || 'meusEventos';
+                if (typeof window.setMenuAtivoPorPagina === 'function') {
+                    window.setMenuAtivoPorPagina(pagina);
+                }
+            }, 50);
+        }
+    }
+}
+async function enviarMensagemOrganizador() {
+    const textarea = document.getElementById('texto-mensagem-organizador');
+    if (!textarea) return;
+    const texto = (textarea.value || '').trim();
+    if (!window.codEventoMensagemOrganizador) { fecharModalMensagem(); return; }
+    if (texto.length === 0) { alert('Digite sua mensagem.'); return; }
+    let timeoutId = null;
+    try {
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 10000);
+        const basePath = `${window.location.origin}/CEU/PaginasGlobais/EnviarMensagemOrganizador.php`;
+        const r = await fetch(basePath, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            credentials: 'include',
+            body: new URLSearchParams({ cod_evento: window.codEventoMensagemOrganizador, mensagem: texto }),
+            signal: controller.signal
+        });
+        if (timeoutId) clearTimeout(timeoutId);
+        const j = await r.json();
+        fecharModalMensagem();
+        if (j && j.sucesso) {
+            alert('Mensagem enviada ao organizador!');
+        } else {
+            alert(j.mensagem || 'Não foi possível enviar a mensagem.');
+        }
+    } catch (e) {
+        if (timeoutId) clearTimeout(timeoutId);
+        fecharModalMensagem();
+        if (e.name !== 'AbortError') {
+            alert('Erro ao enviar mensagem.');
+        }
+    }
+}
+
+// ====== Favoritos ======
+function atualizarIconeFavorito(btn, fav) {
+    if (!btn) return;
+    const img = btn.querySelector('img');
+    if (!img) return;
+    const novoSrc = fav ? '../Imagens/Medalha_preenchida.svg' : '../Imagens/Medalha_linha.svg';
+    // Atualizar diretamente - navegador já tem as imagens em cache
+    img.src = novoSrc;
+    img.alt = fav ? 'Desfavoritar' : 'Favoritar';
+    btn.title = fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+    btn.setAttribute('data-favorito', fav ? '1' : '0');
+}
+
+async function carregarFavoritos() {
+    let timeoutId = null;
+    try {
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 10000);
+        const basePath = `${window.location.origin}/CEU/PaginasGlobais/ListarFavoritos.php`;
+        const r = await fetch(basePath, { 
+            credentials: 'include',
+            signal: controller.signal
+        });
+        if (timeoutId) clearTimeout(timeoutId);
+        if (r.status === 401) { 
+            window.favoritosSetOrganizador.clear(); 
+            window.favoritosDadosOrganizador = []; 
+            return; 
+        }
+        if (!r.ok) {
+            throw new Error(`HTTP error! status: ${r.status}`);
+        }
+        const j = await r.json();
+        if (j && j.sucesso && Array.isArray(j.favoritos)) {
+            window.favoritosSetOrganizador.clear();
+            window.favoritosDadosOrganizador = j.favoritos.filter(f => f && f.cod_evento);
+            for (const f of window.favoritosDadosOrganizador) {
+                const cod = Number(f.cod_evento);
+                if (cod > 0) window.favoritosSetOrganizador.add(cod);
+            }
+            document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                const cod = Number(btn.getAttribute('data-cod'));
+                if (cod && !btn.dataset.processing) {
+                    atualizarIconeFavorito(btn, window.favoritosSetOrganizador.has(cod));
+                }
+            });
+        }
+    } catch (e) {
+        if (e.name !== 'AbortError') {
+            console.warn('Erro ao carregar favoritos:', e);
+        }
+    } finally {
+        if (timeoutId) clearTimeout(timeoutId);
+    }
+}
+
+function abrirModalFavoritos() {
+    renderizarFavoritos();
+    const modal = document.getElementById('modal-favoritos');
+    if (modal) {
+        modal.classList.add('ativo');
+        bloquearScroll();
+    }
+}
+
+function fecharModalFavoritos() {
+    const modal = document.getElementById('modal-favoritos');
+    if (modal) {
+        modal.classList.remove('ativo');
+        desbloquearScroll();
+        setTimeout(() => {
+            const params = new URLSearchParams(window.location.search);
+            const pagina = params.get('pagina') || 'meusEventos';
+            if (typeof window.setMenuAtivoPorPagina === 'function') {
+                window.setMenuAtivoPorPagina(pagina);
+            }
+        }, 50);
+    }
+}
+
+function renderizarFavoritos() {
+    const cont = document.getElementById('lista-favoritos');
+    if (!cont) return;
+    cont.innerHTML = '';
+    if (!window.favoritosDadosOrganizador || window.favoritosDadosOrganizador.length === 0) {
+        cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--texto);padding:1rem;">Nenhum evento favoritado.</div>';
+        return;
+    }
+    const frag = document.createDocumentFragment();
+    window.favoritosDadosOrganizador.forEach(ev => {
+        if (!ev || !ev.cod_evento) return;
+        const a = document.createElement('a');
+        a.href = `ContainerOrganizador.php?pagina=eventoOrganizado&id=${ev.cod_evento}`;
+        a.className = 'favorito-item';
+        a.style.cssText = 'background-color:var(--branco);border-radius:1cqi;padding:0;box-shadow:0.5cqi 0.5cqi 3cqi var(--sombra-forte);display:grid;aspect-ratio:3/2;position:relative;overflow:hidden;text-decoration:none;color:inherit;';
+        
+        const divImagem = document.createElement('div');
+        divImagem.style.cssText = 'width:100%;height:100%;border-radius:2cqi 2cqi 0 0;aspect-ratio:3/2;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;background-color:var(--branco);';
+        const img = document.createElement('img');
+        const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
+        img.src = caminho;
+        img.alt = (ev.nome || 'Evento').substring(0, 100);
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center;display:block;';
+        img.onerror = function() { this.src = '../ImagensEventos/CEU-Logo.png'; };
+        divImagem.appendChild(img);
+
+        const divTitulo = document.createElement('div');
+        divTitulo.className = 'EventoTitulo';
+        divTitulo.textContent = (ev.nome || 'Evento').substring(0, 100);
+        divTitulo.style.cssText = 'font-size:5cqi;font-weight:800;padding:4cqi 3.5cqi;color:var(--branco);background:var(--botao);line-height:1.2;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;';
+
+        a.appendChild(divImagem);
+        a.appendChild(divTitulo);
+        frag.appendChild(a);
+    });
+    cont.appendChild(frag);
+}
+
+function inicializarBotaoFavoritos() {
+    const btnFavoritos = document.getElementById('btn-abrir-favoritos');
+    if (btnFavoritos && !btnFavoritos.dataset.listenerAdicionado) {
+        btnFavoritos.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            await carregarFavoritos();
+            abrirModalFavoritos();
+        });
+        btnFavoritos.dataset.listenerAdicionado = 'true';
+    }
+}
+
+// Listeners de clique para botões de ação
+document.addEventListener('click', async function (e) {
+    // Botão de mensagem
+    const btnMsg = e.target.closest('.BotaoMensagemCard');
+    if (btnMsg) {
+        e.preventDefault(); e.stopPropagation();
+        const cod = Number(btnMsg.getAttribute('data-cod')) || 0;
+        if (!cod) return;
+        window.codEventoMensagemOrganizador = cod;
+        abrirModalMensagem();
+        return;
+    }
+
+    // Botão de compartilhar
+    const btnCompartilhar = e.target.closest('.BotaoCompartilharCard');
+    if (btnCompartilhar) {
+        e.preventDefault(); e.stopPropagation();
+        const cod = Number(btnCompartilhar.getAttribute('data-cod')) || 0;
+        if (!cod) return;
+        window.codEventoOrganizador = cod;
+        abrirModalCompartilhar();
+        return;
+    }
+
+    // Toggle favorito
+    const btnFav = e.target.closest('.BotaoFavoritoCard');
+    if (btnFav) {
+        e.preventDefault(); 
+        e.stopPropagation();
+        if (btnFav.dataset.processing === 'true') return;
+        const cod = Number(btnFav.getAttribute('data-cod')) || 0;
+        if (!cod) return;
+        btnFav.dataset.processing = 'true';
+        const estadoAtual = btnFav.getAttribute('data-favorito') === '1';
+        const novoEstado = !estadoAtual;
+        if (novoEstado) { 
+            window.favoritosSetOrganizador.add(cod); 
+        } else { 
+            window.favoritosSetOrganizador.delete(cod);
+            window.favoritosDadosOrganizador = window.favoritosDadosOrganizador.filter(f => Number(f.cod_evento) !== cod);
+        }
+        atualizarIconeFavorito(btnFav, novoEstado);
+        // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
+        // Buscar especificamente os botões que NÃO estão no modal de favoritos
+        const atualizarTodosBotoes = () => {
+            const modalFavoritos = document.getElementById('modal-favoritos');
+            const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
+            let atualizados = 0;
+            todosBotoes.forEach(btn => {
+                if (btn === btnFav || btn.dataset.processing === 'true') return;
+                const estaNoModal = modalFavoritos && modalFavoritos.contains(btn);
+                const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                if (btnCod === cod) {
+                    if (modalFavoritos && modalFavoritos.contains(btnFav)) {
+                        if (!estaNoModal) {
+                            atualizarIconeFavorito(btn, novoEstado);
+                            atualizados++;
+                        }
+                    } else {
+                        if (estaNoModal) {
+                            atualizarIconeFavorito(btn, novoEstado);
+                            atualizados++;
+                        }
+                    }
+                }
+            });
+            console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, novoEstado: ${novoEstado}`);
+        };
+        atualizarTodosBotoes();
+        setTimeout(atualizarTodosBotoes, 100);
+        setTimeout(atualizarTodosBotoes, 300);
+        try {
+            let timeoutId = null;
+            const controller = new AbortController();
+            timeoutId = setTimeout(() => controller.abort(), 10000);
+            const basePath = `${window.location.origin}/CEU/PaginasGlobais/ToggleFavorito.php`;
+            const r = await fetch(basePath, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                credentials: 'include',
+                body: new URLSearchParams({ cod_evento: cod }),
+                signal: controller.signal
+            });
+            if (timeoutId) clearTimeout(timeoutId);
+            if (r.status === 401) { 
+                if (estadoAtual) { window.favoritosSetOrganizador.add(cod); } else { window.favoritosSetOrganizador.delete(cod); }
+                atualizarIconeFavorito(btnFav, estadoAtual);
+                // Reverter TODOS os botões de favorito com o mesmo código na página
+                document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                    const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                    if (btnCod === cod && btn !== btnFav && !btn.dataset.processing) {
+                        atualizarIconeFavorito(btn, estadoAtual);
+                    }
+                });
+                alert('Faça login para favoritar eventos.'); 
+            } else if (!r.ok) {
+                const text = await r.text();
+                console.error('Erro HTTP:', r.status, text);
+                throw new Error(`HTTP error! status: ${r.status}`);
+            } else {
+                let j;
+                try {
+                    j = await r.json();
+                } catch (parseErr) {
+                    console.error('Erro ao fazer parse do JSON:', parseErr);
+                    throw new Error('Resposta inválida do servidor');
+                }
+                if (j && j.sucesso) {
+                    if (j.favoritado) { window.favoritosSetOrganizador.add(cod); } else { window.favoritosSetOrganizador.delete(cod); window.favoritosDadosOrganizador = window.favoritosDadosOrganizador.filter(f => Number(f.cod_evento) !== cod); }
+                    atualizarIconeFavorito(btnFav, j.favoritado);
+                    // Atualizar TODOS os botões de favorito com o mesmo código na página
+                    // Buscar especificamente os botões que NÃO estão no modal de favoritos
+                    const atualizarTodosBotoes = () => {
+                        const modalFavoritos = document.getElementById('modal-favoritos');
+                        const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
+                        let atualizados = 0;
+                        todosBotoes.forEach(btn => {
+                            if (btn === btnFav || btn.dataset.processing === 'true') return;
+                            const estaNoModal = modalFavoritos && modalFavoritos.contains(btn);
+                            const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                            if (btnCod === cod) {
+                                if (modalFavoritos && modalFavoritos.contains(btnFav)) {
+                                    if (!estaNoModal) {
+                                        atualizarIconeFavorito(btn, j.favoritado);
+                                        atualizados++;
+                                    }
+                                } else {
+                                    if (estaNoModal) {
+                                        atualizarIconeFavorito(btn, j.favoritado);
+                                        atualizados++;
+                                    }
+                                }
+                            }
+                        });
+                        console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, favoritado: ${j.favoritado}`);
+                    };
+                    atualizarTodosBotoes();
+                    setTimeout(atualizarTodosBotoes, 100);
+                    setTimeout(atualizarTodosBotoes, 300);
+                } else {
+                    if (estadoAtual) { window.favoritosSetOrganizador.add(cod); } else { window.favoritosSetOrganizador.delete(cod); }
+                    atualizarIconeFavorito(btnFav, estadoAtual);
+                    // Reverter TODOS os botões de favorito com o mesmo código na página
+                    document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                        const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                        if (btnCod === cod && btn !== btnFav && !btn.dataset.processing) {
+                            atualizarIconeFavorito(btn, estadoAtual);
+                        }
+                    });
+                    alert(j.mensagem || 'Não foi possível atualizar favorito.');
+                }
+            }
+        } catch (err) {
+            if (estadoAtual) { window.favoritosSetOrganizador.add(cod); } else { window.favoritosSetOrganizador.delete(cod); }
+            atualizarIconeFavorito(btnFav, estadoAtual);
+            // Reverter TODOS os botões de favorito com o mesmo código na página
+            document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                if (btnCod === cod && btn !== btnFav && !btn.dataset.processing) {
+                    atualizarIconeFavorito(btn, estadoAtual);
+                }
+            });
+            if (err.name !== 'AbortError') {
+                console.error('Erro ao atualizar favorito:', err);
+                alert('Erro ao atualizar favorito. Verifique sua conexão e tente novamente.');
+            }
+        } finally {
+            btnFav.dataset.processing = 'false';
+        }
+        return;
+    }
+
+    // Abrir modal de favoritos (botão no topo)
+    if (e.target.closest('#btn-abrir-favoritos')) {
+        e.preventDefault(); e.stopPropagation();
+        await carregarFavoritos();
+        abrirModalFavoritos();
+        return;
+    }
+}, true);
+
+// Fechar modal de favoritos ao clicar fora
+const modalFav = document.getElementById('modal-favoritos');
+if (modalFav) {
+    modalFav.onclick = function (e) {
+        if (e.target === this) fecharModalFavoritos();
+    };
+    const listaFavoritos = document.getElementById('lista-favoritos');
+    if (listaFavoritos) {
+        listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
+        listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+    }
+}
+
+// Fechar modais com ESC
+document.addEventListener('keydown', function (e) { 
+    if (e.key === 'Escape' || e.key === 'Esc') { 
+        fecharModalCompartilhar();
+        fecharModalMensagem(true); 
+        fecharModalFavoritos();
+        setTimeout(() => {
+            const params = new URLSearchParams(window.location.search);
+            const pagina = params.get('pagina') || 'meusEventos';
+            if (typeof window.setMenuAtivoPorPagina === 'function') {
+                window.setMenuAtivoPorPagina(pagina);
+            }
+        }, 50);
+    } 
+});
+
+// Carregar favoritos ao iniciar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', carregarFavoritos);
+} else {
+    setTimeout(carregarFavoritos, 50);
+}
+
+// Inicializar botão de favoritos
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarBotaoFavoritos);
+} else {
+    inicializarBotaoFavoritos();
+}
+setTimeout(inicializarBotaoFavoritos, 100);
+
+// Expor funções globalmente para serem chamadas após carregamento via AJAX
+window.carregarFavoritos = carregarFavoritos;
+window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
+window.fecharModalFavoritos = fecharModalFavoritos;
+window.fecharModalMensagem = fecharModalMensagem;
+window.enviarMensagemOrganizador = enviarMensagemOrganizador;
+window.abrirModalCompartilhar = abrirModalCompartilhar;
+window.fecharModalCompartilhar = fecharModalCompartilhar;
+window.copiarLink = copiarLink;
+window.compartilharWhatsApp = compartilharWhatsApp;
+window.compartilharInstagram = compartilharInstagram;
+window.compartilharEmail = compartilharEmail;
+window.compartilharX = compartilharX;

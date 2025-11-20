@@ -158,18 +158,11 @@ function carregarEventosDoServidor() {
                 container.appendChild(div);
             });
 
-            // Atualiza status de favoritos nos cards após carregar
+            // Carregar favoritos após carregar eventos para atualizar ícones
             setTimeout(async () => {
-                const cards = container.querySelectorAll('.CaixaDoEvento');
-                cards.forEach(card => {
-                    const cod = card.querySelector('.BotaoFavoritoCard')?.getAttribute('data-cod');
-                    if (cod && window.favoritosSet && window.favoritosSet.has(Number(cod))) {
-                        const btn = card.querySelector('.BotaoFavoritoCard');
-                        if (btn && typeof window.atualizarIconeFavorito === 'function') {
-                            window.atualizarIconeFavorito(btn, true);
-                        }
-                    }
-                });
+                if (typeof window.carregarFavoritos === 'function') {
+                    await window.carregarFavoritos();
+                }
             }, 100);
 
             // Reinicializa os filtros após carregar

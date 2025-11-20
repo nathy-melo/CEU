@@ -257,6 +257,21 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
                     if (typeof window.inicializarFiltro === 'function') window.inicializarFiltro();
+                    // Garantir que o botão de favoritos funcione após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.inicializarBotaoFavoritos === 'function') {
+                            window.inicializarBotaoFavoritos();
+                        }
+                    }, 150);
+                    // Carregar inscrições e favoritos após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.carregarInscricoes === 'function') {
+                            window.carregarInscricoes();
+                        }
+                        if (typeof window.carregarFavoritos === 'function') {
+                            window.carregarFavoritos();
+                        }
+                    }, 150);
                 }
             },
             'meusEventos': {
@@ -271,6 +286,38 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (typeof window.inicializarFiltroEventos === 'function') {
                         window.inicializarFiltroEventos();
                     }
+                    // Garantir que o botão de favoritos funcione após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.inicializarBotaoFavoritos === 'function') {
+                            window.inicializarBotaoFavoritos();
+                        }
+                    }, 150);
+                    // Carregar favoritos após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.carregarFavoritos === 'function') {
+                            window.carregarFavoritos();
+                        }
+                    }, 150);
+                }
+            },
+            'meusEventos': {
+                html: 'MeusEventosParticipante.php',
+                js: ['../PaginasGlobais/Filtro.js', 'MeusEventosParticipante.js'],
+                init: () => {
+                    // Carrega eventos do servidor primeiro
+                    if (typeof window.carregarEventosDoServidor === 'function') {
+                        window.carregarEventosDoServidor();
+                    }
+                    // Depois inicializa os filtros
+                    if (typeof window.inicializarFiltroEventos === 'function') {
+                        window.inicializarFiltroEventos();
+                    }
+                    // Garantir que o botão de favoritos funcione após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.inicializarBotaoFavoritos === 'function') {
+                            window.inicializarBotaoFavoritos();
+                        }
+                    }, 150);
                 }
             },
             'evento': {

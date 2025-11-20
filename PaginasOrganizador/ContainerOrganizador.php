@@ -95,7 +95,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'evento' => 'CartaodoEventoOrganizador.php',
         'eventoInscrito' => 'CartaoDoEventoInscritoOrganizador.php',
         'eventoOrganizado' => 'CartaoDoEventoOrganizando.html',
-        'meusEventos' => 'MeusEventosOrganizador.html',
+        'meusEventos' => 'MeusEventosOrganizador.php',
         'adicionarEvento' => 'AdicionarEvento.php',
         'gerenciarEvento' => 'GerenciarEvento.php',
         'perfil' => 'PerfilOrganizador.php',
@@ -244,6 +244,15 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 js: ['../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Carregar inscrições e favoritos após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.carregarInscricoes === 'function') {
+                            window.carregarInscricoes();
+                        }
+                        if (typeof window.carregarFavoritos === 'function') {
+                            window.carregarFavoritos();
+                        }
+                    }, 150);
                 }
             },
             'eventosInscritos': {
@@ -251,13 +260,28 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 js: ['../PaginasGlobais/Filtro.js', 'EventosInscritosOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Carregar inscrições e favoritos após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.carregarInscricoes === 'function') {
+                            window.carregarInscricoes();
+                        }
+                        if (typeof window.carregarFavoritos === 'function') {
+                            window.carregarFavoritos();
+                        }
+                    }, 150);
                 }
             },
             'meusEventos': {
-                html: 'MeusEventosOrganizador.html',
+                html: 'MeusEventosOrganizador.php',
                 js: ['../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Carregar favoritos após carregamento via AJAX
+                    setTimeout(() => {
+                        if (typeof window.carregarFavoritos === 'function') {
+                            window.carregarFavoritos();
+                        }
+                    }, 150);
                 }
             },
             'evento': {

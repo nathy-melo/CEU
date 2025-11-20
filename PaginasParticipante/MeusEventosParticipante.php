@@ -355,7 +355,7 @@
             margin-top: 0.75rem;
             display: flex;
             gap: 0.75rem;
-            justify-content: flex-end;
+            justify-content: space-between;
         }
 
         .modal-mensagem .botao-primario {
@@ -835,7 +835,8 @@
             if (!modal) return;
             
             const linkInscricao = window.location.origin + '/CEU/PaginasPublicas/ContainerPublico.php?pagina=evento&cod_evento=' + codEvento;
-            document.getElementById('link-inscricao').value = linkInscricao;
+            const input = document.getElementById('link-inscricao');
+            if (input) input.value = linkInscricao;
             
             modal.classList.add('ativo');
             document.body.style.overflow = 'hidden';
@@ -852,80 +853,103 @@
 
         function copiarLink() {
             const linkInput = document.getElementById('link-inscricao');
+            if (!linkInput) return;
             const textoSpan = document.getElementById('texto-copiar');
             const iconeDiv = document.getElementById('icone-copiar');
             
             linkInput.select();
             
             navigator.clipboard.writeText(linkInput.value).then(() => {
-                textoSpan.textContent = '✓ Copiado!';
-                iconeDiv.style.background = '#28a745';
+                if (textoSpan) textoSpan.textContent = '✓ Copiado!';
+                if (iconeDiv) iconeDiv.style.background = '#28a745';
                 setTimeout(() => {
-                    textoSpan.textContent = 'Copiar';
-                    iconeDiv.style.background = '';
+                    if (textoSpan) textoSpan.textContent = 'Copiar';
+                    if (iconeDiv) iconeDiv.style.background = '';
                 }, 2000);
             }).catch(() => {
                 try {
+                    linkInput.select();
                     document.execCommand('copy');
-                    textoSpan.textContent = '✓ Copiado!';
-                    iconeDiv.style.background = '#28a745';
+                    if (textoSpan) textoSpan.textContent = '✓ Copiado!';
+                    if (iconeDiv) iconeDiv.style.background = '#28a745';
                     setTimeout(() => {
-                        textoSpan.textContent = 'Copiar';
-                        iconeDiv.style.background = '';
+                        if (textoSpan) textoSpan.textContent = 'Copiar';
+                        if (iconeDiv) iconeDiv.style.background = '';
                     }, 2000);
                 } catch (e) {
+                    console.error('Erro ao copiar link:', e);
                     alert('Por favor, copie o link manualmente.');
                 }
             });
         }
 
         function compartilharWhatsApp() {
-            const link = document.getElementById('link-inscricao').value;
+            const input = document.getElementById('link-inscricao');
+            if (!input) return;
+            const link = input.value;
             const texto = encodeURIComponent('Confira este evento! Inscreva-se aqui: ' + link);
             window.open('https://wa.me/?text=' + texto, '_blank');
         }
 
         function compartilharInstagram() {
-            const link = document.getElementById('link-inscricao').value;
+            const input = document.getElementById('link-inscricao');
+            if (!input) return;
+            const link = input.value;
             navigator.clipboard.writeText(link).then(() => {
                 alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
             }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = link;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = link;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
+                } catch (e) {
+                    console.error('Erro ao copiar link:', e);
+                    alert('Por favor, copie o link manualmente.');
+                }
             });
         }
 
         function compartilharEmail() {
-            const link = document.getElementById('link-inscricao').value;
+            const input = document.getElementById('link-inscricao');
+            if (!input) return;
+            const link = input.value;
             const assunto = encodeURIComponent('Convite para Evento');
             const corpo = encodeURIComponent('Olá!\n\nGostaria de convidá-lo(a) para participar deste evento.\n\nInscreva-se através do link: ' + link + '\n\nAté breve!');
             window.location.href = 'mailto:?subject=' + assunto + '&body=' + corpo;
         }
 
         function compartilharX() {
-            const link = document.getElementById('link-inscricao').value;
+            const input = document.getElementById('link-inscricao');
+            if (!input) return;
+            const link = input.value;
             const texto = encodeURIComponent('Confira este evento! 🎉');
             window.open('https://twitter.com/intent/tweet?text=' + texto + '&url=' + encodeURIComponent(link), '_blank');
         }
 
-        // Fecha o modal ao clicar fora
-        document.getElementById('modal-compartilhar').onclick = function(e) {
-            if (e.target === this) {
-                fecharModalCompartilhar();
-            }
-        };
+        // Fecha o modal ao clicar fora - REMOVER DUPLICATA
+        const modalCompartilhar = document.getElementById('modal-compartilhar');
+        if (modalCompartilhar && !modalCompartilhar.dataset.listenerAdicionado) {
+            modalCompartilhar.onclick = function(e) {
+                if (e.target === this) {
+                    fecharModalCompartilhar();
+                }
+            };
+            modalCompartilhar.dataset.listenerAdicionado = 'true';
+        }
 
         // Fecha o modal ao pressionar ESC
         document.addEventListener('keydown', function(e) {
-            if ((e.key === 'Escape' || e.key === 'Esc') && document.getElementById('modal-compartilhar').classList.contains('ativo')) {
-                fecharModalCompartilhar();
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                const modal = document.getElementById('modal-compartilhar');
+                if (modal && modal.classList.contains('ativo')) {
+                    fecharModalCompartilhar();
+                }
             }
         });
 
@@ -959,6 +983,7 @@
         function abrirModalCompartilhar() {
             if (!codEvento) return;
             const modal = document.getElementById('modal-compartilhar');
+            if (!modal) return;
             const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
             const input = document.getElementById('link-inscricao');
             if (input) input.value = linkEvento;
@@ -967,22 +992,40 @@
         }
         function fecharModalCompartilhar() {
             const modal = document.getElementById('modal-compartilhar');
+            if (!modal) return;
             modal.classList.remove('ativo');
             desbloquearScroll();
         }
         function copiarLink() {
             const input = document.getElementById('link-inscricao');
+            if (!input) return;
             input.select();
             input.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(input.value).then(() => {
                 const iconeCopiar = document.getElementById('icone-copiar');
                 const textoCopiar = document.getElementById('texto-copiar');
-                iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-                textoCopiar.textContent = 'Copiado!';
+                if (iconeCopiar) {
+                    iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+                }
+                if (textoCopiar) {
+                    textoCopiar.textContent = 'Copiado!';
+                }
                 setTimeout(() => {
-                    iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
-                    textoCopiar.textContent = 'Copiar';
+                    if (iconeCopiar) {
+                        iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+                    }
+                    if (textoCopiar) {
+                        textoCopiar.textContent = 'Copiar';
+                    }
                 }, 2000);
+            }).catch(() => {
+                // Fallback para navegadores antigos
+                try {
+                    input.select();
+                    document.execCommand('copy');
+                } catch (err) {
+                    console.error('Erro ao copiar link:', err);
+                }
             });
         }
         function compartilharWhatsApp() {
@@ -997,10 +1040,17 @@
             navigator.clipboard.writeText(linkEvento).then(() => {
                 alert('Link copiado! Cole no Instagram para compartilhar.');
             }).catch(() => {
-                const input = document.getElementById('link-inscricao');
-                input.select();
-                document.execCommand('copy');
-                alert('Link copiado! Cole no Instagram para compartilhar.');
+                try {
+                    const input = document.getElementById('link-inscricao');
+                    if (input) {
+                        input.select();
+                        document.execCommand('copy');
+                        alert('Link copiado! Cole no Instagram para compartilhar.');
+                    }
+                } catch (e) {
+                    console.error('Erro ao copiar link:', e);
+                    alert('Por favor, copie o link manualmente.');
+                }
             });
         }
         function compartilharEmail() {
@@ -1016,43 +1066,64 @@
             const texto = `Confira este evento!`;
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
         }
-        document.getElementById('modal-compartilhar').onclick = function (e) { if (e.target === this) fecharModalCompartilhar(); };
+        // REMOVER DUPLICATA - listener já adicionado acima
 
         // Modais de desinscrição
         function abrirModalConfirmarDesinscricao() {
-            document.getElementById('modalConfirmarDesinscricao').classList.add('ativo');
+            const modal = document.getElementById('modalConfirmarDesinscricao');
+            if (!modal) return;
+            modal.classList.add('ativo');
             bloquearScroll();
         }
         function fecharModalConfirmarDesinscricao() {
-            document.getElementById('modalConfirmarDesinscricao').classList.remove('ativo');
+            const modal = document.getElementById('modalConfirmarDesinscricao');
+            if (!modal) return;
+            modal.classList.remove('ativo');
             desbloquearScroll();
         }
         function abrirModalDesinscricaoConfirmada() {
-            document.getElementById('modalDesinscricaoConfirmada').classList.add('ativo');
+            const modal = document.getElementById('modalDesinscricaoConfirmada');
+            if (!modal) return;
+            modal.classList.add('ativo');
             bloquearScroll();
         }
         function fecharModalDesinscricaoConfirmada() {
-            document.getElementById('modalDesinscricaoConfirmada').classList.remove('ativo');
+            const modal = document.getElementById('modalDesinscricaoConfirmada');
+            if (!modal) return;
+            modal.classList.remove('ativo');
             desbloquearScroll();
         }
         function abrirModalConfirmarInscricao() {
-            document.getElementById('modalConfirmarInscricao').classList.add('ativo');
+            const modal = document.getElementById('modalConfirmarInscricao');
+            if (!modal) return;
+            modal.classList.add('ativo');
             bloquearScroll();
         }
         function fecharModalConfirmarInscricao() {
-            document.getElementById('modalConfirmarInscricao').classList.remove('ativo');
+            const modal = document.getElementById('modalConfirmarInscricao');
+            if (!modal) return;
+            modal.classList.remove('ativo');
             desbloquearScroll();
         }
         function abrirModalInscricaoConfirmada() {
-            document.getElementById('modalInscricaoConfirmada').classList.add('ativo');
+            const modal = document.getElementById('modalInscricaoConfirmada');
+            if (!modal) return;
+            modal.classList.add('ativo');
             bloquearScroll();
         }
         function fecharModalInscricaoConfirmada() {
-            document.getElementById('modalInscricaoConfirmada').classList.remove('ativo');
+            const modal = document.getElementById('modalInscricaoConfirmada');
+            if (!modal) return;
+            modal.classList.remove('ativo');
             desbloquearScroll();
         }
         function fecharTodosModaisConfirmacao() {
-            document.querySelectorAll('.modal-overlay.ativo').forEach(m => m.classList.remove('ativo'));
+            const modais = document.querySelectorAll('.modal-overlay.ativo');
+            if (modais && modais.length > 0) {
+                modais.forEach(m => {
+                    if (m && m.classList) m.classList.remove('ativo');
+                });
+            }
             desbloquearScroll();
         }
 
@@ -1157,21 +1228,37 @@
         // Modal de mensagem ao organizador
         function abrirModalMensagem() {
             const m = document.getElementById('modal-mensagem');
-            document.getElementById('texto-mensagem-organizador').value = '';
+            if (!m) return;
+            const textarea = document.getElementById('texto-mensagem-organizador');
+            if (textarea) textarea.value = '';
             m.classList.add('ativo');
             bloquearScroll();
         }
         function fecharModalMensagem(skipUnlock) {
             const m = document.getElementById('modal-mensagem');
-            m.classList.remove('ativo');
-            if (!skipUnlock) desbloquearScroll();
+            if (m) {
+                m.classList.remove('ativo');
+                if (!skipUnlock) {
+                    desbloquearScroll();
+                    // Restaurar o estado do menu após fechar o modal
+                    setTimeout(() => {
+                        const params = new URLSearchParams(window.location.search);
+                        const pagina = params.get('pagina') || 'meusEventos';
+                        if (typeof window.setMenuAtivoPorPagina === 'function') {
+                            window.setMenuAtivoPorPagina(pagina);
+                        }
+                    }, 50);
+                }
+            }
         }
         async function enviarMensagemOrganizador() {
-            const texto = (document.getElementById('texto-mensagem-organizador').value || '').trim();
+            const textarea = document.getElementById('texto-mensagem-organizador');
+            if (!textarea) return;
+            const texto = (textarea.value || '').trim();
             if (!codEventoMensagem) { fecharModalMensagem(); return; }
             if (texto.length === 0) { alert('Digite sua mensagem.'); return; }
             try {
-                const r = await fetch('EnviarMensagemOrganizador.php', {
+                const r = await fetch('../PaginasGlobais/EnviarMensagemOrganizador.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     credentials: 'include',
@@ -1219,6 +1306,7 @@
         window.atualizarIconeInscricao = atualizarIconeInscricao;
 
         async function verificarInscricao(cod, forcarAtualizacao = false) {
+            if (!cod || cod <= 0) return false; // Validar código do evento
             // Sempre limpar o cache do evento específico antes de verificar para garantir dados atualizados
             if (forcarAtualizacao) {
                 inscricaoCache.delete(cod);
@@ -1230,14 +1318,31 @@
             }
             
             // Sempre verificar do servidor quando forçar atualização ou não tiver cache
+            let timeoutId = null;
             try {
-                const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { credentials: 'include' });
+                const controller = new AbortController();
+                timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout de 10 segundos
+                const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { 
+                    credentials: 'include',
+                    signal: controller.signal
+                });
+                if (timeoutId) clearTimeout(timeoutId);
+                if (!r.ok) {
+                    throw new Error(`HTTP error! status: ${r.status}`);
+                }
                 const j = await r.json();
-                const val = !!j.inscrito;
-                inscricaoCache.set(cod, val);
-                return val;
+                if (j && typeof j.inscrito !== 'undefined') {
+                    const val = !!j.inscrito;
+                    inscricaoCache.set(cod, val);
+                    return val;
+                }
+                return false;
             } catch (e) {
+                if (timeoutId) clearTimeout(timeoutId);
                 // Se falhar, usar cache se existir, senão retornar false
+                if (e.name !== 'AbortError') {
+                    console.warn('Erro ao verificar inscrição:', e);
+                }
                 return inscricaoCache.has(cod) ? inscricaoCache.get(cod) : false;
             }
         }
@@ -1246,11 +1351,8 @@
             if (!btn) return;
             const img = btn.querySelector('img');
             if (!img) return;
-            
-            // Atualização INSTANTÂNEA - sem verificações adicionais
             const novoSrc = fav ? '../Imagens/Medalha_preenchida.svg' : '../Imagens/Medalha_linha.svg';
-            
-            // Trocar imagem diretamente - navegador já tem em cache
+            // Atualizar diretamente - navegador já tem as imagens em cache
             img.src = novoSrc;
             img.alt = fav ? 'Desfavoritar' : 'Favoritar';
             btn.title = fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
@@ -1258,14 +1360,31 @@
         }
 
         async function carregarFavoritos() {
+            let timeoutId = null;
             try {
-                const r = await fetch('ListarFavoritos.php', { credentials: 'include' });
-                if (r.status === 401) { favoritosSet.clear(); favoritosDados = []; return; }
+                const controller = new AbortController();
+                timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout de 10 segundos
+                const r = await fetch('../PaginasGlobais/ListarFavoritos.php', { 
+                    credentials: 'include',
+                    signal: controller.signal
+                });
+                if (timeoutId) clearTimeout(timeoutId);
+                if (r.status === 401) { 
+                    favoritosSet.clear(); 
+                    favoritosDados = []; 
+                    return; 
+                }
+                if (!r.ok) {
+                    throw new Error(`HTTP error! status: ${r.status}`);
+                }
                 const j = await r.json();
-                if (j && j.sucesso) {
+                if (j && j.sucesso && Array.isArray(j.favoritos)) {
                     favoritosSet.clear();
-                    favoritosDados = j.favoritos || [];
-                    for (const f of favoritosDados) favoritosSet.add(Number(f.cod_evento));
+                    favoritosDados = j.favoritos.filter(f => f && f.cod_evento); // Filtrar favoritos inválidos
+                    for (const f of favoritosDados) {
+                        const cod = Number(f.cod_evento);
+                        if (cod > 0) favoritosSet.add(cod);
+                    }
                     // Atualiza ícones nos cards visíveis IMEDIATAMENTE
                     document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
                         const cod = Number(btn.getAttribute('data-cod'));
@@ -1275,38 +1394,70 @@
                     });
                 }
             } catch (e) {
-                // silencia
+                // Logar erro para debug, mas não quebrar a aplicação
+                if (e.name !== 'AbortError') {
+                    console.warn('Erro ao carregar favoritos:', e);
+                }
+            } finally {
+                // Garantir que timeout seja limpo
+                if (timeoutId) clearTimeout(timeoutId);
             }
+        }
+
+        // Garantir que o botão de favoritos funcione sempre
+        function inicializarBotaoFavoritos() {
+            const btnFavoritos = document.getElementById('btn-abrir-favoritos');
+            if (btnFavoritos && !btnFavoritos.dataset.listenerAdicionado) {
+                btnFavoritos.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await carregarFavoritos();
+                    abrirModalFavoritos();
+                });
+                btnFavoritos.dataset.listenerAdicionado = 'true';
+            }
+        }
+
+        // Inicializar imediatamente se o DOM já estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarBotaoFavoritos);
+        } else {
+            inicializarBotaoFavoritos();
         }
 
         function abrirModalFavoritos() {
             renderizarFavoritos();
-            document.getElementById('modal-favoritos').classList.add('ativo');
+            const modal = document.getElementById('modal-favoritos');
+            if (!modal) return;
+            modal.classList.add('ativo');
             bloquearScroll();
         }
         function fecharModalFavoritos() {
-            document.getElementById('modal-favoritos').classList.remove('ativo');
-            desbloquearScroll();
-            // Restaurar o estado do menu após fechar o modal
-            // Usar setTimeout para garantir que o DOM foi atualizado
-            setTimeout(() => {
-                const params = new URLSearchParams(window.location.search);
-                const pagina = params.get('pagina') || 'meusEventos';
-                if (typeof window.setMenuAtivoPorPagina === 'function') {
-                    window.setMenuAtivoPorPagina(pagina);
-                } else {
-                    // Fallback: tentar novamente após um pequeno delay
-                    setTimeout(() => {
-                        if (typeof window.setMenuAtivoPorPagina === 'function') {
-                            window.setMenuAtivoPorPagina(pagina);
-                        }
-                    }, 100);
-                }
-            }, 50);
+            const modal = document.getElementById('modal-favoritos');
+            if (modal) {
+                modal.classList.remove('ativo');
+                desbloquearScroll();
+                // Restaurar o estado do menu após fechar o modal
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    const pagina = params.get('pagina') || 'meusEventos';
+                    if (typeof window.setMenuAtivoPorPagina === 'function') {
+                        window.setMenuAtivoPorPagina(pagina);
+                    } else {
+                        // Fallback: tentar novamente após um pequeno delay
+                        setTimeout(() => {
+                            if (typeof window.setMenuAtivoPorPagina === 'function') {
+                                window.setMenuAtivoPorPagina(pagina);
+                            }
+                        }, 100);
+                    }
+                }, 50);
+            }
         }
         
         function renderizarFavoritos() {
             const cont = document.getElementById('lista-favoritos');
+            if (!cont) return;
             cont.innerHTML = '';
             if (!favoritosDados || favoritosDados.length === 0) {
                 cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--texto);padding:1rem;">Nenhum evento favoritado.</div>';
@@ -1314,6 +1465,7 @@
             }
             const frag = document.createDocumentFragment();
             favoritosDados.forEach(ev => {
+                if (!ev || !ev.cod_evento) return; // Validar dados do evento
                 const a = document.createElement('a');
                 a.href = `ContainerParticipante.php?pagina=evento&id=${ev.cod_evento}`;
                 a.className = 'favorito-item';
@@ -1405,12 +1557,15 @@
                 const img = document.createElement('img');
                 const caminho = '../' + (ev.imagem && ev.imagem !== '' ? ev.imagem.replace(/^\\/, '').replace(/^\//, '') : 'ImagensEventos/CEU-Logo.png');
                 img.src = caminho;
-                img.alt = ev.nome || 'Evento';
+                img.alt = (ev.nome || 'Evento').substring(0, 100); // Limitar tamanho do alt
+                img.onerror = function() {
+                    this.src = '../ImagensEventos/CEU-Logo.png'; // Fallback se imagem não carregar
+                };
                 divImagem.appendChild(img);
 
                 const divTitulo = document.createElement('div');
                 divTitulo.className = 'favorito-item-titulo';
-                divTitulo.textContent = ev.nome || 'Evento';
+                divTitulo.textContent = (ev.nome || 'Evento').substring(0, 100); // Limitar tamanho do título
 
                 const divInfo = document.createElement('div');
                 divInfo.className = 'favorito-item-info';
@@ -1419,18 +1574,28 @@
 
                 const liCategoria = document.createElement('li');
                 liCategoria.className = 'evento-info-item';
-                liCategoria.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-categoria.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Categoria:</span> ${ev.categoria || 'N/A'}</span>`;
+                const categoria = (ev.categoria || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Prevenir XSS
+                liCategoria.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-categoria.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Categoria:</span> ${categoria}</span>`;
                 ul.appendChild(liCategoria);
 
                 const liModalidade = document.createElement('li');
                 liModalidade.className = 'evento-info-item';
-                liModalidade.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-modalidade.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Modalidade:</span> ${ev.modalidade || 'N/A'}</span>`;
+                const modalidade = (ev.modalidade || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Prevenir XSS
+                liModalidade.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-modalidade.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Modalidade:</span> ${modalidade}</span>`;
                 ul.appendChild(liModalidade);
 
                 if (ev.inicio) {
                     const liData = document.createElement('li');
                     liData.className = 'evento-info-item';
-                    const dataFormatada = new Date(ev.inicio).toLocaleDateString('pt-BR');
+                    let dataFormatada = 'N/A';
+                    try {
+                        const data = new Date(ev.inicio);
+                        if (!isNaN(data.getTime())) {
+                            dataFormatada = data.toLocaleDateString('pt-BR');
+                        }
+                    } catch (e) {
+                        console.error('Erro ao formatar data:', e);
+                    }
                     liData.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-data.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Data:</span> ${dataFormatada}</span>`;
                     ul.appendChild(liData);
                 }
@@ -1438,7 +1603,8 @@
                 if (ev.lugar) {
                     const liLocal = document.createElement('li');
                     liLocal.className = 'evento-info-item';
-                    liLocal.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-local.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Local:</span> ${ev.lugar}</span>`;
+                    const lugar = (ev.lugar || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Prevenir XSS
+                    liLocal.innerHTML = `<span class="evento-info-icone"><img src="../Imagens/info-local.svg" alt="" /></span><span class="evento-info-texto"><span class="evento-info-label">Local:</span> ${lugar}</span>`;
                     ul.appendChild(liLocal);
                 }
 
@@ -1579,10 +1745,39 @@
                 }
                 
                 atualizarIconeFavorito(btnFav, novoEstado);
+                // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
+                // Buscar especificamente os botões que NÃO estão no modal de favoritos
+                const atualizarTodosBotoes = () => {
+                    const modalFavoritos = document.getElementById('modal-favoritos');
+                    const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
+                    let atualizados = 0;
+                    todosBotoes.forEach(btn => {
+                        if (btn === btnFav || btn.dataset.processing === 'true') return;
+                        const estaNoModal = modalFavoritos && modalFavoritos.contains(btn);
+                        const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                        if (btnCod === cod) {
+                            if (modalFavoritos && modalFavoritos.contains(btnFav)) {
+                                if (!estaNoModal) {
+                                    atualizarIconeFavorito(btn, novoEstado);
+                                    atualizados++;
+                                }
+                            } else {
+                                if (estaNoModal) {
+                                    atualizarIconeFavorito(btn, novoEstado);
+                                    atualizados++;
+                                }
+                            }
+                        }
+                    });
+                    console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, novoEstado: ${novoEstado}`);
+                };
+                atualizarTodosBotoes();
+                setTimeout(atualizarTodosBotoes, 100);
+                setTimeout(atualizarTodosBotoes, 300);
                 
                 // Sincronizar com servidor em background
                 try {
-                    const r = await fetch('ToggleFavorito.php', {
+                    const r = await fetch('../PaginasGlobais/ToggleFavorito.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         credentials: 'include',
@@ -1597,6 +1792,13 @@
                             favoritosSet.delete(cod); 
                         }
                         atualizarIconeFavorito(btnFav, estadoAtual);
+                        // Reverter TODOS os botões de favorito com o mesmo código na página
+                        document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                            const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                            if (btnCod === cod && btn !== btnFav && !btn.dataset.processing) {
+                                atualizarIconeFavorito(btn, estadoAtual);
+                            }
+                        });
                         alert('Faça login para favoritar eventos.'); 
                     } else {
                         const j = await r.json();
@@ -1609,6 +1811,35 @@
                                 favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
                             }
                             atualizarIconeFavorito(btnFav, j.favoritado);
+                            // Atualizar TODOS os botões de favorito com o mesmo código na página
+                            // Buscar especificamente os botões que NÃO estão no modal de favoritos
+                            const atualizarTodosBotoes = () => {
+                                const modalFavoritos = document.getElementById('modal-favoritos');
+                                const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
+                                let atualizados = 0;
+                                todosBotoes.forEach(btn => {
+                                    if (btn === btnFav || btn.dataset.processing === 'true') return;
+                                    const estaNoModal = modalFavoritos && modalFavoritos.contains(btn);
+                                    const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                                    if (btnCod === cod) {
+                                        if (modalFavoritos && modalFavoritos.contains(btnFav)) {
+                                            if (!estaNoModal) {
+                                                atualizarIconeFavorito(btn, j.favoritado);
+                                                atualizados++;
+                                            }
+                                        } else {
+                                            if (estaNoModal) {
+                                                atualizarIconeFavorito(btn, j.favoritado);
+                                                atualizados++;
+                                            }
+                                        }
+                                    }
+                                });
+                                console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, favoritado: ${j.favoritado}`);
+                            };
+                            atualizarTodosBotoes();
+                            setTimeout(atualizarTodosBotoes, 100);
+                            setTimeout(atualizarTodosBotoes, 300);
                         } else {
                             // Reverter em caso de erro
                             if (estadoAtual) { 
@@ -1617,6 +1848,13 @@
                                 favoritosSet.delete(cod); 
                             }
                             atualizarIconeFavorito(btnFav, estadoAtual);
+                            // Reverter TODOS os botões de favorito com o mesmo código na página
+                            document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                                const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                                if (btnCod === cod && btn !== btnFav && !btn.dataset.processing) {
+                                    atualizarIconeFavorito(btn, estadoAtual);
+                                }
+                            });
                             alert(j.mensagem || 'Não foi possível atualizar favorito.');
                         }
                     }
@@ -1628,6 +1866,13 @@
                         favoritosSet.delete(cod); 
                     }
                     atualizarIconeFavorito(btnFav, estadoAtual);
+                    // Reverter TODOS os botões de favorito com o mesmo código na página
+                    document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
+                        const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                        if (btnCod === cod && btn !== btnFav && !btn.dataset.processing) {
+                            atualizarIconeFavorito(btn, estadoAtual);
+                        }
+                    });
                     alert('Erro ao atualizar favorito.');
                 } finally {
                     btnFav.dataset.processing = 'false';
@@ -1635,6 +1880,7 @@
                 return;
             }
 
+            // Abrir modal de favoritos (botão no topo) - fallback caso o listener direto não funcione
             if (e.target.closest('#btn-abrir-favoritos')) {
                 e.preventDefault(); e.stopPropagation();
                 await carregarFavoritos();
@@ -1659,6 +1905,14 @@
                 fecharModalMensagem(true); 
                 fecharTodosModaisConfirmacao(); 
                 fecharModalFavoritos();
+                // Restaurar o estado do menu após fechar modais com ESC
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    const pagina = params.get('pagina') || 'meusEventos';
+                    if (typeof window.setMenuAtivoPorPagina === 'function') {
+                        window.setMenuAtivoPorPagina(pagina);
+                    }
+                }, 50);
             } 
         });
 
@@ -1667,6 +1921,13 @@
         } else {
             setTimeout(carregarFavoritos, 50);
         }
+
+        // Garantir inicialização do botão de favoritos após carregamento
+        setTimeout(inicializarBotaoFavoritos, 100);
+        
+        // Expor funções globalmente para serem chamadas após carregamento via AJAX
+        window.carregarFavoritos = carregarFavoritos;
+        window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
     </script>
 
     <script src="MeusEventosParticipante.js?v=<?= time() ?>"></script>

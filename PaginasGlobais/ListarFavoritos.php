@@ -13,7 +13,7 @@ try {
 
     $cpf = $_SESSION['cpf'];
 
-    $sql = "SELECT e.cod_evento, e.nome, e.categoria, e.inicio, e.lugar, e.modalidade, e.imagem
+    $sql = "SELECT e.cod_evento, e.nome, e.categoria, e.inicio, e.lugar, e.modalidade, e.imagem, e.certificado
             FROM favoritos_evento f
             INNER JOIN evento e ON e.cod_evento = f.cod_evento
             WHERE f.CPF = ?
@@ -33,7 +33,8 @@ try {
             'inicio' => $row['inicio'],
             'lugar' => $row['lugar'],
             'modalidade' => $row['modalidade'],
-            'imagem' => $row['imagem']
+            'imagem' => $row['imagem'],
+            'certificado' => isset($row['certificado']) ? (int)$row['certificado'] : 0
         ];
     }
 
@@ -45,3 +46,4 @@ try {
     http_response_code(500);
     echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno', 'detalhe' => $e->getMessage()]);
 }
+
