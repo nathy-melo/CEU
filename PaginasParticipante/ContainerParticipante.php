@@ -372,7 +372,15 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: '../PaginasGlobais/RedefinirSenhaConta.html',
                 js: ['../PaginasGlobais/RedefinirSenhaConta.js'],
                 init: () => {
-                    if (typeof window.atribuirEventoRedefinirSenha === 'function') window.atribuirEventoRedefinirSenha();
+                    if (typeof window.atribuirEventoRedefinirSenha === 'function') {
+                        window.atribuirEventoRedefinirSenha();
+                    }
+                    // Garante que o toggle de senha seja aplicado
+                    setTimeout(() => {
+                        if (typeof window.aplicarToggleSenhas === 'function') {
+                            window.aplicarToggleSenhas();
+                        }
+                    }, 100);
                 }
             },
             'emailRecuperacao': {
@@ -513,6 +521,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
     <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
+    <script src="../PaginasPublicas/ToggleSenha.js"></script>
     <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>
 
