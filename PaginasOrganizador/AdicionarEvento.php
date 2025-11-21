@@ -288,7 +288,7 @@ mysqli_close($conexao);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adicionar Evento</title>
-    <link rel="stylesheet" href="styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobal.css" />
     <style>
         .cartao-evento {
             background-color: var(--caixas);
@@ -1264,421 +1264,411 @@ mysqli_close($conexao);
         </div>
     </div>
     <script>
-        let imagens = [];
-        let indiceAtual = 0;
-        let colaboradores = [];
-
-        function validarFormulario() {
-            const nome = document.getElementById('nome').value.trim();
-            const local = document.getElementById('local').value.trim();
-            const dataInicio = document.getElementById('data-inicio').value;
-            const dataFim = document.getElementById('data-fim').value;
-            const horarioInicio = document.getElementById('horario-inicio').value;
-            const horarioFim = document.getElementById('horario-fim').value;
-            const publicoAlvo = document.getElementById('publico-alvo').value.trim();
-            const categoria = document.getElementById('categoria').value;
-            const certificado = document.getElementById('certificado').value;
-            const modalidade = document.getElementById('modalidade').value;
-            const descricao = document.getElementById('descricao').value.trim();
-
-            const todosPreenchidos = nome && local && dataInicio && dataFim &&
-                horarioInicio && horarioFim && publicoAlvo &&
-                categoria && certificado && modalidade && descricao;
-
-        }
-
-        function validarCamposObrigatorios() {
-            const campos = [
-                { id: 'nome', nome: 'Nome', elemento: document.getElementById('nome') },
-                { id: 'local', nome: 'Local', elemento: document.getElementById('local') },
-                { id: 'data-inicio', nome: 'Data de Início', elemento: document.getElementById('data-inicio') },
-                { id: 'horario-inicio', nome: 'Horário de Início', elemento: document.getElementById('horario-inicio') },
-                { id: 'data-fim', nome: 'Data de Fim', elemento: document.getElementById('data-fim') },
-                { id: 'horario-fim', nome: 'Horário de Fim', elemento: document.getElementById('horario-fim') },
-                { id: 'publico-alvo', nome: 'Público Alvo', elemento: document.getElementById('publico-alvo') },
-                { id: 'categoria', nome: 'Categoria', elemento: document.getElementById('categoria') },
-                { id: 'modalidade', nome: 'Modalidade', elemento: document.getElementById('modalidade') },
-                { id: 'certificado', nome: 'Tipo de Certificado', elemento: document.getElementById('certificado') },
-                { id: 'descricao', nome: 'Descrição', elemento: document.getElementById('descricao') }
-            ];
-
-            const camposFaltantes = [];
-            const elementosFaltantes = [];
-
-            campos.forEach(campo => {
-                let valor = '';
-                if (campo.elemento) {
-                    if (campo.elemento.tagName === 'SELECT') {
-                        valor = campo.elemento.value;
-                    } else {
-                        valor = campo.elemento.value.trim();
-                    }
-                    
-                    if (!valor) {
-                        camposFaltantes.push(campo.nome);
-                        elementosFaltantes.push(campo.elemento);
-                    } else {
-                        // Remove destaque se o campo foi preenchido
-                        campo.elemento.style.borderColor = '';
-                        campo.elemento.style.boxShadow = '';
-                    }
-                }
-            });
-
-            // Destaca visualmente os campos faltantes
-            elementosFaltantes.forEach(elemento => {
-                elemento.style.borderColor = '#f44336';
-                elemento.style.boxShadow = '0 0 0 3px rgba(244, 67, 54, 0.2)';
-                // Scroll suave até o primeiro campo faltante
-                if (elemento === elementosFaltantes[0]) {
-                    elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    elemento.focus();
-                }
-            });
-
-            return camposFaltantes;
-        }
-
-        // ==== FUNÇÕES DE COLABORADORES ====
-        function abrirModalColaboradores() {
-            document.getElementById('modal-colaboradores').style.display = 'flex';
-            limparCamposColaborador();
-        }
-
-        function fecharModalColaboradores() {
-            document.getElementById('modal-colaboradores').style.display = 'none';
-            limparCamposColaborador();
-        }
-
-        function fecharModalColabSeForFundo(event) {
-            if (event.target.id === 'modal-colaboradores') {
-                fecharModalColaboradores();
-            }
-        }
-
-        function limparCamposColaborador() {
-            document.getElementById('colab-cpf').value = '';
-            document.getElementById('colab-nome').value = '';
-            document.getElementById('colab-email').value = '';
-            document.getElementById('btn-adicionar-colab').disabled = true;
-            document.getElementById('msg-colab-status').style.display = 'none';
-        }
-
-        function formatarCPF(cpf) {
-            cpf = cpf.replace(/\D/g, '');
-            if (cpf.length <= 11) {
-                cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-                cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-                cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-            }
-            return cpf;
-        }
-
-        function verificarCPFColaborador() {
-            const cpfInput = document.getElementById('colab-cpf');
-            const cpf = cpfInput.value.replace(/\D/g, '');
-            const msgStatus = document.getElementById('msg-colab-status');
-            const btnAdicionar = document.getElementById('btn-adicionar-colab');
-
-            if (cpf.length !== 11) {
-                msgStatus.style.display = 'none';
-                btnAdicionar.disabled = true;
+        // Previne execução múltipla do script quando carregado via AJAX
+        (function() {
+            // Verifica se o script já foi executado
+            if (window.adicionarEventoScriptExecutado) {
                 return;
             }
+            window.adicionarEventoScriptExecutado = true;
 
-            // Verifica se já está na lista
-            if (colaboradores.find(c => c.cpf === cpf)) {
-                msgStatus.style.display = 'block';
-                msgStatus.style.color = '#f44336';
-                msgStatus.textContent = '❌ Este organizador já foi adicionado';
-                btnAdicionar.disabled = true;
-                return;
+            let imagens = [];
+            let indiceAtual = 0;
+            let colaboradores = [];
+
+            function validarFormulario() {
+                const nome = document.getElementById('nome').value.trim();
+                const local = document.getElementById('local').value.trim();
+                const dataInicio = document.getElementById('data-inicio').value;
+                const dataFim = document.getElementById('data-fim').value;
+                const horarioInicio = document.getElementById('horario-inicio').value;
+                const horarioFim = document.getElementById('horario-fim').value;
+                const publicoAlvo = document.getElementById('publico-alvo').value.trim();
+                const categoria = document.getElementById('categoria').value;
+                const certificado = document.getElementById('certificado').value;
+                const modalidade = document.getElementById('modalidade').value;
+                const descricao = document.getElementById('descricao').value.trim();
+
+                const todosPreenchidos = nome && local && dataInicio && dataFim &&
+                    horarioInicio && horarioFim && publicoAlvo &&
+                    categoria && certificado && modalidade && descricao;
             }
 
-            // Busca no banco de dados
-            fetch(`../BancoDados/VerificarBancoDados.php?action=verificar_usuario&cpf=${cpf}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.existe && data.usuario) {
-                        document.getElementById('colab-nome').value = data.usuario.nome || '';
-                        document.getElementById('colab-email').value = data.usuario.email || '';
-                        msgStatus.style.display = 'block';
-                        msgStatus.style.color = '#4CAF50';
-                        msgStatus.textContent = '✓ Usuário encontrado no sistema';
-                        btnAdicionar.disabled = false;
-                    } else {
-                        document.getElementById('colab-nome').value = '';
-                        document.getElementById('colab-email').value = '';
-                        msgStatus.style.display = 'block';
-                        msgStatus.style.color = '#f44336';
-                        msgStatus.textContent = '❌ Usuário não cadastrado no sistema';
-                        btnAdicionar.disabled = true;
+            function validarCamposObrigatorios() {
+                const campos = [
+                    { id: 'nome', nome: 'Nome', elemento: document.getElementById('nome') },
+                    { id: 'local', nome: 'Local', elemento: document.getElementById('local') },
+                    { id: 'data-inicio', nome: 'Data de Início', elemento: document.getElementById('data-inicio') },
+                    { id: 'horario-inicio', nome: 'Horário de Início', elemento: document.getElementById('horario-inicio') },
+                    { id: 'data-fim', nome: 'Data de Fim', elemento: document.getElementById('data-fim') },
+                    { id: 'horario-fim', nome: 'Horário de Fim', elemento: document.getElementById('horario-fim') },
+                    { id: 'publico-alvo', nome: 'Público Alvo', elemento: document.getElementById('publico-alvo') },
+                    { id: 'categoria', nome: 'Categoria', elemento: document.getElementById('categoria') },
+                    { id: 'modalidade', nome: 'Modalidade', elemento: document.getElementById('modalidade') },
+                    { id: 'certificado', nome: 'Tipo de Certificado', elemento: document.getElementById('certificado') },
+                    { id: 'descricao', nome: 'Descrição', elemento: document.getElementById('descricao') }
+                ];
+
+                const camposFaltantes = [];
+                const elementosFaltantes = [];
+
+                campos.forEach(campo => {
+                    let valor = '';
+                    if (campo.elemento) {
+                        if (campo.elemento.tagName === 'SELECT') {
+                            valor = campo.elemento.value;
+                        } else {
+                            valor = campo.elemento.value.trim();
+                        }
+                        
+                        if (!valor) {
+                            camposFaltantes.push(campo.nome);
+                            elementosFaltantes.push(campo.elemento);
+                        } else {
+                            campo.elemento.style.borderColor = '';
+                            campo.elemento.style.boxShadow = '';
+                        }
                     }
-                })
-                .catch(() => {
-                    msgStatus.style.display = 'block';
-                    msgStatus.style.color = '#f44336';
-                    msgStatus.textContent = '❌ Erro ao verificar CPF';
-                    btnAdicionar.disabled = true;
                 });
-        }
 
-        function adicionarColaborador() {
-            const cpf = document.getElementById('colab-cpf').value.replace(/\D/g, '');
-            const nome = document.getElementById('colab-nome').value;
-            const email = document.getElementById('colab-email').value;
+                elementosFaltantes.forEach(elemento => {
+                    elemento.style.borderColor = '#f44336';
+                    elemento.style.boxShadow = '0 0 0 3px rgba(244, 67, 54, 0.2)';
+                    if (elemento === elementosFaltantes[0]) {
+                        elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        elemento.focus();
+                    }
+                });
 
-            if (!cpf || !nome || !email) {
-                alert('Dados incompletos');
-                return;
+                return camposFaltantes;
             }
 
-            colaboradores.push({
-                cpf,
-                nome,
-                email
-            });
-            atualizarListaColaboradores();
-            fecharModalColaboradores();
-        }
+            // ==== FUNÇÕES DE COLABORADORES ====
+            window.abrirModalColaboradores = function() {
+                document.getElementById('modal-colaboradores').style.display = 'flex';
+                limparCamposColaborador();
+            };
 
-        function removerColaborador(cpf) {
-            if (confirm('Deseja remover este organizador?')) {
-                colaboradores = colaboradores.filter(c => c.cpf !== cpf);
-                atualizarListaColaboradores();
+            window.fecharModalColaboradores = function() {
+                document.getElementById('modal-colaboradores').style.display = 'none';
+                limparCamposColaborador();
+            };
+
+            window.fecharModalColabSeForFundo = function(event) {
+                if (event.target.id === 'modal-colaboradores') {
+                    fecharModalColaboradores();
+                }
+            };
+
+            function limparCamposColaborador() {
+                document.getElementById('colab-cpf').value = '';
+                document.getElementById('colab-nome').value = '';
+                document.getElementById('colab-email').value = '';
+                document.getElementById('btn-adicionar-colab').disabled = true;
+                document.getElementById('msg-colab-status').style.display = 'none';
             }
-        }
 
-        function atualizarListaColaboradores() {
-            const lista = document.getElementById('lista-colaboradores');
-
-            if (colaboradores.length === 0) {
-                lista.style.display = 'none';
-                return;
+            function formatarCPF(cpf) {
+                cpf = cpf.replace(/\D/g, '');
+                if (cpf.length <= 11) {
+                    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+                    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+                    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                }
+                return cpf;
             }
 
-            lista.style.display = 'block';
-            lista.innerHTML = colaboradores.map(colab => `
-                <div class="colaborador-item">
-                    <div class="colaborador-info">
-                        <div class="colaborador-nome">${colab.nome}</div>
-                        <div class="colaborador-cpf">CPF: ${formatarCPF(colab.cpf)}</div>
-                    </div>
-                    <button type="button" class="btn-remover-colaborador" onclick="removerColaborador('${colab.cpf}')">
-                        Remover
-                    </button>
-                </div>
-            `).join('');
-        }
+            function verificarCPFColaborador() {
+                const cpfInput = document.getElementById('colab-cpf');
+                const cpf = cpfInput.value.replace(/\D/g, '');
+                const msgStatus = document.getElementById('msg-colab-status');
+                const btnAdicionar = document.getElementById('btn-adicionar-colab');
 
-        // Event listener para o CPF do colaborador
-        const colabCpfInput = document.getElementById('colab-cpf');
-        if (colabCpfInput) {
-            colabCpfInput.addEventListener('input', function(e) {
-                e.target.value = formatarCPF(e.target.value);
-            });
-
-            colabCpfInput.addEventListener('blur', verificarCPFColaborador);
-        }
-
-        // Adicionar listeners para validar em tempo real
-        document.querySelectorAll('input, select, textarea').forEach(element => {
-            element.addEventListener('input', function() {
-                validarFormulario();
-                // Remove destaque quando o campo é preenchido
-                if (element.value && element.value.trim()) {
-                    element.style.borderColor = '';
-                    element.style.boxShadow = '';
-                }
-            });
-            element.addEventListener('change', function() {
-                validarFormulario();
-                // Remove destaque quando o campo é preenchido
-                if (element.value && element.value.trim()) {
-                    element.style.borderColor = '';
-                    element.style.boxShadow = '';
-                }
-            });
-        });
-
-        // Chama validação inicial ao carregar a página
-        setTimeout(() => {
-            validarFormulario();
-        }, 100);
-
-        function adicionarImagens(event) {
-            const files = Array.from(event.target.files);
-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB em bytes
-
-            files.forEach(file => {
-                // Validar tamanho do arquivo
-                if (file.size > MAX_FILE_SIZE) {
-                    alert(`Erro: A imagem "${file.name}" excede o limite de 10MB.\nTamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-                    return; // Pula este arquivo
-                }
-
-                // Validar tipo de arquivo
-                const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                if (!tiposPermitidos.includes(file.type)) {
-                    alert(`Erro: O arquivo "${file.name}" não é uma imagem válida.\nFormatos aceitos: JPG, JPEG, PNG, GIF, WEBP`);
+                if (cpf.length !== 11) {
+                    msgStatus.style.display = 'none';
+                    btnAdicionar.disabled = true;
                     return;
                 }
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagens.push(e.target.result);
-                    if (imagens.length === 1) {
-                        indiceAtual = 0;
-                        mostrarCarrossel();
+                if (colaboradores.find(c => c.cpf === cpf)) {
+                    msgStatus.style.display = 'block';
+                    msgStatus.style.color = '#f44336';
+                    msgStatus.textContent = '❌ Este organizador já foi adicionado';
+                    btnAdicionar.disabled = true;
+                    return;
+                }
+
+                fetch(`../BancoDados/VerificarBancoDados.php?action=verificar_usuario&cpf=${cpf}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.existe && data.usuario) {
+                            document.getElementById('colab-nome').value = data.usuario.nome || '';
+                            document.getElementById('colab-email').value = data.usuario.email || '';
+                            msgStatus.style.display = 'block';
+                            msgStatus.style.color = '#4CAF50';
+                            msgStatus.textContent = '✓ Usuário encontrado no sistema';
+                            btnAdicionar.disabled = false;
+                        } else {
+                            document.getElementById('colab-nome').value = '';
+                            document.getElementById('colab-email').value = '';
+                            msgStatus.style.display = 'block';
+                            msgStatus.style.color = '#f44336';
+                            msgStatus.textContent = '❌ Usuário não cadastrado no sistema';
+                            btnAdicionar.disabled = true;
+                        }
+                    })
+                    .catch(() => {
+                        msgStatus.style.display = 'block';
+                        msgStatus.style.color = '#f44336';
+                        msgStatus.textContent = '❌ Erro ao verificar CPF';
+                        btnAdicionar.disabled = true;
+                    });
+            }
+
+            window.adicionarColaborador = function() {
+                const cpf = document.getElementById('colab-cpf').value.replace(/\D/g, '');
+                const nome = document.getElementById('colab-nome').value;
+                const email = document.getElementById('colab-email').value;
+
+                if (!cpf || !nome || !email) {
+                    alert('Dados incompletos');
+                    return;
+                }
+
+                colaboradores.push({ cpf, nome, email });
+                atualizarListaColaboradores();
+                fecharModalColaboradores();
+            };
+
+            window.removerColaborador = function(cpf) {
+                if (confirm('Deseja remover este organizador?')) {
+                    colaboradores = colaboradores.filter(c => c.cpf !== cpf);
+                    atualizarListaColaboradores();
+                }
+            };
+
+            function atualizarListaColaboradores() {
+                const lista = document.getElementById('lista-colaboradores');
+
+                if (colaboradores.length === 0) {
+                    lista.style.display = 'none';
+                    return;
+                }
+
+                lista.style.display = 'block';
+                lista.innerHTML = colaboradores.map(colab => `
+                    <div class="colaborador-item">
+                        <div class="colaborador-info">
+                            <div class="colaborador-nome">${colab.nome}</div>
+                            <div class="colaborador-cpf">CPF: ${formatarCPF(colab.cpf)}</div>
+                        </div>
+                        <button type="button" class="btn-remover-colaborador" onclick="removerColaborador('${colab.cpf}')">
+                            Remover
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            const colabCpfInput = document.getElementById('colab-cpf');
+            if (colabCpfInput) {
+                colabCpfInput.addEventListener('input', function(e) {
+                    e.target.value = formatarCPF(e.target.value);
+                });
+                colabCpfInput.addEventListener('blur', verificarCPFColaborador);
+            }
+
+            document.querySelectorAll('input, select, textarea').forEach(element => {
+                element.addEventListener('input', function() {
+                    validarFormulario();
+                    if (element.value && element.value.trim()) {
+                        element.style.borderColor = '';
+                        element.style.boxShadow = '';
                     }
-                    atualizarVisibilidadeSetas();
-                };
-                reader.readAsDataURL(file);
+                });
+                element.addEventListener('change', function() {
+                    validarFormulario();
+                    if (element.value && element.value.trim()) {
+                        element.style.borderColor = '';
+                        element.style.boxShadow = '';
+                    }
+                });
             });
 
-            // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
-            event.target.value = '';
-        }
+            setTimeout(() => {
+                validarFormulario();
+            }, 100);
 
-        function mostrarCarrossel() {
-            document.getElementById('placeholder-imagem').style.display = 'none';
-            document.getElementById('carrossel-imagens').style.display = 'flex';
-            document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
-        }
+            window.adicionarImagens = function(event) {
+                const files = Array.from(event.target.files);
+                const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-        function esconderCarrossel() {
-            document.getElementById('placeholder-imagem').style.display = 'flex';
-            document.getElementById('carrossel-imagens').style.display = 'none';
-        }
-
-        function removerImagemAtual() {
-            if (imagens.length > 0) {
-                imagens.splice(indiceAtual, 1);
-                if (imagens.length === 0) {
-                    esconderCarrossel();
-                    document.getElementById('input-imagem').value = '';
-                } else {
-                    if (indiceAtual >= imagens.length) {
-                        indiceAtual = imagens.length - 1;
+                files.forEach(file => {
+                    if (file.size > MAX_FILE_SIZE) {
+                        alert(`Erro: A imagem "${file.name}" excede o limite de 10MB.\nTamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                        return;
                     }
-                    document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
-                    atualizarVisibilidadeSetas();
-                }
-            }
-        }
 
-        function atualizarVisibilidadeSetas() {
-            const multiple = imagens.length > 1;
-            const setDisplay = (sel) => {
-                document.querySelectorAll(sel).forEach(el => {
-                    el.style.display = multiple ? '' : 'none';
+                    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!tiposPermitidos.includes(file.type)) {
+                        alert(`Erro: O arquivo "${file.name}" não é uma imagem válida.\nFormatos aceitos: JPG, JPEG, PNG, GIF, WEBP`);
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagens.push(e.target.result);
+                        if (imagens.length === 1) {
+                            indiceAtual = 0;
+                            mostrarCarrossel();
+                        }
+                        atualizarVisibilidadeSetas();
+                    };
+                    reader.readAsDataURL(file);
                 });
-            };
-            setDisplay('.carrossel-anterior');
-            setDisplay('.carrossel-proxima');
-            setDisplay('.modal-imagem-btn-anterior');
-            setDisplay('.modal-imagem-btn-proxima');
-        }
 
-        function mudarImagem(direcao) {
-            if (imagens.length > 0) {
-                indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
+                event.target.value = '';
+            };
+
+            function mostrarCarrossel() {
+                document.getElementById('placeholder-imagem').style.display = 'none';
+                document.getElementById('carrossel-imagens').style.display = 'flex';
                 document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
             }
-        }
 
-        function mudarImagemModal(direcao) {
-            if (imagens.length > 0) {
-                indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
-                document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
-            }
-        }
-
-        document.getElementById('imagem-carrossel').onclick = function(e) {
-            e.stopPropagation();
-            if (imagens.length > 0) {
-                document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
-                document.getElementById('modal-imagem').style.display = 'flex';
-            }
-        };
-
-        function fecharModalImagem() {
-            document.getElementById('modal-imagem').style.display = 'none';
-        }
-
-        document.getElementById('form-evento').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Valida campos obrigatórios antes de enviar
-            const camposFaltantes = validarCamposObrigatorios();
-            
-            if (camposFaltantes.length > 0) {
-                let mensagem = 'Por favor, preencha os seguintes campos obrigatórios:\n\n';
-                camposFaltantes.forEach((campo, index) => {
-                    mensagem += `${index + 1}. ${campo}\n`;
-                });
-                mensagem += '\nOs campos faltantes foram destacados em vermelho.';
-                alert(mensagem);
-                return;
+            function esconderCarrossel() {
+                document.getElementById('placeholder-imagem').style.display = 'flex';
+                document.getElementById('carrossel-imagens').style.display = 'none';
             }
 
-            const formData = new FormData(this);
-
-            // Adiciona colaboradores ao FormData
-            if (colaboradores.length > 0) {
-                formData.append('colaboradores', JSON.stringify(colaboradores));
-            }
-
-            // Desabilita o botão durante o envio
-            const btnCriar = document.getElementById('btn-criar');
-            btnCriar.disabled = true;
-            btnCriar.textContent = 'Criando...';
-
-            fetch('AdicionarEvento.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    // Verifica se a resposta é OK
-                    if (!response.ok) {
-                        throw new Error('Erro HTTP: ' + response.status);
-                    }
-                    // Verifica o tipo de conteúdo
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        return response.text().then(text => {
-                            console.error('Resposta não é JSON:', text);
-                            throw new Error('Resposta do servidor não é JSON válido');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Resposta do servidor:', data);
-                    if (data.sucesso === true) {
-                        alert(data.mensagem || 'Evento criado com sucesso!');
-                        // Redireciona para a página de meus eventos
-                        if (typeof carregarPagina === 'function') {
-                            carregarPagina('meusEventos');
-                        } else {
-                            window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
-                        }
+            window.removerImagemAtual = function() {
+                if (imagens.length > 0) {
+                    imagens.splice(indiceAtual, 1);
+                    if (imagens.length === 0) {
+                        esconderCarrossel();
+                        document.getElementById('input-imagem').value = '';
                     } else {
-                        alert('Erro ao criar evento: ' + (data.erro || 'Erro desconhecido'));
-                        btnCriar.disabled = false;
-                        btnCriar.textContent = 'Criar evento';
+                        if (indiceAtual >= imagens.length) {
+                            indiceAtual = imagens.length - 1;
+                        }
+                        document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+                        atualizarVisibilidadeSetas();
                     }
-                })
-                .catch(error => {
-                    console.error('Erro completo:', error);
-                    alert('Erro ao criar evento: ' + error.message + '. Verifique o console para mais detalhes.');
-                    btnCriar.disabled = false;
-                    btnCriar.textContent = 'Criar evento';
-                });
-        });
+                }
+            };
 
-        // Validação inicial
-        validarFormulario();
+            function atualizarVisibilidadeSetas() {
+                const multiple = imagens.length > 1;
+                const setDisplay = (sel) => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        el.style.display = multiple ? '' : 'none';
+                    });
+                };
+                setDisplay('.carrossel-anterior');
+                setDisplay('.carrossel-proxima');
+                setDisplay('.modal-imagem-btn-anterior');
+                setDisplay('.modal-imagem-btn-proxima');
+            }
+
+            window.mudarImagem = function(direcao) {
+                if (imagens.length > 0) {
+                    indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
+                    document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+                }
+            };
+
+            window.mudarImagemModal = function(direcao) {
+                if (imagens.length > 0) {
+                    indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
+                    document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+                }
+            };
+
+            const imgCarrossel = document.getElementById('imagem-carrossel');
+            if (imgCarrossel) {
+                imgCarrossel.onclick = function(e) {
+                    e.stopPropagation();
+                    if (imagens.length > 0) {
+                        document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+                        document.getElementById('modal-imagem').style.display = 'flex';
+                    }
+                };
+            }
+
+            window.fecharModalImagem = function() {
+                document.getElementById('modal-imagem').style.display = 'none';
+            };
+
+            // CORREÇÃO PRINCIPAL: Adiciona listener do formulário de forma segura
+            const formEvento = document.getElementById('form-evento');
+            if (formEvento) {
+                formEvento.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const camposFaltantes = validarCamposObrigatorios();
+                    
+                    if (camposFaltantes.length > 0) {
+                        let mensagem = 'Por favor, preencha os seguintes campos obrigatórios:\n\n';
+                        camposFaltantes.forEach((campo, index) => {
+                            mensagem += `${index + 1}. ${campo}\n`;
+                        });
+                        mensagem += '\nOs campos faltantes foram destacados em vermelho.';
+                        alert(mensagem);
+                        return;
+                    }
+
+                    const formData = new FormData(this);
+
+                    if (colaboradores.length > 0) {
+                        formData.append('colaboradores', JSON.stringify(colaboradores));
+                    }
+
+                    const btnCriar = document.getElementById('btn-criar');
+                    btnCriar.disabled = true;
+                    btnCriar.textContent = 'Criando...';
+
+                    fetch('AdicionarEvento.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro HTTP: ' + response.status);
+                            }
+                            const contentType = response.headers.get('content-type');
+                            if (!contentType || !contentType.includes('application/json')) {
+                                return response.text().then(text => {
+                                    console.error('Resposta não é JSON:', text);
+                                    throw new Error('Resposta do servidor não é JSON válido');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Resposta do servidor:', data);
+                            if (data.sucesso === true) {
+                                alert(data.mensagem || 'Evento criado com sucesso!');
+                                if (typeof carregarPagina === 'function') {
+                                    carregarPagina('meusEventos');
+                                } else {
+                                    window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
+                                }
+                            } else {
+                                alert('Erro ao criar evento: ' + (data.erro || 'Erro desconhecido'));
+                                btnCriar.disabled = false;
+                                btnCriar.textContent = 'Criar evento';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro completo:', error);
+                            alert('Erro ao criar evento: ' + error.message + '. Verifique o console para mais detalhes.');
+                            btnCriar.disabled = false;
+                            btnCriar.textContent = 'Criar evento';
+                        });
+                });
+            }
+
+            validarFormulario();
+        })();
     </script>
 </body>
 

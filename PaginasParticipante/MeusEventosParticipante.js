@@ -191,6 +191,42 @@ function carregarEventosDoServidor() {
         });
 }
 
+// Função para prevenir navegação dos cards ao clicar nos botões
+function prevenirNavegacaoCards() {
+    document.querySelectorAll('.CaixaDoEvento').forEach(link => {
+        // Remover listener anterior se existir
+        if (link._clickHandlerAdded) return;
+        
+        link.addEventListener('click', function(e) {
+            // Se o clique foi em qualquer botão de ação ou dentro de AcoesFlutuantes, prevenir navegação
+            if (e.target.closest('.AcoesFlutuantes') || 
+                e.target.closest('.BotaoAcaoCard') ||
+                e.target.closest('.BotaoDesinscreverCard') ||
+                e.target.closest('.BotaoFavoritoCard') ||
+                e.target.closest('.BotaoMensagemCard') ||
+                e.target.closest('.BotaoCompartilharCard')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
+        
+        link._clickHandlerAdded = true;
+    });
+    
+    // Adicionar listeners nos próprios botões para garantir que o clique não propague
+    document.querySelectorAll('.BotaoAcaoCard').forEach(btn => {
+        if (btn._stopPropagationAdded) return;
+        
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }, true);
+        
+        btn._stopPropagationAdded = true;
+    });
+}
+
 function inicializarFiltroEventos() {
     const searchInput = document.querySelector('.campo-pesquisa');
     const searchButton = document.querySelector('.botao-pesquisa');
@@ -324,4 +360,5 @@ window.addEventListener('focus', function() {
 
 window.inicializarFiltroEventos = inicializarFiltroEventos;
 window.carregarEventosDoServidor = carregarEventosDoServidor;
+window.prevenirNavegacaoCards = prevenirNavegacaoCards;
 

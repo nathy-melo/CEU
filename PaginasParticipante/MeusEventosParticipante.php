@@ -26,12 +26,14 @@
                 visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
                 transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
             z-index: 50;
+            pointer-events: auto; /* IMPORTANTE: Permitir cliques mesmo quando opacity=0 durante hover */
         }
 
         .CaixaDoEvento:hover .AcoesFlutuantes {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+            pointer-events: auto; /* Garantir que os botões sejam clicáveis */
         }
 
         .BotaoAcaoCard {
@@ -46,6 +48,9 @@
             padding: 0;
             cursor: pointer;
             transition: transform 0.2s ease, background 0.2s ease;
+            pointer-events: auto; /* IMPORTANTE: Garantir que o botão seja clicável */
+            position: relative; /* Adicionar contexto de posicionamento */
+            z-index: 100; /* Colocar acima de qualquer outro elemento */
         }
 
         .BotaoAcaoCard:hover {
@@ -301,7 +306,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: var(--fundo-escuro-transparente);
+            background: var(--caixas);
             z-index: 10000;
             align-items: center;
             justify-content: center;
@@ -349,6 +354,18 @@
             color: var(--texto);
             padding: 0.75rem;
             font-size: 0.95rem;
+        }
+        .modal-mensagem .contador-caracteres {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--texto);
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+        .modal-mensagem .contador-caracteres.limite-alcancado {
+            color: var(--vermelho);
+            opacity: 1;
+            font-weight: 600;
         }
 
         .modal-mensagem .acoes {
@@ -819,6 +836,7 @@
             <div>
                 <textarea id="texto-mensagem-organizador" maxlength="500"
                     placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
+                <div id="contador-mensagem-organizador" class="contador-caracteres">0 / 500</div>
                 <div class="acoes">
                     <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
                     <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
@@ -828,137 +846,26 @@
     </div>
 
     <script>
-        let eventoAtualCompartilhar = null;
 
-        function abrirModalCompartilharEvento(codEvento) {
-            eventoAtualCompartilhar = codEvento;
-            const modal = document.getElementById('modal-compartilhar');
-            if (!modal) return;
-            
-            const linkInscricao = window.location.origin + '/CEU/PaginasPublicas/ContainerPublico.php?pagina=evento&cod_evento=' + codEvento;
-            const input = document.getElementById('link-inscricao');
-            if (input) input.value = linkInscricao;
-            
-            modal.classList.add('ativo');
-            document.body.style.overflow = 'hidden';
+        // Variáveis globais - verificar se já existem para evitar re-declaração
+        if (typeof window.codEvento === 'undefined') {
+            window.codEvento = null;
         }
-
-        function fecharModalCompartilhar() {
-            const modal = document.getElementById('modal-compartilhar');
-            if (modal) {
-                modal.classList.remove('ativo');
-                document.body.style.overflow = '';
-            }
-            eventoAtualCompartilhar = null;
+        if (typeof window.codEventoAcao === 'undefined') {
+            window.codEventoAcao = null;
         }
-
-        function copiarLink() {
-            const linkInput = document.getElementById('link-inscricao');
-            if (!linkInput) return;
-            const textoSpan = document.getElementById('texto-copiar');
-            const iconeDiv = document.getElementById('icone-copiar');
-            
-            linkInput.select();
-            
-            navigator.clipboard.writeText(linkInput.value).then(() => {
-                if (textoSpan) textoSpan.textContent = '✓ Copiado!';
-                if (iconeDiv) iconeDiv.style.background = '#28a745';
-                setTimeout(() => {
-                    if (textoSpan) textoSpan.textContent = 'Copiar';
-                    if (iconeDiv) iconeDiv.style.background = '';
-                }, 2000);
-            }).catch(() => {
-                try {
-                    linkInput.select();
-                    document.execCommand('copy');
-                    if (textoSpan) textoSpan.textContent = '✓ Copiado!';
-                    if (iconeDiv) iconeDiv.style.background = '#28a745';
-                    setTimeout(() => {
-                        if (textoSpan) textoSpan.textContent = 'Copiar';
-                        if (iconeDiv) iconeDiv.style.background = '';
-                    }, 2000);
-                } catch (e) {
-                    console.error('Erro ao copiar link:', e);
-                    alert('Por favor, copie o link manualmente.');
-                }
-            });
+        if (typeof window.btnDesinscreverAtual === 'undefined') {
+            window.btnDesinscreverAtual = null;
         }
-
-        function compartilharWhatsApp() {
-            const input = document.getElementById('link-inscricao');
-            if (!input) return;
-            const link = input.value;
-            const texto = encodeURIComponent('Confira este evento! Inscreva-se aqui: ' + link);
-            window.open('https://wa.me/?text=' + texto, '_blank');
+        if (typeof window.codEventoMensagem === 'undefined') {
+            window.codEventoMensagem = null;
         }
-
-        function compartilharInstagram() {
-            const input = document.getElementById('link-inscricao');
-            if (!input) return;
-            const link = input.value;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
-            }).catch(() => {
-                try {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = link;
-                    textarea.style.position = 'fixed';
-                    textarea.style.opacity = '0';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    alert('Link copiado! Cole no Instagram para compartilhar.\n\nDica: Você pode colar o link na sua bio, em stories ou em posts.');
-                } catch (e) {
-                    console.error('Erro ao copiar link:', e);
-                    alert('Por favor, copie o link manualmente.');
-                }
-            });
-        }
-
-        function compartilharEmail() {
-            const input = document.getElementById('link-inscricao');
-            if (!input) return;
-            const link = input.value;
-            const assunto = encodeURIComponent('Convite para Evento');
-            const corpo = encodeURIComponent('Olá!\n\nGostaria de convidá-lo(a) para participar deste evento.\n\nInscreva-se através do link: ' + link + '\n\nAté breve!');
-            window.location.href = 'mailto:?subject=' + assunto + '&body=' + corpo;
-        }
-
-        function compartilharX() {
-            const input = document.getElementById('link-inscricao');
-            if (!input) return;
-            const link = input.value;
-            const texto = encodeURIComponent('Confira este evento! 🎉');
-            window.open('https://twitter.com/intent/tweet?text=' + texto + '&url=' + encodeURIComponent(link), '_blank');
-        }
-
-        // Fecha o modal ao clicar fora - REMOVER DUPLICATA
-        const modalCompartilhar = document.getElementById('modal-compartilhar');
-        if (modalCompartilhar && !modalCompartilhar.dataset.listenerAdicionado) {
-            modalCompartilhar.onclick = function(e) {
-                if (e.target === this) {
-                    fecharModalCompartilhar();
-                }
-            };
-            modalCompartilhar.dataset.listenerAdicionado = 'true';
-        }
-
-        // Fecha o modal ao pressionar ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' || e.key === 'Esc') {
-                const modal = document.getElementById('modal-compartilhar');
-                if (modal && modal.classList.contains('ativo')) {
-                    fecharModalCompartilhar();
-                }
-            }
-        });
-
-        // Variáveis globais para controle de modais
-        let codEvento = null;
-        let codEventoAcao = null;
-        let btnDesinscreverAtual = null;
-        let codEventoMensagem = null;
+        
+        // Criar referências locais usando var(permite re-declaração) para facilitar o uso
+        var codEvento = window.codEvento;
+        var codEventoAcao = window.codEventoAcao;
+        var btnDesinscreverAtual = window.btnDesinscreverAtual;
+        var codEventoMensagem = window.codEventoMensagem;
 
         // Funções de bloqueio/desbloqueio de scroll
         function bloquearScroll() {
@@ -976,7 +883,12 @@
         function prevenirScroll(e) { if (document.body.classList.contains('modal-aberto')) { e.preventDefault(); } }
         function prevenirScrollTeclado(e) {
             if (!document.body.classList.contains('modal-aberto')) return;
-            const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+            const elementoAtivo = document.activeElement;
+            const isInputOuTextarea = elementoAtivo && (elementoAtivo.tagName === 'TEXTAREA' || elementoAtivo.tagName === 'INPUT');
+            const teclas = [33, 34, 35, 36, 37, 38, 39, 40]; // Teclas de navegação (sem espaço)
+            // Se for espaço (32) e estiver em input/textarea, permitir
+            if (e.keyCode === 32 && isInputOuTextarea) return;
+            // Bloquear outras teclas de navegação
             if (teclas.includes(e.keyCode)) e.preventDefault();
         }
 
@@ -1137,14 +1049,15 @@
         }
 
         async function confirmarDesinscricaoRapida() {
-            if (!codEventoAcao) { fecharModalConfirmarDesinscricao(); return; }
-            
-            // Salvar o código do evento antes de fazer a requisição
-            const codEventoParaDesinscrever = codEventoAcao;
-            const btnParaAtualizar = btnDesinscreverAtual;
+            // IMPORTANTE: Usar window.codEventoAcao para garantir acesso ao valor correto quando chamado via onclick
+            const codEventoParaDesinscrever = window.codEventoAcao;
+            if (!codEventoParaDesinscrever) { 
+                fecharModalConfirmarDesinscricao(); 
+                return; 
+            }
             
             try {
-                const r = await fetch('DesinscreverEvento.php', {
+                const r = await fetch('../PaginasParticipante/DesinscreverEvento.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     credentials: 'include',
@@ -1153,21 +1066,21 @@
                 const j = await r.json();
                 fecharModalConfirmarDesinscricao();
                 if (j && j.sucesso) {
-                    // IMPORTANTE: Limpar o cache deste evento específico para forçar atualização
-                    inscricaoCache.delete(codEventoParaDesinscrever);
-                    // Atualizar cache com o novo valor
+                    // Atualizar cache
                     inscricaoCache.set(codEventoParaDesinscrever, false);
+                    window.inscricaoCache.set(codEventoParaDesinscrever, false);
                     
-                    if (btnParaAtualizar) {
-                        atualizarIconeInscricao(btnParaAtualizar, false);
-                    }
-                    abrirModalDesinscricaoConfirmada();
-                    // Recarrega a lista de eventos após desinscrição - mesmo padrão do EventosInscritosOrganizador.php
-                    setTimeout(() => {
-                        // Limpar cache antes de recarregar para garantir dados atualizados
-                        if (window.inscricaoCache) {
-                            window.inscricaoCache.clear();
+                    // IMPORTANTE: Atualizar TODOS os botões de inscrição com o mesmo código na página
+                    document.querySelectorAll('.BotaoInscreverCard, .BotaoDesinscreverCard').forEach(btn => {
+                        const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                        if (btnCod === codEventoParaDesinscrever) {
+                            atualizarIconeInscricao(btn, false);
                         }
+                    });
+                    
+                    abrirModalDesinscricaoConfirmada();
+                    // Recarrega a lista de eventos após desinscrição
+                    setTimeout(() => {
                         // Verificar se está na página de meus eventos antes de recarregar
                         const params = new URLSearchParams(window.location.search);
                         const pagina = params.get('pagina');
@@ -1186,19 +1099,22 @@
             } finally {
                 // Limpar variáveis após processamento
                 codEventoAcao = null;
+                window.codEventoAcao = null;
                 btnDesinscreverAtual = null;
+                window.btnDesinscreverAtual = null;
             }
         }
 
         async function confirmarInscricaoRapida() {
-            if (!codEventoAcao) { fecharModalConfirmarInscricao(); return; }
-            
-            // Salvar o código do evento antes de fazer a requisição
-            const codEventoParaInscrever = codEventoAcao;
-            const btnParaAtualizar = btnDesinscreverAtual;
+            // IMPORTANTE: Usar window.codEventoAcao para garantir acesso ao valor correto quando chamado via onclick
+            const codEventoParaInscrever = window.codEventoAcao;
+            if (!codEventoParaInscrever) { 
+                fecharModalConfirmarInscricao(); 
+                return; 
+            }
             
             try {
-                const r = await fetch('InscreverEvento.php', {
+                const r = await fetch('../PaginasParticipante/InscreverEvento.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     credentials: 'include',
@@ -1207,21 +1123,21 @@
                 const j = await r.json();
                 fecharModalConfirmarInscricao();
                 if (j && j.sucesso) {
-                    // IMPORTANTE: Limpar o cache deste evento específico para forçar atualização
-                    inscricaoCache.delete(codEventoParaInscrever);
-                    // Atualizar cache com o novo valor
+                    // Atualizar cache
                     inscricaoCache.set(codEventoParaInscrever, true);
+                    window.inscricaoCache.set(codEventoParaInscrever, true);
                     
-                    if (btnParaAtualizar) {
-                        atualizarIconeInscricao(btnParaAtualizar, true);
-                    }
-                    abrirModalInscricaoConfirmada();
-                    // Recarrega a lista de eventos após inscrição - mesmo padrão do EventosInscritosOrganizador.php
-                    setTimeout(() => {
-                        // Limpar cache antes de recarregar para garantir dados atualizados
-                        if (window.inscricaoCache) {
-                            window.inscricaoCache.clear();
+                    // IMPORTANTE: Atualizar TODOS os botões de inscrição com o mesmo código na página
+                    document.querySelectorAll('.BotaoInscreverCard, .BotaoDesinscreverCard').forEach(btn => {
+                        const btnCod = Number(btn.getAttribute('data-cod')) || 0;
+                        if (btnCod === codEventoParaInscrever) {
+                            atualizarIconeInscricao(btn, true);
                         }
+                    });
+                    
+                    abrirModalInscricaoConfirmada();
+                    // Recarrega a lista de eventos após inscrição
+                    setTimeout(() => {
                         // Verificar se está na página de meus eventos antes de recarregar
                         const params = new URLSearchParams(window.location.search);
                         const pagina = params.get('pagina');
@@ -1240,16 +1156,37 @@
             } finally {
                 // Limpar variáveis após processamento
                 codEventoAcao = null;
+                window.codEventoAcao = null;
                 btnDesinscreverAtual = null;
+                window.btnDesinscreverAtual = null;
             }
         }
 
         // Modal de mensagem ao organizador
+        function atualizarContadorMensagem() {
+            const textarea = document.getElementById('texto-mensagem-organizador');
+            const contador = document.getElementById('contador-mensagem-organizador');
+            if (!textarea || !contador) return;
+            const comprimento = textarea.value.length;
+            const maximo = 500;
+            contador.textContent = `${comprimento} / ${maximo}`;
+            if (comprimento >= maximo) {
+                contador.classList.add('limite-alcancado');
+            } else {
+                contador.classList.remove('limite-alcancado');
+            }
+        }
         function abrirModalMensagem() {
             const m = document.getElementById('modal-mensagem');
             if (!m) return;
             const textarea = document.getElementById('texto-mensagem-organizador');
-            if (textarea) textarea.value = '';
+            if (textarea) {
+                textarea.value = '';
+                atualizarContadorMensagem();
+                // Adicionar listener para atualizar contador em tempo real
+                textarea.removeEventListener('input', atualizarContadorMensagem);
+                textarea.addEventListener('input', atualizarContadorMensagem);
+            }
             m.classList.add('ativo');
             bloquearScroll();
         }
@@ -1296,45 +1233,42 @@
             }
         }
 
-        // Favoritos
-        const favoritosSet = new Set();
-        let favoritosDados = [];
-
+        // Favoritos - verificar se já existem para evitar re-declaração
+        if (typeof window.favoritosSet === 'undefined') {
+            window.favoritosSet = new Set();
+        }
+        if (typeof window.favoritosDados === 'undefined') {
+            window.favoritosDados = [];
+        }
+        
         // Inscrição - cache e funções
-        const inscricaoCache = new Map();
-        window.inscricaoCache = inscricaoCache;
+        if (typeof window.inscricaoCache === 'undefined') {
+            window.inscricaoCache = new Map();
+        }
+        
+        // Criar referências locais usando var(permite re-declaração) para facilitar o uso
+        var favoritosSet = window.favoritosSet;
+        var favoritosDados = window.favoritosDados;
+        var inscricaoCache = window.inscricaoCache;
 
         function atualizarIconeInscricao(btn, inscrito) {
             if (!btn) return;
             const img = btn.querySelector('img');
             if (!img) return;
-            
-            // Atualizar classe do botão se necessário (BotaoDesinscreverCard <-> BotaoInscreverCard)
-            const isDesinscrever = btn.classList.contains('BotaoDesinscreverCard');
-            const isInscrever = btn.classList.contains('BotaoInscreverCard');
-            
-            if (inscrito) {
+            // IMPORTANTE: Garantir que o valor seja sempre boolean
+            const estaInscrito = !!inscrito;
+            if (estaInscrito) {
                 img.src = '../Imagens/Circulo_check.svg';
                 img.alt = 'Inscrito';
                 btn.setAttribute('data-inscrito', '1');
                 btn.title = 'Cancelar inscrição';
                 btn.ariaLabel = 'Cancelar inscrição';
-                // Se for BotaoInscreverCard e estiver inscrito, mudar para BotaoDesinscreverCard
-                if (isInscrever) {
-                    btn.classList.remove('BotaoInscreverCard');
-                    btn.classList.add('BotaoDesinscreverCard');
-                }
             } else {
                 img.src = '../Imagens/Circulo_adicionar.svg';
                 img.alt = 'Inscrever';
                 btn.setAttribute('data-inscrito', '0');
                 btn.title = 'Inscrever-se';
                 btn.ariaLabel = 'Inscrever';
-                // Se for BotaoDesinscreverCard e não estiver inscrito, mudar para BotaoInscreverCard
-                if (isDesinscrever) {
-                    btn.classList.remove('BotaoDesinscreverCard');
-                    btn.classList.add('BotaoInscreverCard');
-                }
             }
         }
         window.atualizarIconeInscricao = atualizarIconeInscricao;
@@ -1348,7 +1282,7 @@
             try {
                 const controller = new AbortController();
                 timeoutId = setTimeout(() => controller.abort(), 10000);
-                const r = await fetch(`VerificarInscricao.php?cod_evento=${cod}`, { 
+                const r = await fetch(`../PaginasParticipante/VerificarInscricao.php?cod_evento=${cod}`, { 
                     credentials: 'include',
                     signal: controller.signal
                 });
@@ -1386,7 +1320,7 @@
                 if (codigosEventos.length === 0) return;
                 const controller = new AbortController();
                 timeoutId = setTimeout(() => controller.abort(), 15000);
-                const r = await fetch('VerificarInscricoes.php', {
+                const r = await fetch('../PaginasParticipante/VerificarInscricoes.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -1402,12 +1336,14 @@
                 if (j && j.sucesso && j.inscricoes && typeof j.inscricoes === 'object') {
                     for (const [codEvento, inscrito] of Object.entries(j.inscricoes)) {
                         const cod = Number(codEvento);
-                        if (cod > 0 && typeof inscrito === 'boolean') {
-                            inscricaoCache.set(cod, inscrito);
+                        if (cod > 0) {
+                            // IMPORTANTE: Converter para boolean garantindo que funcione mesmo se vier como string ou número
+                            const estaInscrito = !!inscrito;
+                            inscricaoCache.set(cod, estaInscrito);
                             cards.forEach(card => {
                                 if (Number(card.getAttribute('data-cod-evento')) === cod) {
-                                    const btn = card.querySelector('.BotaoInscreverCard, .BotaoDesinscreverCard');
-                                    if (btn) atualizarIconeInscricao(btn, inscrito);
+                                    const btn = card.querySelector('.BotaoInscreverCard');
+                                    if (btn) atualizarIconeInscricao(btn, estaInscrito);
                                 }
                             });
                         }
@@ -1446,7 +1382,8 @@
                 if (timeoutId) clearTimeout(timeoutId);
                 if (r.status === 401) { 
                     favoritosSet.clear(); 
-                    favoritosDados = []; 
+                    favoritosDados = [];
+                    window.favoritosDados = [];
                     return; 
                 }
                 if (!r.ok) {
@@ -1456,6 +1393,7 @@
                 if (j && j.sucesso && Array.isArray(j.favoritos)) {
                     favoritosSet.clear();
                     favoritosDados = j.favoritos.filter(f => f && f.cod_evento); // Filtrar favoritos inválidos
+                    window.favoritosDados = favoritosDados;
                     for (const f of favoritosDados) {
                         const cod = Number(f.cod_evento);
                         if (cod > 0) favoritosSet.add(cod);
@@ -1690,13 +1628,18 @@
             });
             cont.appendChild(frag);
 
+            // IMPORTANTE: Adicionar listeners diretos nos botões de inscrição dos favoritos
+            setTimeout(() => {
+                adicionarListenersDiretos();
+            }, 50);
+
             // Atualizar status de inscrição nos cards de favoritos
             setTimeout(async () => {
                 const codigosFavoritos = favoritosDados.map(ev => ev.cod_evento);
                 if (codigosFavoritos.length === 0) return;
 
                 try {
-                    const r = await fetch('VerificarInscricoes.php', {
+                    const r = await fetch('../PaginasParticipante/VerificarInscricoes.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include',
@@ -1707,14 +1650,20 @@
 
                     const j = await r.json();
                     if (j && j.sucesso && j.inscricoes) {
+                        // IMPORTANTE: Obter o container novamente dentro do setTimeout para garantir que a referência esteja correta
+                        const contFavoritos = document.getElementById('lista-favoritos');
+                        if (!contFavoritos) return;
+                        
                         for (const [codEvento, inscrito] of Object.entries(j.inscricoes)) {
                             const cod = Number(codEvento);
-                            if (window.inscricaoCache) window.inscricaoCache.set(cod, inscrito);
+                            // IMPORTANTE: Converter para boolean garantindo que funcione mesmo se vier como string ou número
+                            const estaInscrito = !!inscrito;
+                            if (window.inscricaoCache) window.inscricaoCache.set(cod, estaInscrito);
 
                             // Atualizar ícone nos cards de favoritos
-                            const btnInscrever = cont.querySelector(`.BotaoInscreverCard[data-cod="${cod}"]`);
+                            const btnInscrever = contFavoritos.querySelector(`.BotaoInscreverCard[data-cod="${cod}"]`);
                             if (btnInscrever && typeof window.atualizarIconeInscricao === 'function') {
-                                window.atualizarIconeInscricao(btnInscrever, inscrito);
+                                window.atualizarIconeInscricao(btnInscrever, estaInscrito);
                             }
                         }
                     }
@@ -1726,97 +1675,102 @@
 
         // Listeners de clique - usando o mesmo padrão do EventosInscritosOrganizador.php
         document.addEventListener('click', async function (e) {
-            // Ignorar cliques dentro de modais de confirmação - verificar se o clique foi em um botão de modal
-            const target = e.target;
-            if (target.closest('.modal-overlay') || 
-                target.closest('.modal-cancelamento') ||
-                target.classList.contains('botao-cancelamento-cancelar') ||
-                target.classList.contains('botao-cancelamento-continuar') ||
-                target.classList.contains('botao-cancelamento-ok')) {
-                return;
+            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO EventosInscritosOrganizador.php
+            let btnInscrever = e.target.closest('.BotaoInscreverCard');
+            
+            // IMPORTANTE: Também verificar BotaoDesinscreverCard (usado na página de Meus Eventos)
+            if (!btnInscrever) {
+                btnInscrever = e.target.closest('.BotaoDesinscreverCard');
             }
             
-            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO EventosInscritosOrganizador
-            const btnInscrever = e.target.closest('.BotaoInscreverCard');
-            const btnDesinscrever = e.target.closest('.BotaoDesinscreverCard');
-            const btnAcao = btnInscrever || btnDesinscrever;
-            
-            if (btnAcao) {
-                e.preventDefault(); 
-                e.stopPropagation();
-                const cod = Number(btnAcao.getAttribute('data-cod')) || 0;
+            // Se não encontrou, pode ser que o clique foi na imagem - verificar o elemento pai
+            if (!btnInscrever) {
+                if (e.target.tagName === 'IMG' && e.target.closest('.AcoesFlutuantes')) {
+                    // Verificar se a imagem está dentro de um BotaoInscreverCard ou BotaoDesinscreverCard
+                    const img = e.target;
+                    let parent = img.parentElement;
+                    while (parent && parent !== document.body) {
+                        if (parent.classList && (parent.classList.contains('BotaoInscreverCard') || parent.classList.contains('BotaoDesinscreverCard'))) {
+                            btnInscrever = parent;
+                            break;
+                        }
+                        parent = parent.parentElement;
+                    }
+                }
+            }
+            if (btnInscrever) {
+                e.preventDefault(); e.stopPropagation();
+                const cod = Number(btnInscrever.getAttribute('data-cod')) || 0;
                 if (!cod) return;
+                
+                console.log('Botão de inscrição clicado. Código:', cod);
                 
                 // IMPORTANTE: Atualizar as variáveis ANTES de verificar status
                 codEventoAcao = cod;
-                btnDesinscreverAtual = btnAcao;
-                
-                // Se for BotaoDesinscreverCard, já sabemos que está inscrito
-                if (btnDesinscrever) {
-                    abrirModalConfirmarDesinscricao();
-                    return;
-                }
+                window.codEventoAcao = cod;
+                btnDesinscreverAtual = btnInscrever;
+                window.btnDesinscreverAtual = btnInscrever;
                 
                 // IMPORTANTE: Forçar atualização do servidor para garantir dados corretos
                 const inscrito = await verificarInscricao(cod, true); // forçar atualização
                 
+                console.log('Status de inscrição:', inscrito);
+                
                 // Atualizar ícone com o valor correto do servidor
-                atualizarIconeInscricao(btnAcao, inscrito);
+                atualizarIconeInscricao(btnInscrever, inscrito);
                 
                 if (inscrito) {
+                    console.log('Abrindo modal de desinscrição');
                     abrirModalConfirmarDesinscricao();
                 } else {
+                    console.log('Abrindo modal de inscrição');
                     abrirModalConfirmarInscricao();
                 }
                 return;
             }
 
+            // Botão de mensagem
             const btnMsg = e.target.closest('.BotaoMensagemCard');
             if (btnMsg) {
                 e.preventDefault(); e.stopPropagation();
                 const cod = Number(btnMsg.getAttribute('data-cod')) || 0;
                 if (!cod) return;
                 codEventoMensagem = cod;
+                window.codEventoMensagem = cod;
                 abrirModalMensagem();
                 return;
             }
 
+            // Botão de compartilhar
             const btnCompartilhar = e.target.closest('.BotaoCompartilharCard');
             if (btnCompartilhar) {
                 e.preventDefault(); e.stopPropagation();
                 const cod = Number(btnCompartilhar.getAttribute('data-cod')) || 0;
                 if (!cod) return;
                 codEvento = cod;
+                window.codEvento = cod;
                 abrirModalCompartilhar();
                 return;
             }
 
+            // Toggle favorito
             const btnFav = e.target.closest('.BotaoFavoritoCard');
             if (btnFav) {
                 e.preventDefault(); 
                 e.stopPropagation();
-                
-                // Prevenir cliques múltiplos
-                if (btnFav.dataset.processing === 'true') return;
-                
+                if (btnFav.dataset.processing === 'true') return false;
                 const cod = Number(btnFav.getAttribute('data-cod')) || 0;
                 if (!cod) return;
-                
-                // Marcar como processando
                 btnFav.dataset.processing = 'true';
-                
-                // Toggle imediato
                 const estadoAtual = btnFav.getAttribute('data-favorito') === '1';
                 const novoEstado = !estadoAtual;
-                
-                // Atualizar UI INSTANTANEAMENTE
                 if (novoEstado) { 
                     favoritosSet.add(cod); 
                 } else { 
                     favoritosSet.delete(cod);
                     favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+                    window.favoritosDados = favoritosDados;
                 }
-                
                 atualizarIconeFavorito(btnFav, novoEstado);
                 // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
                 // Buscar especificamente os botões que NÃO estão no modal de favoritos
@@ -1848,22 +1802,22 @@
                 setTimeout(atualizarTodosBotoes, 100);
                 setTimeout(atualizarTodosBotoes, 300);
                 
-                // Sincronizar com servidor em background
                 try {
-                    const r = await fetch('../PaginasGlobais/ToggleFavorito.php', {
+                    let timeoutId = null;
+                    const controller = new AbortController();
+                    timeoutId = setTimeout(() => controller.abort(), 10000);
+                    // Usar caminho absoluto baseado na origem para garantir que funcione mesmo via AJAX
+                    const basePath = `${window.location.origin}/CEU/PaginasGlobais/ToggleFavorito.php`;
+                    const r = await fetch(basePath, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         credentials: 'include',
-                        body: new URLSearchParams({ cod_evento: cod })
+                        body: new URLSearchParams({ cod_evento: cod }),
+                        signal: controller.signal
                     });
-                    
+                    if (timeoutId) clearTimeout(timeoutId);
                     if (r.status === 401) { 
-                        // Reverter se não autenticado
-                        if (estadoAtual) { 
-                            favoritosSet.add(cod); 
-                        } else { 
-                            favoritosSet.delete(cod); 
-                        }
+                        if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
                         atualizarIconeFavorito(btnFav, estadoAtual);
                         // Reverter TODOS os botões de favorito com o mesmo código na página
                         document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
@@ -1873,15 +1827,25 @@
                             }
                         });
                         alert('Faça login para favoritar eventos.'); 
+                    } else if (!r.ok) {
+                        const text = await r.text();
+                        console.error('Erro HTTP:', r.status, text);
+                        throw new Error(`HTTP error! status: ${r.status}`);
                     } else {
-                        const j = await r.json();
+                        let j;
+                        try {
+                            j = await r.json();
+                        } catch (parseErr) {
+                            console.error('Erro ao fazer parse do JSON:', parseErr);
+                            throw new Error('Resposta inválida do servidor');
+                        }
                         if (j && j.sucesso) {
-                            // Garantir sincronização final
                             if (j.favoritado) { 
                                 favoritosSet.add(cod); 
                             } else { 
-                                favoritosSet.delete(cod);
+                                favoritosSet.delete(cod); 
                                 favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+                                window.favoritosDados = favoritosDados;
                             }
                             atualizarIconeFavorito(btnFav, j.favoritado);
                             // Atualizar TODOS os botões de favorito com o mesmo código na página
@@ -1914,12 +1878,7 @@
                             setTimeout(atualizarTodosBotoes, 100);
                             setTimeout(atualizarTodosBotoes, 300);
                         } else {
-                            // Reverter em caso de erro
-                            if (estadoAtual) { 
-                                favoritosSet.add(cod); 
-                            } else { 
-                                favoritosSet.delete(cod); 
-                            }
+                            if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
                             atualizarIconeFavorito(btnFav, estadoAtual);
                             // Reverter TODOS os botões de favorito com o mesmo código na página
                             document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
@@ -1932,12 +1891,7 @@
                         }
                     }
                 } catch (err) {
-                    // Reverter em caso de erro de rede
-                    if (estadoAtual) { 
-                        favoritosSet.add(cod); 
-                    } else { 
-                        favoritosSet.delete(cod); 
-                    }
+                    if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
                     atualizarIconeFavorito(btnFav, estadoAtual);
                     // Reverter TODOS os botões de favorito com o mesmo código na página
                     document.querySelectorAll('.BotaoFavoritoCard').forEach(btn => {
@@ -1946,81 +1900,138 @@
                             atualizarIconeFavorito(btn, estadoAtual);
                         }
                     });
-                    alert('Erro ao atualizar favorito.');
+                    if (err.name !== 'AbortError') {
+                        console.error('Erro ao atualizar favorito:', err);
+                        alert('Erro ao atualizar favorito. Verifique sua conexão e tente novamente.');
+                    }
                 } finally {
                     btnFav.dataset.processing = 'false';
                 }
-                return;
+                return false;
             }
 
             // Abrir modal de favoritos (botão no topo) - fallback caso o listener direto não funcione
             if (e.target.closest('#btn-abrir-favoritos')) {
-                e.preventDefault(); e.stopPropagation();
+                e.preventDefault(); 
+                e.stopPropagation();
                 await carregarFavoritos();
                 abrirModalFavoritos();
-                return;
+                return false;
             }
         }, true);
-        
-        // Prevenir navegação do link quando clicar nos botões de ação - mesmo padrão do EventosInscritosOrganizador.php
-        function prevenirNavegacaoCards() {
-            document.querySelectorAll('.CaixaDoEvento').forEach(link => {
-                // Remover listener anterior se existir para evitar duplicatas
-                if (link.dataset.listenerNavegacao === 'true') return;
-                link.addEventListener('click', function(e) {
-                    // Se o clique foi em qualquer botão de ação ou dentro de AcoesFlutuantes, prevenir navegação
-                    if (e.target.closest('.AcoesFlutuantes') || 
-                        e.target.closest('.BotaoAcaoCard') ||
-                        e.target.closest('.BotaoInscreverCard') ||
-                        e.target.closest('.BotaoDesinscreverCard') ||
-                        e.target.closest('.BotaoFavoritoCard') ||
-                        e.target.closest('.BotaoMensagemCard') ||
-                        e.target.closest('.BotaoCompartilharCard')) {
+
+        // Adicionar listeners diretos nos botões como fallback
+        function adicionarListenersDiretos() {
+            document.querySelectorAll('.BotaoInscreverCard, .BotaoDesinscreverCard').forEach(btn => {
+                if (!btn.dataset.listenerDiretoAdicionado) {
+                    // Adicionar listener no botão
+                    btn.addEventListener('click', async function(e) {
                         e.preventDefault();
                         e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        const cod = Number(this.getAttribute('data-cod')) || 0;
+                        if (!cod) return;
+                        codEventoAcao = cod;
+                        window.codEventoAcao = cod;
+                        btnDesinscreverAtual = this;
+                        window.btnDesinscreverAtual = this;
+                        const inscrito = await verificarInscricao(cod, true);
+                        atualizarIconeInscricao(this, inscrito);
+                        if (inscrito) {
+                            abrirModalConfirmarDesinscricao();
+                        } else {
+                            abrirModalConfirmarInscricao();
+                        }
+                        return false;
+                    }, true);
+                    
+                    // Adicionar listener também nas imagens dentro do botão
+                    const img = btn.querySelector('img');
+                    if (img && !img.dataset.listenerImgAdicionado) {
+                        img.addEventListener('click', async function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            const cod = Number(btn.getAttribute('data-cod')) || 0;
+                            if (!cod) return;
+                            codEventoAcao = cod;
+                            window.codEventoAcao = cod;
+                            btnDesinscreverAtual = btn;
+                            window.btnDesinscreverAtual = btn;
+                            const inscrito = await verificarInscricao(cod, true);
+                            atualizarIconeInscricao(btn, inscrito);
+                            if (inscrito) {
+                                abrirModalConfirmarDesinscricao();
+                            } else {
+                                abrirModalConfirmarInscricao();
+                            }
+                            return false;
+                        }, true);
+                        img.dataset.listenerImgAdicionado = 'true';
                     }
-                }, true);
-                link.dataset.listenerNavegacao = 'true';
+                    
+                    btn.dataset.listenerDiretoAdicionado = 'true';
+                }
             });
         }
         
-        // Inicializar prevenção de navegação
-        prevenirNavegacaoCards();
-        
-        // Re-inicializar após carregamento dinâmico de eventos
-        if (typeof window.carregarEventosDoServidor === 'function') {
-            const originalCarregarEventos = window.carregarEventosDoServidor;
-            window.carregarEventosDoServidor = function() {
-                const result = originalCarregarEventos.apply(this, arguments);
-                setTimeout(prevenirNavegacaoCards, 100);
-                return result;
-            };
+        // Chamar a função para adicionar listeners diretos
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', adicionarListenersDiretos);
+        } else {
+            adicionarListenersDiretos();
         }
+        setTimeout(adicionarListenersDiretos, 100);
+
+        // Prevenir navegação do link quando clicar nos botões de ação
+        document.querySelectorAll('.CaixaDoEvento').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Se o clique foi em qualquer botão de ação ou dentro de AcoesFlutuantes, prevenir navegação
+                if (e.target.closest('.AcoesFlutuantes') || 
+                    e.target.closest('.BotaoAcaoCard') ||
+                    e.target.closest('.BotaoInscreverCard') ||
+                    e.target.closest('.BotaoFavoritoCard') ||
+                    e.target.closest('.BotaoMensagemCard') ||
+                    e.target.closest('.BotaoCompartilharCard')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+        });
         
-        const modalFav = document.getElementById('modal-favoritos');
-        if (modalFav) {
-            modalFav.onclick = function (e) { if (e.target === this) fecharModalFavoritos(); };
-            const listaFavoritos = document.getElementById('lista-favoritos');
-            if (listaFavoritos) {
-                listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
-                listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+        // Função para inicializar modais (chamada após carregamento via AJAX)
+        function inicializarModais() {
+            // Fechar modal de favoritos ao clicar fora
+            var modalFav = document.getElementById('modal-favoritos');
+            if (modalFav) {
+                modalFav.onclick = function (e) {
+                    if (e.target === this) fecharModalFavoritos();
+                };
+                var listaFavoritos = document.getElementById('lista-favoritos');
+                if (listaFavoritos) {
+                    listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
+                    listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
+                }
             }
         }
+        
+        // Inicializa modais imediatamente se já existirem
+        inicializarModais();
+        
+        // Re-inicializa modais após carregamento via AJAX
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarModais);
+        } else {
+            setTimeout(inicializarModais, 50);
+        }
 
+        // Fechar modais com ESC
         document.addEventListener('keydown', function (e) { 
             if (e.key === 'Escape' || e.key === 'Esc') { 
                 fecharModalCompartilhar(); 
                 fecharModalMensagem(true); 
-                fecharTodosModaisConfirmacao(); 
                 fecharModalFavoritos();
-                // Restaurar o estado do menu após fechar modais com ESC
-                setTimeout(() => {
-                    const params = new URLSearchParams(window.location.search);
-                    const pagina = params.get('pagina') || 'meusEventos';
-                    if (typeof window.setMenuAtivoPorPagina === 'function') {
-                        window.setMenuAtivoPorPagina(pagina);
-                    }
-                }, 50);
+                fecharTodosModaisConfirmacao();
             } 
         });
 
@@ -2040,14 +2051,42 @@
         // Garantir que carregarInscricoes seja chamada mesmo se o DOM já estiver pronto
         setTimeout(carregarInscricoes, 100);
 
-        // Garantir inicialização do botão de favoritos após carregamento
+        // Inicializar botão de favoritos
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarBotaoFavoritos);
+        } else {
+            inicializarBotaoFavoritos();
+        }
         setTimeout(inicializarBotaoFavoritos, 100);
         
         // Expor funções globalmente para serem chamadas após carregamento via AJAX
+        window.carregarInscricoes = carregarInscricoes;
         window.carregarFavoritos = carregarFavoritos;
         window.inicializarBotaoFavoritos = inicializarBotaoFavoritos;
-        window.carregarInscricoes = carregarInscricoes;
-        window.prevenirNavegacaoCards = prevenirNavegacaoCards;
+        window.inicializarModais = inicializarModais;
+        window.adicionarListenersDiretos = adicionarListenersDiretos;
+        window.confirmarInscricaoRapida = confirmarInscricaoRapida;
+        window.confirmarDesinscricaoRapida = confirmarDesinscricaoRapida;
+        window.abrirModalCompartilhar = abrirModalCompartilhar;
+        window.fecharModalCompartilhar = fecharModalCompartilhar;
+        window.abrirModalConfirmarInscricao = abrirModalConfirmarInscricao;
+        window.fecharModalConfirmarInscricao = fecharModalConfirmarInscricao;
+        window.abrirModalConfirmarDesinscricao = abrirModalConfirmarDesinscricao;
+        window.fecharModalConfirmarDesinscricao = fecharModalConfirmarDesinscricao;
+        window.abrirModalInscricaoConfirmada = abrirModalInscricaoConfirmada;
+        window.fecharModalInscricaoConfirmada = fecharModalInscricaoConfirmada;
+        window.abrirModalDesinscricaoConfirmada = abrirModalDesinscricaoConfirmada;
+        window.fecharModalDesinscricaoConfirmada = fecharModalDesinscricaoConfirmada;
+        window.abrirModalMensagem = abrirModalMensagem;
+        window.fecharModalMensagem = fecharModalMensagem;
+        window.enviarMensagemOrganizador = enviarMensagemOrganizador;
+        window.abrirModalFavoritos = abrirModalFavoritos;
+        window.fecharModalFavoritos = fecharModalFavoritos;
+        window.compartilharWhatsApp = compartilharWhatsApp;
+        window.compartilharInstagram = compartilharInstagram;
+        window.compartilharEmail = compartilharEmail;
+        window.compartilharX = compartilharX;
+        window.copiarLink = copiarLink;
     </script>
 
     <script src="MeusEventosParticipante.js?v=<?= time() ?>"></script>

@@ -714,16 +714,40 @@ function desbloquearScroll() {
 function prevenirScroll(e) { if (document.body.classList.contains('modal-aberto')) { e.preventDefault(); } }
 function prevenirScrollTeclado(e) {
     if (!document.body.classList.contains('modal-aberto')) return;
-    const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    const elementoAtivo = document.activeElement;
+    const isInputOuTextarea = elementoAtivo && (elementoAtivo.tagName === 'TEXTAREA' || elementoAtivo.tagName === 'INPUT');
+    const teclas = [33, 34, 35, 36, 37, 38, 39, 40]; // Teclas de navegação (sem espaço)
+    // Se for espaço (32) e estiver em input/textarea, permitir
+    if (e.keyCode === 32 && isInputOuTextarea) return;
+    // Bloquear outras teclas de navegação
     if (teclas.includes(e.keyCode)) e.preventDefault();
 }
 
 // ====== Modal de Mensagem ======
+function atualizarContadorMensagem() {
+    const textarea = document.getElementById('texto-mensagem-organizador');
+    const contador = document.getElementById('contador-mensagem-organizador');
+    if (!textarea || !contador) return;
+    const comprimento = textarea.value.length;
+    const maximo = 500;
+    contador.textContent = `${comprimento} / ${maximo}`;
+    if (comprimento >= maximo) {
+        contador.classList.add('limite-alcancado');
+    } else {
+        contador.classList.remove('limite-alcancado');
+    }
+}
 function abrirModalMensagem() {
     const m = document.getElementById('modal-mensagem');
     if (!m) return;
     const textarea = document.getElementById('texto-mensagem-organizador');
-    if (textarea) textarea.value = '';
+    if (textarea) {
+        textarea.value = '';
+        atualizarContadorMensagem();
+        // Adicionar listener para atualizar contador em tempo real
+        textarea.removeEventListener('input', atualizarContadorMensagem);
+        textarea.addEventListener('input', atualizarContadorMensagem);
+    }
     m.classList.add('ativo');
     bloquearScroll();
 }

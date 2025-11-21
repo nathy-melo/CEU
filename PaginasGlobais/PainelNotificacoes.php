@@ -143,6 +143,32 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 0.6rem;
+            position: relative;
+        }
+
+        .btn-excluir-notificacao {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            padding: 0;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .btn-excluir-notificacao:hover {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff6b6b;
+            transform: scale(1.1);
         }
 
         .notificacao-tipo-badge {
@@ -161,6 +187,7 @@
         .notificacao-tipo-badge.evento_cancelado { background-color: #F44336; }
         .notificacao-tipo-badge.evento_prestes_iniciar { background-color: #FF9800; }
         .notificacao-tipo-badge.novo_participante { background-color: #2196F3; }
+        .notificacao-tipo-badge.mensagem-participante { background-color: #9C27B0; }
 
         .notificacao-mensagem {
             font-size: 0.95rem;
@@ -196,6 +223,343 @@
         .btn-marcar-lida:hover {
             background-color: var(--botao);
             color: #FFF;
+        }
+
+        /* ==== Estilos para Mensagem de Participante ==== */
+        .notif-mensagem-participante {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .notif-remetente {
+            background: rgba(101, 152, 210, 0.15);
+            padding: 0.6rem 0.8rem;
+            border-radius: 0.4rem;
+            border-left: 3px solid var(--botao);
+        }
+
+        .notif-remetente strong {
+            color: var(--botao);
+            font-weight: 700;
+        }
+
+        .notif-remetente small {
+            display: block;
+            margin-top: 0.3rem;
+            opacity: 0.8;
+            font-size: 0.85rem;
+        }
+
+        .notif-evento {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.4rem;
+        }
+
+        .notif-evento strong {
+            color: var(--azul-claro);
+            font-weight: 600;
+        }
+
+        .notif-conteudo {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.8rem;
+            border-radius: 0.4rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notif-conteudo strong {
+            color: var(--branco);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .notif-texto-mensagem {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.6rem;
+            border-radius: 0.3rem;
+            line-height: 1.6;
+            color: var(--branco);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .btn-responder-mensagem {
+            background: var(--botao) !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.4rem !important;
+            cursor: pointer !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+            white-space: nowrap !important;
+        }
+
+        .btn-responder-mensagem:hover {
+            background: var(--azul-claro) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 8px rgba(101, 152, 210, 0.4) !important;
+        }
+
+        /* ==== Estilos para Thread de Mensagens (estilo Gmail) ==== */
+        .notif-cabecalho-thread {
+            background: rgba(101, 152, 210, 0.1);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--botao);
+            margin-bottom: 1rem;
+        }
+
+        .notif-cabecalho-thread-compacto {
+            background: rgba(101, 152, 210, 0.08);
+            padding: 0.6rem 0.8rem;
+            border-radius: 0.4rem;
+            border-left: 3px solid var(--botao);
+            margin-bottom: 0.75rem;
+        }
+
+        .notif-evento-thread {
+            font-weight: 600;
+            color: var(--botao);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notif-thread-contador {
+            font-size: 0.85rem;
+            font-weight: 400;
+            opacity: 0.8;
+            color: var(--azul-claro);
+        }
+
+        .notif-participantes-thread {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .notif-ultima-mensagem {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-expandir-thread {
+            background: rgba(101, 152, 210, 0.1);
+            color: var(--botao);
+            border: 1px solid rgba(101, 152, 210, 0.3);
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            width: 100%;
+            margin-top: 0.5rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-expandir-thread:hover {
+            background: rgba(101, 152, 210, 0.2);
+            border-color: var(--botao);
+        }
+
+        .thread-icon {
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+
+        .notif-thread-completa {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notif-thread-mensagens {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .notif-mensagem-thread-item {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .notif-mensagem-thread-item.minha-mensagem {
+            background: rgba(101, 152, 210, 0.15);
+            border-left: 3px solid var(--botao);
+            margin-left: 1rem;
+        }
+
+        .notif-mensagem-thread-item.outra-mensagem {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--azul-claro);
+            margin-right: 1rem;
+        }
+
+        .notif-mensagem-thread-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notif-mensagem-thread-remetente {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .notif-mensagem-thread-remetente strong {
+            color: var(--botao);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .notif-mensagem-thread-remetente small {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .notif-mensagem-thread-conteudo {
+            line-height: 1.6;
+            color: var(--branco);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 0.5rem 0;
+        }
+
+        .notif-thread-separador {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+            margin: 0.75rem 0;
+        }
+
+        /* ==== Modal de Resposta ==== */
+        .modal-resposta-mensagem {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--fundo-escuro-transparente);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-resposta-mensagem.ativo {
+            display: flex;
+        }
+
+        .modal-resposta-mensagem .conteudo {
+            background: var(--caixas);
+            color: var(--texto);
+            width: 100%;
+            max-width: 32rem;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
+        }
+
+        .modal-resposta-mensagem .cabecalho {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .modal-resposta-mensagem button.fechar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--texto);
+            transition: opacity 0.2s;
+        }
+
+        .modal-resposta-mensagem button.fechar:hover {
+            opacity: 0.7;
+        }
+
+        .modal-resposta-mensagem .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-resposta-mensagem label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--texto);
+        }
+
+        .modal-resposta-mensagem input[type="text"],
+        .modal-resposta-mensagem textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--borda-clara);
+            background: var(--fundo-claro-transparente);
+            color: var(--texto);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .modal-resposta-mensagem textarea {
+            min-height: 8rem;
+            resize: vertical;
+        }
+
+        .modal-resposta-mensagem .contador-caracteres {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--texto);
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .modal-resposta-mensagem .contador-caracteres.limite-alcancado {
+            color: var(--vermelho);
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        .modal-resposta-mensagem .acoes {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: space-between;
+        }
+
+        .modal-resposta-mensagem .botao {
+            background: var(--botao);
+            color: var(--branco);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-resposta-mensagem .botao:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .modal-resposta-mensagem .botao-secundario {
+            background: var(--vermelho);
         }
 
         /* ==== Mensagem Vazia ==== */
@@ -320,6 +684,9 @@
                     <button class="btn-filtro" data-tipo="novo_participante">
                         <img src="../Imagens/notif-usuario.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"> Novo Participante
                     </button>
+                    <button class="btn-filtro" data-tipo="mensagem_participante">
+                        <img src="../Imagens/Carta.svg" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px; filter: invert(1);"> Mensagens
+                    </button>
                 </div>
 
                 <!-- Conteúdo / Lista de Notificações -->
@@ -338,5 +705,40 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Resposta à Mensagem -->
+    <div id="modal-resposta-mensagem" class="modal-resposta-mensagem">
+        <div class="conteudo" onclick="event.stopPropagation()">
+            <div class="cabecalho">
+                <span>Responder Mensagem</span>
+                <button type="button" class="fechar" onclick="fecharModalResposta()" aria-label="Fechar">×</button>
+            </div>
+            <form id="form-resposta-mensagem" onsubmit="enviarRespostaMensagem(event)">
+                <div class="form-group">
+                    <label for="resposta-cpf-destinatario">CPF do Destinatário</label>
+                    <input type="text" id="resposta-cpf-destinatario" readonly style="background: rgba(255, 255, 255, 0.1); opacity: 0.7;">
+                </div>
+                <div class="form-group">
+                    <label for="resposta-titulo">Título da Notificação*</label>
+                    <input type="text" id="resposta-titulo" maxlength="100" required placeholder="Ex: Resposta à sua mensagem">
+                </div>
+                <div class="form-group" id="grupo-mensagem-original" style="display: none;">
+                    <label>Mensagem Original:</label>
+                    <div id="resposta-mensagem-original" style="background: rgba(0, 0, 0, 0.2); padding: 0.75rem; border-radius: 0.4rem; border-left: 3px solid var(--botao); margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="resposta-conteudo">Mensagem*</label>
+                    <textarea id="resposta-conteudo" maxlength="500" required placeholder="Digite sua resposta (máx. 500 caracteres)"></textarea>
+                    <div id="contador-resposta" class="contador-caracteres">0 / 500</div>
+                </div>
+                <div class="acoes">
+                    <button type="button" class="botao botao-secundario" onclick="fecharModalResposta()">Cancelar</button>
+                    <button type="submit" class="botao">Enviar Resposta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../PaginasGlobais/PainelNotificacoes.js"></script>
 </body>
 </html>

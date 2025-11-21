@@ -262,6 +262,6 @@ function carregarEventosDoServidor() {
 document.addEventListener('DOMContentLoaded', function() {
     inicializarFiltroEventos();
 });
-
 window.inicializarFiltroEventos = inicializarFiltroEventos;
 window.carregarEventosDoServidor = carregarEventosDoServidor;
+

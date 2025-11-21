@@ -24,6 +24,10 @@
                 <span>Enviar Mensagem</span>
                 <img src="../Imagens/Email.svg" alt="Mensagem icon">
             </button>
+            <button class="botao botao-acao" id="btn-enviar-mensagem-cpf">
+                <span>Enviar para CPF</span>
+                <img src="../Imagens/Email.svg" alt="Mensagem CPF icon">
+            </button>
             <button class="botao botao-acao" id="btn-importar-inscritos">
                 <span>Importar Lista de Inscritos</span>
                 <img src="../Imagens/Importar_lista.svg" alt="Importar icon">
@@ -640,6 +644,16 @@
             {
                 id: 'btn-enviar-mensagem-part',
                 fn: abrirModalMensagemPart
+            },
+            {
+                id: 'btn-enviar-mensagem-cpf',
+                fn: () => {
+                    if (typeof window.abrirModalMensagemCPF === 'function') {
+                        window.abrirModalMensagemCPF();
+                    } else {
+                        alert('Função não disponível. Recarregue a página.');
+                    }
+                }
             },
             {
                 id: 'btn-importar-inscritos',

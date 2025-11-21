@@ -437,7 +437,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 init: () => {}
             },
             'adicionarEvento': {
-                html: 'AdicionarEvento.html',
+                html: 'AdicionarEvento.php',
                 js: [],
                 init: () => {}
             },
@@ -484,6 +484,19 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     /* noop */
                 }
             }
+
+            // Limpa flags de scripts executados para permitir re-execução
+            if (window.adicionarEventoScriptExecutado) {
+                delete window.adicionarEventoScriptExecutado;
+            }
+            
+            // Limpa atributos de listener do formulário se existir
+            setTimeout(() => {
+                const formEvento = document.getElementById('form-evento');
+                if (formEvento && formEvento.dataset.listenerAdicionado) {
+                    delete formEvento.dataset.listenerAdicionado;
+                }
+            }, 50);
 
             // Define variável global para páginas que precisam do código do evento
             if (codEvento) {

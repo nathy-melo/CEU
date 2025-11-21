@@ -619,23 +619,172 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         try {
+            // Verifica permissão do organizador
+            $cpfOrganizador = $_SESSION['cpf'];
+            $consultaPermissao = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?
+                                  UNION
+                                  SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?
+                                  LIMIT 1";
+            $stmtPermissao = mysqli_prepare($conexao, $consultaPermissao);
+            mysqli_stmt_bind_param($stmtPermissao, "isis", $codEvento, $cpfOrganizador, $codEvento, $cpfOrganizador);
+            mysqli_stmt_execute($stmtPermissao);
+            $resultadoPermissao = mysqli_stmt_get_result($stmtPermissao);
+
+            if (!mysqli_fetch_assoc($resultadoPermissao)) {
+                mysqli_stmt_close($stmtPermissao);
+                mysqli_close($conexao);
+                echo json_encode(['sucesso' => false, 'erro' => 'sem_permissao']);
+                exit;
+            }
+            mysqli_stmt_close($stmtPermissao);
+
             $totalEnviadas = 0;
             $sqlNotificacao = "INSERT INTO notificacoes (CPF, titulo, mensagem, data_criacao, lida) VALUES (?, ?, ?, NOW(), 0)";
             $stmtNotificacao = mysqli_prepare($conexao, $sqlNotificacao);
 
+            // Verificar se cada CPF é um usuário válido (não precisa estar inscrito)
+            $sqlVerificarUsuario = "SELECT CPF FROM usuario WHERE CPF = ? LIMIT 1";
+            $stmtVerificarUsuario = mysqli_prepare($conexao, $sqlVerificarUsuario);
+
             foreach ($destinatarios as $cpf) {
-                mysqli_stmt_bind_param($stmtNotificacao, "sss", $cpf, $titulo, $conteudo);
-                if (mysqli_stmt_execute($stmtNotificacao)) {
-                    $totalEnviadas++;
+                // Verificar se é um usuário válido
+                mysqli_stmt_bind_param($stmtVerificarUsuario, "s", $cpf);
+                mysqli_stmt_execute($stmtVerificarUsuario);
+                $resultVerificar = mysqli_stmt_get_result($stmtVerificarUsuario);
+                
+                if (mysqli_fetch_assoc($resultVerificar)) {
+                    // É um usuário válido, pode enviar mensagem
+                    mysqli_stmt_bind_param($stmtNotificacao, "sss", $cpf, $titulo, $conteudo);
+                    if (mysqli_stmt_execute($stmtNotificacao)) {
+                        $totalEnviadas++;
+                    }
                 }
+                mysqli_free_result($resultVerificar);
             }
 
+            mysqli_stmt_close($stmtVerificarUsuario);
             mysqli_stmt_close($stmtNotificacao);
             mysqli_close($conexao);
 
             echo json_encode(['sucesso' => true, 'total_enviadas' => $totalEnviadas]);
         } catch (Exception $e) {
             echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Enviar notificação para CPF específico (permite responder mensagens de usuários não inscritos)
+    if (isset($_POST['action']) && $_POST['action'] === 'enviar_notificacao_cpf') {
+        header('Content-Type: application/json; charset=utf-8');
+        require_once __DIR__ . '/../BancoDados/conexao.php';
+
+        $codEvento = intval($_POST['cod_evento'] ?? 0);
+        $titulo = $_POST['titulo'] ?? '';
+        $conteudo = $_POST['conteudo'] ?? '';
+        $cpfDestinatario = trim($_POST['cpf_destinatario'] ?? '');
+
+        if (empty($titulo) || empty($conteudo) || empty($cpfDestinatario)) {
+            echo json_encode(['sucesso' => false, 'erro' => 'Dados incompletos'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+
+        try {
+            // Verifica permissão do organizador
+            $cpfOrganizador = $_SESSION['cpf'];
+            $consultaPermissao = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?
+                                  UNION
+                                  SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?
+                                  LIMIT 1";
+            $stmtPermissao = mysqli_prepare($conexao, $consultaPermissao);
+            mysqli_stmt_bind_param($stmtPermissao, "isis", $codEvento, $cpfOrganizador, $codEvento, $cpfOrganizador);
+            mysqli_stmt_execute($stmtPermissao);
+            $resultadoPermissao = mysqli_stmt_get_result($stmtPermissao);
+
+            if (!mysqli_fetch_assoc($resultadoPermissao)) {
+                mysqli_stmt_close($stmtPermissao);
+                mysqli_close($conexao);
+                echo json_encode(['sucesso' => false, 'erro' => 'sem_permissao'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                exit;
+            }
+            mysqli_stmt_close($stmtPermissao);
+
+            // Verificar se o CPF é um usuário válido
+            $sqlVerificarUsuario = "SELECT CPF, Nome FROM usuario WHERE CPF = ? LIMIT 1";
+            $stmtVerificarUsuario = mysqli_prepare($conexao, $sqlVerificarUsuario);
+            mysqli_stmt_bind_param($stmtVerificarUsuario, "s", $cpfDestinatario);
+            mysqli_stmt_execute($stmtVerificarUsuario);
+            $resultVerificar = mysqli_stmt_get_result($stmtVerificarUsuario);
+            $usuario = mysqli_fetch_assoc($resultVerificar);
+            mysqli_stmt_close($stmtVerificarUsuario);
+
+            if (!$usuario) {
+                mysqli_close($conexao);
+                echo json_encode(['sucesso' => false, 'erro' => 'usuario_nao_encontrado', 'mensagem' => 'CPF não encontrado no sistema'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                exit;
+            }
+
+            // Verifica se é uma resposta (quando vem do modal de resposta)
+            $ehResposta = isset($_POST['eh_resposta']) && $_POST['eh_resposta'] === '1';
+            $mensagemOriginal = trim($_POST['mensagem_original'] ?? '');
+            
+            // Busca dados do remetente (organizador)
+            $sqlRemetente = "SELECT Nome FROM usuario WHERE CPF = ? LIMIT 1";
+            $stmtRemetente = mysqli_prepare($conexao, $sqlRemetente);
+            mysqli_stmt_bind_param($stmtRemetente, "s", $cpfOrganizador);
+            mysqli_stmt_execute($stmtRemetente);
+            $resultRemetente = mysqli_stmt_get_result($stmtRemetente);
+            $dadosRemetente = mysqli_fetch_assoc($resultRemetente) ?: ['Nome' => 'Organizador'];
+            mysqli_stmt_close($stmtRemetente);
+            
+            // Busca dados do evento
+            $sqlEvento = "SELECT nome FROM evento WHERE cod_evento = ? LIMIT 1";
+            $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
+            mysqli_stmt_bind_param($stmtEvento, "i", $codEvento);
+            mysqli_stmt_execute($stmtEvento);
+            $resultEvento = mysqli_stmt_get_result($stmtEvento);
+            $dadosEvento = mysqli_fetch_assoc($resultEvento) ?: ['nome' => 'Evento'];
+            mysqli_stmt_close($stmtEvento);
+            
+            // Formata mensagem no mesmo formato das mensagens de participante
+            $nomeRemetente = $dadosRemetente['Nome'];
+            $nomeEvento = $dadosEvento['nome'];
+            
+            // Armazena APENAS a mensagem atual (não inclui mensagens anteriores)
+            // A thread completa será buscada quando necessário
+            $mensagemCompleta = $conteudo;
+            
+            // Calcula tamanho total considerando o formato CPF|||NOME|||EVENTO|||MENSAGEM
+            $tamanhoBase = mb_strlen($cpfOrganizador . '|||' . $nomeRemetente . '|||' . $nomeEvento . '|||');
+            $tamanhoDisponivel = 255 - $tamanhoBase;
+            
+            // Se a mensagem for muito longa, trunca
+            if (mb_strlen($mensagemCompleta) > $tamanhoDisponivel) {
+                $mensagemCompleta = mb_substr($mensagemCompleta, 0, $tamanhoDisponivel);
+            }
+            
+            // Formato: CPF|||NOME|||EVENTO|||MENSAGEM
+            $mensagemFormatada = $cpfOrganizador . '|||' . $nomeRemetente . '|||' . $nomeEvento . '|||' . $mensagemCompleta;
+            
+            // Define título e tipo
+            $tituloNotificacao = $ehResposta ? 'Resposta de organizador' : $titulo;
+            $tipoNotificacao = 'mensagem_participante';
+            
+            // Enviar notificação com tipo e cod_evento
+            $sqlNotificacao = "INSERT INTO notificacoes (CPF, titulo, tipo, mensagem, cod_evento, data_criacao, lida) VALUES (?, ?, ?, ?, ?, NOW(), 0)";
+            $stmtNotificacao = mysqli_prepare($conexao, $sqlNotificacao);
+            mysqli_stmt_bind_param($stmtNotificacao, "ssssi", $cpfDestinatario, $tituloNotificacao, $tipoNotificacao, $mensagemFormatada, $codEvento);
+            
+            if (mysqli_stmt_execute($stmtNotificacao)) {
+                mysqli_stmt_close($stmtNotificacao);
+                mysqli_close($conexao);
+                echo json_encode(['sucesso' => true, 'total_enviadas' => 1, 'nome_destinatario' => $usuario['Nome']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            } else {
+                mysqli_stmt_close($stmtNotificacao);
+                mysqli_close($conexao);
+                echo json_encode(['sucesso' => false, 'erro' => 'falha_envio'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
         exit;
     }
@@ -2175,6 +2324,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Modal Enviar Mensagem para CPF Específico -->
+    <div class="modal-overlay" id="modalEnviarMensagemCPF" onclick="fecharModalSeForFundo(event, 'modalEnviarMensagemCPF')">
+        <div class="modal-editar">
+            <div class="modal-header">
+                <h2>Enviar Mensagem para CPF Específico</h2>
+                <button class="btn-fechar-modal" onclick="fecharModalMensagemCPF()">&times;</button>
+            </div>
+            <form id="formEnviarMensagemCPF" onsubmit="enviarMensagemCPF(event)">
+                <div class="form-group">
+                    <label for="msg-cpf-destinatario">CPF do Destinatário*</label>
+                    <input type="text" id="msg-cpf-destinatario" maxlength="11" pattern="[0-9]{11}" placeholder="Digite o CPF (apenas números)" required>
+                    <small style="color: #666;">Digite o CPF do usuário que enviou a mensagem (apenas números, sem pontos ou traços)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="msg-titulo-cpf">Título da Notificação*</label>
+                    <input type="text" id="msg-titulo-cpf" maxlength="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="msg-conteudo-cpf">Mensagem*</label>
+                    <textarea id="msg-conteudo-cpf" rows="6" style="width: 100%; padding: 12px; border: 1px solid var(--azul-escuro); border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;" maxlength="500" required></textarea>
+                    <small style="color: #666;">Máximo 500 caracteres</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemCPF()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-salvar">Enviar Notificação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Editar Dados -->
     <div class="modal-overlay" id="modalEditarDados" onclick="fecharModalSeForFundo(event, 'modalEditarDados')">
         <div class="modal-editar">
@@ -2414,6 +2596,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Tenta pegar da URL primeiro
             const urlParams = new URLSearchParams(window.location.search);
             let codFromUrl = urlParams.get('cod_evento');
+            const responderCpf = urlParams.get('responder_cpf');
 
             // Se não vier da URL, tenta pegar da variável global (quando carregado via AJAX)
             if (!codFromUrl && window.codigoEventoParaGerenciar) {
@@ -2421,6 +2604,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             codEventoAtual = codFromUrl;
+            
+            // Se há parâmetro para responder, abre o modal após um pequeno delay
+            if (responderCpf) {
+                setTimeout(() => {
+                    if (typeof window.abrirModalMensagemCPF === 'function') {
+                        window.abrirModalMensagemCPF(responderCpf);
+                    } else if (typeof abrirModalMensagemCPF === 'function') {
+                        abrirModalMensagemCPF(responderCpf);
+                    }
+                    // Remove o parâmetro da URL sem recarregar
+                    const newUrl = window.location.pathname + '?pagina=gerenciarEvento&cod_evento=' + codEventoAtual;
+                    window.history.replaceState({}, '', newUrl);
+                }, 800);
+            }
 
             if (!codEventoAtual) {
                 alert('Erro: Evento não identificado');
@@ -2675,6 +2872,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 {
                     id: 'btn-enviar-mensagem',
                     fn: abrirModalMensagem
+                },
+                {
+                    id: 'btn-enviar-mensagem-cpf',
+                    fn: abrirModalMensagemCPF
                 },
                 {
                     id: 'btn-importar-inscritos',
@@ -3028,6 +3229,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('modalEnviarMensagem').classList.remove('ativo');
             document.getElementById('formEnviarMensagem').reset();
         }
+
+        // ========== MODAL ENVIAR MENSAGEM PARA CPF ESPECÍFICO ==========
+        window.abrirModalMensagemCPF = function(cpfPreenchido = '') {
+            const modal = document.getElementById('modalEnviarMensagemCPF');
+            const inputCPF = document.getElementById('msg-cpf-destinatario');
+            
+            if (cpfPreenchido) {
+                // Remove formatação do CPF se houver
+                inputCPF.value = cpfPreenchido.replace(/\D/g, '');
+                // Marca que é uma resposta quando o CPF é preenchido automaticamente
+                inputCPF.dataset.ehResposta = '1';
+            } else {
+                inputCPF.value = '';
+                inputCPF.dataset.ehResposta = '0';
+            }
+            
+            document.getElementById('formEnviarMensagemCPF').reset();
+            if (cpfPreenchido) {
+                inputCPF.value = cpfPreenchido.replace(/\D/g, '');
+                inputCPF.dataset.ehResposta = '1';
+            }
+            
+            modal.classList.add('ativo');
+        };
+        
+        window.fecharModalMensagemCPF = function() {
+            document.getElementById('modalEnviarMensagemCPF').classList.remove('ativo');
+            document.getElementById('formEnviarMensagemCPF').reset();
+            const inputCPF = document.getElementById('msg-cpf-destinatario');
+            if (inputCPF) {
+                inputCPF.dataset.ehResposta = '0';
+            }
+        };
+        
+        window.enviarMensagemCPF = async function(event) {
+            event.preventDefault();
+
+            const cpfDestinatario = document.getElementById('msg-cpf-destinatario').value.replace(/\D/g, '');
+            const titulo = document.getElementById('msg-titulo-cpf').value;
+            const conteudo = document.getElementById('msg-conteudo-cpf').value;
+
+            if (cpfDestinatario.length !== 11) {
+                alert('CPF deve conter 11 dígitos');
+                return;
+            }
+
+            if (!confirm(`Enviar notificação para o CPF ${cpfDestinatario.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}?`)) {
+                return;
+            }
+
+            try {
+                // Verifica se é uma resposta (quando o CPF foi preenchido automaticamente)
+                const inputCPF = document.getElementById('msg-cpf-destinatario');
+                const ehResposta = inputCPF && inputCPF.dataset.ehResposta === '1' ? '1' : '0';
+                
+                const response = await fetch('GerenciarEvento.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'enviar_notificacao_cpf',
+                        cod_evento: codEventoAtual,
+                        cpf_destinatario: cpfDestinatario,
+                        titulo: titulo,
+                        conteudo: conteudo,
+                        eh_resposta: ehResposta
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.sucesso) {
+                    const nomeDestinatario = data.nome_destinatario ? ` (${data.nome_destinatario})` : '';
+                    alert(`Notificação enviada com sucesso para o CPF ${cpfDestinatario.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}${nomeDestinatario}!`);
+                    fecharModalMensagemCPF();
+                } else {
+                    if (data.erro === 'usuario_nao_encontrado') {
+                        alert('CPF não encontrado no sistema. Verifique se o CPF está correto.');
+                    } else {
+                        alert('Erro ao enviar notificação: ' + (data.mensagem || data.erro || 'Erro desconhecido'));
+                    }
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao enviar notificação');
+            }
+        };
 
         async function enviarMensagemParticipantes(event) {
             event.preventDefault();

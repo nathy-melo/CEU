@@ -299,6 +299,18 @@
             padding: 0.75rem;
             font-size: 0.95rem;
         }
+        .modal-mensagem .contador-caracteres {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--texto);
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+        .modal-mensagem .contador-caracteres.limite-alcancado {
+            color: var(--vermelho);
+            opacity: 1;
+            font-weight: 600;
+        }
         .modal-mensagem .acoes {
             margin-top: 0.75rem;
             display: flex;
@@ -805,6 +817,7 @@
             <div>
                 <textarea id="texto-mensagem-organizador" maxlength="500"
                     placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
+                <div id="contador-mensagem-organizador" class="contador-caracteres">0 / 500</div>
                 <div class="acoes">
                     <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
                     <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
@@ -856,14 +869,37 @@
     </div>
 
     <script>
-        // Variáveis globais
-        let codEvento = null;
-        let codEventoMensagem = null;
-        let codEventoAcao = null;
-        let btnInscreverAtual = null;
-        const favoritosSet = new Set();
-        let favoritosDados = [];
-        const inscricaoCache = new Map();
+        // Variáveis globais - verificar se já existem para evitar re-declaração
+        if (typeof window.codEvento === 'undefined') {
+            window.codEvento = null;
+        }
+        if (typeof window.codEventoMensagem === 'undefined') {
+            window.codEventoMensagem = null;
+        }
+        if (typeof window.codEventoAcao === 'undefined') {
+            window.codEventoAcao = null;
+        }
+        if (typeof window.btnInscreverAtual === 'undefined') {
+            window.btnInscreverAtual = null;
+        }
+        if (typeof window.favoritosSet === 'undefined') {
+            window.favoritosSet = new Set();
+        }
+        if (typeof window.favoritosDados === 'undefined') {
+            window.favoritosDados = [];
+        }
+        if (typeof window.inscricaoCache === 'undefined') {
+            window.inscricaoCache = new Map();
+        }
+        
+        // Criar referências locais usando var (permite re-declaração) para facilitar o uso
+        var codEvento = window.codEvento;
+        var codEventoMensagem = window.codEventoMensagem;
+        var codEventoAcao = window.codEventoAcao;
+        var btnInscreverAtual = window.btnInscreverAtual;
+        var favoritosSet = window.favoritosSet;
+        var favoritosDados = window.favoritosDados;
+        var inscricaoCache = window.inscricaoCache;
         window.inscricaoCache = inscricaoCache;
 
         // Funções de bloqueio/desbloqueio de scroll
@@ -882,7 +918,12 @@
         function prevenirScroll(e) { if (document.body.classList.contains('modal-aberto')) { e.preventDefault(); } }
         function prevenirScrollTeclado(e) {
             if (!document.body.classList.contains('modal-aberto')) return;
-            const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+            const elementoAtivo = document.activeElement;
+            const isInputOuTextarea = elementoAtivo && (elementoAtivo.tagName === 'TEXTAREA' || elementoAtivo.tagName === 'INPUT');
+            const teclas = [33, 34, 35, 36, 37, 38, 39, 40]; // Teclas de navegação (sem espaço)
+            // Se for espaço (32) e estiver em input/textarea, permitir
+            if (e.keyCode === 32 && isInputOuTextarea) return;
+            // Bloquear outras teclas de navegação
             if (teclas.includes(e.keyCode)) e.preventDefault();
         }
 
@@ -978,7 +1019,7 @@
         // Função para inicializar modais (chamada após carregamento via AJAX)
         function inicializarModais() {
             // Fechar modal de compartilhar ao clicar fora
-            const modalCompartilhar = document.getElementById('modal-compartilhar');
+            var modalCompartilhar = document.getElementById('modal-compartilhar');
             if (modalCompartilhar) {
                 modalCompartilhar.onclick = function (e) { 
                     if (e.target === this) {
@@ -989,12 +1030,12 @@
             }
             
             // Fechar modal de favoritos ao clicar fora
-            const modalFav = document.getElementById('modal-favoritos');
+            var modalFav = document.getElementById('modal-favoritos');
             if (modalFav) {
                 modalFav.onclick = function (e) {
                     if (e.target === this) fecharModalFavoritos();
                 };
-                const listaFavoritos = document.getElementById('lista-favoritos');
+                var listaFavoritos = document.getElementById('lista-favoritos');
                 if (listaFavoritos) {
                     listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
                     listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
@@ -1013,11 +1054,30 @@
         }
 
         // ====== Modal de Mensagem ======
+        function atualizarContadorMensagem() {
+            const textarea = document.getElementById('texto-mensagem-organizador');
+            const contador = document.getElementById('contador-mensagem-organizador');
+            if (!textarea || !contador) return;
+            const comprimento = textarea.value.length;
+            const maximo = 500;
+            contador.textContent = `${comprimento} / ${maximo}`;
+            if (comprimento >= maximo) {
+                contador.classList.add('limite-alcancado');
+            } else {
+                contador.classList.remove('limite-alcancado');
+            }
+        }
         function abrirModalMensagem() {
             const m = document.getElementById('modal-mensagem');
             if (!m) return;
             const textarea = document.getElementById('texto-mensagem-organizador');
-            if (textarea) textarea.value = '';
+            if (textarea) {
+                textarea.value = '';
+                atualizarContadorMensagem();
+                // Adicionar listener para atualizar contador em tempo real
+                textarea.removeEventListener('input', atualizarContadorMensagem);
+                textarea.addEventListener('input', atualizarContadorMensagem);
+            }
             m.classList.add('ativo');
             bloquearScroll();
         }
@@ -1099,7 +1159,8 @@
                 if (timeoutId) clearTimeout(timeoutId);
                 if (r.status === 401) { 
                     favoritosSet.clear(); 
-                    favoritosDados = []; 
+                    favoritosDados = [];
+                    window.favoritosDados = [];
                     return; 
                 }
                 if (!r.ok) {
@@ -1109,6 +1170,7 @@
                 if (j && j.sucesso && Array.isArray(j.favoritos)) {
                     favoritosSet.clear();
                     favoritosDados = j.favoritos.filter(f => f && f.cod_evento);
+                    window.favoritosDados = favoritosDados;
                     for (const f of favoritosDados) {
                         const cod = Number(f.cod_evento);
                         if (cod > 0) favoritosSet.add(cod);
@@ -1608,7 +1670,9 @@
                 
                 // IMPORTANTE: Atualizar as variáveis ANTES de verificar status
                 codEventoAcao = cod;
+                window.codEventoAcao = cod;
                 btnInscreverAtual = btnInscrever;
+                window.btnInscreverAtual = btnInscrever;
                 
                 // IMPORTANTE: Forçar atualização do servidor para garantir dados corretos
                 const inscrito = await verificarInscricao(cod, true); // forçar atualização
@@ -1633,6 +1697,7 @@
                 const cod = Number(btnMsg.getAttribute('data-cod')) || 0;
                 if (!cod) return;
                 codEventoMensagem = cod;
+                window.codEventoMensagem = cod;
                 abrirModalMensagem();
                 return false;
             }
@@ -1646,6 +1711,7 @@
                 const cod = Number(btnCompartilhar.getAttribute('data-cod')) || 0;
                 if (!cod) return;
                 codEvento = cod;
+                window.codEvento = cod;
                 abrirModalCompartilhar();
                 return false;
             }
@@ -1667,6 +1733,7 @@
                 } else { 
                     favoritosSet.delete(cod);
                     favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+                    window.favoritosDados = favoritosDados;
                 }
                 atualizarIconeFavorito(btnFav, novoEstado);
                 // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
@@ -1736,7 +1803,13 @@
                             throw new Error('Resposta inválida do servidor');
                         }
                         if (j && j.sucesso) {
-                            if (j.favoritado) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod); }
+                            if (j.favoritado) { 
+                                favoritosSet.add(cod); 
+                            } else { 
+                                favoritosSet.delete(cod); 
+                                favoritosDados = favoritosDados.filter(f => Number(f.cod_evento) !== cod);
+                                window.favoritosDados = favoritosDados;
+                            }
                             atualizarIconeFavorito(btnFav, j.favoritado);
                             // Atualizar TODOS os botões de favorito com o mesmo código na página
                             // Buscar especificamente os botões que NÃO estão no modal de favoritos
@@ -1824,12 +1897,12 @@
         setTimeout(adicionarListenersDeClique, 100);
 
         // Fechar modal de favoritos ao clicar fora
-        const modalFav = document.getElementById('modal-favoritos');
+        var modalFav = document.getElementById('modal-favoritos');
         if (modalFav) {
             modalFav.onclick = function (e) {
                 if (e.target === this) fecharModalFavoritos();
             };
-            const listaFavoritos = document.getElementById('lista-favoritos');
+            var listaFavoritos = document.getElementById('lista-favoritos');
             if (listaFavoritos) {
                 listaFavoritos.addEventListener('wheel', function (e) { e.stopPropagation(); }, { passive: false });
                 listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
@@ -1859,7 +1932,9 @@
                         const cod = Number(this.getAttribute('data-cod')) || 0;
                         if (!cod) return;
                         codEventoAcao = cod;
+                        window.codEventoAcao = cod;
                         btnInscreverAtual = this;
+                        window.btnInscreverAtual = this;
                         const inscrito = await verificarInscricao(cod, true);
                         atualizarIconeInscricao(this, inscrito);
                         if (inscrito) {
@@ -1880,7 +1955,9 @@
                             const cod = Number(btn.getAttribute('data-cod')) || 0;
                             if (!cod) return;
                             codEventoAcao = cod;
+                            window.codEventoAcao = cod;
                             btnInscreverAtual = btn;
+                            window.btnInscreverAtual = btn;
                             const inscrito = await verificarInscricao(cod, true);
                             atualizarIconeInscricao(btn, inscrito);
                             if (inscrito) {

@@ -987,6 +987,83 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   text-transform: uppercase;
 }
 
+/* Item de Notificação no Dropdown - Estilo Melhorado */
+/* Usa !important para garantir que sobrescreva estilos antigos em cache */
+#notificacoes-lista .notificacao-item-dropdown {
+  background: linear-gradient(135deg, rgba(101, 152, 210, 0.08), rgba(255, 255, 255, 0.05)) !important;
+  border-left: 3px solid var(--botao) !important;
+  padding: 12px 14px !important;
+  margin-bottom: 10px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+#notificacoes-lista .notificacao-item-dropdown:last-child {
+  margin-bottom: 0 !important;
+}
+
+#notificacoes-lista .notificacao-item-dropdown:hover {
+  background: linear-gradient(135deg, rgba(101, 152, 210, 0.15), rgba(255, 255, 255, 0.08)) !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+#notificacoes-lista .notificacao-item-dropdown.notif-mensagem {
+  border-left-color: #4CAF50 !important;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08), rgba(255, 255, 255, 0.05)) !important;
+}
+
+#notificacoes-lista .notificacao-item-dropdown.notif-mensagem:hover {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(255, 255, 255, 0.08)) !important;
+}
+
+#notificacoes-lista .notificacao-header-dropdown {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 6px !important;
+}
+
+#notificacoes-lista .notificacao-item-dropdown .notificacao-tipo {
+  font-size: 11px !important;
+  color: var(--azul-claro) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  flex: 1 !important;
+  margin-bottom: 0 !important;
+}
+
+#notificacoes-lista .notificacao-hora {
+  font-size: 10px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-weight: 500 !important;
+}
+
+#notificacoes-lista .notif-remetente-info {
+  margin-bottom: 6px !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#notificacoes-lista .notif-remetente-info strong {
+  color: var(--botao) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  display: block !important;
+  margin-bottom: 2px !important;
+}
+
+#notificacoes-lista .notif-evento-nome {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+
 /* Ícones SVG nas notificações do dropdown */
 .notif-icon {
   width: clamp(14px, 1.5vw, 16px);
@@ -1027,6 +1104,15 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   font-size: clamp(12px, 1.4vw, 14px);
   color: var(--branco);
   line-height: 1.4;
+}
+
+#notificacoes-lista .notificacao-item-dropdown .notificacao-mensagem {
+  font-size: 13px !important;
+  color: var(--branco) !important;
+  line-height: 1.5 !important;
+  margin-top: 4px !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 .notificacoes-vazio {
@@ -3191,6 +3277,12 @@ body[data-theme="dark"] .btn-toggle-senha img {
     margin-bottom: 6px !important;
   }
 
+  /* Garante que notificacao-item-dropdown mantenha estilo mesmo em mobile */
+  #notificacoes-lista .notificacao-item-dropdown {
+    padding: 12px 14px !important;
+    margin-bottom: 10px !important;
+  }
+
   .notificacao-item .notificacao-tipo {
     font-size: 10px !important;
   }
@@ -3232,6 +3324,13 @@ body[data-theme="dark"] .btn-toggle-senha img {
     padding: 8px 9px !important;
     margin-bottom: 5px !important;
     border-left-width: 2px !important;
+  }
+
+  /* Garante que notificacao-item-dropdown mantenha estilo mesmo em mobile pequeno */
+  #notificacoes-lista .notificacao-item-dropdown {
+    padding: 10px 12px !important;
+    margin-bottom: 8px !important;
+    border-left-width: 3px !important;
   }
 
   .notificacao-item .notificacao-tipo {

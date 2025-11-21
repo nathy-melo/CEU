@@ -366,6 +366,18 @@ function formatar($txt) {
             padding: 0.75rem;
             font-size: 0.95rem;
         }
+        .modal-mensagem .contador-caracteres {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--texto);
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+        .modal-mensagem .contador-caracteres.limite-alcancado {
+            color: var(--vermelho);
+            opacity: 1;
+            font-weight: 600;
+        }
         .modal-mensagem .acoes {
             margin-top: 0.75rem;
             display: flex;
@@ -881,6 +893,7 @@ function formatar($txt) {
             <div>
                 <textarea id="texto-mensagem-organizador" maxlength="500"
                     placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
+                <div id="contador-mensagem-organizador" class="contador-caracteres">0 / 500</div>
                 <div class="acoes">
                     <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
                     <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>

@@ -110,8 +110,14 @@ CREATE TABLE notificacoes (
     cod_evento INT NULL COMMENT 'Referência ao evento se aplicável',
     lida TINYINT(1) NOT NULL DEFAULT 0,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    thread_id INT NULL COMMENT 'ID da thread/conversa. NULL para mensagens não relacionadas',
+    mensagem_original_id INT NULL COMMENT 'ID da notificação que está sendo respondida',
+    cpf_remetente CHAR(11) NULL COMMENT 'CPF do remetente da mensagem (para mensagens_participante)',
     FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
-    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL
+    FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE SET NULL,
+    FOREIGN KEY (mensagem_original_id) REFERENCES notificacoes(id) ON DELETE SET NULL,
+    INDEX idx_thread_id (thread_id),
+    INDEX idx_mensagem_original (mensagem_original_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE colaboradores_evento (

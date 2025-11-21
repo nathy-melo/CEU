@@ -175,14 +175,53 @@ class GerenciadorNotificacoes {
                 minute: '2-digit' 
             });
             const tipoTexto = this.obterTextoTipo(notif.tipo);
+            
+            // Formata mensagem se for de participante
+            let mensagemFormatada = this.escaparHTML(notif.mensagem);
+            let isMensagemParticipante = notif.tipo === 'mensagem_participante';
+            let remetenteInfo = '';
+            let eventoInfo = '';
+            let mensagemTexto = mensagemFormatada;
+            
+            if (isMensagemParticipante) {
+                // Formato: CPF|||NOME|||EVENTO|||MENSAGEM
+                const partes = notif.mensagem.split('|||');
+                if (partes.length >= 4) {
+                    const cpfRemetente = partes[0];
+                    const nomeRemetente = this.escaparHTML(partes[1]);
+                    const nomeEvento = this.escaparHTML(partes[2]);
+                    mensagemTexto = this.escaparHTML(partes.slice(3).join('|||'));
+                    
+                    // Trunca mensagem se muito longa
+                    if (mensagemTexto.length > 100) {
+                        mensagemTexto = mensagemTexto.substring(0, 97) + '...';
+                    }
+                    
+                    remetenteInfo = `<div class="notif-remetente-info">
+                        <strong>${nomeRemetente}</strong>
+                        <span class="notif-evento-nome">${nomeEvento}</span>
+                    </div>`;
+                }
+            } else {
+                // Trunca mensagem se muito longa
+                if (mensagemTexto.length > 120) {
+                    mensagemTexto = mensagemTexto.substring(0, 117) + '...';
+                }
+            }
 
             html += `
-            <div class="notificacao-item" onclick="window.gerenciadorNotificacoes?.marcarComoLida(${notif.id})">
-                <div class="notificacao-tipo">
-                    ${tipoTexto} • ${hora}
+            <div class="notificacao-item-dropdown ${isMensagemParticipante ? 'notif-mensagem' : ''}" onclick="window.gerenciadorNotificacoes?.marcarComoLida(${notif.id})">
+                <div class="notificacao-header-dropdown">
+                    <div class="notificacao-tipo">
+                        ${tipoTexto}
+                    </div>
+                    <div class="notificacao-hora">
+                        ${hora}
+                    </div>
                 </div>
+                ${remetenteInfo}
                 <div class="notificacao-mensagem">
-                    ${this.escaparHTML(notif.mensagem)}
+                    ${mensagemTexto}
                 </div>
             </div>
             `;
@@ -237,6 +276,7 @@ class GerenciadorNotificacoes {
             'evento_cancelado': '<img src="../Imagens/notif-cancelado.svg" class="notif-icon"> Evento cancelado',
             'evento_prestes_iniciar': '<img src="../Imagens/notif-relogio.svg" class="notif-icon"> Evento iniciando',
             'novo_participante': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Novo participante',
+            'mensagem_participante': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Mensagem',
             'solicitacao_colaborador': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Solicitação de colaboração',
             'colaboracao_aprovada': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Colaboração aprovada',
             'colaboracao_recusada': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Colaboração recusada',
