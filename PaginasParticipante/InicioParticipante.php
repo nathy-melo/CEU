@@ -1133,6 +1133,25 @@
                     listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
                 }
             }
+            
+            // Fechar modal de mensagem ao clicar fora
+            var modalMensagem = document.getElementById('modal-mensagem');
+            if (modalMensagem) {
+                modalMensagem.onclick = function (e) {
+                    if (e.target === this) fecharModalMensagem();
+                };
+            }
+            
+            // Fechar modais de confirmação ao clicar fora
+            var modaisConfirmacao = document.querySelectorAll('.modal-overlay');
+            modaisConfirmacao.forEach(function(modal) {
+                modal.onclick = function (e) {
+                    if (e.target === this) {
+                        modal.classList.remove('ativo');
+                        desbloquearScroll();
+                    }
+                };
+            });
         }
         
         // Inicializa modais imediatamente se já existirem

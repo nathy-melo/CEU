@@ -2001,6 +2001,17 @@
         
         // Função para inicializar modais (chamada após carregamento via AJAX)
         function inicializarModais() {
+            // Fechar modal de compartilhar ao clicar fora
+            var modalCompartilhar = document.getElementById('modal-compartilhar');
+            if (modalCompartilhar) {
+                modalCompartilhar.onclick = function (e) {
+                    if (e.target === this) {
+                        e.stopPropagation();
+                        fecharModalCompartilhar();
+                    }
+                };
+            }
+            
             // Fechar modal de favoritos ao clicar fora
             var modalFav = document.getElementById('modal-favoritos');
             if (modalFav) {
@@ -2013,6 +2024,25 @@
                     listaFavoritos.addEventListener('touchmove', function (e) { e.stopPropagation(); }, { passive: false });
                 }
             }
+            
+            // Fechar modal de mensagem ao clicar fora
+            var modalMensagem = document.getElementById('modal-mensagem');
+            if (modalMensagem) {
+                modalMensagem.onclick = function (e) {
+                    if (e.target === this) fecharModalMensagem();
+                };
+            }
+            
+            // Fechar modais de confirmação ao clicar fora
+            var modaisConfirmacao = document.querySelectorAll('.modal-overlay');
+            modaisConfirmacao.forEach(function(modal) {
+                modal.onclick = function (e) {
+                    if (e.target === this) {
+                        modal.classList.remove('ativo');
+                        desbloquearScroll();
+                    }
+                };
+            });
         }
         
         // Inicializa modais imediatamente se já existirem

@@ -457,7 +457,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   word-wrap: break-word;
   display: block;
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
   pointer-events: none;
   font-weight: 500;
   z-index: 3;
