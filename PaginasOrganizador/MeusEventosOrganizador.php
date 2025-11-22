@@ -199,8 +199,11 @@ function formatar($txt) {
             position: relative;
         }
 
-        /* Botões flutuantes no card (favoritar, mensagem, compartilhar) */
-        .CaixaDoEvento { position: relative; }
+        /* Botões flutuantes no card */
+        .CaixaDoEvento {
+            position: relative;
+        }
+
         .AcoesFlutuantes {
             position: absolute;
             bottom: 1.5cqi;
@@ -215,12 +218,16 @@ function formatar($txt) {
                 visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
                 transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
             z-index: 50;
+            pointer-events: auto; /* IMPORTANTE: Permitir cliques mesmo quando opacity=0 durante hover */
         }
+
         .CaixaDoEvento:hover .AcoesFlutuantes {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+            pointer-events: auto; /* Garantir que os botões sejam clicáveis */
         }
+
         .BotaoAcaoCard {
             width: 11cqi;
             height: 11cqi;
@@ -233,11 +240,16 @@ function formatar($txt) {
             padding: 0;
             cursor: pointer;
             transition: transform 0.2s ease, background 0.2s ease;
+            pointer-events: auto; /* IMPORTANTE: Garantir que o botão seja clicável */
+            position: relative; /* Adicionar contexto de posicionamento */
+            z-index: 100; /* Colocar acima de qualquer outro elemento */
         }
+
         .BotaoAcaoCard:hover {
             transform: scale(1.1);
             background: var(--fundo-hover-transparente);
         }
+
         .BotaoAcaoCard img {
             width: 7cqi;
             height: 7cqi;
