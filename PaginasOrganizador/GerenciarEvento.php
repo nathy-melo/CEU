@@ -2171,6 +2171,392 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         height: 14px;
         filter: brightness(0) invert(1);
     }
+
+    /* ===== ESTILOS PARA LAYOUT COMPACTO ===== */
+    .secao-superior-compacta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .barra-pesquisa-wrapper-compacta {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    .barra-pesquisa-wrapper-compacta .barra-pesquisa-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+        width: 100%;
+        max-width: 580px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .acoes-rapidas-wrapper {
+        width: 100%;
+    }
+
+    .secao-titulo-compacta {
+        color: var(--branco);
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+        margin: 0 0 8px 0;
+        text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .secao-acoes-massa-compacta {
+        margin-top: 8px;
+        margin-bottom: 12px;
+    }
+
+    .secao-acoes-massa-compacta .secao-titulo-compacta {
+        margin-bottom: 8px;
+    }
+
+    /* Melhorar visibilidade dos botões */
+    .botao-acao {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .botao-acao:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        transform: translateY(-2px);
+    }
+
+    /* Melhorar grade de ações */
+    .grade-acoes-gerenciamento {
+        gap: 10px !important;
+    }
+
+    /* ===== RESPONSIVIDADE PARA TABLETS (768px - 1024px) ===== */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .secao-superior-compacta {
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+            max-width: 500px;
+        }
+
+        .secao-titulo-compacta {
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .secao-acoes-massa-compacta {
+            margin-top: 6px;
+            margin-bottom: 10px;
+        }
+
+        .grade-acoes-gerenciamento {
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px !important;
+        }
+
+        .botao-acao {
+            padding: 10px 14px;
+            font-size: 12px;
+            min-height: 44px;
+        }
+
+        .botao-acao img {
+            height: 18px;
+            width: 18px;
+        }
+
+        .acoes-em-massa {
+            gap: 12px;
+        }
+
+        .botao-em-massa {
+            padding: 6px 20px;
+            font-size: 14px;
+        }
+
+        .tabela-participantes th,
+        .tabela-participantes td {
+            padding: 8px 10px !important;
+            font-size: 13px !important;
+        }
+    }
+
+    /* ===== RESPONSIVIDADE PARA CELULARES (até 768px) ===== */
+    @media (max-width: 768px) {
+        .secao-superior-compacta {
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .barra-pesquisa-wrapper-compacta {
+            margin-bottom: 6px;
+        }
+
+        .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+            max-width: 100%;
+        }
+
+        .secao-titulo-compacta {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .secao-acoes-massa-compacta {
+            margin-top: 6px;
+            margin-bottom: 10px;
+        }
+
+        .secao-gerenciamento {
+            gap: 8px;
+        }
+
+        .grade-acoes-gerenciamento {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+        }
+
+        .botao-acao {
+            flex-direction: column;
+            padding: 10px 8px;
+            font-size: 11px;
+            min-height: 70px;
+            gap: 4px;
+        }
+
+        .botao-acao span {
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .botao-acao img {
+            height: 24px;
+            width: 24px;
+        }
+
+        .acoes-em-massa {
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .botao-em-massa {
+            width: 100%;
+            justify-content: center;
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        .contador-participantes {
+            padding: 10px 16px;
+        }
+
+        .contador-participantes span {
+            font-size: 14px;
+        }
+
+        .envoltorio-tabela {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 12px;
+        }
+
+        .envoltorio-tabela::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .envoltorio-tabela::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .envoltorio-tabela::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .tabela-participantes {
+            min-width: 600px;
+            font-size: 12px;
+        }
+
+        .tabela-participantes th,
+        .tabela-participantes td {
+            padding: 8px 6px !important;
+            font-size: 11px !important;
+        }
+
+        .coluna-dados {
+            max-width: 200px;
+        }
+
+        .coluna-dados p {
+            font-size: 11px;
+            margin: 0 0 2px 0;
+        }
+
+        .coluna-dados strong {
+            font-size: 10px;
+        }
+
+        .grupo-acoes,
+        .grupo-status {
+            min-width: 140px;
+            gap: 4px;
+        }
+
+        .botao-acao-tabela {
+            padding: 4px 8px;
+            font-size: 10px;
+        }
+
+        .botao-acao-tabela img {
+            height: 14px;
+            width: 14px;
+        }
+
+        .linha-status {
+            font-size: 10px;
+            gap: 4px;
+        }
+
+        .linha-status > span:first-child {
+            min-width: 60px;
+            font-size: 10px;
+        }
+
+        .emblema-status {
+            padding: 2px 8px;
+            font-size: 9px;
+        }
+
+        .emblema-status img {
+            height: 12px;
+            width: 12px;
+        }
+    }
+
+    /* ===== RESPONSIVIDADE PARA CELULARES PEQUENOS (até 480px) ===== */
+    @media (max-width: 480px) {
+        .secao-superior-compacta {
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .secao-titulo-compacta {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .grade-acoes-gerenciamento {
+            grid-template-columns: 1fr !important;
+            gap: 6px !important;
+        }
+
+        .botao-acao {
+            min-height: 60px;
+            padding: 8px;
+        }
+
+        .botao-acao span {
+            font-size: 10px;
+        }
+
+        .botao-acao img {
+            height: 20px;
+            width: 20px;
+        }
+
+        .tabela-participantes th,
+        .tabela-participantes td {
+            padding: 6px 8px !important;
+            font-size: 11px !important;
+        }
+    }
+
+    /* ===== AJUSTES ADICIONAIS PARA RESPONSIVIDADE ===== */
+
+    /* Barra de pesquisa responsiva */
+    @media (max-width: 768px) {
+        .campo-pesquisa {
+            font-size: 14px !important;
+            padding: 0 12px !important;
+        }
+
+        .botao-pesquisa {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        .icone-pesquisa {
+            width: 50px !important;
+            height: 50px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .campo-pesquisa {
+            font-size: 13px !important;
+            padding: 0 10px !important;
+        }
+
+        .botao-pesquisa {
+            width: 45px !important;
+            height: 45px !important;
+        }
+
+        .icone-pesquisa {
+            width: 45px !important;
+            height: 45px !important;
+        }
+    }
+
+    /* Modais responsivos */
+    @media (max-width: 768px) {
+        .modal-editar {
+            width: 95% !important;
+            padding: 24px !important;
+            max-height: 95vh !important;
+        }
+
+        .modal-header h2 {
+            font-size: 20px !important;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            font-size: 14px !important;
+            padding: 10px !important;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-modal {
+            width: 100%;
+            padding: 12px;
+        }
+    }
 </style>
 
 <body>

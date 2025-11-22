@@ -4,65 +4,63 @@
 ?>
 
 <div class="secao-gerenciamento">
-    <!-- Seção: Ações Rápidas -->
-    <div>
-        <h2 class="secao-titulo">Ações Rápidas</h2>
-        <div class="grade-acoes-gerenciamento">
-            <button class="botao botao-acao" id="btn-adicionar-participante">
-                <span>Adicionar</span>
-                <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
-            </button>
-            <button class="botao botao-acao" id="btn-importar-presenca">
-                <span>Importar Lista de Presença</span>
-                <img src="../Imagens/Importar.svg" alt="Importar icon">
-            </button>
-            <button class="botao botao-acao" id="btn-exportar-presenca">
-                <span>Exportar Lista de Presença</span>
-                <img src="../Imagens/Exportar.svg" alt="Exportar icon">
-            </button>
-            <button class="botao botao-acao" id="btn-enviar-mensagem-part">
-                <span>Enviar Mensagem</span>
-                <img src="../Imagens/Email.svg" alt="Mensagem icon">
-            </button>
-            <button class="botao botao-acao" id="btn-enviar-mensagem-cpf">
-                <span>Enviar para CPF</span>
-                <img src="../Imagens/Email.svg" alt="Mensagem CPF icon">
-            </button>
-            <button class="botao botao-acao" id="btn-importar-inscritos">
-                <span>Importar Lista de Inscritos</span>
-                <img src="../Imagens/Importar_lista.svg" alt="Importar icon">
-            </button>
-            <button class="botao botao-acao" id="btn-exportar-inscritos">
-                <span>Exportar Lista de Inscritos</span>
-                <img src="../Imagens/Exportar_lista.svg" alt="Exportar icon">
-            </button>
-        </div>
-    </div>
-
-    <div class="divisor-secao"></div>
-
-    <!-- Seção: Buscar Participantes -->
-    <div>
-        <h2 class="secao-titulo">Buscar Participantes</h2>
-        <div class="barra-pesquisa-container">
-            <div class="barra-pesquisa">
-                <div class="campo-pesquisa-wrapper">
-                    <input class="campo-pesquisa" type="text" id="busca-participantes" name="busca_participantes" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
-                    <button class="botao-pesquisa" id="btn-buscar-part" aria-label="Procurar">
-                        <div class="icone-pesquisa">
-                            <img src="../Imagens/lupa.png" alt="Lupa">
-                        </div>
-                    </button>
+    <!-- Seção Superior: Busca e Ações Rápidas Integradas -->
+    <div class="secao-superior-compacta">
+        <!-- Barra de Pesquisa no Topo -->
+        <div class="barra-pesquisa-wrapper-compacta">
+            <div class="barra-pesquisa-container">
+                <div class="barra-pesquisa">
+                    <div class="campo-pesquisa-wrapper">
+                        <input class="campo-pesquisa" type="text" id="busca-participantes" name="busca_participantes" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
+                        <button class="botao-pesquisa" id="btn-buscar-part" aria-label="Procurar">
+                            <div class="icone-pesquisa">
+                                <img src="../Imagens/lupa.png" alt="Lupa">
+                            </div>
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="acoes-rapidas-wrapper">
+            <h2 class="secao-titulo-compacta">Ações Rápidas</h2>
+            <div class="grade-acoes-gerenciamento">
+                <button class="botao botao-acao" id="btn-adicionar-participante">
+                    <span>Adicionar</span>
+                    <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
+                </button>
+                <button class="botao botao-acao" id="btn-importar-presenca">
+                    <span>Importar Lista de Presença</span>
+                    <img src="../Imagens/Importar.svg" alt="Importar icon">
+                </button>
+                <button class="botao botao-acao" id="btn-exportar-presenca">
+                    <span>Exportar Lista de Presença</span>
+                    <img src="../Imagens/Exportar.svg" alt="Exportar icon">
+                </button>
+                <button class="botao botao-acao" id="btn-enviar-mensagem-part">
+                    <span>Enviar Mensagem</span>
+                    <img src="../Imagens/Email.svg" alt="Mensagem icon">
+                </button>
+                <button class="botao botao-acao" id="btn-enviar-mensagem-cpf">
+                    <span>Enviar para CPF</span>
+                    <img src="../Imagens/Email.svg" alt="Mensagem CPF icon">
+                </button>
+                <button class="botao botao-acao" id="btn-importar-inscritos">
+                    <span>Importar Lista de Inscritos</span>
+                    <img src="../Imagens/Importar_lista.svg" alt="Importar icon">
+                </button>
+                <button class="botao botao-acao" id="btn-exportar-inscritos">
+                    <span>Exportar Lista de Inscritos</span>
+                    <img src="../Imagens/Exportar_lista.svg" alt="Exportar icon">
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="divisor-secao"></div>
-
     <!-- Seção: Ações em Massa -->
-    <div>
-        <h2 class="secao-titulo">Ações em Massa</h2>
+    <div class="secao-acoes-massa-compacta">
+        <h2 class="secao-titulo-compacta">Ações em Massa</h2>
         <div class="acoes-em-massa" id="acoes-em-massa-part">
             <button class="botao botao-em-massa botao-branco" id="botao-toggle-selecao-part">
                 <span id="texto-toggle-selecao-part">Selecionar Todos</span>
@@ -82,8 +80,6 @@
             </button>
         </div>
     </div>
-
-    <div class="divisor-secao"></div>
 
     <!-- Seção: Lista de Participantes -->
     <div>
@@ -1587,5 +1583,540 @@
 .botao-secundario:hover {
     background-color: #f0f7ff;
     transform: translateY(-1px);
+}
+
+/* ===== ESTILOS PARA LAYOUT COMPACTO E VISÍVEL ===== */
+.secao-superior-compacta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.barra-pesquisa-wrapper-compacta {
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.barra-pesquisa-wrapper-compacta .barra-pesquisa-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.barra-pesquisa-wrapper-compacta .barra-pesquisa {
+    width: 100%;
+    max-width: 580px;
+    display: flex;
+    justify-content: center;
+}
+
+.acoes-rapidas-wrapper {
+    width: 100%;
+}
+
+.secao-titulo-compacta {
+    color: var(--branco);
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 8px 0;
+    text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.3px;
+}
+
+.secao-acoes-massa-compacta {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.secao-acoes-massa-compacta .acoes-em-massa {
+    margin-top: 4px;
+}
+
+/* Reduzir espaçamento geral da seção de gerenciamento */
+.secao-gerenciamento {
+    gap: 10px;
+    padding: 0;
+}
+
+/* Melhorar visibilidade dos botões de ação */
+.botao-acao {
+    background-color: var(--branco) !important;
+    border: 2px solid rgba(101, 152, 210, 0.3) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.botao-acao:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(101, 152, 210, 0.25), 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+    border-color: var(--azul-escuro) !important;
+    background-color: #f0f7ff !important;
+}
+
+.botao-acao:active {
+    transform: translateY(-1px) !important;
+}
+
+/* Melhorar visibilidade dos botões de ação em massa */
+.botao-em-massa {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease !important;
+    border: 2px solid transparent !important;
+}
+
+.botao-em-massa:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+    filter: brightness(1.1) !important;
+}
+
+.botao-em-massa:active {
+    transform: translateY(0) !important;
+}
+
+.botao-em-massa.botao-branco {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+}
+
+.botao-em-massa.botao-branco:hover {
+    background-color: #f8f9fa !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Reduzir espaçamento antes da lista */
+.secao-gerenciamento > div:last-child {
+    margin-top: 8px;
+}
+
+.contador-participantes {
+    margin-bottom: 12px !important;
+}
+
+.envoltorio-tabela {
+    margin-top: 0 !important;
+}
+
+/* Melhorar grade de ações */
+.grade-acoes-gerenciamento {
+    gap: 10px !important;
+}
+
+/* ===== RESPONSIVIDADE PARA TABLETS (768px - 1024px) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .secao-superior-compacta {
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    
+    .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+        max-width: 100%;
+    }
+    
+    .secao-titulo-compacta {
+        font-size: 17px;
+        margin-bottom: 10px;
+    }
+    
+    .grade-acoes-gerenciamento {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+        gap: 10px !important;
+        max-width: 100% !important;
+    }
+    
+    .botao-acao {
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+    }
+    
+    .botao-acao span {
+        font-size: 12px !important;
+    }
+    
+    .botao-acao img {
+        height: 18px !important;
+        width: 18px !important;
+    }
+    
+    .secao-acoes-massa-compacta {
+        margin-top: 10px;
+        margin-bottom: 14px;
+    }
+    
+    .acoes-em-massa {
+        gap: 12px !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .botao-em-massa {
+        padding: 6px 18px !important;
+        font-size: 14px !important;
+    }
+    
+    .botao-em-massa img {
+        height: 20px !important;
+    }
+    
+    .secao-gerenciamento {
+        gap: 12px;
+    }
+    
+    .contador-participantes {
+        padding: 12px 20px !important;
+        margin-bottom: 14px !important;
+    }
+    
+    .contador-participantes span {
+        font-size: 15px !important;
+    }
+}
+
+/* ===== RESPONSIVIDADE PARA CELULARES (até 768px) ===== */
+@media (max-width: 768px) {
+    .secao-superior-compacta {
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .barra-pesquisa-wrapper-compacta {
+        margin-bottom: 6px;
+    }
+    
+    .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+        max-width: 100%;
+    }
+    
+    .campo-pesquisa-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .secao-titulo-compacta {
+        font-size: 16px;
+        margin-bottom: 8px;
+        padding: 0 10px;
+    }
+    
+    .grade-acoes-gerenciamento {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 8px !important;
+        max-width: 100% !important;
+    }
+    
+    .botao-acao {
+        padding: 10px 12px !important;
+        font-size: 11px !important;
+        min-height: 44px !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+    
+    .botao-acao span {
+        font-size: 11px !important;
+        white-space: normal !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+    }
+    
+    .botao-acao img {
+        height: 18px !important;
+        width: 18px !important;
+    }
+    
+    .secao-acoes-massa-compacta {
+        margin-top: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .acoes-em-massa {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+    }
+    
+    .botao-em-massa {
+        width: 100% !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+    }
+    
+    .botao-em-massa img {
+        height: 20px !important;
+    }
+    
+    .secao-gerenciamento {
+        gap: 8px;
+        padding: 0 8px;
+    }
+    
+    .contador-participantes {
+        padding: 10px 16px !important;
+        margin-bottom: 10px !important;
+        border-radius: 8px !important;
+    }
+    
+    .contador-participantes span {
+        font-size: 14px !important;
+    }
+    
+    .envoltorio-tabela {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .tabela-participantes {
+        font-size: 12px !important;
+        min-width: 600px !important;
+    }
+    
+    .tabela-participantes th,
+    .tabela-participantes td {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+    }
+    
+    .coluna-dados {
+        max-width: 250px !important;
+    }
+    
+    .coluna-dados p {
+        font-size: 11px !important;
+        margin: 0 0 2px 0 !important;
+    }
+    
+    .coluna-dados strong {
+        font-size: 11px !important;
+    }
+    
+    .grupo-acoes,
+    .grupo-status {
+        min-width: 150px !important;
+        gap: 4px !important;
+    }
+    
+    .botao-acao-tabela {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    .botao-acao-tabela img {
+        height: 16px !important;
+        width: 16px !important;
+    }
+    
+    .linha-status {
+        font-size: 11px !important;
+        gap: 6px !important;
+    }
+    
+    .emblema-status {
+        font-size: 10px !important;
+        padding: 2px 8px !important;
+    }
+    
+    .emblema-status img {
+        height: 14px !important;
+        width: 14px !important;
+    }
+}
+
+/* ===== RESPONSIVIDADE PARA CELULARES PEQUENOS (até 480px) ===== */
+@media (max-width: 480px) {
+    .secao-superior-compacta {
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+    
+    .secao-titulo-compacta {
+        font-size: 14px;
+        margin-bottom: 6px;
+        padding: 0 5px;
+    }
+    
+    .grade-acoes-gerenciamento {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+    }
+    
+    .botao-acao {
+        padding: 8px 10px !important;
+        font-size: 10px !important;
+        min-height: 40px !important;
+    }
+    
+    .botao-acao span {
+        font-size: 10px !important;
+    }
+    
+    .botao-acao img {
+        height: 16px !important;
+        width: 16px !important;
+    }
+    
+    .secao-acoes-massa-compacta {
+        margin-top: 6px;
+        margin-bottom: 10px;
+    }
+    
+    .acoes-em-massa {
+        gap: 8px !important;
+    }
+    
+    .botao-em-massa {
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+    }
+    
+    .secao-gerenciamento {
+        gap: 6px;
+        padding: 0 5px;
+    }
+    
+    .contador-participantes {
+        padding: 8px 12px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .contador-participantes span {
+        font-size: 13px !important;
+    }
+    
+    .tabela-participantes {
+        min-width: 550px !important;
+    }
+    
+    .tabela-participantes th,
+    .tabela-participantes td {
+        padding: 6px 8px !important;
+        font-size: 11px !important;
+    }
+}
+
+/* ===== AJUSTES ADICIONAIS PARA RESPONSIVIDADE ===== */
+
+/* Barra de pesquisa responsiva */
+@media (max-width: 768px) {
+    .campo-pesquisa {
+        font-size: 14px !important;
+        padding: 0 12px !important;
+    }
+    
+    .botao-pesquisa {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    
+    .icone-pesquisa {
+        width: 50px !important;
+        height: 50px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .campo-pesquisa {
+        font-size: 13px !important;
+        padding: 0 10px !important;
+    }
+    
+    .botao-pesquisa {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    .icone-pesquisa {
+        width: 45px !important;
+        height: 45px !important;
+    }
+}
+
+/* Modais responsivos */
+@media (max-width: 768px) {
+    .modal-editar,
+    .modal-conteudo {
+        width: 95% !important;
+        max-width: 95% !important;
+        padding: 20px 16px !important;
+        margin: 10px !important;
+    }
+    
+    .modal-header {
+        padding: 16px !important;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .modal-body {
+        padding: 16px !important;
+    }
+    
+    .modal-footer {
+        padding: 12px 16px !important;
+        flex-direction: column-reverse !important;
+        gap: 8px !important;
+    }
+    
+    .btn-modal {
+        width: 100% !important;
+        padding: 12px !important;
+    }
+    
+    .form-group {
+        margin-bottom: 16px !important;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        font-size: 14px !important;
+        padding: 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-editar,
+    .modal-conteudo {
+        width: 98% !important;
+        padding: 16px 12px !important;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.2rem !important;
+    }
+    
+    .formatos-exportacao {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    .btn-formato {
+        padding: 16px !important;
+    }
+}
+
+/* Ajustes para tabela em telas pequenas - melhorar scroll horizontal */
+@media (max-width: 768px) {
+    .envoltorio-tabela {
+        position: relative !important;
+    }
+    
+    .envoltorio-tabela::before {
+        content: '← Role para ver mais →';
+        display: block;
+        text-align: center;
+        padding: 8px;
+        background: rgba(101, 152, 210, 0.1);
+        color: var(--azul-escuro);
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0;
+    }
 }
 </style>

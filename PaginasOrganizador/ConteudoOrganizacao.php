@@ -4,45 +4,43 @@
 ?>
 
 <div class="secao-gerenciamento">
-    <!-- Seção: Ações Rápidas -->
-    <div>
-        <h2 class="secao-titulo">Ações Rápidas</h2>
-        <div class="grade-acoes-gerenciamento">
-            <button class="botao botao-acao" id="btn-adicionar-organizacao">
-                <span>Adicionar Organizador</span>
-                <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
-            </button>
-            <button class="botao botao-acao" id="btn-enviar-mensagem-organizacao">
-                <span>Enviar Mensagem</span>
-                <img src="../Imagens/Email.svg" alt="Mensagem icon">
-            </button>
-        </div>
-    </div>
-
-    <div class="divisor-secao"></div>
-
-    <!-- Seção: Buscar Membros -->
-    <div>
-        <h2 class="secao-titulo">Buscar Membros</h2>
-        <div class="barra-pesquisa-container">
-            <div class="barra-pesquisa">
-                <div class="campo-pesquisa-wrapper">
-                    <input class="campo-pesquisa" type="text" id="busca-organizacao" name="busca_organizacao" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
-                    <button class="botao-pesquisa" id="btn-buscar-org" aria-label="Procurar">
-                        <div class="icone-pesquisa">
-                            <img src="../Imagens/lupa.png" alt="Lupa">
-                        </div>
-                    </button>
+    <!-- Seção Superior: Busca e Ações Rápidas Integradas -->
+    <div class="secao-superior-compacta">
+        <!-- Barra de Pesquisa no Topo -->
+        <div class="barra-pesquisa-wrapper-compacta">
+            <div class="barra-pesquisa-container">
+                <div class="barra-pesquisa">
+                    <div class="campo-pesquisa-wrapper">
+                        <input class="campo-pesquisa" type="text" id="busca-organizacao" name="busca_organizacao" placeholder="Procure por nome, RA ou CPF" autocomplete="off" />
+                        <button class="botao-pesquisa" id="btn-buscar-org" aria-label="Procurar">
+                            <div class="icone-pesquisa">
+                                <img src="../Imagens/lupa.png" alt="Lupa">
+                            </div>
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="acoes-rapidas-wrapper">
+            <h2 class="secao-titulo-compacta">Ações Rápidas</h2>
+            <div class="grade-acoes-gerenciamento">
+                <button class="botao botao-acao" id="btn-adicionar-organizacao">
+                    <span>Adicionar Organizador</span>
+                    <img src="../Imagens/Adicionar_participante.svg" alt="Adicionar icon">
+                </button>
+                <button class="botao botao-acao" id="btn-enviar-mensagem-organizacao">
+                    <span>Enviar Mensagem</span>
+                    <img src="../Imagens/Email.svg" alt="Mensagem icon">
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="divisor-secao"></div>
-
     <!-- Seção: Ações em Massa -->
-    <div>
-        <h2 class="secao-titulo">Ações em Massa</h2>
+    <div class="secao-acoes-massa-compacta">
+        <h2 class="secao-titulo-compacta">Ações em Massa</h2>
         <div class="acoes-em-massa" id="acoes-em-massa-org">
             <button class="botao botao-em-massa botao-branco" id="botao-toggle-selecao-org">
                 <span id="texto-toggle-selecao-org">Selecionar Todos</span>
@@ -62,8 +60,6 @@
             </button>
         </div>
     </div>
-
-    <div class="divisor-secao"></div>
 
     <!-- Seção: Lista da Organização -->
     <div>
