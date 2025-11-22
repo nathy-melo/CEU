@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eventos Acontecendo</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
+  <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <style>
     /* Botão compartilhar no card */
     .CaixaDoEvento {
@@ -233,12 +234,12 @@
     // Mapear texto e converter para string simples
     function formatar($txt) {
         $map = [
-            'Á'=>'A','À'=>'A','Â'=>'A','Ã'=>'A','Ä'=>'A','á'=>'a','à'=>'a','â'=>'a','ã'=>'a','ä'=>'a',
-            'É'=>'E','È'=>'E','Ê'=>'E','Ë'=>'E','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e',
-            'Í'=>'I','Ì'=>'I','Î'=>'I','Ï'=>'I','í'=>'i','ì'=>'i','î'=>'i','ï'=>'i',
-            'Ó'=>'O','Ò'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','ó'=>'o','ò'=>'o','ô'=>'o','õ'=>'o','ö'=>'o',
-            'Ú'=>'U','Ù'=>'U','Û'=>'U','Ü'=>'U','ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u',
-            'Ç'=>'C','ç'=>'c'
+            'Í'=>'A','Í€'=>'A','Í‚'=>'A','Í'=>'A','Í„'=>'A','á'=>'a','Í '=>'a','Í¢'=>'a','ã'=>'a','Í¤'=>'a',
+            'É'=>'E','Íˆ'=>'E','ÍŠ'=>'E','Í‹'=>'E','é'=>'e','Í¨'=>'e','Íª'=>'e','Í«'=>'e',
+            'Í'=>'I','ÍŒ'=>'I','ÍŽ'=>'I','Í'=>'I','í'=>'i','Í¬'=>'i','Í®'=>'i','Í¯'=>'i',
+            'Í“'=>'O','Í’'=>'O','Í”'=>'O','Õ'=>'O','Í–'=>'O','ó'=>'o','Í²'=>'o','Í´'=>'o','õ'=>'o','Í¶'=>'o',
+            'Ú'=>'U','Í™'=>'U','Í›'=>'U','Íœ'=>'U','ú'=>'u','Í¹'=>'u','Í»'=>'u','Í¼'=>'u',
+            'Í‡'=>'C','ç'=>'c'
         ];
         $txt = strtr($txt ?? '', $map);
         $txt = strtolower($txt);
@@ -369,7 +370,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Compartilhar</span>
-        <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
+        <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">Í—</button>
       </div>
 
       <div class="opcoes-compartilhamento">
@@ -429,7 +430,7 @@
       </div>
 
       <div class="aviso-compartilhar">
-        <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+        <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
       </div>
     </div>
   </div>
@@ -537,3 +538,4 @@
 </body>
 
 </html>
+

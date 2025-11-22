@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $imgDefault = '../ImagensPerfis/FotodePerfil.webp';
 $imgSrc = $imgDefault;
@@ -24,7 +24,7 @@ try {
             }
             mysqli_stmt_close($stmt);
         }
-        // NÃO fechar $conexao aqui; outras páginas no mesmo request podem usá-la
+        // NÍO fechar $conexao aqui; outras páginas no mesmo request podem usá-la
         // mysqli_close($conexao);
     }
 } catch (Throwable $e) { /* usa padrão */ }
@@ -37,6 +37,7 @@ try {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Lateral</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <script src="MenuP.js"></script>
 </head>
 
@@ -90,3 +91,4 @@ try {
 </body>
 
 </html>
+

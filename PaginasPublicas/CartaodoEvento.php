@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cartão do Evento</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <?php
     // Sessão e banco
     if (session_status() === PHP_SESSION_NONE) {
@@ -722,9 +723,9 @@
             </div>
             <div class="Imagem campo-imagem">
                 <div class="carrossel-imagens">
-                    <button class="carrossel-btn carrossel-anterior" onclick="mudarImagem(-1)">⮜</button>
+                    <button class="carrossel-btn carrossel-anterior" onclick="mudarImagem(-1)">â®œ</button>
                     <img id="imagem-carrossel" src="<?php echo htmlspecialchars($imagem_src); ?>" alt="Imagem do evento">
-                    <button class="carrossel-btn carrossel-proxima" onclick="mudarImagem(1)">⮞</button>
+                    <button class="carrossel-btn carrossel-proxima" onclick="mudarImagem(1)">â®ž</button>
                 </div>
             </div>
             <div class="Descricao grupo-campo">
@@ -748,9 +749,9 @@
 
         <div id="modal-imagem" class="modal-imagem">
             <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
-            <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">⮜</button>
+            <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">â®œ</button>
             <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img">
-            <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">⮞</button>
+            <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">â®ž</button>
         </div>
 
         <!-- Modal Compartilhar -->
@@ -758,7 +759,7 @@
             <div class="conteudo">
                 <div class="cabecalho">
                     <span>Compartilhar</span>
-                    <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
+                    <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">Í—</button>
                 </div>
                 <div class="opcoes-compartilhamento">
                     <button class="btn-compartilhar-app" onclick="compartilharWhatsApp()" title="Compartilhar no WhatsApp">
@@ -806,7 +807,7 @@
                     <input type="text" id="link-inscricao" readonly />
                 </div>
                 <div class="aviso-compartilhar">
-                    <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+                    <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
                 </div>
             </div>
         </div>
@@ -939,8 +940,8 @@
 
                 if (!data.sucesso) {
                     let msg = 'Não foi possível enviar a solicitação.';
-                    if (data.erro === 'ja_organizador') msg = 'Você já é organizador deste evento.';
-                    if (data.erro === 'ja_colaborador') msg = 'Você já é colaborador deste evento.';
+                    if (data.erro === 'ja_organizador') msg = 'VocÍª já é organizador deste evento.';
+                    if (data.erro === 'ja_colaborador') msg = 'VocÍª já é colaborador deste evento.';
                     alert(msg);
                     return;
                 }
@@ -1090,3 +1091,4 @@
 </body>
 
 </html>
+

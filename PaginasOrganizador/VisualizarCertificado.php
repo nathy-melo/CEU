@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Verificar sessão e autenticação
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -9,7 +9,7 @@ if (!isset($_SESSION['cpf'])) {
     exit;
 }
 
-// Parâmetros obrigatórios
+// ParÍ¢metros obrigatórios
 $codigoVerificacao = isset($_GET['codigo']) ? trim($_GET['codigo']) : '';
 
 if (!$codigoVerificacao) {
@@ -87,7 +87,8 @@ if (!$temPermissao) {
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <title>Acesso Negado</title>
-        <link rel='stylesheet' href='../styleGlobal.css'>
+        <link rel='stylesheet' href="../styleGlobal.css" />
+        <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
         <style>
             body { background: var(--fundo); padding: 40px; }
             .erro-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; text-align: center; }
@@ -106,7 +107,7 @@ if (!$temPermissao) {
                 </svg>
                 Acesso Negado
             </h1>
-            <p>Você não tem permissão para visualizar este certificado.</p>
+            <p>VocÍª não tem permissão para visualizar este certificado.</p>
             <p>Somente o participante ou organizadores do evento podem acessar.</p>
             <a href='javascript:window.close()' class='botao-voltar'>Fechar</a>
         </div>
@@ -129,7 +130,7 @@ $debugLog = []; // Array para logs de debug
 
 // Se não existe, tenta regenerar silenciosamente
 if (!$arquivoExiste) {
-    $debugLog[] = "🔍 Arquivo não existe: $arquivoPdf";
+    $debugLog[] = "ðŸ” Arquivo não existe: $arquivoPdf";
     
     try {
         // Buscar dados completos para regeneração
@@ -150,13 +151,13 @@ if (!$arquivoExiste) {
         $dados = mysqli_fetch_assoc($resDados);
         mysqli_stmt_close($stmtDados);
         
-        $debugLog[] = "📊 Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÃO ENCONTRADOS");
+        $debugLog[] = "ðŸ“Š Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÍO ENCONTRADOS");
 
         if ($dados) {
             // Incluir o autoload de bibliotecas
             $autoloadPath = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
             $autoloadExiste = file_exists($autoloadPath);
-            $debugLog[] = "📚 Autoload: " . ($autoloadExiste ? "EXISTE" : "NÃO EXISTE") . " em $autoloadPath";
+            $debugLog[] = "ðŸ“š Autoload: " . ($autoloadExiste ? "EXISTE" : "NÍO EXISTE") . " em $autoloadPath";
             
             if ($autoloadExiste) {
                 require_once $autoloadPath;
@@ -164,11 +165,11 @@ if (!$arquivoExiste) {
 
             // Carregar ProcessadorTemplate e tentar gerar
             require_once __DIR__ . '/../Certificacao/ProcessadorTemplate.php';
-            $debugLog[] = "✅ ProcessadorTemplate carregado";
+            $debugLog[] = "âœ… ProcessadorTemplate carregado";
 
             try {
                 $proc = new \CEU\Certificacao\ProcessadorTemplate($autoloadPath);
-                $debugLog[] = "✅ ProcessadorTemplate instanciado";
+                $debugLog[] = "âœ… ProcessadorTemplate instanciado";
 
                 // Obter template do modelo
                 $modelo = $certificado['modelo'] ?? 'universal';
@@ -193,7 +194,7 @@ if (!$arquivoExiste) {
                         ? 'ModeloExemploOrganizador' 
                         : 'ModeloExemplo';
                     
-                    $debugLog[] = "⚠️ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
+                    $debugLog[] = "âš ï¸ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
                     
                     foreach ($possiveisExtensoes as $ext) {
                         $caminho = __DIR__ . "/../Certificacao/templates/$modeloPadrao.$ext";
@@ -204,7 +205,7 @@ if (!$arquivoExiste) {
                     }
                 }
                 
-                $debugLog[] = "📄 Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÃO ENCONTRADO");
+                $debugLog[] = "ðŸ“„ Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÍO ENCONTRADO");
 
                 if ($templatePath) {
                     // Preparar dados para preenchimento
@@ -226,27 +227,27 @@ if (!$arquivoExiste) {
                         $dadosCert['CargoOrganizador'] = '';
                     }
                     
-                    $debugLog[] = "📝 Tipo de certificado: $tipo";
-                    $debugLog[] = "📝 Dados do certificado preparados: " . json_encode($dadosCert, JSON_UNESCAPED_UNICODE);
+                    $debugLog[] = "ðŸ“ Tipo de certificado: $tipo";
+                    $debugLog[] = "ðŸ“ Dados do certificado preparados: " . json_encode($dadosCert, JSON_UNESCAPED_UNICODE);
 
                     // Diretório de saída
                     $pastaSaida = __DIR__ . '/../Certificacao/certificados';
                     if (!is_dir($pastaSaida)) {
                         mkdir($pastaSaida, 0755, true);
-                        $debugLog[] = "📁 Pasta criada: $pastaSaida";
+                        $debugLog[] = "ðŸ“ Pasta criada: $pastaSaida";
                     } else {
-                        $debugLog[] = "📁 Pasta já existe: $pastaSaida";
+                        $debugLog[] = "ðŸ“ Pasta já existe: $pastaSaida";
                     }
 
                     // Extrair nome do arquivo original da coluna 'arquivo'
                     $arquivoOriginal = basename($certificado['arquivo']);
                     $caminhoSaida = $pastaSaida . '/' . $arquivoOriginal;
-                    $debugLog[] = "💾 Caminho de saída: $caminhoSaida";
+                    $debugLog[] = "ðŸ’¾ Caminho de saída: $caminhoSaida";
 
                     // Gerar PDF
-                    $debugLog[] = "🚀 Iniciando geração do PDF...";
+                    $debugLog[] = "ðŸš€ Iniciando geração do PDF...";
                     $resultado = $proc->gerarPdfDeModelo($templatePath, $dadosCert, $caminhoSaida);
-                    $debugLog[] = "📋 Resultado da geração: " . json_encode($resultado, JSON_UNESCAPED_UNICODE);
+                    $debugLog[] = "ðŸ“‹ Resultado da geração: " . json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
                     // Verifica sucesso (pode ser 'sucesso' ou 'success')
                     $sucesso = ($resultado['sucesso'] ?? $resultado['success'] ?? false);
@@ -254,30 +255,30 @@ if (!$arquivoExiste) {
                     if ($sucesso) {
                         // Atualizar verificação
                         $arquivoExiste = file_exists($arquivoPdf);
-                        $debugLog[] = "✅ PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÃO");
+                        $debugLog[] = "âœ… PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÍO");
                         
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {
-                            $debugLog[] = "🔄 Recarregando página para exibir o certificado...";
+                            $debugLog[] = "ðŸ”„ Recarregando página para exibir o certificado...";
                             echo "<script>window.location.reload();</script>";
                             exit;
                         }
                     } else {
-                        $debugLog[] = "❌ Falha ao gerar PDF: " . ($resultado['erro'] ?? $resultado['error'] ?? 'sem detalhes');
+                        $debugLog[] = "âŒ Falha ao gerar PDF: " . ($resultado['erro'] ?? $resultado['error'] ?? 'sem detalhes');
                     }
                 } else {
-                    $debugLog[] = "❌ Template não encontrado, abortando geração";
+                    $debugLog[] = "âŒ Template não encontrado, abortando geração";
                 }
             } catch (Exception $e) {
-                $debugLog[] = "❌ ERRO ProcessadorTemplate: " . $e->getMessage();
-                $debugLog[] = "📍 Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
+                $debugLog[] = "âŒ ERRO ProcessadorTemplate: " . $e->getMessage();
+                $debugLog[] = "ðŸ“ Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
             }
         } else {
-            $debugLog[] = "❌ Não foi possível buscar dados do evento/usuário";
+            $debugLog[] = "âŒ Não foi possível buscar dados do evento/usuário";
         }
     } catch (Exception $e) {
-        $debugLog[] = "❌ ERRO GERAL: " . $e->getMessage();
-        $debugLog[] = "📍 Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
+        $debugLog[] = "âŒ ERRO GERAL: " . $e->getMessage();
+        $debugLog[] = "ðŸ“ Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
     }
 }
 ?>
@@ -532,7 +533,7 @@ if (!$arquivoExiste) {
     <script>
         // Logs de debug da regeneração do certificado
         <?php if (!empty($debugLog)): ?>
-        console.group('🔧 DEBUG: Regeneração do Certificado');
+        console.group('ðŸ”§ DEBUG: Regeneração do Certificado');
         <?php foreach ($debugLog as $log): ?>
         console.log(<?php echo json_encode($log, JSON_UNESCAPED_UNICODE); ?>);
         <?php endforeach; ?>
@@ -552,3 +553,4 @@ if (!$arquivoExiste) {
     </script>
 </div>
 </div>
+

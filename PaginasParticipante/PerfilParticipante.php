@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Inicia a sessão apenas se não estiver ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo'])) {
     $codigo = trim($_POST['codigo']);
 
     if (!$codigo) {
-        responderJson('erro', '⚠️ Código é obrigatório.');
+        responderJson('erro', 'âš ï¸ Código é obrigatório.');
     }
 
     // Verifica se o código existe na tabela de códigos (sistema atualizado)
@@ -61,19 +61,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo'])) {
                 $_SESSION['codigo'] = $codigo;
                 
                 mysqli_close($conexao);
-                responderJson('sucesso', '✅ Parabéns! Você agora é um organizador.');
+                responderJson('sucesso', 'âœ… Parabéns! VocÍª agora é um organizador.');
             } else {
                 $erroBanco = mysqli_error($conexao);
                 mysqli_close($conexao);
-                responderJson('erro', '❌ Erro ao atualizar usuário: ' . $erroBanco);
+                responderJson('erro', 'âŒ Erro ao atualizar usuário: ' . $erroBanco);
             }
         } else {
             mysqli_close($conexao);
-            responderJson('erro', '❌ Erro ao processar código.');
+            responderJson('erro', 'âŒ Erro ao processar código.');
         }
     } else {
         mysqli_close($conexao);
-        responderJson('erro', '⚠️ Código de acesso inválido ou já utilizado.');
+        responderJson('erro', 'âš ï¸ Código de acesso inválido ou já utilizado.');
     }
 }
 
@@ -110,6 +110,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfil</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
 </head>
 <style>
     .container-perfil {
@@ -657,7 +658,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 
                     <?php if (!$dadosUsuario['Organizador']): ?>
                     <div class="grupo-formulario">
-                        <label for="ra-input">RA (Registro Acadêmico):</label>
+                        <label for="ra-input">RA (Registro AcadÍªmico):</label>
                         <div class="controle-formulario">
                             <span id="ra-display">
                                 <?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?>
@@ -740,3 +741,4 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 </body>
 
 </html>
+

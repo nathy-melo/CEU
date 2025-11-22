@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -15,12 +15,13 @@
     <meta name="apple-mobile-web-app-title" content="Admin CEU">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- Ícones para PWA (preparado para futuro) -->
+    <!-- Ícones para PWA (preparado para futuro) -->
     <!-- <link rel="icon" type="image/png" sizes="192x192" href="../Imagens/icon-192.png"> -->
     <!-- <link rel="apple-touch-icon" sizes="180x180" href="../Imagens/icon-180.png"> -->
     <!-- <link rel="manifest" href="manifest.json"> -->
 
-    <link rel="stylesheet" href="../styleGlobal.css">
+    <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <link rel="stylesheet" href="styleAdmin.css">
     <style>
         /* Override global centering from styleGlobal.css only on this page */
@@ -401,7 +402,7 @@
                     <div class="admin-container" style="margin-top: 20px;">
                         <h4><svg class="icon icon-small" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-9 5.5L5 9a8 8 0 111 8l-2 1.5A10 10 0 1012 2z"/></svg> Ajuda de Firewall e Rede</h4>
                         <p>
-                            Para acessar no celular, conecte ao mesmo Wi‑Fi e use o endereço local acima.
+                            Para acessar no celular, conecte ao mesmo Wiâ€‘Fi e use o endereço local acima.
                             Se não abrir, verifique o Firewall do Windows e libere o Apache (porta 80). Consulte:
                         </p>
                         <ul>
@@ -436,7 +437,7 @@
                             <option value="Semana">Semana</option>
                             <option value="Minicurso">Minicurso</option>
                             <option value="Hackathon">Hackathon</option>
-                            <option value="Conferência">Conferência</option>
+                            <option value="ConferÍªncia">ConferÍªncia</option>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
@@ -605,12 +606,12 @@
         </div>
     </div>
 
-    <!-- Área de Teste -->
+    <!-- Írea de Teste -->
     <div id="test" class="admin-section">
         <h3><svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                 <path
                     d="M20 2H4c-1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
-            </svg> Área de Teste</h3>
+            </svg> Írea de Teste</h3>
 
         <div style="background: white; padding: 20px; border-radius: 10px;">
             <h4>Teste de Funcionalidades</h4>
@@ -855,7 +856,7 @@
             }
         }
 
-        // Função auxiliar para fazer requisições à API
+        // Função auxiliar para fazer requisições Í  API
         async function apiCall(endpoint, method = 'GET', data = null) {
             const options = {
                 method: method,
@@ -1068,7 +1069,7 @@
         }
 
         // =======================================
-        // USUÁRIOS
+        // USUÍRIOS
         // =======================================
 
         async function carregarUsuarios() {
@@ -1077,7 +1078,7 @@
                 currentData.usuarios = [];
 
                 // Mostrar loading
-                document.getElementById('usuariosContainer').innerHTML = '<p>🔄 Carregando usuários...</p>';
+                document.getElementById('usuariosContainer').innerHTML = '<p>ðŸ”„ Carregando usuários...</p>';
 
                 const result = await apiCall('usuarios');
                 currentData.usuarios = result.data;
@@ -1094,7 +1095,7 @@
         }
 
         // =======================================
-        // CÓDIGOS
+        // CÍ“DIGOS
         // =======================================
 
         async function carregarCodigos() {
@@ -1103,7 +1104,7 @@
                 currentData.codigos = [];
 
                 // Mostrar loading
-                document.getElementById('codigosContainer').innerHTML = '<p>🔄 Carregando códigos...</p>';
+                document.getElementById('codigosContainer').innerHTML = '<p>ðŸ”„ Carregando códigos...</p>';
 
                 const result = await apiCall('codigos');
                 currentData.codigos = result.data;
@@ -1191,33 +1192,33 @@
         }
 
         // =======================================
-        // AÇÕES DOS BOTÕES
+        // AÍ‡ÕES DOS BOTÕES
         // =======================================
 
         async function gerarNovoCodigo() {
             // Pergunta se quer gerar automaticamente ou inserir manualmente
-            const opcao = confirm('GERAÇÃO DE CÓDIGO\n\nOK = Gerar código automático (seguro)\nCancelar = Inserir código manualmente');
+            const opcao = confirm('GERAÍ‡ÍO DE CÍ“DIGO\n\nOK = Gerar código automático (seguro)\nCancelar = Inserir código manualmente');
 
             let codigo = '';
             if (!opcao) {
                 // Modo manual
-                codigo = prompt('CÓDIGO MANUAL\n\nDigite o código (exatamente 8 caracteres):\n• Letras: A-Z (exceto I, O)\n• Números: 2-9 (exceto 0, 1)\n\nExemplo: AB3C5XYZ');
+                codigo = prompt('CÍ“DIGO MANUAL\n\nDigite o código (exatamente 8 caracteres):\nâ€¢ Letras: A-Z (exceto I, O)\nâ€¢ Números: 2-9 (exceto 0, 1)\n\nExemplo: AB3C5XYZ');
                 if (!codigo) return; // Cancelou
 
                 codigo = codigo.toUpperCase().trim();
                 if (codigo.length !== 8) {
-                    alert('ERRO: O código deve ter exatamente 8 caracteres!\n\nVocê digitou: ' + codigo.length + ' caracteres');
+                    alert('ERRO: O código deve ter exatamente 8 caracteres!\n\nVocÍª digitou: ' + codigo.length + ' caracteres');
                     return;
                 }
 
                 if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(codigo)) {
-                    alert('FORMATO INVÁLIDO!\n\nUse apenas:\n• Letras: A, B, C, D, E, F, G, H, J, K, L, M, N, P, Q, R, S, T, U, V, W, X, Y, Z\n• Números: 2, 3, 4, 5, 6, 7, 8, 9\n\n(Sem: I, O, 0, 1)');
+                    alert('FORMATO INVÍLIDO!\n\nUse apenas:\nâ€¢ Letras: A, B, C, D, E, F, G, H, J, K, L, M, N, P, Q, R, S, T, U, V, W, X, Y, Z\nâ€¢ Números: 2, 3, 4, 5, 6, 7, 8, 9\n\n(Sem: I, O, 0, 1)');
                     return;
                 }
             }
 
             // Pergunta pelas observações SEPARADAMENTE
-            const observacoes = prompt('OBSERVAÇÕES (opcional)\n\nDescreva o propósito deste código:\n(deixe vazio se não quiser observações)') || '';
+            const observacoes = prompt('OBSERVAÍ‡ÕES (opcional)\n\nDescreva o propósito deste código:\n(deixe vazio se não quiser observações)') || '';
 
             try {
                 const payload = { observacoes };
@@ -1231,7 +1232,7 @@
                 console.log('Payload completo:', payload);
 
                 const response = await apiCall('codigos', 'POST', payload);
-                alert('CÓDIGO CRIADO COM SUCESSO!\n\nCódigo: ' + response.codigo + '\nObservações: ' + (observacoes || 'Nenhuma') + '\n\nEste código é único e seguro!');
+                alert('CÍ“DIGO CRIADO COM SUCESSO!\n\nCódigo: ' + response.codigo + '\nObservações: ' + (observacoes || 'Nenhuma') + '\n\nEste código é único e seguro!');
                 carregarCodigos();
             } catch (error) {
                 console.error('Erro ao criar código:', error);
@@ -1347,7 +1348,7 @@
 
         function fecharModalEvento() {
             document.getElementById('modalEvento').style.display = 'none';
-            // Limpar estado readonly ao fechar para evitar persistência inesperada
+            // Limpar estado readonly ao fechar para evitar persistÍªncia inesperada
             const cod = document.getElementById('cod_evento');
             if (cod) { cod.readOnly = false; cod.classList.remove('readonly-input'); }
         }
@@ -1357,7 +1358,7 @@
         }
 
         // =======================================
-        // MODAL DE USUÁRIOS
+        // MODAL DE USUÍRIOS
         // =======================================
 
         function showModalUsuario() {
@@ -1515,7 +1516,7 @@
         }
 
         // =======================================
-        // SOLICITAÇÕES DE SENHA
+        // SOLICITAÍ‡ÕES DE SENHA
         // =======================================
 
         async function carregarSolicitacoesSenha() {
@@ -1523,7 +1524,7 @@
                 const filtroStatus = document.getElementById('filtroStatusSenha')?.value || 'pendente';
 
                 // Mostrar loading
-                document.getElementById('senhasContainer').innerHTML = '<p>🔄 Carregando solicitações...</p>';
+                document.getElementById('senhasContainer').innerHTML = '<p>ðŸ”„ Carregando solicitações...</p>';
 
                 const result = await apiCall(`senhas&status=${filtroStatus}`);
                 currentData.senhas = result.data;
@@ -1706,12 +1707,12 @@
             }
 
             const observacoes = prompt(
-                `OBSERVAÇÕES (opcional)\n\n` +
+                `OBSERVAÍ‡ÕES (opcional)\n\n` +
                 `Adicione alguma observação sobre esta redefinição:\n` +
                 `(deixe vazio se não quiser adicionar)`
             ) || `Senha redefinida pelo admin em ${new Date().toLocaleString('pt-BR')}`;
 
-            if (confirm(`CONFIRMAR REDEFINIÇÃO\n\nUsuário: ${nome}\nEmail: ${email}\nNova Senha: ${'*'.repeat(novaSenha.length)}\n\nDeseja continuar?`)) {
+            if (confirm(`CONFIRMAR REDEFINIÍ‡ÍO\n\nUsuário: ${nome}\nEmail: ${email}\nNova Senha: ${'*'.repeat(novaSenha.length)}\n\nDeseja continuar?`)) {
                 resolverSolicitacaoSenha(id, cpf, novaSenha, observacoes);
             }
         }
@@ -1746,14 +1747,14 @@
         }
 
         function verObservacoes(obs) {
-            alert('OBSERVAÇÕES\n\n' + (obs || 'Sem observações.'));
+            alert('OBSERVAÍ‡ÕES\n\n' + (obs || 'Sem observações.'));
         }
 
         function verObservacoesPorId(id) {
             try {
                 const s = (currentData && currentData.senhas) ? currentData.senhas.find(x => x.id == id) : null;
                 const obs = s && s.observacoes ? String(s.observacoes) : 'Sem observações.';
-                alert('OBSERVAÇÕES\n\n' + obs);
+                alert('OBSERVAÍ‡ÕES\n\n' + obs);
             } catch (e) {
                 alert('Não foi possível exibir as observações.');
                 console.error('verObservacoesPorId error:', e);
@@ -2043,11 +2044,11 @@
                 const data = await response.json();
 
                 if (data.sucesso) {
-                    alert('✓ Backup realizado com sucesso!');
+                    alert('âœ“ Backup realizado com sucesso!');
                     await carregarListaBackups();
                     await carregarInfoBackups();
                 } else {
-                    alert('✗ Erro: ' + data.mensagem);
+                    alert('âœ— Erro: ' + data.mensagem);
                 }
             } catch (e) {
                 alert('Erro ao fazer backup: ' + e.message);
@@ -2082,7 +2083,7 @@
                 html += '<div class="table-wrapper"><table class="admin-table">';
                 html += '<thead><tr><th>Data/Hora</th><th>Tamanho</th><th>Ações</th></tr></thead><tbody>';
                 if (!backups || backups.length === 0) {
-                    html += '<tr><td colspan="3" style="text-align:center; padding:20px; color:#999;">📁 Nenhum backup disponível</td></tr>';
+                    html += '<tr><td colspan="3" style="text-align:center; padding:20px; color:#999;">ðŸ“ Nenhum backup disponível</td></tr>';
                 } else {
                     backups.forEach(backup => {
                         html += '<tr>' +
@@ -2100,7 +2101,7 @@
             } else {
                 html += '<div class="mobile-cards-container">';
                 if (!backups || backups.length === 0) {
-                    html += '<p style="text-align:center; padding:20px; color:#999;">📁 Nenhum backup disponível</p>';
+                    html += '<p style="text-align:center; padding:20px; color:#999;">ðŸ“ Nenhum backup disponível</p>';
                 } else {
                     backups.forEach(backup => {
                         html += '<div class="mobile-card">' +
@@ -2138,7 +2139,7 @@
         }
 
         function restaurarBackupConfirm(nome) {
-            if (!confirm('ATENÇÃO: Tem certeza? Isto vai RESTAURAR o banco de dados e SUBSTITUIR todos os dados atuais!')) {
+            if (!confirm('ATENÍ‡ÍO: Tem certeza? Isto vai RESTAURAR o banco de dados e SUBSTITUIR todos os dados atuais!')) {
                 return;
             }
             restaurarBackup(nome);
@@ -2156,10 +2157,10 @@
                 const data = await response.json();
 
                 if (data.sucesso) {
-                    alert('✓ Backup restaurado com sucesso!');
+                    alert('âœ“ Backup restaurado com sucesso!');
                     location.reload();
                 } else {
-                    alert('✗ Erro: ' + data.mensagem);
+                    alert('âœ— Erro: ' + data.mensagem);
                 }
             } catch (e) {
                 alert('Erro ao restaurar: ' + e.message);
@@ -2185,10 +2186,10 @@
                 const data = await response.json();
 
                 if (data.sucesso) {
-                    alert('✓ Backup deletado com sucesso!');
+                    alert('âœ“ Backup deletado com sucesso!');
                     await carregarListaBackups();
                 } else {
-                    alert('✗ Erro: ' + data.mensagem);
+                    alert('âœ— Erro: ' + data.mensagem);
                 }
             } catch (e) {
                 alert('Erro ao deletar: ' + e.message);
@@ -2196,7 +2197,7 @@
         }
         
         // =======================================
-        // PWA / REDE - DIAGNÓSTICO E AÇÕES
+        // PWA / REDE - DIAGNÍ“STICO E AÍ‡ÕES
         // =======================================
         async function carregarPwaRede() {
             // Reset UI
@@ -2339,7 +2340,7 @@
 
                 const arrow = document.createElement('span');
                 arrow.className = 'ddl-arrow';
-                arrow.textContent = '▾';
+                arrow.textContent = 'â–¾';
 
                 btn.appendChild(labelSpan);
                 btn.appendChild(arrow);
@@ -2457,7 +2458,7 @@
                 selects.forEach(buildForSelect);
             }
 
-            // Rebuild simples quando conteúdos dinâmicos são injetados
+            // Rebuild simples quando conteúdos dinÍ¢micos são injetados
             let mo;
             function attachObserver() {
                 const container = document.querySelector('.admin-page-container');
@@ -2486,3 +2487,4 @@
 </body>
 
 </html>
+

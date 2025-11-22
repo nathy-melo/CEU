@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Sessão já é iniciada pelo ContainerOrganizador.php
 include_once '../BancoDados/conexao.php';
 
@@ -142,12 +142,12 @@ if (empty($cpfUsuario)) {
 // Função para formatar strings para os atributos data-*
 function formatar($txt) {
     $map = [
-        'Á'=>'A','À'=>'A','Â'=>'A','Ã'=>'A','Ä'=>'A','á'=>'a','à'=>'a','â'=>'a','ã'=>'a','ä'=>'a',
-        'É'=>'E','È'=>'E','Ê'=>'E','Ë'=>'E','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e',
-        'Í'=>'I','Ì'=>'I','Î'=>'I','Ï'=>'I','í'=>'i','ì'=>'i','î'=>'i','ï'=>'i',
-        'Ó'=>'O','Ò'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','ó'=>'o','ò'=>'o','ô'=>'o','õ'=>'o','ö'=>'o',
-        'Ú'=>'U','Ù'=>'U','Û'=>'U','Ü'=>'U','ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u',
-        'Ç'=>'C','ç'=>'c'
+        'Í'=>'A','Í€'=>'A','Í‚'=>'A','Í'=>'A','Í„'=>'A','á'=>'a','Í '=>'a','Í¢'=>'a','ã'=>'a','Í¤'=>'a',
+        'É'=>'E','Íˆ'=>'E','ÍŠ'=>'E','Í‹'=>'E','é'=>'e','Í¨'=>'e','Íª'=>'e','Í«'=>'e',
+        'Í'=>'I','ÍŒ'=>'I','ÍŽ'=>'I','Í'=>'I','í'=>'i','Í¬'=>'i','Í®'=>'i','Í¯'=>'i',
+        'Í“'=>'O','Í’'=>'O','Í”'=>'O','Õ'=>'O','Í–'=>'O','ó'=>'o','Í²'=>'o','Í´'=>'o','õ'=>'o','Í¶'=>'o',
+        'Ú'=>'U','Í™'=>'U','Í›'=>'U','Íœ'=>'U','ú'=>'u','Í¹'=>'u','Í»'=>'u','Í¼'=>'u',
+        'Í‡'=>'C','ç'=>'c'
     ];
     $txt = strtr($txt ?? '', $map);
     $txt = strtolower($txt);
@@ -163,6 +163,7 @@ function formatar($txt) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Eventos</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <style>
         body {
             align-items: flex-start;
@@ -696,7 +697,7 @@ function formatar($txt) {
         <div class="barra-pesquisa-fixa">
             <div class="section-title-wrapper">
                 <div class="barra-pesquisa-container">
-                    <!-- Botão de favoritos à esquerda da barra de pesquisa -->
+                    <!-- Botão de favoritos Í  esquerda da barra de pesquisa -->
                     <button type="button" class="BotaoFavoritosTrigger botao" id="btn-abrir-favoritos" title="Ver favoritos"
                         aria-label="Ver favoritos">
                         <img src="../Imagens/Medalha_preenchida.svg" alt="Favoritos">
@@ -798,7 +799,7 @@ function formatar($txt) {
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div style="grid-column:1/-1;text-align:center;padding:5px 0;color:var(--botao);font-size:1.1rem;">
-                        Você ainda não criou nenhum evento
+                        VocÍª ainda não criou nenhum evento
                     </div>
                 <?php endif; ?>
             </div>
@@ -877,7 +878,7 @@ function formatar($txt) {
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div style="grid-column:1/-1;text-align:center;padding:30px 0;color:var(--botao);font-size:1.1rem;">
-                        Você não é organizador em nenhum evento ainda.
+                        VocÍª não é organizador em nenhum evento ainda.
                     </div>
                 <?php endif; ?>
             </div>
@@ -889,7 +890,7 @@ function formatar($txt) {
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Meus favoritos</span>
-                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">Í—</button>
             </div>
             <div id="lista-favoritos" class="lista-favoritos"></div>
         </div>
@@ -900,7 +901,7 @@ function formatar($txt) {
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Enviar mensagem ao organizador</span>
-                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
             </div>
             <div>
                 <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -919,7 +920,7 @@ function formatar($txt) {
         <div class="conteudo">
             <div class="cabecalho">
                 <span>Compartilhar</span>
-                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
             </div>
             <div class="opcoes-compartilhamento">
                 <button class="btn-compartilhar-app" onclick="compartilharWhatsApp()" title="Compartilhar no WhatsApp">
@@ -967,7 +968,7 @@ function formatar($txt) {
                 <input type="text" id="link-inscricao" readonly />
             </div>
             <div class="aviso-compartilhar">
-                <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+                <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
             </div>
         </div>
     </div>
@@ -976,4 +977,6 @@ function formatar($txt) {
 </body>
 
 </html>
+
+
 

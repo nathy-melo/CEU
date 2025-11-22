@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
 ini_set('session.gc_maxlifetime', 360);
 session_set_cookie_params(360);
@@ -20,14 +20,14 @@ if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividad
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sessão Expirada - CEU</title>
-        <link rel="stylesheet" href="../styleGlobal.css">
+        <link rel="stylesheet" href="../styleGlobal.css" />`n    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />>
         <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png">
     </head>
     <body>
         <div id="modalSessaoExpirada" class="modal-personalizado mostrar">
             <div class="conteudo-modal-personalizado">
                 <div class="cabecalho-modal-personalizado">Um anjo sussurrou no seu ouvido:</div>
-                <div class="corpo-modal-personalizado">Sua sessão expirou. Você precisa fazer login novamente para continuar.</div>
+                <div class="corpo-modal-personalizado">Sua sessão expirou. VocÍª precisa fazer login novamente para continuar.</div>
                 <button class="botao botao-modal-personalizado" onclick="window.location.href=\'../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada\'">Fazer Login</button>
             </div>
         </div>
@@ -68,8 +68,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // Cache-busting para CSS global (evita centralização por CSS antigo em cache SW/navegador)
         $__cssPath = realpath(__DIR__ . '/../styleGlobal.css');
         $__cssVer = $__cssPath ? filemtime($__cssPath) : time();
+        $__cssMobilePath = realpath(__DIR__ . '/../styleGlobalMobile.css');
+        $__cssMobileVer = $__cssMobilePath ? filemtime($__cssMobilePath) : time();
     ?>
     <link rel="stylesheet" href="../styleGlobal.css?v=<?= $__cssVer ?>" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css?v=<?= $__cssMobileVer ?>" media="(max-width: 767px)" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
     <script src="/CEU/pwa-config.js" defer></script>
 </head>
@@ -122,7 +125,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <!-- Menu fixo -->
     <?php include 'MenuO.php'; ?>
 
-    <!-- Conteúdo dinâmico -->
+    <!-- Conteúdo dinÍ¢mico -->
     <div id="conteudo-dinamico">
         <?php include $arquivo; ?>
     </div>
@@ -445,7 +448,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: '../PaginasGlobais/PainelNotificacoes.php',
                 js: ['../PaginasGlobais/PainelNotificacoes.js'],
                 init: () => {
-                    console.log('✅ Painel de Notificações carregado');
+                    console.log('âœ… Painel de Notificações carregado');
                     // Força a inicialização do script mesmo após DOMContentLoaded
                     if (typeof window.inicializarPainelNotificacoes === 'function') {
                         window.inicializarPainelNotificacoes();
@@ -541,7 +544,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         }
 
                         // Se for página de evento organizado, o JavaScript já detecta automaticamente
-                        // se os dados vêm do PHP ou precisa carregar via AJAX
+                        // se os dados vÍªm do PHP ou precisa carregar via AJAX
                         // Não precisa chamar manualmente aqui
 
                         // Reinicia verificação de sessão para nova página (5 minutos)
@@ -600,3 +603,4 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 </body>
 
 </html>
+

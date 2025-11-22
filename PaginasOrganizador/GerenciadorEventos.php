@@ -140,7 +140,7 @@ try {
     }
 
     // ===========================
-    // LISTAR EVENTOS DE COLABORAÇÃO
+    // LISTAR EVENTOS DE COLABORAÇÍO
     // ===========================
     if ($action === 'listar_colaboracao') {
         garantirEsquemaColaboradores($conexao);

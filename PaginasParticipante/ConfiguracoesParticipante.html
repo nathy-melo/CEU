@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
 </head>
 <style>
     .conteiner-configuracoes {
@@ -41,7 +42,7 @@
         max-width: 100%;
         max-height: 100%;
     }
-    /* Ícone inline (SVG) para Baixar App */
+    /* Ícone inline (SVG) para Baixar App */
     .icon-download {
         display: inline-block;
         width: 90%;
@@ -139,7 +140,7 @@
                     </span>
                 </div>
                 <span class="botao botao-configuracao" style="white-space:normal; line-height:1.2;">
-                    Para instalar no iOS: toque em Compartilhar → "Adicionar à Tela de Início"
+                    Para instalar no iOS: toque em Compartilhar â†’ "Adicionar Í  Tela de Início"
                 </span>
             </div>
         </div>
@@ -158,7 +159,7 @@
                 return (typeof window.ceuIsMobile === 'function' ? window.ceuIsMobile() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
             }
             function canInstall(){
-                if (isIOS) return false; // iOS não fornece prompt — mostrar dica
+                if (isIOS) return false; // iOS não fornece prompt â€” mostrar dica
                 if (typeof window.ceuCanInstall === 'function') return window.ceuCanInstall();
                 return !!window.deferredPrompt && isMobile() && !isStandalone();
             }
@@ -194,3 +195,4 @@
 </body>
 
 </html>
+

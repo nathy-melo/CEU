@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Limpa qualquer output anterior
 ob_start();
 
@@ -289,6 +289,7 @@ mysqli_close($conexao);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adicionar Evento</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <style>
         .cartao-evento {
             background-color: var(--caixas);
@@ -1169,7 +1170,7 @@ mysqli_close($conexao);
                     <option value="Palestra">Palestra</option>
                     <option value="Workshop">Workshop</option>
                     <option value="Seminário">Seminário</option>
-                    <option value="Conferência">Conferência</option>
+                    <option value="ConferÍªncia">ConferÍªncia</option>
                     <option value="Curso">Curso</option>
                     <option value="Treinamento">Treinamento</option>
                     <option value="Outro">Outro</option>
@@ -1203,9 +1204,9 @@ mysqli_close($conexao);
                     </div>
                     <div class="carrossel-imagens" id="carrossel-imagens" style="display: none;">
                         <button type="button" class="btn-remover-imagem" id="btn-remover-imagem" onclick="event.stopPropagation(); removerImagemAtual();">&times;</button>
-                        <button type="button" class="carrossel-btn carrossel-anterior" onclick="event.stopPropagation(); mudarImagem(-1)">⮜</button>
+                        <button type="button" class="carrossel-btn carrossel-anterior" onclick="event.stopPropagation(); mudarImagem(-1)">â®œ</button>
                         <img id="imagem-carrossel" src="" alt="Imagem do evento" />
-                        <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">⮞</button>
+                        <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">â®ž</button>
                         <button type="button" class="btn-adicionar-mais" onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
                             <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                             Adicionar mais imagens
@@ -1228,10 +1229,10 @@ mysqli_close($conexao);
         <div id="modal-imagem" class="modal-imagem">
             <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
             <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior"
-                onclick="mudarImagemModal(-1)">⮜</button>
+                onclick="mudarImagemModal(-1)">â®œ</button>
             <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img" />
             <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima"
-                onclick="mudarImagemModal(1)">⮞</button>
+                onclick="mudarImagemModal(1)">â®ž</button>
         </div>
 
         <!-- Modal Adicionar Colaborador -->
@@ -1343,7 +1344,7 @@ mysqli_close($conexao);
                 return camposFaltantes;
             }
 
-            // ==== FUNÇÕES DE COLABORADORES ====
+            // ==== FUNÍ‡ÕES DE COLABORADORES ====
             window.abrirModalColaboradores = function() {
                 document.getElementById('modal-colaboradores').style.display = 'flex';
                 limparCamposColaborador();
@@ -1393,7 +1394,7 @@ mysqli_close($conexao);
                 if (colaboradores.find(c => c.cpf === cpf)) {
                     msgStatus.style.display = 'block';
                     msgStatus.style.color = '#f44336';
-                    msgStatus.textContent = '❌ Este organizador já foi adicionado';
+                    msgStatus.textContent = 'âŒ Este organizador já foi adicionado';
                     btnAdicionar.disabled = true;
                     return;
                 }
@@ -1406,21 +1407,21 @@ mysqli_close($conexao);
                             document.getElementById('colab-email').value = data.usuario.email || '';
                             msgStatus.style.display = 'block';
                             msgStatus.style.color = '#4CAF50';
-                            msgStatus.textContent = '✓ Usuário encontrado no sistema';
+                            msgStatus.textContent = 'âœ“ Usuário encontrado no sistema';
                             btnAdicionar.disabled = false;
                         } else {
                             document.getElementById('colab-nome').value = '';
                             document.getElementById('colab-email').value = '';
                             msgStatus.style.display = 'block';
                             msgStatus.style.color = '#f44336';
-                            msgStatus.textContent = '❌ Usuário não cadastrado no sistema';
+                            msgStatus.textContent = 'âŒ Usuário não cadastrado no sistema';
                             btnAdicionar.disabled = true;
                         }
                     })
                     .catch(() => {
                         msgStatus.style.display = 'block';
                         msgStatus.style.color = '#f44336';
-                        msgStatus.textContent = '❌ Erro ao verificar CPF';
+                        msgStatus.textContent = 'âŒ Erro ao verificar CPF';
                         btnAdicionar.disabled = true;
                     });
             }
@@ -1598,7 +1599,7 @@ mysqli_close($conexao);
                 document.getElementById('modal-imagem').style.display = 'none';
             };
 
-            // CORREÇÃO PRINCIPAL: Adiciona listener do formulário de forma segura
+            // CORREÍ‡ÍO PRINCIPAL: Adiciona listener do formulário de forma segura
             const formEvento = document.getElementById('form-evento');
             if (formEvento) {
                 formEvento.addEventListener('submit', function(e) {
@@ -1673,3 +1674,4 @@ mysqli_close($conexao);
 </body>
 
 </html>
+

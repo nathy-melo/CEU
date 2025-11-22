@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Inicia a sessão apenas se não houver uma ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
@@ -66,6 +66,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
 </head>
 <style>
     .container-perfil {
@@ -413,7 +414,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
                         </div>
                     </div>
                     <div class="grupo-formulario">
-                        <label for="ra-input">RA (Registro Acadêmico):</label>
+                        <label for="ra-input">RA (Registro AcadÍªmico):</label>
                         <div class="controle-formulario">
                             <span id="ra-display"><?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?></span>
                             <input type="text" id="ra-input" name="ra" value="<?php echo htmlspecialchars($dadosUsuario['RA'] ?? ''); ?>" class="hidden" maxlength="7" placeholder="Ex: 1234567" autocomplete="off">
@@ -449,3 +450,4 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 </body>
 
 </html>
+

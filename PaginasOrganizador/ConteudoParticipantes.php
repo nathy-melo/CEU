@@ -1254,7 +1254,7 @@
             return;
         }
 
-        if (!confirm(`ATENÇÃO: Excluir ${participantesSelecionados.size} participante(s)?\n\nEsta ação não pode ser desfeita!`)) {
+        if (!confirm(`ATENÇÍO: Excluir ${participantesSelecionados.size} participante(s)?\n\nEsta ação não pode ser desfeita!`)) {
             return;
         }
 

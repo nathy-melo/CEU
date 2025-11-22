@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartão do Evento</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <?php
   // Sessão e banco
   if (session_status() === PHP_SESSION_NONE) {
@@ -35,7 +36,7 @@
     if (!mysqli_fetch_assoc($resultadoPermissao)) {
       mysqli_stmt_close($stmtPermissao);
       mysqli_close($conexao);
-      echo '<script>alert("Você não tem permissão para visualizar este evento"); history.back();</script>';
+      echo '<script>alert("VocÍª não tem permissão para visualizar este evento"); history.back();</script>';
       exit;
     }
     mysqli_stmt_close($stmtPermissao);
@@ -1095,7 +1096,7 @@
       border-radius: .5rem;
     }
 
-    /* Botões de ação à direita do cartão */
+    /* Botões de ação Í  direita do cartão */
     .botoes-acao-cartao {
       position: absolute;
       left: calc(50% + 30rem + 1rem);
@@ -1251,7 +1252,7 @@
 <body>
   <div id="main-content">
     <main id="secao-detalhes-evento" class="secao-detalhes-evento">
-      <!-- Botões de ação à direita do cartão -->
+      <!-- Botões de ação Í  direita do cartão -->
       <div class="botoes-acao-cartao">
         <button type="button" class="BotaoAcaoCartao BotaoFavoritoCartao botao" title="Favoritar" aria-label="Favoritar"
           data-cod="<?= $id_evento ?>" data-favorito="0">
@@ -1341,7 +1342,7 @@
             <option value="Palestra" <?php echo ($evento['categoria'] ?? '') === 'Palestra' ? 'selected' : ''; ?>>Palestra</option>
             <option value="Workshop" <?php echo ($evento['categoria'] ?? '') === 'Workshop' ? 'selected' : ''; ?>>Workshop</option>
             <option value="Seminário" <?php echo ($evento['categoria'] ?? '') === 'Seminário' ? 'selected' : ''; ?>>Seminário</option>
-            <option value="Conferência" <?php echo ($evento['categoria'] ?? '') === 'Conferência' ? 'selected' : ''; ?>>Conferência</option>
+            <option value="ConferÍªncia" <?php echo ($evento['categoria'] ?? '') === 'ConferÍªncia' ? 'selected' : ''; ?>>ConferÍªncia</option>
             <option value="Curso" <?php echo ($evento['categoria'] ?? '') === 'Curso' ? 'selected' : ''; ?>>Curso</option>
             <option value="Treinamento" <?php echo ($evento['categoria'] ?? '') === 'Treinamento' ? 'selected' : ''; ?>>Treinamento</option>
             <option value="Outro" <?php echo ($evento['categoria'] ?? '') === 'Outro' ? 'selected' : ''; ?>>Outro</option>
@@ -1377,9 +1378,9 @@
             </div>
             <div class="carrossel-imagens" id="carrossel-imagens">
               <button type="button" class="btn-remover-imagem" id="btn-remover-imagem">&times;</button>
-              <button type="button" class="carrossel-btn carrossel-anterior" id="btn-anterior">⮜</button>
+              <button type="button" class="carrossel-btn carrossel-anterior" id="btn-anterior">â®œ</button>
               <img id="imagem-carrossel" src="<?php echo htmlspecialchars($imagem_src); ?>" alt="Imagem do evento" />
-              <button type="button" class="carrossel-btn carrossel-proxima" id="btn-proxima">⮞</button>
+              <button type="button" class="carrossel-btn carrossel-proxima" id="btn-proxima">â®ž</button>
               <button type="button" class="btn-adicionar-mais" id="btn-adicionar-mais-imagens">
                 <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                 Adicionar mais imagens
@@ -1407,9 +1408,9 @@
 
     <div id="modal-imagem" class="modal-imagem">
       <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
-      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">⮜</button>
+      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">â®œ</button>
       <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img" />
-      <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">⮞</button>
+      <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">â®ž</button>
     </div>
   </div>
 
@@ -1418,7 +1419,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Organização do Evento</span>
-        <button type="button" class="fechar" onclick="fecharModalColaboradores()" aria-label="Fechar">×</button>
+        <button type="button" class="fechar" onclick="fecharModalColaboradores()" aria-label="Fechar">Í—</button>
       </div>
 
       <div class="linha-form">
@@ -1439,7 +1440,7 @@
     <div class="conteudo" onclick="event.stopPropagation()">
       <div class="cabecalho">
         <span>Enviar mensagem ao organizador</span>
-        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
       </div>
       <div>
         <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -1458,7 +1459,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Compartilhar</span>
-        <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
+        <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
       </div>
 
       <div class="opcoes-compartilhamento">
@@ -1513,7 +1514,7 @@
       </div>
 
       <div class="aviso-compartilhar">
-        <strong>ℹ️ Informação:</strong> Este link é para <strong>inscrição no evento</strong>. Para adicionar um novo organizador, use o botão <strong>"+"</strong> ao lado campo "Organizado por:".
+        <strong>â„¹ï¸ Informação:</strong> Este link é para <strong>inscrição no evento</strong>. Para adicionar um novo organizador, use o botão <strong>"+"</strong> ao lado campo "Organizado por:".
       </div>
     </div>
   </div>
@@ -1900,4 +1901,6 @@
 </body>
 
 </html>
+
+
 

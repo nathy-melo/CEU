@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0; // 0=claro, 1=escuro
 ?>
@@ -10,6 +10,7 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tema do Site</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
 </head>
 <style>
     .cartao-tema { background-color: var(--caixas); border-radius: 1rem; padding: 1.35rem 3.05rem 1.15rem; max-width: 34.65rem; width: 100%; display: flex; flex-direction: column; align-items: center; box-shadow: 0rem 0.18rem 0.9rem 0rem var(--sombra-forte); }
@@ -100,7 +101,7 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                             aplicarTemaLocal(temaAtual);
                             destacar();
                         } else if (result.status === 401) {
-                            alert('Você precisa estar logado para alterar o tema.');
+                            alert('VocÍª precisa estar logado para alterar o tema.');
                         } else {
                             alert('Não foi possível salvar o tema agora.');
                         }
@@ -116,3 +117,4 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 </body>
 
 </html>
+

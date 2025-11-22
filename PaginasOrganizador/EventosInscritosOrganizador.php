@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eventos inscritos</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <style>
         /* Modal de Compartilhar - mesmo padrão do InicioParticipante.php */
         .modal-compartilhar {
@@ -636,51 +637,51 @@
     function formatar($txt)
     {
         $map = [
-            'Á' => 'A',
-            'À' => 'A',
-            'Â' => 'A',
-            'Ã' => 'A',
-            'Ä' => 'A',
+            'Í' => 'A',
+            'Í€' => 'A',
+            'Í‚' => 'A',
+            'Í' => 'A',
+            'Í„' => 'A',
             'á' => 'a',
-            'à' => 'a',
-            'â' => 'a',
+            'Í ' => 'a',
+            'Í¢' => 'a',
             'ã' => 'a',
-            'ä' => 'a',
+            'Í¤' => 'a',
             'É' => 'E',
-            'È' => 'E',
-            'Ê' => 'E',
-            'Ë' => 'E',
+            'Íˆ' => 'E',
+            'ÍŠ' => 'E',
+            'Í‹' => 'E',
             'é' => 'e',
-            'è' => 'e',
-            'ê' => 'e',
-            'ë' => 'e',
-            'Í' => 'I',
-            'Ì' => 'I',
-            'Î' => 'I',
-            'Ï' => 'I',
+            'Í¨' => 'e',
+            'Íª' => 'e',
+            'Í«' => 'e',
+            'Í' => 'I',
+            'ÍŒ' => 'I',
+            'ÍŽ' => 'I',
+            'Í' => 'I',
             'í' => 'i',
-            'ì' => 'i',
-            'î' => 'i',
-            'ï' => 'i',
-            'Ó' => 'O',
-            'Ò' => 'O',
-            'Ô' => 'O',
+            'Í¬' => 'i',
+            'Í®' => 'i',
+            'Í¯' => 'i',
+            'Í“' => 'O',
+            'Í’' => 'O',
+            'Í”' => 'O',
             'Õ' => 'O',
-            'Ö' => 'O',
+            'Í–' => 'O',
             'ó' => 'o',
-            'ò' => 'o',
-            'ô' => 'o',
+            'Í²' => 'o',
+            'Í´' => 'o',
             'õ' => 'o',
-            'ö' => 'o',
+            'Í¶' => 'o',
             'Ú' => 'U',
-            'Ù' => 'U',
-            'Û' => 'U',
-            'Ü' => 'U',
+            'Í™' => 'U',
+            'Í›' => 'U',
+            'Íœ' => 'U',
             'ú' => 'u',
-            'ù' => 'u',
-            'û' => 'u',
-            'ü' => 'u',
-            'Ç' => 'C',
+            'Í¹' => 'u',
+            'Í»' => 'u',
+            'Í¼' => 'u',
+            'Í‡' => 'C',
             'ç' => 'c'
         ];
         $txt = strtr($txt ?? '', $map);
@@ -693,7 +694,7 @@
     <div id="main-content">
         <div class="section-title-wrapper">
             <div class="barra-pesquisa-container">
-                <!-- Botão de favoritos à esquerda da barra de pesquisa -->
+                <!-- Botão de favoritos Í  esquerda da barra de pesquisa -->
                 <button type="button" class="BotaoFavoritosTrigger botao" id="btn-abrir-favoritos" title="Ver favoritos"
                     aria-label="Ver favoritos">
                     <img src="../Imagens/Medalha_preenchida.svg" alt="Favoritos">
@@ -824,7 +825,7 @@
         <div class="conteudo">
             <div class="cabecalho">
                 <span>Compartilhar</span>
-                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
             </div>
 
             <div class="opcoes-compartilhamento">
@@ -879,7 +880,7 @@
             </div>
 
             <div class="aviso-compartilhar">
-                <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+                <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
             </div>
         </div>
     </div>
@@ -889,7 +890,7 @@
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Meus favoritos</span>
-                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">Í—</button>
             </div>
             <div id="lista-favoritos" class="lista-favoritos"></div>
         </div>
@@ -900,7 +901,7 @@
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Enviar mensagem ao organizador</span>
-                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
             </div>
             <div>
                 <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -980,7 +981,7 @@
             window.inscricaoCache = new Map();
         }
         
-        // Criar referências locais usando var (permite re-declaração) para facilitar o uso
+        // Criar referÍªncias locais usando var (permite re-declaração) para facilitar o uso
         var codEvento = window.codEvento;
         var codEventoMensagem = window.codEventoMensagem;
         var codEventoAcao = window.codEventoAcao;
@@ -1454,7 +1455,7 @@
                     if (r.status === 401) return;
                     const j = await r.json();
                     if (j && j.sucesso && j.inscricoes) {
-                        // IMPORTANTE: Obter o container novamente dentro do setTimeout para garantir que a referência esteja correta
+                        // IMPORTANTE: Obter o container novamente dentro do setTimeout para garantir que a referÍªncia esteja correta
                         const contFavoritos = document.getElementById('lista-favoritos');
                         if (!contFavoritos) return;
                         
@@ -1756,7 +1757,7 @@
 
         // Listeners de clique - usando o mesmo padrão do MeusEventosParticipante.php
         document.addEventListener('click', async function (e) {
-            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO MeusEventosParticipante
+            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÍO DO MeusEventosParticipante
             const btnInscrever = e.target.closest('.BotaoInscreverCard');
             if (btnInscrever) {
                 e.preventDefault(); e.stopPropagation();
@@ -1837,7 +1838,7 @@
                 
                 atualizarIconeFavorito(btnFav, novoEstado);
                 // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
-                // Buscar especificamente os botões que NÃO estão no modal de favoritos
+                // Buscar especificamente os botões que NÍO estão no modal de favoritos
                 const atualizarTodosBotoes = () => {
                     const modalFavoritos = document.getElementById('modal-favoritos');
                     const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
@@ -1912,7 +1913,7 @@
                             }
                             atualizarIconeFavorito(btnFav, j.favoritado);
                             // Atualizar TODOS os botões de favorito com o mesmo código na página
-                            // Buscar especificamente os botões que NÃO estão no modal de favoritos
+                            // Buscar especificamente os botões que NÍO estão no modal de favoritos
                             const atualizarTodosBotoes = () => {
                                 const modalFavoritos = document.getElementById('modal-favoritos');
                                 const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
@@ -2108,3 +2109,4 @@
 </body>
 
 </html>
+

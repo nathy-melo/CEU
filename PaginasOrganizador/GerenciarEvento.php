@@ -1305,6 +1305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Evento</title>
     <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
 </head>
 <style>
     a,
@@ -2620,13 +2621,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <!-- FIM ABA: PARTICIPANTES -->
 
-                <!-- ABA: ORGANIZAÇÃO -->
+                <!-- ABA: ORGANIZAÇÍO -->
                 <div class="conteudo-aba" id="aba-organizacao">
                     <div style="text-align: center; padding: 40px; color: var(--texto);">
                         <p>Carregando conteúdo...</p>
                     </div>
                 </div>
-                <!-- FIM ABA: ORGANIZAÇÃO -->
+                <!-- FIM ABA: ORGANIZAÇÍO -->
 
             </div>
 
@@ -2883,7 +2884,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             carregarConteudoAba(nomeAba, abaElement);
         }
 
-        // ==== FUNÇÃO PARA CARREGAR CONTEÚDO DINÂMICO DAS ABAS ====
+        // ==== FUNÇÍO PARA CARREGAR CONTEÚDO DINÂMICO DAS ABAS ====
         function carregarConteudoAba(nomeAba, abaElement) {
             // Define o arquivo de conteúdo para cada aba
             const arquivosConteudo = {
@@ -2938,7 +2939,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
         }
 
-        // ==== FUNÇÃO PARA EXECUTAR SCRIPTS DO CONTEÚDO CARREGADO ====
+        // ==== FUNÇÍO PARA EXECUTAR SCRIPTS DO CONTEÚDO CARREGADO ====
         function executarScriptsDoConteudo(elemento) {
             const scripts = elemento.querySelectorAll('script');
 
@@ -3027,7 +3028,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             inicializarEventos();
         }
 
-        // ==== FUNÇÃO PARA CARREGAR DADOS DO EVENTO ====
+        // ==== FUNÇÍO PARA CARREGAR DADOS DO EVENTO ====
         function carregarDadosEvento() {
             fetch(`GerenciarEvento.php?action=buscar&cod_evento=${codEventoAtual}`)
                 .then(response => response.json())
@@ -3874,7 +3875,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return;
             }
 
-            if (!confirm(`ATENÇÃO: Excluir ${participantesSelecionados.size} participante(s)?\n\nEsta ação não pode ser desfeita!`)) {
+            if (!confirm(`ATENÇÍO: Excluir ${participantesSelecionados.size} participante(s)?\n\nEsta ação não pode ser desfeita!`)) {
                 return;
             }
 
@@ -3915,3 +3916,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartão do Evento</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
+    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <?php
   // Integração com o banco
   include_once('../BancoDados/conexao.php');
@@ -439,7 +440,7 @@
     color: var(--botao);
   }
 
-  /* Botões de ação à direita do cartão */
+  /* Botões de ação Í  direita do cartão */
   .botoes-acao-cartao {
     position: absolute;
     left: calc(50% + 30rem + 1rem);
@@ -692,7 +693,7 @@
 <body>
   <div id="main-content">
     <main id="secao-detalhes-evento" class="secao-detalhes-evento">
-      <!-- Botões de ação à direita do cartão -->
+      <!-- Botões de ação Í  direita do cartão -->
       <div class="botoes-acao-cartao">
         <button type="button" class="BotaoAcaoCartao BotaoFavoritoCartao botao" title="Favoritar" aria-label="Favoritar"
           data-cod="<?= $id_evento ?>" data-favorito="0">
@@ -791,7 +792,7 @@
       <div class="conteudo" onclick="event.stopPropagation()">
         <div class="cabecalho">
           <span>Enviar mensagem ao organizador</span>
-          <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+          <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
         </div>
         <div>
           <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -810,7 +811,7 @@
       <div class="conteudo">
         <div class="cabecalho">
           <span>Compartilhar</span>
-          <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
+          <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
         </div>
 
         <div class="opcoes-compartilhamento">
@@ -865,7 +866,7 @@
         </div>
 
         <div class="aviso-compartilhar">
-          <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+          <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
         </div>
       </div>
     </div>
@@ -1359,3 +1360,4 @@
 </body>
 
 </html>
+

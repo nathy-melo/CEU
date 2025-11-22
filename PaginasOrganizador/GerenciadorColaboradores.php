@@ -287,7 +287,7 @@ try {
         }
 
         // ===========================
-        // SAIR DA COLABORAÇÃO
+        // SAIR DA COLABORAÇÍO
         // ===========================
         if ($action === 'sair') {
             $codEvento = isset($_POST['cod_evento']) ? (int) $_POST['cod_evento'] : 0;
@@ -366,7 +366,7 @@ try {
         }
 
         // ===========================
-        // APROVAR/RECUSAR SOLICITAÇÃO
+        // APROVAR/RECUSAR SOLICITAÇÍO
         // ===========================
         if ($action === 'aprovar' || $action === 'recusar') {
             $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;

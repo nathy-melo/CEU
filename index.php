@@ -39,13 +39,13 @@ session_start();
 
                 // Se retornou erro de conexão
                 if (data.erro) {
-                    alert('❌ ERRO DE CONEXÃO\n\n' + data.mensagem + '\n\nPor favor:\n1. Abra o XAMPP Control Panel\n2. Inicie o MySQL\n3. Recarregue esta página');
+                    alert('❌ ERRO DE CONEXÍO\n\n' + data.mensagem + '\n\nPor favor:\n1. Abra o XAMPP Control Panel\n2. Inicie o MySQL\n3. Recarregue esta página');
                     return;
                 }
 
                 if (!data.bancoExiste) {
                     // Banco não existe
-                    if (confirm('⚠️ BANCO DE DADOS NÃO ENCONTRADO!\n\nO banco de dados CEU_bd não existe.\n\nDeseja criar e importar o banco de dados agora?\n(Isso executará o arquivo BancodeDadosCEU.sql)')) {
+                    if (confirm('⚠️ BANCO DE DADOS NÍO ENCONTRADO!\n\nO banco de dados CEU_bd não existe.\n\nDeseja criar e importar o banco de dados agora?\n(Isso executará o arquivo BancodeDadosCEU.sql)')) {
                         atualizarBanco();
                     } else {
                         alert('❌ Não é possível continuar sem o banco de dados.');

@@ -481,7 +481,7 @@
         carregarOrganizacao();
     }, 100);
 
-    // ===== FUNÇÕES DE VERIFICAÇÃO E SALVAMENTO =====
+    // ===== FUNÇÕES DE VERIFICAÇÍO E SALVAMENTO =====
 
     async function verificarCPFColaborador() {
         const cpfInput = document.getElementById('add-cpf-colab');
@@ -595,7 +595,7 @@
         }
     }
 
-    // ===== FUNÇÕES DE EDIÇÃO E EXCLUSÃO =====
+    // ===== FUNÇÕES DE EDIÇÍO E EXCLUSÍO =====
 
     function abrirModalEditarMembro(cpf) {
         const membro = todosOrganizacao.find(m => m.cpf === cpf);
@@ -813,7 +813,7 @@
             return;
         }
 
-        if (!confirm(`ATENÇÃO: Excluir ${membrosSelecionados.size} membro(s)?\n\nEsta ação não pode ser desfeita!`)) {
+        if (!confirm(`ATENÇÍO: Excluir ${membrosSelecionados.size} membro(s)?\n\nEsta ação não pode ser desfeita!`)) {
             return;
         }
 
