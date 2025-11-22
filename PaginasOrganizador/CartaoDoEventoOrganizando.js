@@ -1432,7 +1432,8 @@
     const btnRemoverImg = document.getElementById('btn-remover-imagem');
     const btnAdicionarMaisImgs = document.getElementById('btn-adicionar-mais-imagens');
 
-    if (btnVoltar && btnCompartilhar && btnParticipantes && btnEditar) {
+    // Configura os botões principais (btn-compartilhar foi removido e substituído pelos botões de ação)
+    if (btnVoltar && btnParticipantes && btnEditar) {
       btnVoltar.onclick = function () {
         if (typeof carregarPagina === 'function') {
           carregarPagina('meusEventos');
@@ -1440,7 +1441,10 @@
           window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
         }
       };
-      btnCompartilhar.onclick = abrirModalCompartilhar;
+      // btn-compartilhar foi removido - agora está nos botões de ação à direita
+      if (btnCompartilhar) {
+        btnCompartilhar.onclick = abrirModalCompartilhar;
+      }
       btnParticipantes.onclick = irParaParticipantes;
       btnEditar.onclick = editarEvento;
     }

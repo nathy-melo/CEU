@@ -89,6 +89,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
   }
 
   .cartao-evento {
@@ -205,8 +206,6 @@
   .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 6; }
 
   .BotaoVoltar { grid-column: span 2 / span 2; grid-column-start: 1; grid-row-start: 9; }
-
-  .BotaoCompartilhar { grid-column: span 2 / span 2; grid-column-start: 4; grid-row-start: 9; }
 
   .BotaoInscrever { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 9; }
 
@@ -440,6 +439,157 @@
     color: var(--botao);
   }
 
+  /* Botões de ação à direita do cartão */
+  .botoes-acao-cartao {
+    position: absolute;
+    left: calc(50% + 30rem + 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 10;
+  }
+
+  .BotaoAcaoCartao {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 100%;
+    background: var(--fundo-escuro-transparente);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+    box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
+  }
+
+  .BotaoAcaoCartao:hover {
+    transform: scale(1.1);
+    background: var(--fundo-hover-transparente);
+  }
+
+  .BotaoAcaoCartao img {
+    width: 1.75rem;
+    height: 1.75rem;
+    filter: invert(1);
+    display: block;
+  }
+
+  /* Modal de mensagem ao organizador */
+  .modal-mensagem {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--fundo-escuro-transparente);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-mensagem.ativo { display: flex; }
+  .modal-mensagem .conteudo {
+    background: var(--caixas);
+    color: var(--texto);
+    width: 100%;
+    max-width: 32rem;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
+  }
+  .modal-mensagem .cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-weight: 800;
+    font-size: 1.15rem;
+  }
+  .modal-mensagem button.fechar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--texto);
+  }
+  .modal-mensagem textarea {
+    width: 100%;
+    min-height: 8rem;
+    resize: vertical;
+    border-radius: 0.5rem;
+    border: 1px solid var(--borda-clara);
+    background: var(--fundo-claro-transparente);
+    color: var(--texto);
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+  .modal-mensagem .contador-caracteres {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--texto);
+    margin-top: 0.5rem;
+    opacity: 0.7;
+  }
+  .modal-mensagem .contador-caracteres.limite-alcancado {
+    color: var(--vermelho);
+    opacity: 1;
+    font-weight: 600;
+  }
+  .modal-mensagem .acoes {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+  .modal-mensagem .botao-primario {
+    background: var(--botao);
+    color: var(--branco);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .modal-mensagem .botao-secundario {
+    background: var(--vermelho);
+    color: var(--branco);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Responsividade - esconder botões em telas menores */
+  @media (max-width: 1200px) {
+    .botoes-acao-cartao {
+      left: calc(50% + 30rem + 0.5rem);
+    }
+    .BotaoAcaoCartao {
+      width: 3rem;
+      height: 3rem;
+    }
+    .BotaoAcaoCartao img {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .botoes-acao-cartao {
+      position: static;
+      transform: none;
+      flex-direction: row;
+      justify-content: center;
+      margin-top: 1rem;
+      gap: 0.75rem;
+      left: auto;
+    }
+    .secao-detalhes-evento {
+      flex-direction: column;
+    }
+  }
+
   /* Modals de Confirmação */
   .modal-overlay {
     display: none;
@@ -542,6 +692,21 @@
 <body>
   <div id="main-content">
     <main id="secao-detalhes-evento" class="secao-detalhes-evento">
+      <!-- Botões de ação à direita do cartão -->
+      <div class="botoes-acao-cartao">
+        <button type="button" class="BotaoAcaoCartao BotaoFavoritoCartao botao" title="Favoritar" aria-label="Favoritar"
+          data-cod="<?= $id_evento ?>" data-favorito="0">
+          <img src="../Imagens/Medalha_linha.svg" alt="Favoritar">
+        </button>
+        <button type="button" class="BotaoAcaoCartao BotaoMensagemCartao botao" title="Enviar mensagem ao organizador"
+          aria-label="Mensagem" data-cod="<?= $id_evento ?>">
+          <img src="../Imagens/Carta.svg" alt="Mensagem">
+        </button>
+        <button type="button" class="BotaoAcaoCartao BotaoCompartilharCartao botao" title="Compartilhar"
+          aria-label="Compartilhar" data-cod="<?= $id_evento ?>">
+          <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
+        </button>
+      </div>
       <div class="cartao-evento">
         <div class="Nome grupo-campo">
           <label>Nome:</label>
@@ -609,9 +774,6 @@
         <div class="BotaoVoltar">
           <button onclick="history.back()" class="botao">Voltar</button>
         </div>
-        <div class="BotaoCompartilhar">
-          <button onclick="abrirModalCompartilhar()" class="botao">Compartilhar</button>
-        </div>
         <div class="BotaoInscrever">
           <button class="botao botao-inscrever">Inscrever-se</button>
         </div>
@@ -624,12 +786,31 @@
       <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img">
     </div>
 
+    <!-- Modal Mensagem ao Organizador -->
+    <div id="modal-mensagem" class="modal-mensagem">
+      <div class="conteudo" onclick="event.stopPropagation()">
+        <div class="cabecalho">
+          <span>Enviar mensagem ao organizador</span>
+          <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+        </div>
+        <div>
+          <textarea id="texto-mensagem-organizador" maxlength="500"
+            placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
+          <div id="contador-mensagem-organizador" class="contador-caracteres">0 / 500</div>
+          <div class="acoes">
+            <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
+            <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Compartilhar -->
     <div id="modal-compartilhar" class="modal-compartilhar">
       <div class="conteudo">
         <div class="cabecalho">
           <span>Compartilhar</span>
-          <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
+          <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
         </div>
 
         <div class="opcoes-compartilhamento">
@@ -783,14 +964,27 @@
       if (e.key === 'Escape' || e.key === 'Esc') {
         fecharModalImagem();
         fecharModalCompartilhar();
+        fecharModalMensagem(true);
       }
     });
 
     // Carrega as imagens quando a página é carregada
     carregarImagensEvento();
 
-    // Funções de compartilhamento
-    const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
+    // ====== Variáveis globais ======
+    if (typeof window.favoritosSet === 'undefined') {
+      window.favoritosSet = new Set();
+    }
+    if (typeof window.codEventoMensagem === 'undefined') {
+      window.codEventoMensagem = null;
+    }
+    if (typeof window.codEvento === 'undefined') {
+      window.codEvento = null;
+    }
+    window.codEvento = codEvento;
+    var favoritosSet = window.favoritosSet;
+    var codEventoMensagem = window.codEventoMensagem;
+    var codEventoCompartilhar = codEvento;
 
     // Função para bloquear scroll
     function bloquearScroll() {
@@ -825,71 +1019,340 @@
       }
     }
 
-    function abrirModalCompartilhar() {
-      const modal = document.getElementById('modal-compartilhar');
-      modal.classList.add('ativo');
-      document.getElementById('link-inscricao').value = linkEvento;
+    // ====== Funções de Favorito ======
+    function atualizarIconeFavorito(btn, fav) {
+      if (!btn) return;
+      const img = btn.querySelector('img');
+      if (!img) return;
+      const novoSrc = fav ? '../Imagens/Medalha_preenchida.svg' : '../Imagens/Medalha_linha.svg';
+      img.src = novoSrc;
+      img.alt = fav ? 'Desfavoritar' : 'Favoritar';
+      btn.title = fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+      btn.setAttribute('data-favorito', fav ? '1' : '0');
+    }
+
+    async function carregarFavoritos() {
+      let timeoutId = null;
+      try {
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 10000);
+        const basePath = `${window.location.origin}/CEU/PaginasGlobais/ListarFavoritos.php`;
+        const r = await fetch(basePath, { 
+          credentials: 'include',
+          signal: controller.signal
+        });
+        if (timeoutId) clearTimeout(timeoutId);
+        if (r.status === 401) { 
+          favoritosSet.clear(); 
+          return; 
+        }
+        if (!r.ok) {
+          throw new Error(`HTTP error! status: ${r.status}`);
+        }
+        const j = await r.json();
+        if (j && j.sucesso && Array.isArray(j.favoritos)) {
+          favoritosSet.clear();
+          for (const f of j.favoritos) {
+            const cod = Number(f.cod_evento);
+            if (cod > 0) favoritosSet.add(cod);
+          }
+          const btnFavorito = document.querySelector('.BotaoFavoritoCartao');
+          if (btnFavorito) {
+            atualizarIconeFavorito(btnFavorito, favoritosSet.has(codEvento));
+          }
+        }
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          console.warn('Erro ao carregar favoritos:', e);
+        }
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
+      }
+    }
+
+    // ====== Funções de Mensagem ao Organizador ======
+    function atualizarContadorMensagem() {
+      const textarea = document.getElementById('texto-mensagem-organizador');
+      const contador = document.getElementById('contador-mensagem-organizador');
+      if (!textarea || !contador) return;
+      const comprimento = textarea.value.length;
+      const maximo = 500;
+      contador.textContent = `${comprimento} / ${maximo}`;
+      if (comprimento >= maximo) {
+        contador.classList.add('limite-alcancado');
+      } else {
+        contador.classList.remove('limite-alcancado');
+      }
+    }
+
+    function abrirModalMensagem() {
+      const m = document.getElementById('modal-mensagem');
+      if (!m) return;
+      const textarea = document.getElementById('texto-mensagem-organizador');
+      if (textarea) {
+        textarea.value = '';
+        atualizarContadorMensagem();
+        textarea.removeEventListener('input', atualizarContadorMensagem);
+        textarea.addEventListener('input', atualizarContadorMensagem);
+      }
+      m.classList.add('ativo');
       bloquearScroll();
     }
 
+    function fecharModalMensagem(skipUnlock) {
+      const m = document.getElementById('modal-mensagem');
+      if (m) {
+        m.classList.remove('ativo');
+        if (!skipUnlock) {
+          desbloquearScroll();
+        }
+      }
+    }
+
+    async function enviarMensagemOrganizador() {
+      const textarea = document.getElementById('texto-mensagem-organizador');
+      if (!textarea) return;
+      const texto = (textarea.value || '').trim();
+      if (!codEventoMensagem) { fecharModalMensagem(); return; }
+      if (texto.length === 0) { alert('Digite sua mensagem.'); return; }
+      let timeoutId = null;
+      try {
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 10000);
+        const basePath = `${window.location.origin}/CEU/PaginasGlobais/EnviarMensagemOrganizador.php`;
+        const r = await fetch(basePath, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          credentials: 'include',
+          body: new URLSearchParams({ cod_evento: codEventoMensagem, mensagem: texto }),
+          signal: controller.signal
+        });
+        if (timeoutId) clearTimeout(timeoutId);
+        const j = await r.json();
+        fecharModalMensagem();
+        if (j && j.sucesso) {
+          alert('Mensagem enviada ao organizador!');
+        } else {
+          alert(j.mensagem || 'Não foi possível enviar a mensagem.');
+        }
+      } catch (e) {
+        if (timeoutId) clearTimeout(timeoutId);
+        fecharModalMensagem();
+        if (e.name !== 'AbortError') {
+          alert('Erro ao enviar mensagem.');
+        }
+      }
+    }
+
+    // ====== Modal de Compartilhar ======
+    function abrirModalCompartilhar() {
+      if (!codEventoCompartilhar) return;
+      const modal = document.getElementById('modal-compartilhar');
+      if (!modal) return;
+      const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
+      const input = document.getElementById('link-inscricao');
+      if (input) input.value = linkEvento;
+      modal.classList.add('ativo');
+      bloquearScroll();
+    }
     function fecharModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
+      if (!modal) return;
       modal.classList.remove('ativo');
       desbloquearScroll();
     }
-
     function copiarLink() {
       const input = document.getElementById('link-inscricao');
+      if (!input) return;
       input.select();
       input.setSelectionRange(0, 99999);
-
       navigator.clipboard.writeText(input.value).then(() => {
         const iconeCopiar = document.getElementById('icone-copiar');
         const textoCopiar = document.getElementById('texto-copiar');
-
-        iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-        textoCopiar.textContent = 'Copiado!';
-
+        if (iconeCopiar) {
+          iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+        }
+        if (textoCopiar) {
+          textoCopiar.textContent = 'Copiado!';
+        }
         setTimeout(() => {
-          iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
-          textoCopiar.textContent = 'Copiar';
+          if (iconeCopiar) {
+            iconeCopiar.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+          }
+          if (textoCopiar) {
+            textoCopiar.textContent = 'Copiar';
+          }
         }, 2000);
+      }).catch(() => {
+        try {
+          input.select();
+          document.execCommand('copy');
+        } catch (err) {
+          console.error('Erro ao copiar link:', err);
+        }
       });
     }
-
     function compartilharWhatsApp() {
+      if (!codEventoCompartilhar) return;
+      const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
       const texto = `Confira este evento: ${linkEvento}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
-
     function compartilharInstagram() {
+      if (!codEventoCompartilhar) return;
+      const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
       navigator.clipboard.writeText(linkEvento).then(() => {
         alert('Link copiado! Cole no Instagram para compartilhar.');
       }).catch(() => {
         const input = document.getElementById('link-inscricao');
-        input.select();
-        document.execCommand('copy');
-        alert('Link copiado! Cole no Instagram para compartilhar.');
+        if (input) {
+          input.select();
+          document.execCommand('copy');
+          alert('Link copiado! Cole no Instagram para compartilhar.');
+        }
       });
     }
-
     function compartilharEmail() {
+      if (!codEventoCompartilhar) return;
+      const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
       const assunto = 'Confira este evento!';
       const corpo = `Olá! Gostaria de compartilhar este evento com você: ${linkEvento}`;
       window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
     }
-
     function compartilharX() {
+      if (!codEventoCompartilhar) return;
+      const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
       const texto = `Confira este evento!`;
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
     }
 
-    // Fecha o modal ao clicar fora do conteúdo
-    document.getElementById('modal-compartilhar').onclick = function(e) {
-      if (e.target === this) {
-        fecharModalCompartilhar();
+    // ====== Event Listeners para os botões ======
+    document.addEventListener('DOMContentLoaded', function() {
+      // Botão de favoritar
+      const btnFavorito = document.querySelector('.BotaoFavoritoCartao');
+      if (btnFavorito) {
+        btnFavorito.addEventListener('click', async function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (this.dataset.processing === 'true') return false;
+          const cod = Number(this.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          this.dataset.processing = 'true';
+          const estadoAtual = this.getAttribute('data-favorito') === '1';
+          const novoEstado = !estadoAtual;
+          if (novoEstado) { 
+            favoritosSet.add(cod); 
+          } else { 
+            favoritosSet.delete(cod);
+          }
+          atualizarIconeFavorito(this, novoEstado);
+          try {
+            let timeoutId = null;
+            const controller = new AbortController();
+            timeoutId = setTimeout(() => controller.abort(), 10000);
+            const basePath = `${window.location.origin}/CEU/PaginasGlobais/ToggleFavorito.php`;
+            const r = await fetch(basePath, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              credentials: 'include',
+              body: new URLSearchParams({ cod_evento: cod }),
+              signal: controller.signal
+            });
+            if (timeoutId) clearTimeout(timeoutId);
+            if (r.status === 401) { 
+              if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+              atualizarIconeFavorito(this, estadoAtual);
+              alert('Faça login para favoritar eventos.'); 
+            } else if (!r.ok) {
+              throw new Error(`HTTP error! status: ${r.status}`);
+            } else {
+              const j = await r.json();
+              if (j && j.sucesso) {
+                if (j.favoritado) { 
+                  favoritosSet.add(cod); 
+                } else { 
+                  favoritosSet.delete(cod); 
+                }
+                atualizarIconeFavorito(this, j.favoritado);
+              } else {
+                if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+                atualizarIconeFavorito(this, estadoAtual);
+                alert(j.mensagem || 'Não foi possível atualizar favorito.');
+              }
+            }
+          } catch (err) {
+            if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+            atualizarIconeFavorito(this, estadoAtual);
+            if (err.name !== 'AbortError') {
+              console.error('Erro ao atualizar favorito:', err);
+              alert('Erro ao atualizar favorito. Verifique sua conexão e tente novamente.');
+            }
+          } finally {
+            this.dataset.processing = 'false';
+          }
+          return false;
+        });
       }
-    };
+
+      // Botão de mensagem
+      const btnMensagem = document.querySelector('.BotaoMensagemCartao');
+      if (btnMensagem) {
+        btnMensagem.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const cod = Number(this.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          codEventoMensagem = cod;
+          window.codEventoMensagem = cod;
+          abrirModalMensagem();
+          return false;
+        });
+      }
+
+      // Botão de compartilhar
+      const btnCompartilhar = document.querySelector('.BotaoCompartilharCartao');
+      if (btnCompartilhar) {
+        btnCompartilhar.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const cod = Number(this.getAttribute('data-cod')) || 0;
+          if (!cod) return;
+          codEventoCompartilhar = cod;
+          window.codEvento = cod;
+          abrirModalCompartilhar();
+          return false;
+        });
+      }
+
+      // Fechar modais ao clicar fora
+      const modalMensagem = document.getElementById('modal-mensagem');
+      if (modalMensagem) {
+        modalMensagem.onclick = function(e) {
+          if (e.target === this) fecharModalMensagem();
+        };
+      }
+
+      const modalCompartilhar = document.getElementById('modal-compartilhar');
+      if (modalCompartilhar) {
+        modalCompartilhar.onclick = function(e) {
+          if (e.target === this) {
+            e.stopPropagation();
+            fecharModalCompartilhar();
+          }
+        };
+      }
+
+      // Fechar modais com ESC
+      document.addEventListener('keydown', function(e) { 
+        if (e.key === 'Escape' || e.key === 'Esc') { 
+          fecharModalMensagem(true);
+          fecharModalCompartilhar();
+        } 
+      });
+
+      // Carregar favoritos ao iniciar
+      carregarFavoritos();
+    });
   </script>
 
   <script src="CartaoDoEventoParticipante.js?v=<?= time() ?>"></script>
