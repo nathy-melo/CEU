@@ -80,30 +80,69 @@ if ($cpfUsuario === $cpfParticipante) {
 
 if (!$temPermissao) {
     mysqli_close($conexao);
-    echo "
+?>
     <!DOCTYPE html>
-    <html lang='pt-BR'>
+    <html lang="pt-BR">
+
     <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Acesso Negado</title>
-        <link rel='stylesheet' href="../styleGlobal.css" />
-        <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
         <style>
-            body { background: var(--fundo); padding: 40px; }
-            .erro-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; text-align: center; }
-            .erro-container h1 { color: var(--vermelho); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-            .erro-container h1 svg { width: 28px; height: 28px; }
-            .erro-container p { color: var(--cinza-escuro); margin-bottom: 20px; }
-            .botao-voltar { background: var(--botao); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block; }
+            @import url('../styleGlobal.css');
+            @import url('../styleGlobalMobile.css') (max-width: 767px);
+        </style>
+        <style>
+            body {
+                background: var(--fundo);
+                padding: 40px;
+            }
+
+            .erro-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .erro-container h1 {
+                color: var(--vermelho);
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .erro-container h1 svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .erro-container p {
+                color: var(--cinza-escuro);
+                margin-bottom: 20px;
+            }
+
+            .botao-voltar {
+                background: var(--botao);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 6px;
+                text-decoration: none;
+                display: inline-block;
+            }
         </style>
     </head>
+
     <body>
         <div class='erro-container'>
             <h1>
                 <svg width='28' height='28' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                    <rect x='3' y='11' width='18' height='11' rx='2' ry='2' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>
-                    <path d='M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>
+                    <rect x='3' y='11' width='18' height='11' rx='2' ry='2' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
+                    <path d='M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
                 </svg>
                 Acesso Negado
             </h1>
@@ -112,8 +151,9 @@ if (!$temPermissao) {
             <a href='javascript:window.close()' class='botao-voltar'>Fechar</a>
         </div>
     </body>
+
     </html>
-    ";
+<?php
     exit;
 }
 
@@ -553,4 +593,3 @@ if (!$arquivoExiste) {
     </script>
 </div>
 </div>
-

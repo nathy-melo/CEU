@@ -80,40 +80,80 @@ if ($cpfUsuario === $cpfParticipante) {
 
 if (!$temPermissao) {
     mysqli_close($conexao);
-    echo "
+?>
     <!DOCTYPE html>
-    <html lang='pt-BR'>
+    <html lang="pt-BR">
+
     <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Acesso Negado</title>
-        <link rel='stylesheet' href="../styleGlobal.css" />
-        <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
         <style>
-            body { background: var(--fundo); padding: 40px; }
-            .erro-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; text-align: center; }
-            .erro-container h1 { color: var(--vermelho); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-            .erro-container h1 svg { width: 28px; height: 28px; }
-            .erro-container p { color: var(--cinza-escuro); margin-bottom: 20px; }
-            .botao-voltar { background: var(--botao); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block; }
+            @import url('../styleGlobal.css');
+            @import url('../styleGlobalMobile.css') (max-width: 767px);
+        </style>
+        <style>
+            body {
+                background: var(--fundo);
+                padding: 40px;
+            }
+
+            .erro-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .erro-container h1 {
+                color: var(--vermelho);
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .erro-container h1 svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .erro-container p {
+                color: var(--cinza-escuro);
+                margin-bottom: 20px;
+            }
+
+            .botao-voltar {
+                background: var(--botao);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 6px;
+                text-decoration: none;
+                display: inline-block;
+            }
         </style>
     </head>
+
     <body>
         <div class='erro-container'>
             <h1>
                 <svg width='28' height='28' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                    <rect x='3' y='11' width='18' height='11' rx='2' ry='2' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>
-                    <path d='M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>
+                    <rect x='3' y='11' width='18' height='11' rx='2' ry='2' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
+                    <path d='M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
                 </svg>
                 Acesso Negado
             </h1>
-            <p>VocÍª não tem permissão para visualizar este certificado.</p>
+            <p>Você não tem permissão para visualizar este certificado.</p>
             <p>Somente o participante ou organizadores do evento podem acessar.</p>
             <a href='javascript:window.close()' class='botao-voltar'>Fechar</a>
         </div>
     </body>
+
     </html>
-    ";
+<?php
     exit;
 }
 
@@ -131,7 +171,7 @@ $debugLog = []; // Array para logs de debug
 // Se não existe, tenta regenerar silenciosamente
 if (!$arquivoExiste) {
     $debugLog[] = "ðŸ” Arquivo não existe: $arquivoPdf";
-    
+
     try {
         // Buscar dados completos para regeneração
         $queryDados = "SELECT 
@@ -150,7 +190,7 @@ if (!$arquivoExiste) {
         $resDados = mysqli_stmt_get_result($stmtDados);
         $dados = mysqli_fetch_assoc($resDados);
         mysqli_stmt_close($stmtDados);
-        
+
         $debugLog[] = "ðŸ“Š Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÍO ENCONTRADOS");
 
         if ($dados) {
@@ -158,7 +198,7 @@ if (!$arquivoExiste) {
             $autoloadPath = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
             $autoloadExiste = file_exists($autoloadPath);
             $debugLog[] = "ðŸ“š Autoload: " . ($autoloadExiste ? "EXISTE" : "NÍO EXISTE") . " em $autoloadPath";
-            
+
             if ($autoloadExiste) {
                 require_once $autoloadPath;
             }
@@ -174,11 +214,11 @@ if (!$arquivoExiste) {
                 // Obter template do modelo
                 $modelo = $certificado['modelo'] ?? 'universal';
                 $tipo = $certificado['tipo'] ?? 'participante';
-                
+
                 // Buscar arquivo de template (pode ser .docx, .pptx, etc)
                 $possiveisExtensoes = ['docx', 'pptx', 'doc', 'ppt'];
                 $templatePath = null;
-                
+
                 // Tenta primeiro com o modelo específico
                 foreach ($possiveisExtensoes as $ext) {
                     $caminho = __DIR__ . "/../Certificacao/templates/$modelo.$ext";
@@ -187,15 +227,15 @@ if (!$arquivoExiste) {
                         break;
                     }
                 }
-                
+
                 // Se não encontrou, usa o modelo padrão baseado no tipo
                 if (!$templatePath) {
-                    $modeloPadrao = (strtolower($tipo) === 'organizador' || strtolower($tipo) === 'org') 
-                        ? 'ModeloExemploOrganizador' 
+                    $modeloPadrao = (strtolower($tipo) === 'organizador' || strtolower($tipo) === 'org')
+                        ? 'ModeloExemploOrganizador'
                         : 'ModeloExemplo';
-                    
+
                     $debugLog[] = "âš ï¸ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
-                    
+
                     foreach ($possiveisExtensoes as $ext) {
                         $caminho = __DIR__ . "/../Certificacao/templates/$modeloPadrao.$ext";
                         if (file_exists($caminho)) {
@@ -204,7 +244,7 @@ if (!$arquivoExiste) {
                         }
                     }
                 }
-                
+
                 $debugLog[] = "ðŸ“„ Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÍO ENCONTRADO");
 
                 if ($templatePath) {
@@ -219,14 +259,14 @@ if (!$arquivoExiste) {
                         'CodigoVerificacao' => $codigoVerificacao,
                         'DataEmissao' => date('d/m/Y H:i')
                     ];
-                    
+
                     // Se for certificado de PARTICIPANTE, adiciona o nome do organizador
                     // Se for de ORGANIZADOR, não adiciona (pois a própria pessoa é o organizador)
                     if (strtolower($tipo) === 'participante') {
                         $dadosCert['NomeOrganizador'] = $dados['nome_org'] ?? '';
                         $dadosCert['CargoOrganizador'] = '';
                     }
-                    
+
                     $debugLog[] = "ðŸ“ Tipo de certificado: $tipo";
                     $debugLog[] = "ðŸ“ Dados do certificado preparados: " . json_encode($dadosCert, JSON_UNESCAPED_UNICODE);
 
@@ -251,12 +291,12 @@ if (!$arquivoExiste) {
 
                     // Verifica sucesso (pode ser 'sucesso' ou 'success')
                     $sucesso = ($resultado['sucesso'] ?? $resultado['success'] ?? false);
-                    
+
                     if ($sucesso) {
                         // Atualizar verificação
                         $arquivoExiste = file_exists($arquivoPdf);
                         $debugLog[] = "âœ… PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÍO");
-                        
+
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {
                             $debugLog[] = "ðŸ”„ Recarregando página para exibir o certificado...";
@@ -299,160 +339,160 @@ if (!$arquivoExiste) {
     }
 
     .header-certificado {
-            background: var(--caixas);
-            padding: 20px 25px;
-            border-radius: 6px;
-            color: white;
-            margin-bottom: 20px;
+        background: var(--caixas);
+        padding: 20px 25px;
+        border-radius: 6px;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .header-certificado h1 {
+        margin: 0 0 12px 0;
+        font-size: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header-certificado h1 svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .header-certificado .info-linha {
+        margin: 6px 0;
+        font-size: 13px;
+        opacity: 0.95;
+    }
+
+    .header-certificado .info-linha strong {
+        font-weight: 600;
+        margin-right: 5px;
+    }
+
+    .codigo-inline {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        cursor: help;
+        transition: background 0.2s;
+    }
+
+    .codigo-inline:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .acoes-certificado {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .botao {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: none;
+        font-size: 13px;
+    }
+
+    .botao-azul {
+        background: var(--botao);
+        color: white;
+    }
+
+    .botao-azul:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .botao-verde {
+        background: var(--verde);
+        color: white;
+    }
+
+    .botao-verde:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .botao-cinza {
+        background: white;
+        color: var(--cinza-escuro);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .botao-cinza:hover {
+        background: var(--vermelho);
+        color: white;
+    }
+
+    .botao svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .viewer-container {
+        background: white;
+        border-radius: 6px;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .pdf-embed {
+        width: 100%;
+        height: 600px;
+        border: none;
+        display: block;
+        background: #fafafa;
+    }
+
+    @media (max-width: 768px) {
+        .container-certificado {
+            padding: 15px;
+        }
+
+        .header-certificado {
+            padding: 15px 20px;
         }
 
         .header-certificado h1 {
-            margin: 0 0 12px 0;
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 18px;
         }
 
-        .header-certificado h1 svg {
-            width: 24px;
-            height: 24px;
+        .card-info {
+            padding: 15px 20px;
         }
 
-        .header-certificado .info-linha {
-            margin: 6px 0;
-            font-size: 13px;
-            opacity: 0.95;
-        }
-
-        .header-certificado .info-linha strong {
-            font-weight: 600;
-            margin-right: 5px;
-        }
-
-        .codigo-inline {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            cursor: help;
-            transition: background 0.2s;
-        }
-
-        .codigo-inline:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
         }
 
         .acoes-certificado {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
         }
 
         .botao {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
-            font-size: 13px;
-        }
-
-        .botao-azul {
-            background: var(--botao);
-            color: white;
-        }
-
-        .botao-azul:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .botao-verde {
-            background: var(--verde);
-            color: white;
-        }
-
-        .botao-verde:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .botao-cinza {
-            background: white;
-            color: var(--cinza-escuro);
-            border: 1px solid rgba(0, 0, 0, 0.2);
-        }
-
-        .botao-cinza:hover {
-            background: var(--vermelho);
-            color: white;
-        }
-
-        .botao svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .viewer-container {
-            background: white;
-            border-radius: 6px;
-            padding: 0;
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+            justify-content: center;
         }
 
         .pdf-embed {
-            width: 100%;
-            height: 600px;
-            border: none;
-            display: block;
-            background: #fafafa;
+            height: 450px;
         }
-
-        @media (max-width: 768px) {
-            .container-certificado {
-                padding: 15px;
-            }
-
-            .header-certificado {
-                padding: 15px 20px;
-            }
-
-            .header-certificado h1 {
-                font-size: 18px;
-            }
-
-            .card-info {
-                padding: 15px 20px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .acoes-certificado {
-                flex-direction: column;
-            }
-
-            .botao {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .pdf-embed {
-                height: 450px;
-            }
-        }
-    </style>
+    }
+</style>
 
 <div id="main-content">
     <div class="container-certificado">
@@ -533,13 +573,13 @@ if (!$arquivoExiste) {
     <script>
         // Logs de debug da regeneração do certificado
         <?php if (!empty($debugLog)): ?>
-        console.group('ðŸ”§ DEBUG: Regeneração do Certificado');
-        <?php foreach ($debugLog as $log): ?>
-        console.log(<?php echo json_encode($log, JSON_UNESCAPED_UNICODE); ?>);
-        <?php endforeach; ?>
-        console.groupEnd();
+            console.group('ðŸ”§ DEBUG: Regeneração do Certificado');
+            <?php foreach ($debugLog as $log): ?>
+                console.log(<?php echo json_encode($log, JSON_UNESCAPED_UNICODE); ?>);
+            <?php endforeach; ?>
+            console.groupEnd();
         <?php endif; ?>
-        
+
         function imprimirCertificado() {
             const janela = window.open('<?php echo $arquivoPdf; ?>', '_blank');
             if (janela) {
@@ -553,4 +593,3 @@ if (!$arquivoExiste) {
     </script>
 </div>
 </div>
-
