@@ -712,7 +712,7 @@
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Responder Mensagem</span>
-                <button type="button" class="fechar" onclick="fecharModalResposta()" aria-label="Fechar">Í—</button>
+                <button type="button" class="fechar" onclick="fecharModalResposta()" aria-label="Fechar">×</button>
             </div>
             <form id="form-resposta-mensagem" onsubmit="enviarRespostaMensagem(event)">
                 <div class="form-group">
@@ -721,7 +721,7 @@
                 </div>
                 <div class="form-group">
                     <label for="resposta-titulo">Título da Notificação*</label>
-                    <input type="text" id="resposta-titulo" maxlength="100" required placeholder="Ex: Resposta Í  sua mensagem">
+                    <input type="text" id="resposta-titulo" maxlength="100" required placeholder="Ex: Resposta à sua mensagem">
                 </div>
                 <div class="form-group" id="grupo-mensagem-original" style="display: none;">
                     <label>Mensagem Original:</label>

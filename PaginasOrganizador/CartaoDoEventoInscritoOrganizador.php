@@ -694,7 +694,7 @@
         color: var(--botao);
     }
 
-    /* Botões de ação Í  direita do cartão */
+    /* Botões de ação direita do cartão */
     .botoes-acao-cartao {
         position: absolute;
         left: calc(50% + 30rem + 1rem);
@@ -844,12 +844,17 @@
             flex-direction: column;
         }
     }
+
+    /* Manter botões de ação visveis quando modal está aberto */
+    body.modal-aberto .botoes-acao-cartao {
+        z-index: 10001 !important;
+    }
 </style>
 
 <body>
     <div id="main-content">
         <main id="secao-detalhes-evento" class="secao-detalhes-evento">
-            <!-- Botões de ação Í  direita do cartão -->
+            <!-- Botões de ação direita do cartão -->
             <div class="botoes-acao-cartao">
                 <button type="button" class="BotaoAcaoCartao BotaoFavoritoCartao botao" title="Favoritar" aria-label="Favoritar"
                     data-cod="<?= $id_evento ?>" data-favorito="0">
@@ -948,7 +953,7 @@
             <div class="conteudo" onclick="event.stopPropagation()">
                 <div class="cabecalho">
                     <span>Enviar mensagem ao organizador</span>
-                    <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
+                    <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
                 </div>
                 <div>
                     <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -967,7 +972,7 @@
             <div class="conteudo">
                 <div class="cabecalho">
                     <span>Compartilhar</span>
-                    <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
+                    <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
                 </div>
 
                 <div class="opcoes-compartilhamento">
@@ -1030,7 +1035,7 @@
         <!-- Modal de Confirmação de Cancelamento -->
         <div id="modalConfirmarCancelamento" class="modal-overlay" style="display:none;">
             <div class="modal-cancelamento">
-                <h2 class="modal-cancelamento-titulo">VocÍª deseja cancelar a inscrição?</h2>
+                <h2 class="modal-cancelamento-titulo">Você deseja cancelar a inscrição?</h2>
                 <div class="modal-cancelamento-botoes">
                     <button type="button" class="botao-cancelamento-cancelar" onclick="fecharModalConfirmarCancelamento()">Não</button>
                     <button type="button" class="botao-cancelamento-continuar" onclick="confirmarCancelamento()">Continuar</button>

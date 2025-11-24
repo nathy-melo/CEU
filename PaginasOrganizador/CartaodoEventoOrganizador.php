@@ -991,7 +991,7 @@
       <div class="conteudo" onclick="event.stopPropagation()">
         <div class="cabecalho">
           <span>Enviar mensagem ao organizador</span>
-          <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
+          <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
         </div>
         <div>
           <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -1010,7 +1010,7 @@
       <div class="conteudo">
         <div class="cabecalho">
           <span>Compartilhar</span>
-          <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
+          <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
         </div>
 
         <div class="opcoes-compartilhamento">
@@ -1077,7 +1077,7 @@
   </div>
 
   <script>
-    const codEvento = <?= $id_evento ?>;
+    var codEvento = <?= $id_evento ?>;
     let imagens = [];
 
     // Carrega as imagens do evento
@@ -1183,15 +1183,15 @@
         if (!data || data.sucesso === false) {
           // Mensagens específicas primeiro
           if (data && data.erro === 'ja_organizador') {
-            alert('VocÍª já é organizador deste evento.');
+            alert('Você já é organizador deste evento.');
             return;
           }
           if (data && data.erro === 'ja_colaborador') {
-            alert('VocÍª já é colaborador deste evento.');
+            alert('Você já é colaborador deste evento.');
             return;
           }
           if (data && data.erro === 'nao_autenticado') {
-            alert('VocÍª precisa estar logado para solicitar colaboração.');
+            alert('Você precisa estar logado para solicitar colaboração.');
             window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login';
             return;
           }
@@ -1656,7 +1656,7 @@
   <!-- Modal Inscrição Confirmada -->
   <div class="modal-overlay" id="modalInscricaoConfirmada">
     <div class="modal-cancelamento" onclick="event.stopPropagation()">
-      <h2 class="modal-cancelamento-titulo">VocÍª foi inscrito com sucesso neste evento!</h2>
+      <h2 class="modal-cancelamento-titulo">Você foi inscrito com sucesso neste evento!</h2>
       <div class="modal-cancelamento-botoes">
         <button type="button" class="botao-cancelamento-ok" onclick="fecharModalInscricaoConfirmada(); event.stopPropagation();">OK</button>
       </div>

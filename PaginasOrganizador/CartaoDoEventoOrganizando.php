@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartão do Evento</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
-    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
+  <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <?php
   // Sessão e banco
   if (session_status() === PHP_SESSION_NONE) {
@@ -36,7 +36,7 @@
     if (!mysqli_fetch_assoc($resultadoPermissao)) {
       mysqli_stmt_close($stmtPermissao);
       mysqli_close($conexao);
-      echo '<script>alert("VocÍª não tem permissão para visualizar este evento"); history.back();</script>';
+      echo '<script>alert("Você não tem permissão para visualizar este evento"); history.back();</script>';
       exit;
     }
     mysqli_stmt_close($stmtPermissao);
@@ -93,7 +93,7 @@
     }
 
     $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
-    
+
     // Certificado
     $certificado = 'Não';
     $certificado_numerico = 0;
@@ -101,7 +101,7 @@
       $certificado = 'Sim';
       $certificado_numerico = 1;
     }
-    
+
     // Modalidade
     $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
@@ -1144,7 +1144,11 @@
       justify-content: center;
       padding: 1rem;
     }
-    .modal-mensagem.ativo { display: flex; }
+
+    .modal-mensagem.ativo {
+      display: flex;
+    }
+
     .modal-mensagem .conteudo {
       background: var(--caixas);
       color: var(--texto);
@@ -1154,6 +1158,7 @@
       padding: 1.25rem;
       box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
     }
+
     .modal-mensagem .cabecalho {
       display: flex;
       align-items: center;
@@ -1162,6 +1167,7 @@
       font-weight: 800;
       font-size: 1.15rem;
     }
+
     .modal-mensagem button.fechar {
       background: none;
       border: none;
@@ -1169,6 +1175,7 @@
       cursor: pointer;
       color: var(--texto);
     }
+
     .modal-mensagem textarea {
       width: 100%;
       min-height: 8rem;
@@ -1180,6 +1187,7 @@
       padding: 0.75rem;
       font-size: 0.95rem;
     }
+
     .modal-mensagem .contador-caracteres {
       text-align: right;
       font-size: 0.85rem;
@@ -1187,17 +1195,20 @@
       margin-top: 0.5rem;
       opacity: 0.7;
     }
+
     .modal-mensagem .contador-caracteres.limite-alcancado {
       color: var(--vermelho);
       opacity: 1;
       font-weight: 600;
     }
+
     .modal-mensagem .acoes {
       margin-top: 0.75rem;
       display: flex;
       gap: 0.75rem;
       justify-content: space-between;
     }
+
     .modal-mensagem .botao-primario {
       background: var(--botao);
       color: var(--branco);
@@ -1207,6 +1218,7 @@
       font-weight: 700;
       cursor: pointer;
     }
+
     .modal-mensagem .botao-secundario {
       background: var(--vermelho);
       color: var(--branco);
@@ -1222,10 +1234,12 @@
       .botoes-acao-cartao {
         left: calc(50% + 30rem + 0.5rem);
       }
+
       .BotaoAcaoCartao {
         width: 3rem;
         height: 3rem;
       }
+
       .BotaoAcaoCartao img {
         width: 1.5rem;
         height: 1.5rem;
@@ -1242,9 +1256,15 @@
         gap: 0.75rem;
         left: auto;
       }
+
       .secao-detalhes-evento {
         flex-direction: column;
       }
+    }
+
+    /* Manter botões de ação visíveis quando modal está aberto */
+    body.modal-aberto .botoes-acao-cartao {
+      z-index: 10001 !important;
     }
   </style>
 </head>
@@ -1341,8 +1361,8 @@
             <option value="">Selecione</option>
             <option value="Palestra" <?php echo ($evento['categoria'] ?? '') === 'Palestra' ? 'selected' : ''; ?>>Palestra</option>
             <option value="Workshop" <?php echo ($evento['categoria'] ?? '') === 'Workshop' ? 'selected' : ''; ?>>Workshop</option>
-            <option value="Seminário" <?php echo ($evento['categoria'] ?? '') === 'Seminário' ? 'selected' : ''; ?>>Seminário</option>
-            <option value="ConferÍªncia" <?php echo ($evento['categoria'] ?? '') === 'ConferÍªncia' ? 'selected' : ''; ?>>ConferÍªncia</option>
+            <option value="Seminario" <?php echo ($evento['categoria'] ?? '') === 'Seminario' ? 'selected' : ''; ?>>Seminário</option>
+            <option value="Conferencia" <?php echo ($evento['categoria'] ?? '') === 'Conferencia' ? 'selected' : ''; ?>>Conferência</option>
             <option value="Curso" <?php echo ($evento['categoria'] ?? '') === 'Curso' ? 'selected' : ''; ?>>Curso</option>
             <option value="Treinamento" <?php echo ($evento['categoria'] ?? '') === 'Treinamento' ? 'selected' : ''; ?>>Treinamento</option>
             <option value="Outro" <?php echo ($evento['categoria'] ?? '') === 'Outro' ? 'selected' : ''; ?>>Outro</option>
@@ -1363,10 +1383,10 @@
           <div id="certificate" class="caixa-valor"><?php echo htmlspecialchars($certificado); ?></div>
           <select id="input-certificado" class="campo-select" autocomplete="off">
             <option value="">Selecione</option>
-            <option value="Sem certificacao" <?php echo $certificado_numerico === 0 && $certificado !== 'Ensino' && $certificado !== 'Pesquisa' && $certificado !== 'Extensão' && $certificado !== 'Outro' ? 'selected' : ''; ?>>Sem certificação</option>
+            <option value="Sem certificacao" <?php echo $certificado_numerico === 0 && $certificado !== 'Ensino' && $certificado !== 'Pesquisa' && $certificado !== 'Extensao' && $certificado !== 'Outro' ? 'selected' : ''; ?>>Sem certificação</option>
             <option value="Ensino" <?php echo $certificado === 'Ensino' ? 'selected' : ''; ?>>Ensino</option>
             <option value="Pesquisa" <?php echo $certificado === 'Pesquisa' ? 'selected' : ''; ?>>Pesquisa</option>
-            <option value="Extensao" <?php echo $certificado === 'Extensão' ? 'selected' : ''; ?>>Extensão</option>
+            <option value="Extensao" <?php echo $certificado === 'Extensao' ? 'selected' : ''; ?>>Extensão</option>
             <option value="Outro" <?php echo $certificado === 'Outro' ? 'selected' : ''; ?>>Outro</option>
           </select>
         </div>
@@ -1378,9 +1398,9 @@
             </div>
             <div class="carrossel-imagens" id="carrossel-imagens">
               <button type="button" class="btn-remover-imagem" id="btn-remover-imagem">&times;</button>
-              <button type="button" class="carrossel-btn carrossel-anterior" id="btn-anterior">â®œ</button>
+              <button type="button" class="carrossel-btn carrossel-anterior" id="btn-anterior">◄</button>
               <img id="imagem-carrossel" src="<?php echo htmlspecialchars($imagem_src); ?>" alt="Imagem do evento" />
-              <button type="button" class="carrossel-btn carrossel-proxima" id="btn-proxima">â®ž</button>
+              <button type="button" class="carrossel-btn carrossel-proxima" id="btn-proxima">►</button>
               <button type="button" class="btn-adicionar-mais" id="btn-adicionar-mais-imagens">
                 <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                 Adicionar mais imagens
@@ -1408,9 +1428,9 @@
 
     <div id="modal-imagem" class="modal-imagem">
       <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
-      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">â®œ</button>
+      <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">◄</button>
       <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img" />
-      <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">â®ž</button>
+      <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">►</button>
     </div>
   </div>
 
@@ -1419,7 +1439,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Organização do Evento</span>
-        <button type="button" class="fechar" onclick="fecharModalColaboradores()" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="fecharModalColaboradores()" aria-label="Fechar">×</button>
       </div>
 
       <div class="linha-form">
@@ -1440,7 +1460,7 @@
     <div class="conteudo" onclick="event.stopPropagation()">
       <div class="cabecalho">
         <span>Enviar mensagem ao organizador</span>
-        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
       </div>
       <div>
         <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -1459,7 +1479,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Compartilhar</span>
-        <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
       </div>
 
       <div class="opcoes-compartilhamento">
@@ -1514,7 +1534,7 @@
       </div>
 
       <div class="aviso-compartilhar">
-        <strong>â„¹ï¸ Informação:</strong> Este link é para <strong>inscrição no evento</strong>. Para adicionar um novo organizador, use o botão <strong>"+"</strong> ao lado campo "Organizado por:".
+        <strong>ℹ️ Informação:</strong> Este link é para <strong>inscrição no evento</strong>. Para adicionar um novo organizador, use o botão <strong>"+"</strong> ao lado campo "Organizado por:".
       </div>
     </div>
   </div>
@@ -1522,7 +1542,7 @@
   <script>
     // Passa o ID do evento para o JavaScript
     window.codEventoAtual = <?php echo $id_evento; ?>;
-    const codEvento = <?php echo $id_evento; ?>;
+    var codEvento = <?php echo $id_evento; ?>;
 
     // ====== Variáveis globais ======
     if (typeof window.favoritosSet === 'undefined') {
@@ -1542,17 +1562,28 @@
     // ====== Funções de bloqueio/desbloqueio de scroll ======
     function bloquearScroll() {
       document.body.classList.add('modal-aberto');
-      document.addEventListener('wheel', prevenirScroll, { passive: false });
-      document.addEventListener('touchmove', prevenirScroll, { passive: false });
+      document.addEventListener('wheel', prevenirScroll, {
+        passive: false
+      });
+      document.addEventListener('touchmove', prevenirScroll, {
+        passive: false
+      });
       document.addEventListener('keydown', prevenirScrollTeclado, false);
     }
+
     function desbloquearScroll() {
       document.body.classList.remove('modal-aberto');
       document.removeEventListener('wheel', prevenirScroll);
       document.removeEventListener('touchmove', prevenirScroll);
       document.removeEventListener('keydown', prevenirScrollTeclado);
     }
-    function prevenirScroll(e) { if (document.body.classList.contains('modal-aberto')) { e.preventDefault(); } }
+
+    function prevenirScroll(e) {
+      if (document.body.classList.contains('modal-aberto')) {
+        e.preventDefault();
+      }
+    }
+
     function prevenirScrollTeclado(e) {
       if (!document.body.classList.contains('modal-aberto')) return;
       const elementoAtivo = document.hoverElement;
@@ -1580,14 +1611,14 @@
         const controller = new AbortController();
         timeoutId = setTimeout(() => controller.abort(), 10000);
         const basePath = `${window.location.origin}/CEU/PaginasGlobais/ListarFavoritos.php`;
-        const r = await fetch(basePath, { 
+        const r = await fetch(basePath, {
           credentials: 'include',
           signal: controller.signal
         });
         if (timeoutId) clearTimeout(timeoutId);
-        if (r.status === 401) { 
-          favoritosSet.clear(); 
-          return; 
+        if (r.status === 401) {
+          favoritosSet.clear();
+          return;
         }
         if (!r.ok) {
           throw new Error(`HTTP error! status: ${r.status}`);
@@ -1656,8 +1687,14 @@
       const textarea = document.getElementById('texto-mensagem-organizador');
       if (!textarea) return;
       const texto = (textarea.value || '').trim();
-      if (!codEventoMensagem) { fecharModalMensagem(); return; }
-      if (texto.length === 0) { alert('Digite sua mensagem.'); return; }
+      if (!codEventoMensagem) {
+        fecharModalMensagem();
+        return;
+      }
+      if (texto.length === 0) {
+        alert('Digite sua mensagem.');
+        return;
+      }
       let timeoutId = null;
       try {
         const controller = new AbortController();
@@ -1665,9 +1702,14 @@
         const basePath = `${window.location.origin}/CEU/PaginasGlobais/EnviarMensagemOrganizador.php`;
         const r = await fetch(basePath, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
           credentials: 'include',
-          body: new URLSearchParams({ cod_evento: codEventoMensagem, mensagem: texto }),
+          body: new URLSearchParams({
+            cod_evento: codEventoMensagem,
+            mensagem: texto
+          }),
           signal: controller.signal
         });
         if (timeoutId) clearTimeout(timeoutId);
@@ -1698,12 +1740,14 @@
       modal.classList.add('ativo');
       bloquearScroll();
     }
+
     function fecharModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
       if (!modal) return;
       modal.classList.remove('ativo');
       desbloquearScroll();
     }
+
     function copiarLink() {
       const input = document.getElementById('link-inscricao');
       if (!input) return;
@@ -1735,12 +1779,14 @@
         }
       });
     }
+
     function compartilharWhatsApp() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
       const texto = `Confira este evento: ${linkEvento}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
+
     function compartilharInstagram() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
@@ -1755,6 +1801,7 @@
         }
       });
     }
+
     function compartilharEmail() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
@@ -1762,6 +1809,7 @@
       const corpo = `Olá! Gostaria de compartilhar este evento com você: ${linkEvento}`;
       window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
     }
+
     function compartilharX() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
@@ -1783,9 +1831,9 @@
           this.dataset.processing = 'true';
           const estadoAtual = this.getAttribute('data-favorito') === '1';
           const novoEstado = !estadoAtual;
-          if (novoEstado) { 
-            favoritosSet.add(cod); 
-          } else { 
+          if (novoEstado) {
+            favoritosSet.add(cod);
+          } else {
             favoritosSet.delete(cod);
           }
           atualizarIconeFavorito(this, novoEstado);
@@ -1796,35 +1844,51 @@
             const basePath = `${window.location.origin}/CEU/PaginasGlobais/ToggleFavorito.php`;
             const r = await fetch(basePath, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
               credentials: 'include',
-              body: new URLSearchParams({ cod_evento: cod }),
+              body: new URLSearchParams({
+                cod_evento: cod
+              }),
               signal: controller.signal
             });
             if (timeoutId) clearTimeout(timeoutId);
-            if (r.status === 401) { 
-              if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+            if (r.status === 401) {
+              if (estadoAtual) {
+                favoritosSet.add(cod);
+              } else {
+                favoritosSet.delete(cod);
+              }
               atualizarIconeFavorito(this, estadoAtual);
-              alert('Faça login para favoritar eventos.'); 
+              alert('Faça login para favoritar eventos.');
             } else if (!r.ok) {
               throw new Error(`HTTP error! status: ${r.status}`);
             } else {
               const j = await r.json();
               if (j && j.sucesso) {
-                if (j.favoritado) { 
-                  favoritosSet.add(cod); 
-                } else { 
-                  favoritosSet.delete(cod); 
+                if (j.favoritado) {
+                  favoritosSet.add(cod);
+                } else {
+                  favoritosSet.delete(cod);
                 }
                 atualizarIconeFavorito(this, j.favoritado);
               } else {
-                if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+                if (estadoAtual) {
+                  favoritosSet.add(cod);
+                } else {
+                  favoritosSet.delete(cod);
+                }
                 atualizarIconeFavorito(this, estadoAtual);
                 alert(j.mensagem || 'Não foi possível atualizar favorito.');
               }
             }
           } catch (err) {
-            if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+            if (estadoAtual) {
+              favoritosSet.add(cod);
+            } else {
+              favoritosSet.delete(cod);
+            }
             atualizarIconeFavorito(this, estadoAtual);
             if (err.name !== 'AbortError') {
               console.error('Erro ao atualizar favorito:', err);
@@ -1886,11 +1950,11 @@
       }
 
       // Fechar modais com ESC
-      document.addEventListener('keydown', function(e) { 
-        if (e.key === 'Escape' || e.key === 'Esc') { 
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
           fecharModalMensagem(true);
           fecharModalCompartilhar();
-        } 
+        }
       });
 
       // Carregar favoritos ao iniciar
@@ -1901,6 +1965,3 @@
 </body>
 
 </html>
-
-
-

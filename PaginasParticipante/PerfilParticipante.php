@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo'])) {
     $codigo = trim($_POST['codigo']);
 
     if (!$codigo) {
-        responderJson('erro', 'âš ï¸ Código é obrigatório.');
+        responderJson('erro', '⚠️ Código é obrigatório.');
     }
 
     // Verifica se o código existe na tabela de códigos (sistema atualizado)
@@ -61,19 +61,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo'])) {
                 $_SESSION['codigo'] = $codigo;
                 
                 mysqli_close($conexao);
-                responderJson('sucesso', 'âœ… Parabéns! VocÍª agora é um organizador.');
+                responderJson('sucesso', '✅ Parabéns! Você agora é um organizador.');
             } else {
                 $erroBanco = mysqli_error($conexao);
                 mysqli_close($conexao);
-                responderJson('erro', 'âŒ Erro ao atualizar usuário: ' . $erroBanco);
+                responderJson('erro', '❌ Erro ao atualizar usuário: ' . $erroBanco);
             }
         } else {
             mysqli_close($conexao);
-            responderJson('erro', 'âŒ Erro ao processar código.');
+            responderJson('erro', '❌ Erro ao processar código.');
         }
     } else {
         mysqli_close($conexao);
-        responderJson('erro', 'âš ï¸ Código de acesso inválido ou já utilizado.');
+        responderJson('erro', '❌ Código de acesso inválido ou já utilizado.');
     }
 }
 
@@ -658,7 +658,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
 
                     <?php if (!$dadosUsuario['Organizador']): ?>
                     <div class="grupo-formulario">
-                        <label for="ra-input">RA (Registro AcadÍªmico):</label>
+                        <label for="ra-input">RA (Registro Acadêmico):</label>
                         <div class="controle-formulario">
                             <span id="ra-display">
                                 <?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?>

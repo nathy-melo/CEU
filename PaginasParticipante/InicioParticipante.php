@@ -396,7 +396,7 @@
       cursor: pointer;
     }
 
-    /* Botão para abrir lista de favoritos (Í  esquerda da barra de pesquisa) */
+    /* Botão para abrir lista de favoritos (esquerda da barra de pesquisa) */
     .BotaoFavoritosTrigger {
       width: clamp(30px, 4vw, 48px);
       aspect-ratio: 1 / 1;
@@ -704,7 +704,7 @@
   <div id="main-content">
     <div class="section-title-wrapper">
       <div class="barra-pesquisa-container">
-        <!-- Botão de favoritos Í  esquerda da barra de pesquisa -->
+        <!-- Botão de favoritos à esquerda da barra de pesquisa -->
         <button type="button" class="BotaoFavoritosTrigger botao" id="btn-abrir-favoritos" title="Ver favoritos"
           aria-label="Ver favoritos">
           <img src="../Imagens/Medalha_preenchida.svg" alt="Favoritos">
@@ -741,12 +741,18 @@
                     
                     // Mapeia duração numérica (horas) para faixas usadas no filtro
                     $duracaoFaixa = '';
+                    $duracaoNumero = 0;
                     if (is_numeric($ev['duracao'])) {
                         $h = (float)$ev['duracao'];
+                        $duracaoNumero = $h;
                         if ($h < 1) { $duracaoFaixa = 'menos_1h'; }
                         elseif ($h < 2) { $duracaoFaixa = '1h_2h'; }
                         elseif ($h < 4) { $duracaoFaixa = '2h_4h'; }
-                        else { $duracaoFaixa = 'mais_5h'; }
+                        elseif ($h < 6) { $duracaoFaixa = '4h_6h'; }
+                        elseif ($h < 8) { $duracaoFaixa = '6h_8h'; }
+                        elseif ($h < 10) { $duracaoFaixa = '8h_10h'; }
+                        elseif ($h < 20) { $duracaoFaixa = '10h_20h'; }
+                        else { $duracaoFaixa = 'mais_20h'; }
                     }
                     
                     // Certificado: simples sim/nao
@@ -761,6 +767,7 @@
         href="ContainerParticipante.php?pagina=evento&id=<?= (int)$ev['cod_evento'] ?>"
         data-tipo="<?= htmlspecialchars($tipo) ?>" data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
         data-localizacao="<?= htmlspecialchars($local) ?>" data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>"
+        data-duracaoNumero="<?= $duracaoNumero ?>"
         data-data="<?= $dataInicioISO ?>" data-certificado="<?= $cert ?>"
         data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
         <!-- Ações flutuantes: Inscrever, Favoritar, Mensagem, Compartilhar -->
@@ -845,7 +852,7 @@
     <div class="conteudo" onclick="event.stopPropagation()">
       <div class="cabecalho">
         <span>Meus favoritos</span>
-        <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">×</button>
       </div>
       <div id="lista-favoritos" class="lista-favoritos"></div>
     </div>
@@ -856,7 +863,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Compartilhar</span>
-        <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
       </div>
 
       <div class="opcoes-compartilhamento">
@@ -968,7 +975,7 @@
     <div class="conteudo" onclick="event.stopPropagation()">
       <div class="cabecalho">
         <span>Enviar mensagem ao organizador</span>
-        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
       </div>
       <div>
         <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -997,7 +1004,7 @@
         window.inscricaoCache = new Map();
     }
     
-    // Criar referÍªncias locais usando var (permite re-declaração) para facilitar o uso
+    // Criar referências locais usando var (permite re-declaração) para facilitar o uso
     var codEvento = window.codEvento;
     var codEventoAcao = window.codEventoAcao;
     var btnInscreverAtual = window.btnInscreverAtual;
@@ -1371,7 +1378,7 @@
           inscricaoCache.set(codEventoAcao, true);
           atualizarIconeInscricao(btnInscreverAtual, true);
           abrirModalInscricaoConfirmada();
-          // NÍO disparar evento inscricaoAtualizada aqui para evitar recarregamento indevido na página de início
+          // Não disparar evento inscricaoAtualizada aqui para evitar recarregamento indevido na página de início
           // O evento só deve ser disparado em páginas específicas que precisam recarregar (ex: MeusEventos)
         } else {
           alert(j.mensagem || 'Erro ao realizar inscrição.');
@@ -1397,7 +1404,7 @@
           inscricaoCache.set(codEventoAcao, false);
           atualizarIconeInscricao(btnInscreverAtual, false);
           abrirModalDesinscricaoConfirmada();
-          // NÍO disparar evento inscricaoAtualizada aqui para evitar recarregamento indevido na página de início
+          // Não disparar evento inscricaoAtualizada aqui para evitar recarregamento indevido na página de início
           // O evento só deve ser disparado em páginas específicas que precisam recarregar (ex: MeusEventos)
         } else {
           alert(j.mensagem || 'Erro ao cancelar inscrição.');
@@ -1420,7 +1427,7 @@
         window.favoritosDados = [];
     }
     
-    // Criar referÍªncias locais usando var (permite re-declaração) para facilitar o uso
+    // Criar referências locais usando var (permite re-declaração) para facilitar o uso
     var codEventoMensagem = window.codEventoMensagem;
     var favoritosSet = window.favoritosSet;
     var favoritosDados = window.favoritosDados;
@@ -1899,7 +1906,7 @@
                 }
                 atualizarIconeFavorito(btnFav, novoEstado);
                 // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
-                // Buscar especificamente os botões que NÍO estão no modal de favoritos
+                // Buscar especificamente os botões que NÃO estão no modal de favoritos
                 const atualizarTodosBotoes = () => {
                     const modalFavoritos = document.getElementById('modal-favoritos');
                     const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
@@ -1974,7 +1981,7 @@
                             }
                             atualizarIconeFavorito(btnFav, j.favoritado);
                             // Atualizar TODOS os botões de favorito com o mesmo código na página
-                            // Buscar especificamente os botões que NÍO estão no modal de favoritos
+                            // Buscar especificamente os botões que NÃO estão no modal de favoritos
                             const atualizarTodosBotoes = () => {
                                 const modalFavoritos = document.getElementById('modal-favoritos');
                                 const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');

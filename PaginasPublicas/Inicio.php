@@ -225,28 +225,69 @@
 
 <body>
   <?php
-    include_once '../BancoDados/conexao.php';
+  include_once '../BancoDados/conexao.php';
 
-    // Buscar eventos trazendo campos usados no filtro
-    $sql = "SELECT cod_evento, categoria, nome, inicio, conclusao, duracao, certificado, lugar, modalidade, imagem FROM evento ORDER BY inicio";
-    $res = mysqli_query($conexao, $sql);
+  // Buscar eventos trazendo campos usados no filtro
+  $sql = "SELECT cod_evento, categoria, nome, inicio, conclusao, duracao, certificado, lugar, modalidade, imagem FROM evento ORDER BY inicio";
+  $res = mysqli_query($conexao, $sql);
 
-    // Mapear texto e converter para string simples
-    function formatar($txt) {
-        $map = [
-            'Í'=>'A','Í€'=>'A','Í‚'=>'A','Í'=>'A','Í„'=>'A','á'=>'a','Í '=>'a','Í¢'=>'a','ã'=>'a','Í¤'=>'a',
-            'É'=>'E','Íˆ'=>'E','ÍŠ'=>'E','Í‹'=>'E','é'=>'e','Í¨'=>'e','Íª'=>'e','Í«'=>'e',
-            'Í'=>'I','ÍŒ'=>'I','ÍŽ'=>'I','Í'=>'I','í'=>'i','Í¬'=>'i','Í®'=>'i','Í¯'=>'i',
-            'Í“'=>'O','Í’'=>'O','Í”'=>'O','Õ'=>'O','Í–'=>'O','ó'=>'o','Í²'=>'o','Í´'=>'o','õ'=>'o','Í¶'=>'o',
-            'Ú'=>'U','Í™'=>'U','Í›'=>'U','Íœ'=>'U','ú'=>'u','Í¹'=>'u','Í»'=>'u','Í¼'=>'u',
-            'Í‡'=>'C','ç'=>'c'
-        ];
-        $txt = strtr($txt ?? '', $map);
-        $txt = strtolower($txt);
-        $txt = str_replace(' ', '_', $txt);
-        return preg_replace('/[^a-z0-9_]/','', $txt);
-    }
-    ?>
+  // Mapear texto e converter para string simples
+  function formatar($txt)
+  {
+    $map = [
+      'Í' => 'A',
+      'Í€' => 'A',
+      'Í‚' => 'A',
+      'Í' => 'A',
+      'Í„' => 'A',
+      'á' => 'a',
+      'Í ' => 'a',
+      'Í¢' => 'a',
+      'ã' => 'a',
+      'Í¤' => 'a',
+      'É' => 'E',
+      'Íˆ' => 'E',
+      'ÍŠ' => 'E',
+      'Í‹' => 'E',
+      'é' => 'e',
+      'Í¨' => 'e',
+      'Íª' => 'e',
+      'Í«' => 'e',
+      'Í' => 'I',
+      'ÍŒ' => 'I',
+      'ÍŽ' => 'I',
+      'Í' => 'I',
+      'í' => 'i',
+      'Í¬' => 'i',
+      'Í®' => 'i',
+      'Í¯' => 'i',
+      'Í“' => 'O',
+      'Í’' => 'O',
+      'Í”' => 'O',
+      'Õ' => 'O',
+      'Í–' => 'O',
+      'ó' => 'o',
+      'Í²' => 'o',
+      'Í´' => 'o',
+      'õ' => 'o',
+      'Í¶' => 'o',
+      'Ú' => 'U',
+      'Í™' => 'U',
+      'Í›' => 'U',
+      'Íœ' => 'U',
+      'ú' => 'u',
+      'Í¹' => 'u',
+      'Í»' => 'u',
+      'Í¼' => 'u',
+      'Í‡' => 'C',
+      'ç' => 'c'
+    ];
+    $txt = strtr($txt ?? '', $map);
+    $txt = strtolower($txt);
+    $txt = str_replace(' ', '_', $txt);
+    return preg_replace('/[^a-z0-9_]/', '', $txt);
+  }
+  ?>
 
   <div id="main-content">
     <div class="section-title-wrapper">
@@ -273,94 +314,110 @@
 
     <div class="container" id="eventos-container">
       <?php if ($res && mysqli_num_rows($res) > 0): ?>
-      <?php while ($ev = mysqli_fetch_assoc($res)):
-                    $dataInicioISO = date('Y-m-d', strtotime($ev['inicio']));
-                    $dataFormatada = date('d/m/y', strtotime($ev['inicio']));
-                    $tipo = formatar($ev['categoria']); // liga com os checkboxes tipo_evento
-                    $local = formatar($ev['lugar']);    // liga com localizacao
-                    $modalidadeAttr = formatar($ev['modalidade'] ?? ''); // liga com modalidade
-                    // Mapeia duração numérica (horas) para faixas usadas no filtro
-                    $duracaoFaixa = '';
-                    if (is_numeric($ev['duracao'])) {
-                        $h = (float)$ev['duracao'];
-                        if ($h < 1) { $duracaoFaixa = 'menos_1h'; }
-                        elseif ($h < 2) { $duracaoFaixa = '1h_2h'; }
-                        elseif ($h < 4) { $duracaoFaixa = '2h_4h'; }
-                        else { $duracaoFaixa = 'mais_5h'; }
-                    }
-                    // Certificado: simples sim/nao
-                    $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
-                    
-                    // Preparar caminho da imagem
-                    $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
-                    $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
-                ?>
-      <a class="botao CaixaDoEvento" style="text-decoration:none;color:inherit;display:block;"
-        href="ContainerPublico.php?pagina=evento&id=<?= (int)$ev['cod_evento'] ?>"
-        data-tipo="<?= htmlspecialchars($tipo) ?>" data-localizacao="<?= htmlspecialchars($local) ?>"
-        data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>" data-certificado="<?= $cert ?>"
-        data-data="<?= $dataInicioISO ?>" data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
-        data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
-        <div class="BotaoAcaoCard">
-          <button type="button" class="BotaoCompartilharCard botao" title="Compartilhar" aria-label="Compartilhar"
-            data-cod="<?= (int)$ev['cod_evento'] ?>">
-            <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
-          </button>
-        </div>
-        <div class="EventoImagem">
-          <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
-        </div>
-        <div class="EventoTitulo">
-          <?= htmlspecialchars($ev['nome']) ?>
-        </div>
-        <div class="EventoInfo">
-          <ul class="evento-info-list" aria-label="Informações do evento">
-            <li class="evento-info-item">
-              <span class="evento-info-icone" aria-hidden="true">
-                <img src="../Imagens/info-categoria.svg" alt="" />
-              </span>
-              <span class="evento-info-texto"><span class="evento-info-label">Categoria:</span>
-                <?= htmlspecialchars($ev['categoria']) ?>
-              </span>
-            </li>
-            <li class="evento-info-item">
-              <span class="evento-info-icone" aria-hidden="true">
-                <img src="../Imagens/info-modalidade.svg" alt="" />
-              </span>
-              <span class="evento-info-texto"><span class="evento-info-label">Modalidade:</span>
-                <?= htmlspecialchars($ev['modalidade'] ?? '') ?>
-              </span>
-            </li>
-            <li class="evento-info-item">
-              <span class="evento-info-icone" aria-hidden="true">
-                <img src="../Imagens/info-data.svg" alt="" />
-              </span>
-              <span class="evento-info-texto"><span class="evento-info-label">Data:</span>
-                <?= $dataFormatada ?>
-              </span>
-            </li>
-            <li class="evento-info-item">
-              <span class="evento-info-icone" aria-hidden="true">
-                <img src="../Imagens/info-local.svg" alt="" />
-              </span>
-              <span class="evento-info-texto"><span class="evento-info-label">Local:</span>
-                <?= htmlspecialchars($ev['lugar']) ?>
-              </span>
-            </li>
-            <li class="evento-info-item">
-              <span class="evento-info-icone" aria-hidden="true">
-                <img src="../Imagens/info-certificado.svg" alt="" />
-              </span>
-              <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span>
-                <?= ($cert === 'sim' ? 'Sim' : 'Não') ?>
-              </span>
-            </li>
-          </ul>
-        </div>
-      </a>
-      <?php endwhile; ?>
+        <?php while ($ev = mysqli_fetch_assoc($res)):
+          $dataInicioISO = date('Y-m-d', strtotime($ev['inicio']));
+          $dataFormatada = date('d/m/y', strtotime($ev['inicio']));
+          $tipo = formatar($ev['categoria']); // liga com os checkboxes tipo_evento
+          $local = formatar($ev['lugar']);    // liga com localizacao
+          $modalidadeAttr = formatar($ev['modalidade'] ?? ''); // liga com modalidade
+          // Mapeia duração numérica (horas) para faixas usadas no filtro
+          $duracaoFaixa = '';
+          $duracaoNumero = 0;
+          if (is_numeric($ev['duracao'])) {
+            $h = (float)$ev['duracao'];
+            $duracaoNumero = $h;
+            if ($h < 1) {
+              $duracaoFaixa = 'menos_1h';
+            } elseif ($h < 2) {
+              $duracaoFaixa = '1h_2h';
+            } elseif ($h < 4) {
+              $duracaoFaixa = '2h_4h';
+            } elseif ($h < 6) {
+              $duracaoFaixa = '4h_6h';
+            } elseif ($h < 8) {
+              $duracaoFaixa = '6h_8h';
+            } elseif ($h < 10) {
+              $duracaoFaixa = '8h_10h';
+            } elseif ($h < 20) {
+              $duracaoFaixa = '10h_20h';
+            } else {
+              $duracaoFaixa = 'mais_20h';
+            }
+          }
+          // Certificado: simples sim/nao
+          $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
+
+          // Preparar caminho da imagem
+          $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
+          $caminho_imagem = '../' . ltrim($imagem_evento, "/\\");
+        ?>
+          <a class="botao CaixaDoEvento" style="text-decoration:none;color:inherit;display:block;"
+            href="ContainerPublico.php?pagina=evento&id=<?= (int)$ev['cod_evento'] ?>"
+            data-tipo="<?= htmlspecialchars($tipo) ?>" data-localizacao="<?= htmlspecialchars($local) ?>"
+            data-duracao="<?= htmlspecialchars($duracaoFaixa) ?>" data-duracaoNumero="<?= $duracaoNumero ?>"
+            data-certificado="<?= $cert ?>"
+            data-data="<?= $dataInicioISO ?>" data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
+            data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
+            <div class="BotaoAcaoCard">
+              <button type="button" class="BotaoCompartilharCard botao" title="Compartilhar" aria-label="Compartilhar"
+                data-cod="<?= (int)$ev['cod_evento'] ?>">
+                <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
+              </button>
+            </div>
+            <div class="EventoImagem">
+              <img src="<?= htmlspecialchars($caminho_imagem) ?>" alt="<?= htmlspecialchars($ev['nome']) ?>">
+            </div>
+            <div class="EventoTitulo">
+              <?= htmlspecialchars($ev['nome']) ?>
+            </div>
+            <div class="EventoInfo">
+              <ul class="evento-info-list" aria-label="Informações do evento">
+                <li class="evento-info-item">
+                  <span class="evento-info-icone" aria-hidden="true">
+                    <img src="../Imagens/info-categoria.svg" alt="" />
+                  </span>
+                  <span class="evento-info-texto"><span class="evento-info-label">Categoria:</span>
+                    <?= htmlspecialchars($ev['categoria']) ?>
+                  </span>
+                </li>
+                <li class="evento-info-item">
+                  <span class="evento-info-icone" aria-hidden="true">
+                    <img src="../Imagens/info-modalidade.svg" alt="" />
+                  </span>
+                  <span class="evento-info-texto"><span class="evento-info-label">Modalidade:</span>
+                    <?= htmlspecialchars($ev['modalidade'] ?? '') ?>
+                  </span>
+                </li>
+                <li class="evento-info-item">
+                  <span class="evento-info-icone" aria-hidden="true">
+                    <img src="../Imagens/info-data.svg" alt="" />
+                  </span>
+                  <span class="evento-info-texto"><span class="evento-info-label">Data:</span>
+                    <?= $dataFormatada ?>
+                  </span>
+                </li>
+                <li class="evento-info-item">
+                  <span class="evento-info-icone" aria-hidden="true">
+                    <img src="../Imagens/info-local.svg" alt="" />
+                  </span>
+                  <span class="evento-info-texto"><span class="evento-info-label">Local:</span>
+                    <?= htmlspecialchars($ev['lugar']) ?>
+                  </span>
+                </li>
+                <li class="evento-info-item">
+                  <span class="evento-info-icone" aria-hidden="true">
+                    <img src="../Imagens/info-certificado.svg" alt="" />
+                  </span>
+                  <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span>
+                    <?= ($cert === 'sim' ? 'Sim' : 'Não') ?>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </a>
+        <?php endwhile; ?>
       <?php else: ?>
-      <p style="grid-column:1/-1;text-align:center;padding:20px;">Nenhum evento cadastrado.</p>
+        <p style="grid-column:1/-1;text-align:center;padding:20px;">Nenhum evento cadastrado.</p>
       <?php endif; ?>
     </div>
   </div>
@@ -370,7 +427,7 @@
     <div class="conteudo">
       <div class="cabecalho">
         <span>Compartilhar</span>
-        <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">Í—</button>
+        <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
       </div>
 
       <div class="opcoes-compartilhamento">
@@ -430,7 +487,7 @@
       </div>
 
       <div class="aviso-compartilhar">
-        <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+        <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
       </div>
     </div>
   </div>
@@ -441,17 +498,28 @@
 
     function bloquearScroll() {
       document.body.classList.add('modal-aberto');
-      document.addEventListener('wheel', prevenirScroll, { passive: false });
-      document.addEventListener('touchmove', prevenirScroll, { passive: false });
+      document.addEventListener('wheel', prevenirScroll, {
+        passive: false
+      });
+      document.addEventListener('touchmove', prevenirScroll, {
+        passive: false
+      });
       document.addEventListener('keydown', prevenirScrollTeclado, false);
     }
+
     function desbloquearScroll() {
       document.body.classList.remove('modal-aberto');
       document.removeEventListener('wheel', prevenirScroll);
       document.removeEventListener('touchmove', prevenirScroll);
       document.removeEventListener('keydown', prevenirScrollTeclado);
     }
-    function prevenirScroll(e) { if (document.body.classList.contains('modal-aberto')) { e.preventDefault(); } }
+
+    function prevenirScroll(e) {
+      if (document.body.classList.contains('modal-aberto')) {
+        e.preventDefault();
+      }
+    }
+
     function prevenirScrollTeclado(e) {
       if (!document.body.classList.contains('modal-aberto')) return;
       const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
@@ -467,11 +535,13 @@
       modal.classList.add('ativo');
       bloquearScroll();
     }
+
     function fecharModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
       modal.classList.remove('ativo');
       desbloquearScroll();
     }
+
     function copiarLink() {
       const input = document.getElementById('link-inscricao');
       input.select();
@@ -487,12 +557,14 @@
         }, 2000);
       });
     }
+
     function compartilharWhatsApp() {
       if (!codEvento) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
       const texto = `Confira este evento: ${linkEvento}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
+
     function compartilharInstagram() {
       if (!codEvento) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
@@ -505,6 +577,7 @@
         alert('Link copiado! Cole no Instagram para compartilhar.');
       });
     }
+
     function compartilharEmail() {
       if (!codEvento) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
@@ -512,6 +585,7 @@
       const corpo = `Olá! Gostaria de compartilhar este evento com você: ${linkEvento}`;
       window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
     }
+
     function compartilharX() {
       if (!codEvento) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
@@ -519,23 +593,29 @@
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
     }
     // Fechar modal ao clicar fora
-    document.getElementById('modal-compartilhar').onclick = function (e) { if (e.target === this) fecharModalCompartilhar(); };
+    document.getElementById('modal-compartilhar').onclick = function(e) {
+      if (e.target === this) fecharModalCompartilhar();
+    };
     // Fechar modal com ESC
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Esc') fecharModalCompartilhar(); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') fecharModalCompartilhar();
+    });
 
     // Listeners para os botões de compartilhar nos cards
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
       const btn = e.target.closest('.BotaoCompartilharCard');
       if (btn) {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
         codEvento = parseInt(btn.getAttribute('data-cod')) || null;
         abrirModalCompartilhar();
       }
     }, true);
+
   </script>
   <!-- Script de Responsividade Mobile -->
   <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
+  
 </body>
 
 </html>
-

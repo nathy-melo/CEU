@@ -25,7 +25,7 @@ if (isset($_SESSION['ultima_atividade']) && (time() - $_SESSION['ultima_atividad
         <div id="modalSessaoExpirada" class="modal-personalizado mostrar">
             <div class="conteudo-modal-personalizado">
                 <div class="cabecalho-modal-personalizado">Um anjo sussurrou no seu ouvido:</div>
-                <div class="corpo-modal-personalizado">Sua sessão expirou. VocÍª precisa fazer login novamente para continuar.</div>
+                <div class="corpo-modal-personalizado">Sua sessão expirou. Você precisa fazer login novamente para continuar.</div>
                 <button class="botao botao-modal-personalizado" onclick="window.location.href=\'../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada\'">Fazer Login</button>
             </div>
         </div>
@@ -63,11 +63,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/CEU/manifest.json" />
     <?php
-        // Cache-busting para CSS global
-        $__cssPath = realpath(__DIR__ . '/../styleGlobal.css');
-        $__cssVer = $__cssPath ? filemtime($__cssPath) : time();
-        $__cssMobilePath = realpath(__DIR__ . '/../styleGlobalMobile.css');
-        $__cssMobileVer = $__cssMobilePath ? filemtime($__cssMobilePath) : time();
+    // Cache-busting para CSS global
+    $__cssPath = realpath(__DIR__ . '/../styleGlobal.css');
+    $__cssVer = $__cssPath ? filemtime($__cssPath) : time();
+    $__cssMobilePath = realpath(__DIR__ . '/../styleGlobalMobile.css');
+    $__cssMobileVer = $__cssMobilePath ? filemtime($__cssMobilePath) : time();
     ?>
     <link rel="stylesheet" href="../styleGlobal.css?v=<?= $__cssVer ?>" />
     <link rel="stylesheet" href="../styleGlobalMobile.css?v=<?= $__cssMobileVer ?>" media="(max-width: 767px)" />
@@ -75,7 +75,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <script src="/CEU/pwa-config.js" defer></script>
 </head>
 
-<body <?php 
+<body <?php
         $paginaAtual = $pagina ?? ($_GET['pagina'] ?? 'inicio');
         $classes = [];
         // Páginas com barra de pesquisa precisam começar do topo
@@ -88,7 +88,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         if (!empty($classes)) {
             echo 'class="' . implode(' ', $classes) . '"';
         }
-    ?>>
+        ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
@@ -118,7 +118,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <!-- Menu fixo -->
     <?php include 'MenuP.php'; ?>
 
-    <!-- Conteúdo dinÍ¢mico -->
+    <!-- Conteúdo dinâmico -->
     <div id="conteudo-dinamico">
         <?php include $arquivo; ?>
     </div>
@@ -237,7 +237,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         function atualizarClasseBody(pagina) {
             const b = document.body;
             if (!b) return;
-            
+
             // Páginas com barra de pesquisa precisam começar do topo
             const paginasComBarraPesquisa = ['inicio', 'meusEventos'];
             if (paginasComBarraPesquisa.includes(pagina)) {
@@ -245,7 +245,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             } else {
                 b.classList.remove('pagina-com-barra-pesquisa');
             }
-            
+
             // Páginas que precisam começar do topo (não centralizadas)
             if (pagina === 'meusEventos') {
                 b.classList.add('pagina-lista-eventos');
@@ -415,7 +415,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 html: '../PaginasGlobais/PainelNotificacoes.php',
                 js: ['../PaginasGlobais/PainelNotificacoes.js'],
                 init: () => {
-                    console.log('âœ… Painel de Notificações carregado');
+                    console.log('✓ Painel de Notificações carregado');
                     // Força a inicialização do script mesmo após DOMContentLoaded
                     if (typeof window.inicializarPainelNotificacoes === 'function') {
                         window.inicializarPainelNotificacoes();
@@ -457,15 +457,15 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (novoConteudo) {
                         const alvo = document.getElementById('conteudo-dinamico');
                         alvo.innerHTML = novoConteudo.innerHTML;
-                        
+
                         // Garante que a classe js-ready está presente
                         if (!document.body.classList.contains('js-ready')) {
                             document.body.classList.add('js-ready');
                         }
-                        
+
                         // Força scroll para o topo ao trocar de página
                         window.scrollTo(0, 0);
-                        
+
                         // Executa scripts embutidos na página carregada (ex.: TemaDoSite.php)
                         executarScriptsNoConteudo(alvo);
                         sincronizarMenuComConteudo();
@@ -490,12 +490,12 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         // =========================
         // Eventos de inicialização
         // =========================
-        
+
         // Desabilita restauração automática de scroll do navegador
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
-        
+
         window.onpopstate = function() {
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
@@ -504,15 +504,15 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 
         // Marca que JS está pronto IMEDIATAMENTE para prevenir FOUC
         document.documentElement.classList.add('js-loading');
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             // Marca que o DOM está pronto
             document.body.classList.add('js-ready');
             document.documentElement.classList.remove('js-loading');
-            
+
             // Força scroll para o topo ao carregar/recarregar a página
             window.scrollTo(0, 0);
-            
+
             const params = new URLSearchParams(window.location.search);
             const pagina = params.get('pagina') || 'inicio';
             if (typeof window.setMenuAtivoPorPagina === 'function') window.setMenuAtivoPorPagina(pagina);
@@ -529,4 +529,3 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 </body>
 
 </html>
-

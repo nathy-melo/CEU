@@ -679,7 +679,7 @@
     <div id="main-content">
         <div class="section-title-wrapper">
             <div class="barra-pesquisa-container">
-                <!-- Botão de favoritos Í  esquerda da barra de pesquisa -->
+                <!-- Botão de favoritos esquerda da barra de pesquisa -->
                 <button type="button" class="BotaoFavoritosTrigger botao" id="btn-abrir-favoritos" title="Ver favoritos"
                     aria-label="Ver favoritos">
                     <img src="../Imagens/Medalha_preenchida.svg" alt="Favoritos">
@@ -714,7 +714,7 @@
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Meus favoritos</span>
-                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">Í—</button>
+                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">×</button>
             </div>
             <div id="lista-favoritos" class="lista-favoritos"></div>
         </div>
@@ -725,7 +725,7 @@
         <div class="conteudo">
             <div class="cabecalho">
                 <span>Compartilhar</span>
-                <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">Í—</button>
+                <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
             </div>
 
             <div class="opcoes-compartilhamento">
@@ -832,7 +832,7 @@
         <div class="conteudo" onclick="event.stopPropagation()">
             <div class="cabecalho">
                 <span>Enviar mensagem ao organizador</span>
-                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">Í—</button>
+                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
             </div>
             <div>
                 <textarea id="texto-mensagem-organizador" maxlength="500"
@@ -862,7 +862,7 @@
             window.codEventoMensagem = null;
         }
         
-        // Criar referÍªncias locais usando var(permite re-declaração) para facilitar o uso
+        // Criar referências locais usando var(permite re-declaração) para facilitar o uso
         var codEvento = window.codEvento;
         var codEventoAcao = window.codEventoAcao;
         var btnDesinscreverAtual = window.btnDesinscreverAtual;
@@ -1247,7 +1247,7 @@
             window.inscricaoCache = new Map();
         }
         
-        // Criar referÍªncias locais usando var(permite re-declaração) para facilitar o uso
+        // Criar referências locais usando var(permite re-declaração) para facilitar o uso
         var favoritosSet = window.favoritosSet;
         var favoritosDados = window.favoritosDados;
         var inscricaoCache = window.inscricaoCache;
@@ -1651,7 +1651,7 @@
 
                     const j = await r.json();
                     if (j && j.sucesso && j.inscricoes) {
-                        // IMPORTANTE: Obter o container novamente dentro do setTimeout para garantir que a referÍªncia esteja correta
+                        // IMPORTANTE: Obter o container novamente dentro do setTimeout para garantir que a referência esteja correta
                         const contFavoritos = document.getElementById('lista-favoritos');
                         if (!contFavoritos) return;
                         
@@ -1676,7 +1676,7 @@
 
         // Listeners de clique - usando o mesmo padrão do EventosInscritosOrganizador.php
         document.addEventListener('click', async function (e) {
-            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÍO DO EventosInscritosOrganizador.php
+            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO EventosInscritosOrganizador.php
             let btnInscrever = e.target.closest('.BotaoInscreverCard');
             
             // IMPORTANTE: Também verificar BotaoDesinscreverCard (usado na página de Meus Eventos)
@@ -1774,7 +1774,7 @@
                 }
                 atualizarIconeFavorito(btnFav, novoEstado);
                 // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
-                // Buscar especificamente os botões que NÍO estão no modal de favoritos
+                // Buscar especificamente os botões que NÃO estão no modal de favoritos
                 const atualizarTodosBotoes = () => {
                     const modalFavoritos = document.getElementById('modal-favoritos');
                     const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');
@@ -1850,7 +1850,7 @@
                             }
                             atualizarIconeFavorito(btnFav, j.favoritado);
                             // Atualizar TODOS os botões de favorito com o mesmo código na página
-                            // Buscar especificamente os botões que NÍO estão no modal de favoritos
+                            // Buscar especificamente os botões que NÃO estão no modal de favoritos
                             const atualizarTodosBotoes = () => {
                                 const modalFavoritos = document.getElementById('modal-favoritos');
                                 const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');

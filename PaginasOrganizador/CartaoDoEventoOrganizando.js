@@ -908,7 +908,7 @@
       const inputImagem = document.getElementById('input-imagem');
       console.log('Input de imagem:', inputImagem, 'Arquivos selecionados:', inputImagem.files.length);
       if (inputImagem.files.length > 0) {
-        console.log('Enviando', inputImagem.files.length, 'imagens ao servidor');
+        console.log('Enviando', inputImagem.files.length, 'imagem(ns) ao servidor');
         for (let i = 0; i < inputImagem.files.length; i++) {
           formData.append('imagens_evento[]', inputImagem.files[i]);
           console.log('Imagem', i, ':', inputImagem.files[i].name);

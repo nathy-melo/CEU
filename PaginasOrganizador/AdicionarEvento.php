@@ -1169,8 +1169,8 @@ mysqli_close($conexao);
                     <option value="">Selecione</option>
                     <option value="Palestra">Palestra</option>
                     <option value="Workshop">Workshop</option>
-                    <option value="Seminário">Seminário</option>
-                    <option value="ConferÍªncia">ConferÍªncia</option>
+                    <option value="Seminario">Seminario</option>
+                    <option value="Conferencia">Conferencia</option>
                     <option value="Curso">Curso</option>
                     <option value="Treinamento">Treinamento</option>
                     <option value="Outro">Outro</option>
@@ -1182,7 +1182,7 @@ mysqli_close($conexao);
                     <option value="">Selecione</option>
                     <option value="Presencial">Presencial</option>
                     <option value="Online">Online</option>
-                    <option value="Híbrido">Híbrido</option>
+                    <option value="Hibrido">Híbrido</option>
                 </select>
             </div>
             <div class="Certificado grupo-campo">
@@ -1344,7 +1344,7 @@ mysqli_close($conexao);
                 return camposFaltantes;
             }
 
-            // ==== FUNÍ‡ÕES DE COLABORADORES ====
+            // ==== FUNÇÕES DE COLABORADORES ====
             window.abrirModalColaboradores = function() {
                 document.getElementById('modal-colaboradores').style.display = 'flex';
                 limparCamposColaborador();
@@ -1407,7 +1407,7 @@ mysqli_close($conexao);
                             document.getElementById('colab-email').value = data.usuario.email || '';
                             msgStatus.style.display = 'block';
                             msgStatus.style.color = '#4CAF50';
-                            msgStatus.textContent = 'âœ“ Usuário encontrado no sistema';
+                            msgStatus.textContent = '✔ Usuário encontrado no sistema';
                             btnAdicionar.disabled = false;
                         } else {
                             document.getElementById('colab-nome').value = '';
@@ -1599,7 +1599,7 @@ mysqli_close($conexao);
                 document.getElementById('modal-imagem').style.display = 'none';
             };
 
-            // CORREÍ‡ÍO PRINCIPAL: Adiciona listener do formulário de forma segura
+            // CORREÇÃO PRINCIPAL: Adiciona listener do formulário de forma segura
             const formEvento = document.getElementById('form-evento');
             if (formEvento) {
                 formEvento.addEventListener('submit', function(e) {

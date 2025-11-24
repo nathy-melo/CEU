@@ -101,7 +101,7 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                             aplicarTemaLocal(temaAtual);
                             destacar();
                         } else if (result.status === 401) {
-                            alert('VocÍª precisa estar logado para alterar o tema.');
+                            alert('Você precisa estar logado para alterar o tema.');
                         } else {
                             alert('Não foi possível salvar o tema agora.');
                         }

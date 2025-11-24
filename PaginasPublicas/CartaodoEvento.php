@@ -759,7 +759,7 @@
             <div class="conteudo">
                 <div class="cabecalho">
                     <span>Compartilhar</span>
-                    <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">Í—</button>
+                    <button type="button" class="fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">×</button>
                 </div>
                 <div class="opcoes-compartilhamento">
                     <button class="btn-compartilhar-app" onclick="compartilharWhatsApp()" title="Compartilhar no WhatsApp">
@@ -940,8 +940,8 @@
 
                 if (!data.sucesso) {
                     let msg = 'Não foi possível enviar a solicitação.';
-                    if (data.erro === 'ja_organizador') msg = 'VocÍª já é organizador deste evento.';
-                    if (data.erro === 'ja_colaborador') msg = 'VocÍª já é colaborador deste evento.';
+                    if (data.erro === 'ja_organizador') msg = 'Você já é organizador deste evento.';
+                    if (data.erro === 'ja_colaborador') msg = 'Você já é colaborador deste evento.';
                     alert(msg);
                     return;
                 }
