@@ -14,4 +14,3 @@ if (!isset($_GET['page']) && !isset($_POST['action'])) {
 // Se chegou aqui, algo está errado - redirecionar para segurança
 header('Location: LoginAdmin.html');
 exit();
-?>

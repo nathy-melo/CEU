@@ -1204,9 +1204,9 @@ mysqli_close($conexao);
                     </div>
                     <div class="carrossel-imagens" id="carrossel-imagens" style="display: none;">
                         <button type="button" class="btn-remover-imagem" id="btn-remover-imagem" onclick="event.stopPropagation(); removerImagemAtual();">&times;</button>
-                        <button type="button" class="carrossel-btn carrossel-anterior" onclick="event.stopPropagation(); mudarImagem(-1)">â®œ</button>
+                        <button type="button" class="carrossel-btn carrossel-anterior" onclick="event.stopPropagation(); mudarImagem(-1)">‹</button>
                         <img id="imagem-carrossel" src="" alt="Imagem do evento" />
-                        <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">â®ž</button>
+                        <button type="button" class="carrossel-btn carrossel-proxima" onclick="event.stopPropagation(); mudarImagem(1)">›</button>
                         <button type="button" class="btn-adicionar-mais" onclick="event.stopPropagation(); document.getElementById('input-imagem').click();">
                             <img src="../Imagens/AdicionarMais.svg" alt="" aria-hidden="true" />
                             Adicionar mais imagens
@@ -1229,10 +1229,10 @@ mysqli_close($conexao);
         <div id="modal-imagem" class="modal-imagem">
             <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
             <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior"
-                onclick="mudarImagemModal(-1)">â®œ</button>
+                onclick="mudarImagemModal(-1)">‹</button>
             <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img" />
             <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima"
-                onclick="mudarImagemModal(1)">â®ž</button>
+                onclick="mudarImagemModal(1)">›</button>
         </div>
 
         <!-- Modal Adicionar Colaborador -->
@@ -1394,7 +1394,7 @@ mysqli_close($conexao);
                 if (colaboradores.find(c => c.cpf === cpf)) {
                     msgStatus.style.display = 'block';
                     msgStatus.style.color = '#f44336';
-                    msgStatus.textContent = 'âŒ Este organizador já foi adicionado';
+                    msgStatus.textContent = '❌ Este organizador já foi adicionado';
                     btnAdicionar.disabled = true;
                     return;
                 }
@@ -1414,14 +1414,14 @@ mysqli_close($conexao);
                             document.getElementById('colab-email').value = '';
                             msgStatus.style.display = 'block';
                             msgStatus.style.color = '#f44336';
-                            msgStatus.textContent = 'âŒ Usuário não cadastrado no sistema';
+                            msgStatus.textContent = '❌ Usuário não cadastrado no sistema';
                             btnAdicionar.disabled = true;
                         }
                     })
                     .catch(() => {
                         msgStatus.style.display = 'block';
                         msgStatus.style.color = '#f44336';
-                        msgStatus.textContent = 'âŒ Erro ao verificar CPF';
+                        msgStatus.textContent = '❌ Erro ao verificar CPF';
                         btnAdicionar.disabled = true;
                     });
             }

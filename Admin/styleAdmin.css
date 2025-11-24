@@ -5,24 +5,24 @@
 
 /* Importar variáveis CSS do site principal */
 :root {
-  --branco: #FFFFFF;
-  --preto: #000000;
-  --botao: #6598D2;
-  --caixas: #4F6C8C;
-  --fundo: #D1EAFF;
-  --cinza-escuro: #333333;
-  --cinza-medio: #888888;
-  --azul-escuro: #0a1449;
-  --azul-claro: #8ad7da;
-  --sombra-padrao: rgba(0, 0, 0, 0.6);
-  --sombra-forte: rgba(0, 0, 0, 0.8);
-  --sombra-leve: rgba(0, 0, 0, 0.5);
+    --branco: #FFFFFF;
+    --preto: #000000;
+    --botao: #6598D2;
+    --caixas: #4F6C8C;
+    --fundo: #D1EAFF;
+    --cinza-escuro: #333333;
+    --cinza-medio: #888888;
+    --azul-escuro: #0a1449;
+    --azul-claro: #8ad7da;
+    --sombra-padrao: rgba(0, 0, 0, 0.6);
+    --sombra-forte: rgba(0, 0, 0, 0.8);
+    --sombra-leve: rgba(0, 0, 0, 0.5);
 }
 
 :root[data-theme="dark"] {
-  --fundo: #253542;
-  --caixas: #000B18;
-  --botao: #1A4090;
+    --fundo: #253542;
+    --caixas: #000B18;
+    --botao: #1A4090;
 }
 
 /* Reset global para páginas administrativas */
@@ -35,7 +35,8 @@
 }
 
 /* Fundo padrão do site para admin */
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -46,25 +47,34 @@ html, body {
 }
 
 /* Scrollbar padrão do site */
-html, body {
+html,
+body {
     scrollbar-width: thin;
     scrollbar-color: var(--botao) var(--caixas);
 }
-html::-webkit-scrollbar, body::-webkit-scrollbar {
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
     width: 0.8rem;
     background: var(--caixas);
     border-radius: 1rem;
 }
-html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, var(--botao) 60%, var(--caixas) 100%);
     border-radius: 1rem;
     box-shadow: 0 0.1rem 0.3rem 0 var(--sombra-leve);
     border: 2px solid var(--branco);
 }
-html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--botao) 60%, var(--caixas) 100%);
 }
-html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
     background: var(--caixas);
     border-radius: 1rem;
 }
@@ -84,15 +94,18 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
     padding: 15px 20px;
     text-align: center;
     border-radius: 10px;
-    margin: 0 auto 15px auto; /* centraliza e alinha com o conteúdo principal */
+    margin: 0 auto 15px auto;
+    /* centraliza e alinha com o conteúdo principal */
     box-shadow: 0rem 0.1rem 1rem var(--sombra-leve);
     width: 100%;
-    max-width: 1400px; /* mesma largura máxima do .admin-container */
+    max-width: 1400px;
+    /* mesma largura máxima do .admin-container */
 }
 
 .admin-header h1 {
     margin: 0;
-    font-size: clamp(18px, 5vw, 26px); /* Responsivo: 18px mobile → 26px desktop */
+    font-size: clamp(18px, 5vw, 26px);
+    /* Responsivo: 18px mobile → 26px desktop */
     font-weight: 600;
     color: var(--branco);
     text-shadow: 0px 2px 8px var(--preto);
@@ -100,7 +113,8 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 
 .admin-header .subtitle {
     margin: 3px 0 0 0;
-    font-size: clamp(13px, 3.5vw, 15px); /* Responsivo: 13px mobile → 15px desktop */
+    font-size: clamp(13px, 3.5vw, 15px);
+    /* Responsivo: 13px mobile → 15px desktop */
     opacity: 0.9;
     color: var(--branco);
 }
@@ -119,7 +133,8 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 .admin-section h3 {
     color: var(--azul-escuro);
     margin-bottom: 15px;
-    font-size: clamp(18px, 4.5vw, 22px); /* Responsivo: 18px mobile → 22px desktop */
+    font-size: clamp(18px, 4.5vw, 22px);
+    /* Responsivo: 18px mobile → 22px desktop */
     border-bottom: 2px solid var(--botao);
     padding-bottom: 8px;
 }
@@ -188,7 +203,8 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
     font-size: 16px;
 }
 
-.form-group input, .form-group select {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 14px 18px;
     border: 2px solid var(--botao);
@@ -220,7 +236,9 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 }
 
 /* Removido pseudo-ícone para usar somente a seta nativa do navegador */
-.select-wrapper::after { display: none; }
+.select-wrapper::after {
+    display: none;
+}
 
 .select-wrapper select {
     width: 100%;
@@ -232,11 +250,18 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
 }
 
 /* Caso algum select fora de .form-group use classe search-input */
-select.search-input { appearance: auto; -webkit-appearance: auto; -moz-appearance: auto; padding-right: 10px; }
+select.search-input {
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    padding-right: 10px;
+}
 
 /* Oculta seta no IE/Edge legado */
 /* Mostrar seta nativa também em IE/Edge legado */
-select::-ms-expand { display: inline; }
+select::-ms-expand {
+    display: inline;
+}
 
 /* Tentar harmonizar o menu das opções (efeito varia por navegador) */
 .select-wrapper select option {
@@ -247,7 +272,9 @@ select::-ms-expand { display: inline; }
 /* ============================ */
 /* Dropdown custom (Admin - all screens) */
 /* ============================ */
-.ddl-hidden-native { display: none !important; }
+.ddl-hidden-native {
+    display: none !important;
+}
 
 .ddl-container {
     position: relative;
@@ -268,7 +295,7 @@ select::-ms-expand { display: inline; }
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     user-select: none;
 }
 
@@ -278,7 +305,11 @@ select::-ms-expand { display: inline; }
     border-color: var(--azul-escuro);
 }
 
-.ddl-arrow { margin-left: 8px; font-size: 12px; color: var(--preto); }
+.ddl-arrow {
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--preto);
+}
 
 .ddl-menu {
     position: absolute;
@@ -288,7 +319,7 @@ select::-ms-expand { display: inline; }
     background: var(--branco);
     border: 2px solid var(--botao);
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     max-height: 260px;
     overflow: auto;
     padding: 6px;
@@ -296,7 +327,9 @@ select::-ms-expand { display: inline; }
     display: none;
 }
 
-.ddl-container.open .ddl-menu { display: block; }
+.ddl-container.open .ddl-menu {
+    display: block;
+}
 
 .ddl-item {
     padding: 10px 12px;
@@ -307,17 +340,30 @@ select::-ms-expand { display: inline; }
     font-size: 15px;
 }
 
-.ddl-item:hover { background: rgba(79,108,140,0.08); }
-.ddl-item.selected { background: rgba(79,108,140,0.15); font-weight: 600; }
+.ddl-item:hover {
+    background: rgba(79, 108, 140, 0.08);
+}
+
+.ddl-item.selected {
+    background: rgba(79, 108, 140, 0.15);
+    font-weight: 600;
+}
 
 @media (max-width: 480px) {
-    .ddl-toggle { padding: 10px 30px 10px 12px; font-size: 15px; }
-    .ddl-item { font-size: 14px; }
+    .ddl-toggle {
+        padding: 10px 30px 10px 12px;
+        font-size: 15px;
+    }
+
+    .ddl-item {
+        font-size: 14px;
+    }
 }
 
 /* Mantemos o select nativo e apenas estilizamos o controle; o menu aberto é do sistema/OS. */
 
-.form-group input:focus, .form-group select:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--azul-escuro);
     box-shadow: 0 0 0 2px rgba(106, 152, 210, 0.3);
@@ -331,7 +377,8 @@ select::-ms-expand { display: inline; }
     border: 1px solid rgba(255, 71, 87, 0.3);
     border-radius: 5px;
     display: none;
-    font-size: clamp(12px, 3vw, 14px); /* Responsivo: 12px mobile → 14px desktop */
+    font-size: clamp(12px, 3vw, 14px);
+    /* Responsivo: 12px mobile → 14px desktop */
 }
 
 .back-link {
@@ -339,7 +386,8 @@ select::-ms-expand { display: inline; }
     display: block;
     color: var(--azul-claro);
     text-decoration: none;
-    font-size: clamp(13px, 3.5vw, 14px); /* Responsivo: 13px mobile → 14px desktop */
+    font-size: clamp(13px, 3.5vw, 14px);
+    /* Responsivo: 13px mobile → 14px desktop */
     transition: color 0.3s ease;
 }
 
@@ -375,7 +423,7 @@ select::-ms-expand { display: inline; }
 
 /* Containers internos com background claro */
 #eventosContainer,
-#usuariosContainer, 
+#usuariosContainer,
 #codigosContainer,
 #certificadosContainer,
 #senhasContainer,
@@ -387,7 +435,8 @@ select::-ms-expand { display: inline; }
 }
 
 /* Botões administrativos seguindo padrão do site */
-.btn, .botao,
+.btn,
+.botao,
 .btn-admin-login,
 .btn-generate,
 .btn-secondary,
@@ -406,7 +455,8 @@ select::-ms-expand { display: inline; }
     justify-content: center;
 }
 
-.btn:hover, .botao:hover,
+.btn:hover,
+.botao:hover,
 .btn-admin-login:hover,
 .btn-generate:hover,
 .btn-secondary:hover,
@@ -420,7 +470,8 @@ select::-ms-expand { display: inline; }
     color: var(--branco);
     width: 100%;
     padding: 12px;
-    font-size: clamp(15px, 4vw, 16px); /* Responsivo: 15px mobile → 16px desktop */
+    font-size: clamp(15px, 4vw, 16px);
+    /* Responsivo: 15px mobile → 16px desktop */
     margin-top: 8px;
     border-radius: 8px;
 }
@@ -429,7 +480,8 @@ select::-ms-expand { display: inline; }
     background-color: #28a745;
     color: var(--branco);
     padding: 12px 24px;
-    font-size: clamp(14px, 3.5vw, 16px); /* Responsivo: 14px mobile → 16px desktop */
+    font-size: clamp(14px, 3.5vw, 16px);
+    /* Responsivo: 14px mobile → 16px desktop */
     margin: 3px;
     min-width: 120px;
     white-space: nowrap;
@@ -440,7 +492,8 @@ select::-ms-expand { display: inline; }
     background-color: var(--botao);
     color: var(--branco);
     padding: 12px 24px;
-    font-size: clamp(14px, 3.5vw, 16px); /* Responsivo: 14px mobile → 16px desktop */
+    font-size: clamp(14px, 3.5vw, 16px);
+    /* Responsivo: 14px mobile → 16px desktop */
     margin: 3px;
     min-width: 120px;
     white-space: nowrap;
@@ -451,7 +504,8 @@ select::-ms-expand { display: inline; }
     background-color: var(--botao);
     color: var(--branco);
     padding: 12px 24px;
-    font-size: clamp(14px, 3.5vw, 16px); /* Responsivo: 14px mobile → 16px desktop */
+    font-size: clamp(14px, 3.5vw, 16px);
+    /* Responsivo: 14px mobile → 16px desktop */
     margin: 3px;
     min-width: 120px;
     white-space: nowrap;
@@ -505,7 +559,8 @@ select::-ms-expand { display: inline; }
 /* Estilos para botões pequenos da tabela */
 .btn-small {
     padding: 10px 15px;
-    font-size: clamp(13px, 3.5vw, 15px); /* Responsivo: 13px mobile → 15px desktop */
+    font-size: clamp(13px, 3.5vw, 15px);
+    /* Responsivo: 13px mobile → 15px desktop */
     margin: 3px;
     border: none;
     border-radius: 6px;
@@ -652,7 +707,8 @@ select::-ms-expand { display: inline; }
     border-collapse: separate;
     border-spacing: 0;
     margin-top: 0;
-    background-color: transparent; /* fundo vem do wrapper */
+    background-color: transparent;
+    /* fundo vem do wrapper */
     /* Radius e sombra ficam no wrapper para evitar artefatos */
     border-radius: 0;
     overflow: visible;
@@ -875,8 +931,13 @@ select::-ms-expand { display: inline; }
 
 /* Animação para loading spinner */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Modal estilos */
@@ -921,6 +982,7 @@ select::-ms-expand { display: inline; }
 }
 
 @media (max-width: 768px) {
+
     #modalEvento .admin-container,
     #modalUsuario .admin-container {
         top: 0 !important;
@@ -1113,6 +1175,7 @@ h4 .icon {
 
 /* Em telas pequenas, forçar 1 coluna */
 @media screen and (max-width: 600px) {
+
     .dashboard-grid,
     .responsive-card-grid {
         grid-template-columns: 1fr;
@@ -1433,7 +1496,8 @@ h4 .icon {
     .form-group select,
     .form-group textarea {
         padding: 12px 15px;
-        font-size: 16px; /* Evita zoom automático no iOS */
+        font-size: 16px;
+        /* Evita zoom automático no iOS */
         width: 100%;
         border-radius: 6px;
         border: 2px solid var(--botao);
@@ -1573,13 +1637,15 @@ h4 .icon {
 
 /* Melhorias para telas touch */
 @media (hover: none) and (pointer: coarse) {
+
     /* Aumentar área de toque dos botões */
     .btn-small,
     .admin-nav .btn-secondary,
     .btn-generate,
     .btn-secondary,
     .btn-test {
-        min-height: 44px; /* Tamanho mínimo recomendado para touch */
+        min-height: 44px;
+        /* Tamanho mínimo recomendado para touch */
     }
 
     /* Remover hover effects em telas touch */
@@ -1627,6 +1693,7 @@ h4 .icon {
 
 /* Print styles */
 @media print {
+
     .admin-nav,
     .btn-generate,
     .btn-secondary,
@@ -1656,6 +1723,7 @@ h4 .icon {
     .mobile-cards-container {
         display: none !important;
     }
+
     .table-wrapper,
     .table-responsive {
         display: block !important;

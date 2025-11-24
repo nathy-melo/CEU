@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Configurações centralizadas do sistema administrativo CEU
  * Este arquivo centraliza todas as configurações de segurança e sistema
@@ -72,26 +73,29 @@ define('SYSTEM_ENV', 'DEVELOPMENT'); // DEVELOPMENT, TESTING, PRODUCTION
 /**
  * Gera hash SHA-256 para uma string
  */
-function generateSecureHash($input) {
+function generateSecureHash($input)
+{
     return hash('sha256', $input);
 }
 
 /**
  * Verifica se está em ambiente de desenvolvimento
  */
-function isDevelopment() {
+function isDevelopment()
+{
     return SYSTEM_ENV === 'DEVELOPMENT';
 }
 
 /**
  * Registra log de atividade administrativa
  */
-function logAdminActivity($activity, $details = '') {
+function logAdminActivity($activity, $details = '')
+{
     if (ENABLE_ACCESS_LOG) {
         $timestamp = date('Y-m-d H:i:s');
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
-        
+
         $logEntry = "[$timestamp] Admin Activity: $activity | IP: $ip | Details: $details | User-Agent: " . substr($userAgent, 0, 100);
         error_log($logEntry);
     }
@@ -100,13 +104,14 @@ function logAdminActivity($activity, $details = '') {
 /**
  * Formata tempo restante da sessão
  */
-function formatSessionTime($seconds) {
+function formatSessionTime($seconds)
+{
     if ($seconds <= 0) return '0 minutos';
-    
+
     $minutes = floor($seconds / 60);
     $hours = floor($minutes / 60);
     $minutes = $minutes % 60;
-    
+
     if ($hours > 0) {
         return "$hours h $minutes min";
     } else {
@@ -131,5 +136,3 @@ if (!extension_loaded('session')) {
 if (isDevelopment()) {
     logAdminActivity('CONFIG_LOADED', 'Configurações administrativas carregadas');
 }
-
-?>

@@ -147,7 +147,7 @@
                     </span>
                 </div>
                 <span class="botao botao-configuracao" style="white-space:normal; line-height:1.2;">
-                    Para instalar no iOS: toque em Compartilhar â†’ "Adicionar Í  Tela de Início"
+                    Para instalar no iOS: toque em Compartilhar → "Adicionar à Tela de Início"
                 </span>
             </div>
         </div>
@@ -166,7 +166,7 @@
                 return (typeof window.ceuIsMobile === 'function' ? window.ceuIsMobile() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
             }
             function canInstall(){
-                if (isIOS) return false; // iOS não fornece prompt â€” mostrar dica
+                if (isIOS) return false; // iOS não fornece prompt — mostrar dica
                 if (typeof window.ceuCanInstall === 'function') return window.ceuCanInstall();
                 return !!window.deferredPrompt && isMobile() && !isStandalone();
             }

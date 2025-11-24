@@ -8,44 +8,52 @@ session_start();
 require_once 'ConfigAdmin.php';
 
 // Função para verificar autenticação admin
-function verificarAutenticacaoAdmin() {
+function verificarAutenticacaoAdmin()
+{
     // Verificar se sessão admin existe
-    if (!isset($_SESSION['admin_authenticated']) || 
+    if (
+        !isset($_SESSION['admin_authenticated']) ||
         $_SESSION['admin_authenticated'] !== true ||
         !isset($_SESSION['admin_hash_check']) ||
-        $_SESSION['admin_hash_check'] !== ADMIN_USER_HASH) {
-        
+        $_SESSION['admin_hash_check'] !== ADMIN_USER_HASH
+    ) {
+
         redirecionarParaLogin(MSG_ACCESS_DENIED);
         return false;
     }
-    
+
     // Verificar timeout da sessão
-    if (isset($_SESSION['admin_login_time']) && 
-        (time() - $_SESSION['admin_login_time']) > ADMIN_SESSION_TIMEOUT) {
-        
+    if (
+        isset($_SESSION['admin_login_time']) &&
+        (time() - $_SESSION['admin_login_time']) > ADMIN_SESSION_TIMEOUT
+    ) {
+
         destruirSessaoAdmin();
         redirecionarParaLogin(MSG_SESSION_EXPIRED);
         return false;
     }
-    
+
     // Verificar IP (se habilitado)
-    if (ENABLE_IP_CHECK && 
-        isset($_SESSION['admin_ip']) && 
-        $_SESSION['admin_ip'] !== ($_SERVER['REMOTE_ADDR'] ?? 'unknown')) {
-        
+    if (
+        ENABLE_IP_CHECK &&
+        isset($_SESSION['admin_ip']) &&
+        $_SESSION['admin_ip'] !== ($_SERVER['REMOTE_ADDR'] ?? 'unknown')
+    ) {
+
         destruirSessaoAdmin();
         redirecionarParaLogin(MSG_IP_CHANGED);
         return false;
     }
-    
+
     // Renovar timestamp da sessão
     $_SESSION['admin_login_time'] = time();
-    
+
     return true;
 }
 
 // Função para destruir sessão admin
-function destruirSessaoAdmin() {
+function destruirSessaoAdmin()
+{
     unset($_SESSION['admin_authenticated']);
     unset($_SESSION['admin_hash_check']);
     unset($_SESSION['admin_login_time']);
@@ -53,15 +61,18 @@ function destruirSessaoAdmin() {
 }
 
 // Função para redirecionar para login
-function redirecionarParaLogin($mensagem = '') {
+function redirecionarParaLogin($mensagem = '')
+{
     if (!empty($mensagem)) {
         $_SESSION['admin_error'] = $mensagem;
     }
-    
+
     // Verificar se é requisição AJAX
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        
+    if (
+        !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+    ) {
+
         header('Content-Type: application/json');
         echo json_encode([
             'success' => false,
@@ -77,7 +88,8 @@ function redirecionarParaLogin($mensagem = '') {
 }
 
 // Função para logout admin
-function logoutAdmin() {
+function logoutAdmin()
+{
     destruirSessaoAdmin();
     session_destroy();
     header('Location: LoginAdmin.html');
@@ -103,4 +115,3 @@ $time_remaining = ADMIN_SESSION_TIMEOUT - (time() - $admin_session_time);
 
 // Log de acesso admin (para auditoria)
 logAdminActivity('PAGE_ACCESS', 'Página: ' . ($_SERVER['REQUEST_URI'] ?? 'unknown'));
-?>

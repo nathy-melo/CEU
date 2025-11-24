@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - CEU</title>
 
-    <!-- Meta tags PWA-ready -->
     <meta name="description"
         content="Sistema de Gerenciamento Administrativo - CEU (Catálogo de Eventos Universitários)">
     <meta name="theme-color" content="#4F6C8C">
@@ -15,16 +14,10 @@
     <meta name="apple-mobile-web-app-title" content="Admin CEU">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- Ícones para PWA (preparado para futuro) -->
-    <!-- <link rel="icon" type="image/png" sizes="192x192" href="../Imagens/icon-192.png"> -->
-    <!-- <link rel="apple-touch-icon" sizes="180x180" href="../Imagens/icon-180.png"> -->
-    <!-- <link rel="manifest" href="manifest.json"> -->
-
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <link rel="stylesheet" href="styleAdmin.css">
     <style>
-        /* Override global centering from styleGlobal.css only on this page */
         body {
             display: block !important;
             justify-content: initial !important;
@@ -442,7 +435,7 @@
                                 <path d="M12 2a10 10 0 00-9 5.5L5 9a8 8 0 111 8l-2 1.5A10 10 0 1012 2z" />
                             </svg> Ajuda de Firewall e Rede</h4>
                         <p>
-                            Para acessar no celular, conecte ao mesmo Wiâ€‘Fi e use o endereço local acima.
+                            Para acessar no celular, conecte ao mesmo Wi-Fi e use o endereço local acima.
                             Se não abrir, verifique o Firewall do Windows e libere o Apache (porta 80). Consulte:
                         </p>
                         <ul>
@@ -2381,7 +2374,7 @@
 
                 const arrow = document.createElement('span');
                 arrow.className = 'ddl-arrow';
-                arrow.textContent = 'â–¾';
+                arrow.textContent = '▼';
 
                 btn.appendChild(labelSpan);
                 btn.appendChild(arrow);
