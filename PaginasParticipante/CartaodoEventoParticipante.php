@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartão do Evento</title>
   <link rel="stylesheet" href="../styleGlobal.css" />
-    <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
+  <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <?php
   // Integração com o banco
   include_once('../BancoDados/conexao.php');
@@ -21,53 +21,74 @@
 
   // Verificar se encontrou o evento
   if ($resultado && mysqli_num_rows($resultado) > 0) {
-      $evento = mysqli_fetch_assoc($resultado);
+    $evento = mysqli_fetch_assoc($resultado);
 
-      $data_inicio = date('d/m/y', strtotime($evento['inicio']));
-      $data_fim = date('d/m/y', strtotime($evento['conclusao']));
-      $hora_inicio = date('H:i', strtotime($evento['inicio']));
-      $hora_fim = date('H:i', strtotime($evento['conclusao']));
-      
-      // Datas de inscrição
-      $data_inicio_inscricao = '-';
-      $data_fim_inscricao = '-';
-      $hora_inicio_inscricao = '-';
-      $hora_fim_inscricao = '-';
-      
-      if (!empty($evento['inicio_inscricao'])) {
-          $data_inicio_inscricao = date('d/m/y', strtotime($evento['inicio_inscricao']));
-          $hora_inicio_inscricao = date('H:i', strtotime($evento['inicio_inscricao']));
-      }
-      if (!empty($evento['fim_inscricao'])) {
-          $data_fim_inscricao = date('d/m/y', strtotime($evento['fim_inscricao']));
-          $hora_fim_inscricao = date('H:i', strtotime($evento['fim_inscricao']));
-      }
-      
-      $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
+    $data_inicio = date('d/m/y', strtotime($evento['inicio']));
+    $data_fim = date('d/m/y', strtotime($evento['conclusao']));
+    $hora_inicio = date('H:i', strtotime($evento['inicio']));
+    $hora_fim = date('H:i', strtotime($evento['conclusao']));
+
+    // Datas de inscrição
+    $data_inicio_inscricao = '-';
+    $data_fim_inscricao = '-';
+    $hora_inicio_inscricao = '-';
+    $hora_fim_inscricao = '-';
+
+    if (!empty($evento['inicio_inscricao'])) {
+      $data_inicio_inscricao = date('d/m/y', strtotime($evento['inicio_inscricao']));
+      $hora_inicio_inscricao = date('H:i', strtotime($evento['inicio_inscricao']));
+    }
+    if (!empty($evento['fim_inscricao'])) {
+      $data_fim_inscricao = date('d/m/y', strtotime($evento['fim_inscricao']));
+      $hora_fim_inscricao = date('H:i', strtotime($evento['fim_inscricao']));
+    }
+
+    $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
   } else {
-      // Se não encontrou o evento, usar dados padrão
-      $evento = array(
-          'nome' => 'Evento não encontrado',
-          'lugar' => 'Local não informado',
-          'descricao' => 'Descrição não disponível',
-          'categoria' => 'Não informado',
-          'publico_alvo' => 'Não informado',
-          'certificado' => 0,
-          'modalidade' => 'Presencial',
-          'imagem' => 'ImagensEventos/CEU-ImagemEvento.png'
-      );
-      $data_inicio = '00/00/00';
-      $data_fim = '00/00/00';
-      $hora_inicio = '00:00';
-      $hora_fim = '00:00';
-      $data_inicio_inscricao = '-';
-      $data_fim_inscricao = '-';
-      $hora_inicio_inscricao = '-';
-      $hora_fim_inscricao = '-';
-      $nome_organizador = 'Não informado';
+    // Se não encontrou o evento, usar dados padrão
+    $evento = array(
+      'nome' => 'Evento não encontrado',
+      'lugar' => 'Local não informado',
+      'descricao' => 'Descrição não disponível',
+      'categoria' => 'Não informado',
+      'publico_alvo' => 'Não informado',
+      'certificado' => 0,
+      'modalidade' => 'Presencial',
+      'imagem' => 'ImagensEventos/CEU-ImagemEvento.png'
+    );
+    $data_inicio = '00/00/00';
+    $data_fim = '00/00/00';
+    $hora_inicio = '00:00';
+    $hora_fim = '00:00';
+    $data_inicio_inscricao = '-';
+    $data_fim_inscricao = '-';
+    $hora_inicio_inscricao = '-';
+    $hora_fim_inscricao = '-';
+    $nome_organizador = 'Não informado';
   }
 
-  $certificado = (isset($evento['certificado']) && (int)$evento['certificado'] === 1) ? 'Sim' : 'Não';
+  // Define o texto para exibição de certificado
+  $tipo_certificado = isset($evento['tipo_certificado']) ? $evento['tipo_certificado'] : '';
+  $tem_certificado = isset($evento['certificado']) && (int)$evento['certificado'] === 1;
+
+  if ($tem_certificado) {
+    // Se tem certificado, verifica o tipo
+    if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensão') {
+      $certificado = $tipo_certificado;
+    } else {
+      // Se for "Outro" ou qualquer outro valor, exibe apenas "Sim"
+      $certificado = 'Sim';
+    }
+  } else {
+    // Se não tem certificado
+    $certificado = 'Não';
+  }
+
+  // Verifica se o evento já foi finalizado
+  $dataHoraAtual = new DateTime();
+  $dataConclusaoEvento = new DateTime($evento['conclusao']);
+  $eventoFinalizado = ($dataConclusaoEvento < $dataHoraAtual);
+
   $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
   // Ajustar caminho da imagem relativo a esta pasta
@@ -113,7 +134,7 @@
   }
 
   /* Campos seguem grid original adaptado */
-  .cartao-evento > div {
+  .cartao-evento>div {
     background: none;
     border: none;
     display: flex;
@@ -162,16 +183,48 @@
     padding-top: 1em;
   }
 
-  .Nome { grid-column: span 4 / span 4; }
-  .Organizador { grid-column: span 4 / span 4; grid-column-start: 5; }
-  .Local { grid-column: span 8 / span 8; grid-row-start: 2; }
-  
-  .DataHorarioInicio { grid-column: span 4 / span 4; grid-row-start: 3; }
-  .DataHorarioFim { grid-column: span 4 / span 4; grid-column-start: 5; grid-row-start: 3; }
-  
-  .DataHorarioInscricaoInicio { grid-column: span 4 / span 4; grid-row-start: 4; }
-  .DataHorarioInscricaoFim { grid-column: span 4 / span 4; grid-column-start: 5; grid-row-start: 4; }
-  
+  .Nome {
+    grid-column: span 4 / span 4;
+  }
+
+  .Organizador {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
+  }
+
+  .Local {
+    grid-column: span 4 / span 4;
+    grid-row-start: 2;
+  }
+
+  .CargaHoraria {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
+    grid-row-start: 2;
+  }
+
+  .DataHorarioInicio {
+    grid-column: span 4 / span 4;
+    grid-row-start: 3;
+  }
+
+  .DataHorarioFim {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
+    grid-row-start: 3;
+  }
+
+  .DataHorarioInscricaoInicio {
+    grid-column: span 4 / span 4;
+    grid-row-start: 4;
+  }
+
+  .DataHorarioInscricaoFim {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
+    grid-row-start: 4;
+  }
+
   /* Container para campos de data e horário */
   .campo-data-horario {
     display: flex;
@@ -190,11 +243,29 @@
   .campo-data-horario .caixa-valor:last-child {
     flex: 0.8;
   }
-  
-  .PublicoAlvo { grid-column: span 2 / span 2; grid-row-start: 5; }
-  .Categoria { grid-column: span 2 / span 2; grid-column-start: 3; grid-row-start: 5; }
-  .Modalidade { grid-column: span 2 / span 2; grid-column-start: 5; grid-row-start: 5; }
-  .Certificado { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 5; }
+
+  .PublicoAlvo {
+    grid-column: span 2 / span 2;
+    grid-row-start: 5;
+  }
+
+  .Categoria {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 5;
+  }
+
+  .Modalidade {
+    grid-column: span 2 / span 2;
+    grid-column-start: 5;
+    grid-row-start: 5;
+  }
+
+  .Certificado {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 5;
+  }
 
   .Imagem {
     grid-column: span 4 / span 4;
@@ -209,11 +280,56 @@
     min-width: 0;
   }
 
-  .Descricao { grid-column: span 4 / span 4; grid-row: span 3 / span 3; grid-column-start: 5; grid-row-start: 6; }
+  .Descricao {
+    grid-column: span 4 / span 4;
+    grid-row: span 3 / span 3;
+    grid-column-start: 5;
+    grid-row-start: 6;
+  }
 
-  .BotaoVoltar { grid-column: span 2 / span 2; grid-column-start: 1; grid-row-start: 9; }
+  .BotaoVoltar {
+    grid-column: span 2 / span 2;
+    grid-column-start: 1;
+    grid-row-start: 9;
+  }
 
-  .BotaoInscrever { grid-column: span 2 / span 2; grid-column-start: 7; grid-row-start: 9; }
+  .BotaoInscrever {
+    grid-column: span 2 / span 2;
+    grid-column-start: 7;
+    grid-row-start: 9;
+  }
+  
+  .BotaoInscrever button,
+  .BotaoInscrever .botao-finalizado {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.35rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: block;
+  }
+  
+  .BotaoInscrever button {
+    background-color: var(--botao);
+    color: var(--branco);
+  }
+  
+  .BotaoInscrever button:hover {
+    background-color: var(--botao-hover, #5a52d5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .BotaoInscrever .botao-finalizado {
+    background-color: var(--cinza-escuro);
+    color: var(--branco);
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
 
   /* Imagem */
   .campo-imagem {
@@ -267,7 +383,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0, 0, 0, 0.85);
     z-index: 9999;
     justify-content: center;
     align-items: center;
@@ -289,7 +405,7 @@
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 2rem;
-    box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.5);
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
   }
 
   .campo-imagem {
@@ -493,7 +609,11 @@
     justify-content: center;
     padding: 1rem;
   }
-  .modal-mensagem.ativo { display: flex; }
+
+  .modal-mensagem.ativo {
+    display: flex;
+  }
+
   .modal-mensagem .conteudo {
     background: var(--caixas);
     color: var(--texto);
@@ -503,6 +623,7 @@
     padding: 1.25rem;
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
   }
+
   .modal-mensagem .cabecalho {
     display: flex;
     align-items: center;
@@ -511,6 +632,7 @@
     font-weight: 800;
     font-size: 1.15rem;
   }
+
   .modal-mensagem button.fechar {
     background: none;
     border: none;
@@ -518,6 +640,7 @@
     cursor: pointer;
     color: var(--texto);
   }
+
   .modal-mensagem textarea {
     width: 100%;
     min-height: 8rem;
@@ -529,6 +652,7 @@
     padding: 0.75rem;
     font-size: 0.95rem;
   }
+
   .modal-mensagem .contador-caracteres {
     text-align: right;
     font-size: 0.85rem;
@@ -536,17 +660,20 @@
     margin-top: 0.5rem;
     opacity: 0.7;
   }
+
   .modal-mensagem .contador-caracteres.limite-alcancado {
     color: var(--vermelho);
     opacity: 1;
     font-weight: 600;
   }
+
   .modal-mensagem .acoes {
     margin-top: 0.75rem;
     display: flex;
     gap: 0.75rem;
     justify-content: space-between;
   }
+
   .modal-mensagem .botao-primario {
     background: var(--botao);
     color: var(--branco);
@@ -556,6 +683,7 @@
     font-weight: 700;
     cursor: pointer;
   }
+
   .modal-mensagem .botao-secundario {
     background: var(--vermelho);
     color: var(--branco);
@@ -571,10 +699,12 @@
     .botoes-acao-cartao {
       left: calc(50% + 30rem + 0.5rem);
     }
+
     .BotaoAcaoCartao {
       width: 3rem;
       height: 3rem;
     }
+
     .BotaoAcaoCartao img {
       width: 1.5rem;
       height: 1.5rem;
@@ -591,6 +721,7 @@
       gap: 0.75rem;
       left: auto;
     }
+
     .secao-detalhes-evento {
       flex-direction: column;
     }
@@ -726,6 +857,15 @@
           <label>Local:</label>
           <div id="event-local" class="caixa-valor"><?= htmlspecialchars($evento['lugar']) ?></div>
         </div>
+        <div class="CargaHoraria grupo-campo">
+          <label>Carga Horária:</label>
+          <div class="caixa-valor"><?php
+                                    $carga_horaria = isset($evento['duracao']) && $evento['duracao'] > 0 ? floatval($evento['duracao']) : 0;
+                                    $horas = intval($carga_horaria);
+                                    $minutos = round(($carga_horaria - $horas) * 60);
+                                    echo str_pad($horas, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos, 2, '0', STR_PAD_LEFT);
+                                    ?></div>
+        </div>
         <div class="DataHorarioInicio grupo-campo">
           <label>Data e Horário de Início:</label>
           <div class="campo-data-horario">
@@ -781,7 +921,13 @@
           <button onclick="history.back()" class="botao">Voltar</button>
         </div>
         <div class="BotaoInscrever">
-          <button class="botao botao-inscrever">Inscrever-se</button>
+          <?php if ($eventoFinalizado): ?>
+            <div class="botao-finalizado">
+              Evento Finalizado
+            </div>
+          <?php else: ?>
+            <button class="botao botao-inscrever">Inscrever-se</button>
+          <?php endif; ?>
         </div>
       </div>
     </main>
@@ -928,13 +1074,13 @@
       try {
         const response = await fetch(`BuscarImagensEvento.php?cod_evento=${codEvento}`);
         const dados = await response.json();
-        
+
         if (dados.sucesso && dados.imagens && dados.imagens.length > 0) {
           imagens = dados.imagens.map(img => '../' + img.caminho);
         } else {
           imagens = ['<?= htmlspecialchars($imagem_src) ?>'];
         }
-        
+
         // Atualiza a imagem inicial
         if (imagens.length > 0) {
           document.getElementById('event-image').src = imagens[0];
@@ -946,7 +1092,7 @@
     }
 
     // Configura o onclick da imagem
-    document.getElementById('event-image').onclick = function (e) {
+    document.getElementById('event-image').onclick = function(e) {
       e.stopPropagation();
       if (imagens.length > 0) {
         document.getElementById('imagem-ampliada').src = imagens[0];
@@ -995,8 +1141,12 @@
     // Função para bloquear scroll
     function bloquearScroll() {
       document.body.classList.add('modal-aberto');
-      document.addEventListener('wheel', prevenirScroll, { passive: false });
-      document.addEventListener('touchmove', prevenirScroll, { passive: false });
+      document.addEventListener('wheel', prevenirScroll, {
+        passive: false
+      });
+      document.addEventListener('touchmove', prevenirScroll, {
+        passive: false
+      });
       document.addEventListener('keydown', prevenirScrollTeclado, false);
     }
 
@@ -1018,7 +1168,7 @@
     // Previne scroll com setas do teclado e Page Up/Down
     function prevenirScrollTeclado(e) {
       if (!document.body.classList.contains('modal-aberto')) return;
-      
+
       const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
       if (teclas.includes(e.keyCode)) {
         e.preventDefault();
@@ -1043,14 +1193,14 @@
         const controller = new AbortController();
         timeoutId = setTimeout(() => controller.abort(), 10000);
         const basePath = `${window.location.origin}/CEU/PaginasGlobais/ListarFavoritos.php`;
-        const r = await fetch(basePath, { 
+        const r = await fetch(basePath, {
           credentials: 'include',
           signal: controller.signal
         });
         if (timeoutId) clearTimeout(timeoutId);
-        if (r.status === 401) { 
-          favoritosSet.clear(); 
-          return; 
+        if (r.status === 401) {
+          favoritosSet.clear();
+          return;
         }
         if (!r.ok) {
           throw new Error(`HTTP error! status: ${r.status}`);
@@ -1119,8 +1269,14 @@
       const textarea = document.getElementById('texto-mensagem-organizador');
       if (!textarea) return;
       const texto = (textarea.value || '').trim();
-      if (!codEventoMensagem) { fecharModalMensagem(); return; }
-      if (texto.length === 0) { alert('Digite sua mensagem.'); return; }
+      if (!codEventoMensagem) {
+        fecharModalMensagem();
+        return;
+      }
+      if (texto.length === 0) {
+        alert('Digite sua mensagem.');
+        return;
+      }
       let timeoutId = null;
       try {
         const controller = new AbortController();
@@ -1128,9 +1284,14 @@
         const basePath = `${window.location.origin}/CEU/PaginasGlobais/EnviarMensagemOrganizador.php`;
         const r = await fetch(basePath, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
           credentials: 'include',
-          body: new URLSearchParams({ cod_evento: codEventoMensagem, mensagem: texto }),
+          body: new URLSearchParams({
+            cod_evento: codEventoMensagem,
+            mensagem: texto
+          }),
           signal: controller.signal
         });
         if (timeoutId) clearTimeout(timeoutId);
@@ -1161,12 +1322,14 @@
       modal.classList.add('ativo');
       bloquearScroll();
     }
+
     function fecharModalCompartilhar() {
       const modal = document.getElementById('modal-compartilhar');
       if (!modal) return;
       modal.classList.remove('ativo');
       desbloquearScroll();
     }
+
     function copiarLink() {
       const input = document.getElementById('link-inscricao');
       if (!input) return;
@@ -1198,12 +1361,14 @@
         }
       });
     }
+
     function compartilharWhatsApp() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
       const texto = `Confira este evento: ${linkEvento}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
+
     function compartilharInstagram() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
@@ -1218,6 +1383,7 @@
         }
       });
     }
+
     function compartilharEmail() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
@@ -1225,6 +1391,7 @@
       const corpo = `Olá! Gostaria de compartilhar este evento com você: ${linkEvento}`;
       window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
     }
+
     function compartilharX() {
       if (!codEventoCompartilhar) return;
       const linkEvento = `${window.location.origin}/CEU/PaginasPublicas/EventoPublico.php?codEvento=${codEventoCompartilhar}`;
@@ -1246,9 +1413,9 @@
           this.dataset.processing = 'true';
           const estadoAtual = this.getAttribute('data-favorito') === '1';
           const novoEstado = !estadoAtual;
-          if (novoEstado) { 
-            favoritosSet.add(cod); 
-          } else { 
+          if (novoEstado) {
+            favoritosSet.add(cod);
+          } else {
             favoritosSet.delete(cod);
           }
           atualizarIconeFavorito(this, novoEstado);
@@ -1259,35 +1426,51 @@
             const basePath = `${window.location.origin}/CEU/PaginasGlobais/ToggleFavorito.php`;
             const r = await fetch(basePath, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
               credentials: 'include',
-              body: new URLSearchParams({ cod_evento: cod }),
+              body: new URLSearchParams({
+                cod_evento: cod
+              }),
               signal: controller.signal
             });
             if (timeoutId) clearTimeout(timeoutId);
-            if (r.status === 401) { 
-              if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+            if (r.status === 401) {
+              if (estadoAtual) {
+                favoritosSet.add(cod);
+              } else {
+                favoritosSet.delete(cod);
+              }
               atualizarIconeFavorito(this, estadoAtual);
-              alert('Faça login para favoritar eventos.'); 
+              alert('Faça login para favoritar eventos.');
             } else if (!r.ok) {
               throw new Error(`HTTP error! status: ${r.status}`);
             } else {
               const j = await r.json();
               if (j && j.sucesso) {
-                if (j.favoritado) { 
-                  favoritosSet.add(cod); 
-                } else { 
-                  favoritosSet.delete(cod); 
+                if (j.favoritado) {
+                  favoritosSet.add(cod);
+                } else {
+                  favoritosSet.delete(cod);
                 }
                 atualizarIconeFavorito(this, j.favoritado);
               } else {
-                if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+                if (estadoAtual) {
+                  favoritosSet.add(cod);
+                } else {
+                  favoritosSet.delete(cod);
+                }
                 atualizarIconeFavorito(this, estadoAtual);
                 alert(j.mensagem || 'Não foi possível atualizar favorito.');
               }
             }
           } catch (err) {
-            if (estadoAtual) { favoritosSet.add(cod); } else { favoritosSet.delete(cod); }
+            if (estadoAtual) {
+              favoritosSet.add(cod);
+            } else {
+              favoritosSet.delete(cod);
+            }
             atualizarIconeFavorito(this, estadoAtual);
             if (err.name !== 'AbortError') {
               console.error('Erro ao atualizar favorito:', err);
@@ -1349,11 +1532,11 @@
       }
 
       // Fechar modais com ESC
-      document.addEventListener('keydown', function(e) { 
-        if (e.key === 'Escape' || e.key === 'Esc') { 
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
           fecharModalMensagem(true);
           fecharModalCompartilhar();
-        } 
+        }
       });
 
       // Carregar favoritos ao iniciar
@@ -1365,4 +1548,3 @@
 </body>
 
 </html>
-

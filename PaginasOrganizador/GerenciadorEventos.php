@@ -51,7 +51,18 @@ function formatarEvento($dadosEvento)
     }
 
     // Formatar certificado
-    $textoTemCertificado = $dadosEvento['certificado'] == 1 ? 'Sim' : 'Não';
+    $tipo_certificado = $dadosEvento['tipo_certificado'] ?? '';
+    $tem_certificado = $dadosEvento['certificado'] == 1;
+    
+    if ($tem_certificado) {
+        if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensao') {
+            $textoTemCertificado = $tipo_certificado;
+        } else {
+            $textoTemCertificado = 'Sim';
+        }
+    } else {
+        $textoTemCertificado = 'Não';
+    }
 
     return [
         'cod_evento' => $dadosEvento['cod_evento'],
@@ -185,7 +196,18 @@ try {
 
         $eventos = [];
         while ($row = mysqli_fetch_assoc($resultado)) {
-            $row['certificado'] = ((int)$row['certificado'] === 1) ? 'Sim' : 'Não';
+            $tipo_certificado = $row['tipo_certificado'] ?? '';
+            $tem_certificado = ((int)$row['certificado'] === 1);
+            
+            if ($tem_certificado) {
+                if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensao') {
+                    $row['certificado'] = $tipo_certificado;
+                } else {
+                    $row['certificado'] = 'Sim';
+                }
+            } else {
+                $row['certificado'] = 'Não';
+            }
             $eventos[] = $row;
         }
 
@@ -308,7 +330,12 @@ try {
                 'inicio' => $dadosEvento['inicio'],
                 'conclusao' => $dadosEvento['conclusao'],
                 'duracao' => $dadosEvento['duracao'],
-                'certificado' => $dadosEvento['certificado'] == 1 ? 'Sim' : 'Não',
+                'certificado' => ($dadosEvento['certificado'] == 1 && 
+                    ($dadosEvento['tipo_certificado'] === 'Ensino' || 
+                     $dadosEvento['tipo_certificado'] === 'Pesquisa' || 
+                     $dadosEvento['tipo_certificado'] === 'Extensao')) 
+                        ? $dadosEvento['tipo_certificado'] 
+                        : ($dadosEvento['certificado'] == 1 ? 'Sim' : 'Não'),
                 'certificado_numerico' => $dadosEvento['certificado'],
                 'modalidade' => $dadosEvento['modalidade'],
                 'imagem' => $dadosEvento['imagem'],

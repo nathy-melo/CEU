@@ -132,7 +132,29 @@ if (empty($cpfUsuario)) {
         mysqli_stmt_execute($stmtColaboracao);
         $resultadoColaboracao = mysqli_stmt_get_result($stmtColaboracao);
         while ($row = mysqli_fetch_assoc($resultadoColaboracao)) {
-            $row['certificado'] = ((int)$row['certificado'] === 1) ? 'Sim' : 'Não';
+            $row['tipo_certificado'] = $row['tipo_certificado'] ?? '';
+            $tem_certificado = ((int)$row['certificado'] === 1);
+            
+            if ($tem_certificado) {
+                if ($row['tipo_certificado'] === 'Ensino' || $row['tipo_certificado'] === 'Pesquisa' || $row['tipo_certificado'] === 'Extensao') {
+                    $row['certificado'] = $row['tipo_certificado'];
+                } else {
+                    $row['certificado'] = 'Sim';
+                }
+            } else {
+                $row['certificado'] = 'Não';
+            }
+            $tem_certificado = ((int)$row['certificado'] === 1);
+            
+            if ($tem_certificado) {
+                if ($row['tipo_certificado'] === 'Ensino' || $row['tipo_certificado'] === 'Pesquisa' || $row['tipo_certificado'] === 'Extensao') {
+                    $row['certificado'] = $row['tipo_certificado'];
+                } else {
+                    $row['certificado'] = 'Sim';
+                }
+            } else {
+                $row['certificado'] = 'Não';
+            }
             $eventosColaboracao[] = $row;
         }
         mysqli_stmt_close($stmtColaboracao);
@@ -791,7 +813,19 @@ function formatar($txt) {
                                         <span class="evento-info-icone" aria-hidden="true">
                                             <img src="../Imagens/info-certificado.svg" alt="" />
                                         </span>
-                                        <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> <?= htmlspecialchars($ev['certificado']) ?></span>
+                                        <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> <?php 
+                                            $tipo_cert = $ev['tipo_certificado'] ?? '';
+                                            $tem_cert = isset($ev['certificado']) && (int)$ev['certificado'] === 1;
+                                            if ($tem_cert) {
+                                                if ($tipo_cert === 'Ensino' || $tipo_cert === 'Pesquisa' || $tipo_cert === 'Extensão') {
+                                                    echo htmlspecialchars($tipo_cert);
+                                                } else {
+                                                    echo 'Sim';
+                                                }
+                                            } else {
+                                                echo 'Não';
+                                            }
+                                        ?></span>
                                     </li>
                                 </ul>
                             </div>
@@ -870,7 +904,19 @@ function formatar($txt) {
                                         <span class="evento-info-icone" aria-hidden="true">
                                             <img src="../Imagens/info-certificado.svg" alt="" />
                                         </span>
-                                        <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> <?= htmlspecialchars($ev['certificado']) ?></span>
+                                        <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span> <?php 
+                                            $tipo_cert = $ev['tipo_certificado'] ?? '';
+                                            $tem_cert = isset($ev['certificado']) && (int)$ev['certificado'] === 1;
+                                            if ($tem_cert) {
+                                                if ($tipo_cert === 'Ensino' || $tipo_cert === 'Pesquisa' || $tipo_cert === 'Extensão') {
+                                                    echo htmlspecialchars($tipo_cert);
+                                                } else {
+                                                    echo 'Sim';
+                                                }
+                                            } else {
+                                                echo 'Não';
+                                            }
+                                        ?></span>
                                     </li>
                                 </ul>
                             </div>

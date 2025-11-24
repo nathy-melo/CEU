@@ -1233,6 +1233,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  background: transparent !important;
 }
 
 /* Estado inicial da seta (>) */
@@ -1243,7 +1244,8 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   height: 1.2em;
   background: url('Imagens/Seta_Direita_Menu.svg') center/contain no-repeat;
   transition: transform 0.3s ease;
-  filter: invert(100%);
+  filter: invert(100%) !important;
+  opacity: 1 !important;
 }
 
 /* Estado da seta quando o menu está expandido (<) */

@@ -12,6 +12,12 @@
   if (session_status() === PHP_SESSION_NONE) {
     session_start();
   }
+  
+  // Evita cache do navegador
+  header("Cache-Control: no-cache, no-store, must-revalidate");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+  
   include_once('../BancoDados/conexao.php');
 
   // Aceita tanto 'id' quanto 'cod_evento' para compatibilidade
@@ -19,7 +25,7 @@
   $cpfUsuario = $_SESSION['cpf'] ?? null;
 
   if ($id_evento <= 0) {
-    echo '<script>alert("Código do evento inválido"); history.back();</script>';
+    header('Location: ContainerOrganizador.php?pagina=meusEventos');
     exit;
   }
 
@@ -36,10 +42,14 @@
     if (!mysqli_fetch_assoc($resultadoPermissao)) {
       mysqli_stmt_close($stmtPermissao);
       mysqli_close($conexao);
-      echo '<script>alert("Você não tem permissão para visualizar este evento"); history.back();</script>';
+      header('Location: ContainerOrganizador.php?pagina=meusEventos');
       exit;
     }
     mysqli_stmt_close($stmtPermissao);
+  } else {
+    mysqli_close($conexao);
+    header('Location: ContainerOrganizador.php?pagina=meusEventos');
+    exit;
   }
 
   // Busca dados do evento
@@ -94,12 +104,22 @@
 
     $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
 
-    // Certificado
-    $certificado = 'Não';
-    $certificado_numerico = 0;
-    if (isset($evento['certificado']) && (int)$evento['certificado'] === 1) {
-      $certificado = 'Sim';
-      $certificado_numerico = 1;
+    // Certificado - usa a lógica de tipos
+    $tipo_certificado = isset($evento['tipo_certificado']) ? $evento['tipo_certificado'] : '';
+    $tem_certificado = isset($evento['certificado']) && (int)$evento['certificado'] === 1;
+    $certificado_numerico = $tem_certificado ? 1 : 0;
+    
+    if ($tem_certificado) {
+        // Se tem certificado, verifica o tipo
+        if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensão') {
+            $certificado = $tipo_certificado;
+        } else if ($tipo_certificado === 'Outro') {
+            $certificado = 'Outro';
+        } else {
+            $certificado = 'Sim';
+        }
+    } else {
+        $certificado = 'Não';
     }
 
     // Modalidade
@@ -113,7 +133,7 @@
   } else {
     mysqli_stmt_close($stmt);
     mysqli_close($conexao);
-    echo '<script>alert("Evento não encontrado"); history.back();</script>';
+    header('Location: ContainerOrganizador.php?pagina=meusEventos');
     exit;
   }
 
@@ -395,7 +415,13 @@
     }
 
     .Local {
-      grid-column: span 8 / span 8;
+      grid-column: span 4 / span 4;
+      grid-row-start: 2;
+    }
+
+    .CargaHoraria {
+      grid-column: span 4 / span 4;
+      grid-column-start: 5;
       grid-row-start: 2;
     }
 
@@ -1289,7 +1315,7 @@
       </div>
       <div class="cartao-evento">
         <div class="Nome grupo-campo">
-          <span class="rotulo-campo">Nome:</span>
+          <span class="rotulo-campo">Nome: <span style="color: var(--vermelho);">*</span></span>
           <div id="event-name" class="caixa-valor"><?php echo htmlspecialchars($evento['nome']); ?></div>
           <input type="text" id="input-nome" class="campo-input" placeholder="Digite o nome do evento" autocomplete="off">
         </div>
@@ -1301,61 +1327,71 @@
           </div>
         </div>
         <div class="Local grupo-campo">
-          <span class="rotulo-campo">Local:</span>
+          <span class="rotulo-campo">Local: <span style="color: var(--vermelho);">*</span></span>
           <div id="event-local" class="caixa-valor"><?php echo htmlspecialchars($evento['lugar']); ?></div>
           <input type="text" id="input-local" class="campo-input" placeholder="Digite o local do evento" autocomplete="off">
         </div>
+        <div class="CargaHoraria grupo-campo">
+          <span class="rotulo-campo">Carga Horária: <span style="color: var(--vermelho);">*</span></span>
+          <div class="caixa-valor"><?php 
+            $carga_horaria = isset($evento['duracao']) && $evento['duracao'] > 0 ? floatval($evento['duracao']) : 0;
+            $horas = intval($carga_horaria);
+            $minutos = round(($carga_horaria - $horas) * 60);
+            echo str_pad($horas, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos, 2, '0', STR_PAD_LEFT);
+          ?></div>
+          <input type="number" id="input-carga-horaria" class="campo-input" placeholder="Horas" step="0.5" min="0" max="500" value="<?php echo $carga_horaria; ?>" autocomplete="off" required>
+        </div>
         <div class="DataHorarioInicio grupo-campo">
-          <span class="rotulo-campo">Data e Horário de Início do Evento:</span>
+          <span class="rotulo-campo">Data e Horário de Início do Evento: <span style="color: var(--vermelho);">*</span></span>
           <div class="campo-data-horario" id="campo-data-horario-inicio-visualizacao">
             <div id="start-date" class="caixa-valor"><?php echo $data_inicio; ?></div>
             <div id="start-time" class="caixa-valor"><?php echo $hora_inicio; ?></div>
           </div>
           <div class="campo-data-horario" id="campo-data-horario-inicio-edicao" style="display: none;">
-            <input type="date" id="input-data-inicio" class="campo-input" value="<?php echo $data_inicio_input; ?>" autocomplete="off">
-            <input type="time" id="input-horario-inicio" class="campo-input" value="<?php echo $hora_inicio_input; ?>" autocomplete="off">
+            <input type="date" id="input-data-inicio" class="campo-input" value="<?php echo $data_inicio_input; ?>" min="2025-11-20" max="2026-12-31" autocomplete="off" required>
+            <input type="time" id="input-horario-inicio" class="campo-input" value="<?php echo $hora_inicio_input; ?>" autocomplete="off" required>
           </div>
         </div>
         <div class="DataHorarioFim grupo-campo">
-          <span class="rotulo-campo">Data e Horário de Fim do Evento:</span>
+          <span class="rotulo-campo">Data e Horário de Fim do Evento: <span style="color: var(--vermelho);">*</span></span>
           <div class="campo-data-horario" id="campo-data-horario-fim-visualizacao">
             <div id="end-date" class="caixa-valor"><?php echo $data_fim; ?></div>
             <div id="end-time" class="caixa-valor"><?php echo $hora_fim; ?></div>
           </div>
           <div class="campo-data-horario" id="campo-data-horario-fim-edicao" style="display: none;">
-            <input type="date" id="input-data-fim" class="campo-input" value="<?php echo $data_fim_input; ?>" autocomplete="off">
-            <input type="time" id="input-horario-fim" class="campo-input" value="<?php echo $hora_fim_input; ?>" autocomplete="off">
+            <input type="date" id="input-data-fim" class="campo-input" value="<?php echo $data_fim_input; ?>" min="2025-11-20" max="2026-12-31" autocomplete="off" required>
+            <input type="time" id="input-horario-fim" class="campo-input" value="<?php echo $hora_fim_input; ?>" autocomplete="off" required>
           </div>
         </div>
         <div class="DataHorarioInscricaoInicio grupo-campo">
-          <span class="rotulo-campo">Início das Inscrições:</span>
+          <span class="rotulo-campo">Início das Inscrições: <span style="color: var(--vermelho);">*</span></span>
           <div class="campo-data-horario" id="campo-data-horario-inscricao-inicio-visualizacao">
             <div id="inicio-inscricao" class="caixa-valor"><?php echo htmlspecialchars($data_inicio_inscricao); ?></div>
             <div id="horario-inicio-inscricao" class="caixa-valor"><?php echo htmlspecialchars($hora_inicio_inscricao); ?></div>
           </div>
           <div class="campo-data-horario" id="campo-data-horario-inscricao-inicio-edicao" style="display: none;">
-            <input type="date" id="input-data-inicio-inscricao" class="campo-input" value="<?php echo $data_inicio_inscricao_input; ?>" autocomplete="off">
-            <input type="time" id="input-horario-inicio-inscricao" class="campo-input" value="<?php echo $hora_inicio_inscricao_input; ?>" autocomplete="off">
+            <input type="date" id="input-data-inicio-inscricao" class="campo-input" value="<?php echo $data_inicio_inscricao_input; ?>" min="2025-11-20" max="2026-12-31" autocomplete="off" required>
+            <input type="time" id="input-horario-inicio-inscricao" class="campo-input" value="<?php echo $hora_inicio_inscricao_input; ?>" autocomplete="off" required>
           </div>
         </div>
         <div class="DataHorarioInscricaoFim grupo-campo">
-          <span class="rotulo-campo">Fim das Inscrições:</span>
+          <span class="rotulo-campo">Fim das Inscrições: <span style="color: var(--vermelho);">*</span></span>
           <div class="campo-data-horario" id="campo-data-horario-inscricao-fim-visualizacao">
             <div id="fim-inscricao" class="caixa-valor"><?php echo htmlspecialchars($data_fim_inscricao); ?></div>
             <div id="horario-fim-inscricao" class="caixa-valor"><?php echo htmlspecialchars($hora_fim_inscricao); ?></div>
           </div>
           <div class="campo-data-horario" id="campo-data-horario-inscricao-fim-edicao" style="display: none;">
-            <input type="date" id="input-data-fim-inscricao" class="campo-input" value="<?php echo $data_fim_inscricao_input; ?>" autocomplete="off">
-            <input type="time" id="input-horario-fim-inscricao" class="campo-input" value="<?php echo $hora_fim_inscricao_input; ?>" autocomplete="off">
+            <input type="date" id="input-data-fim-inscricao" class="campo-input" value="<?php echo $data_fim_inscricao_input; ?>" min="2025-11-20" max="2026-12-31" autocomplete="off" required>
+            <input type="time" id="input-horario-fim-inscricao" class="campo-input" value="<?php echo $hora_fim_inscricao_input; ?>" autocomplete="off" required>
           </div>
         </div>
         <div class="PublicoAlvo grupo-campo">
-          <span class="rotulo-campo">Público alvo:</span>
+          <span class="rotulo-campo">Público alvo: <span style="color: var(--vermelho);">*</span></span>
           <div id="audience" class="caixa-valor"><?php echo htmlspecialchars($evento['publico_alvo'] ?? 'Não informado'); ?></div>
           <input type="text" id="input-publico-alvo" class="campo-input" placeholder="Ex: Estudantes" autocomplete="off">
         </div>
         <div class="Categoria grupo-campo">
-          <span class="rotulo-campo">Categoria:</span>
+          <span class="rotulo-campo">Categoria: <span style="color: var(--vermelho);">*</span></span>
           <div id="category" class="caixa-valor"><?php echo htmlspecialchars($evento['categoria'] ?? ''); ?></div>
           <select id="input-categoria" class="campo-select" autocomplete="off">
             <option value="">Selecione</option>
@@ -1369,7 +1405,7 @@
           </select>
         </div>
         <div class="Modalidade grupo-campo">
-          <span class="rotulo-campo">Modalidade:</span>
+          <span class="rotulo-campo">Modalidade: <span style="color: var(--vermelho);">*</span></span>
           <div id="modality" class="caixa-valor"><?php echo htmlspecialchars($modalidade); ?></div>
           <select id="input-modalidade" class="campo-select" autocomplete="off">
             <option value="">Selecione</option>
@@ -1379,14 +1415,14 @@
           </select>
         </div>
         <div class="Certificado grupo-campo">
-          <span class="rotulo-campo">Certificado:</span>
+          <span class="rotulo-campo">Certificado: <span style="color: var(--vermelho);">*</span></span>
           <div id="certificate" class="caixa-valor"><?php echo htmlspecialchars($certificado); ?></div>
           <select id="input-certificado" class="campo-select" autocomplete="off">
             <option value="">Selecione</option>
-            <option value="Sem certificacao" <?php echo $certificado_numerico === 0 && $certificado !== 'Ensino' && $certificado !== 'Pesquisa' && $certificado !== 'Extensao' && $certificado !== 'Outro' ? 'selected' : ''; ?>>Sem certificação</option>
+            <option value="Sem certificacao" <?php echo $certificado_numerico === 0 && $certificado !== 'Ensino' && $certificado !== 'Pesquisa' && $certificado !== 'Extensão' && $certificado !== 'Outro' ? 'selected' : ''; ?>>Sem certificação</option>
             <option value="Ensino" <?php echo $certificado === 'Ensino' ? 'selected' : ''; ?>>Ensino</option>
             <option value="Pesquisa" <?php echo $certificado === 'Pesquisa' ? 'selected' : ''; ?>>Pesquisa</option>
-            <option value="Extensao" <?php echo $certificado === 'Extensao' ? 'selected' : ''; ?>>Extensão</option>
+            <option value="Extensao" <?php echo $certificado === 'Extensão' || $certificado === 'Extensao' ? 'selected' : ''; ?>>Extensão</option>
             <option value="Outro" <?php echo $certificado === 'Outro' ? 'selected' : ''; ?>>Outro</option>
           </select>
         </div>
@@ -1410,7 +1446,7 @@
           <input type="file" id="input-imagem" name="imagens_evento" accept="image/*" multiple onchange="adicionarImagens(event)" autocomplete="off">
         </div>
         <div class="Descricao grupo-campo">
-          <span class="rotulo-campo">Descrição:</span>
+          <span class="rotulo-campo">Descrição: <span style="color: var(--vermelho);">*</span></span>
           <div id="description" class="caixa-valor caixa-descricao"><?php echo htmlspecialchars($evento['descricao']); ?></div>
           <textarea id="input-descricao" class="campo-textarea" placeholder="Descreva o evento..." autocomplete="off"><?php echo htmlspecialchars($evento['descricao']); ?></textarea>
         </div>
@@ -1418,7 +1454,7 @@
           <button id="btn-voltar" class="botao-voltar">Voltar</button>
         </div>
         <div class="BotaoParticipantes botao">
-          <button id="btn-participantes" class="botao-participantes">Participantes</button>
+          <button id="btn-participantes" class="botao-participantes">Gerenciar</button>
         </div>
         <div class="BotaoEditar botao">
           <button id="btn-editar" class="botao-editar">Editar</button>

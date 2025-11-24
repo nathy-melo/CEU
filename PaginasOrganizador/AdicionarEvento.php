@@ -53,14 +53,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $inicio = $dataInicio . ' ' . $horarioInicio . ':00';
     $conclusao = $dataFim . ' ' . $horarioFim . ':00';
 
+    // Valida formato de data e hora
+    try {
+        $dataInicioObj = new DateTime($inicio);
+        $dataConclusaoObj = new DateTime($conclusao);
+    } catch (Exception $e) {
+        echo json_encode(['erro' => 'Data ou horário inválidos. Verifique os valores informados.']);
+        exit;
+    }
+
+    // Valida se a data de início não está no passado
+    $dataHoraAtual = new DateTime();
+    if ($dataInicioObj < $dataHoraAtual) {
+        echo json_encode(['erro' => 'Não é possível criar um evento com data de início no passado']);
+        exit;
+    }
+
     // Combina data e hora das inscrições (se fornecidas)
     $inicioInscricao = null;
     $fimInscricao = null;
     if (!empty($dataInicioInscricao) && !empty($horarioInicioInscricao)) {
         $inicioInscricao = $dataInicioInscricao . ' ' . $horarioInicioInscricao . ':00';
+        try {
+            new DateTime($inicioInscricao);
+        } catch (Exception $e) {
+            echo json_encode(['erro' => 'Data ou horário de início das inscrições inválidos.']);
+            exit;
+        }
     }
     if (!empty($dataFimInscricao) && !empty($horarioFimInscricao)) {
         $fimInscricao = $dataFimInscricao . ' ' . $horarioFimInscricao . ':00';
+        try {
+            new DateTime($fimInscricao);
+        } catch (Exception $e) {
+            echo json_encode(['erro' => 'Data ou horário de fim das inscrições inválidos.']);
+            exit;
+        }
     }
     
     // Converte NULL para string vazia para bind_param (será tratado como NULL no banco)
@@ -68,10 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fimInscricaoStr = $fimInscricao ?? '';
 
     // Calcula duração em horas
-    $dataInicioObj = new DateTime($inicio);
-    $dataConclusaoObj = new DateTime($conclusao);
     $intervalo = $dataInicioObj->diff($dataConclusaoObj);
     $duracao = ($intervalo->days * 24) + $intervalo->h + ($intervalo->i / 60);
+    
+    // Valida: se o evento é no mesmo dia, não pode ter mais de 16 horas
+    if ($intervalo->days === 0 && $duracao > 16) {
+        echo json_encode(['erro' => 'Um evento de um único dia não pode ter mais de 16 horas de duração.']);
+        exit;
+    }
 
     // Converte certificado para booleano
     $certificadoBool = ($certificado !== 'Sem certificacao') ? 1 : 0;
@@ -154,20 +186,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         garantirColunaEvento($conexao, 'inicio_inscricao', 'DATETIME NULL');
         garantirColunaEvento($conexao, 'fim_inscricao', 'DATETIME NULL');
+        garantirColunaEvento($conexao, 'tipo_certificado', "VARCHAR(50) NULL DEFAULT 'Sem certificacao'");
 
         // Insere evento (mantém campo imagem com a principal para compatibilidade)
-        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao, tipo_certificado) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
-        // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s)
+        // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s)
         // Para campos NULL, usa string vazia (será tratado como NULL no banco se o campo aceitar NULL)
         $inicioInscricaoFinal = (!empty($inicioInscricaoStr)) ? $inicioInscricaoStr : '';
         $fimInscricaoFinal = (!empty($fimInscricaoStr)) ? $fimInscricaoStr : '';
         
         mysqli_stmt_bind_param(
             $stmtEvento,
-            "isssssssdissss",
+            "isssssssdisssss",
             $codEvento,
             $categoria,
             $nome,
@@ -181,7 +214,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $modalidade,
             $caminhoImagemPrincipal,
             $inicioInscricaoFinal,
-            $fimInscricaoFinal
+            $fimInscricaoFinal,
+            $certificado
         );
 
         if (!mysqli_stmt_execute($stmtEvento)) {
@@ -1134,28 +1168,28 @@ mysqli_close($conexao);
             <div class="DataHorarioInicio grupo-campo">
                 <label for="data-inicio"><span style="color: red;">*</span> Data e Horário de Início do Evento:</label>
                 <div class="campo-data-horario">
-                    <input type="date" id="data-inicio" name="data_inicio" class="campo-input" required autocomplete="off">
+                    <input type="date" id="data-inicio" name="data_inicio" class="campo-input" min="1900-01-01" max="2099-12-31" required autocomplete="off">
                     <input type="time" id="horario-inicio" name="horario_inicio" class="campo-input" required autocomplete="off">
                 </div>
             </div>
             <div class="DataHorarioFim grupo-campo">
                 <label for="data-fim"><span style="color: red;">*</span> Data e Horário de Fim do Evento:</label>
                 <div class="campo-data-horario">
-                    <input type="date" id="data-fim" name="data_fim" class="campo-input" required autocomplete="off">
+                    <input type="date" id="data-fim" name="data_fim" class="campo-input" min="1900-01-01" max="2099-12-31" required autocomplete="off">
                     <input type="time" id="horario-fim" name="horario_fim" class="campo-input" required autocomplete="off">
                 </div>
             </div>
             <div class="DataHorarioInscricaoInicio grupo-campo">
                 <label for="data-inicio-inscricao">Início das Inscrições:</label>
                 <div class="campo-data-horario">
-                    <input type="date" id="data-inicio-inscricao" name="data_inicio_inscricao" class="campo-input" autocomplete="off">
+                    <input type="date" id="data-inicio-inscricao" name="data_inicio_inscricao" class="campo-input" min="1900-01-01" max="2099-12-31" autocomplete="off">
                     <input type="time" id="horario-inicio-inscricao" name="horario_inicio_inscricao" class="campo-input" autocomplete="off">
                 </div>
             </div>
             <div class="DataHorarioInscricaoFim grupo-campo">
                 <label for="data-fim-inscricao">Fim das Inscrições:</label>
                 <div class="campo-data-horario">
-                    <input type="date" id="data-fim-inscricao" name="data_fim_inscricao" class="campo-input" autocomplete="off">
+                    <input type="date" id="data-fim-inscricao" name="data_fim_inscricao" class="campo-input" min="1900-01-01" max="2099-12-31" autocomplete="off">
                     <input type="time" id="horario-fim-inscricao" name="horario_fim_inscricao" class="campo-input" autocomplete="off">
                 </div>
             </div>

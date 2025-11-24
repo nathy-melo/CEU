@@ -67,7 +67,28 @@
     $nome_organizador = 'Não informado';
   }
 
-  $certificado = (isset($evento['certificado']) && (int)$evento['certificado'] === 1) ? 'Sim' : 'Não';
+  // Define o texto para exibição de certificado
+  $tipo_certificado = isset($evento['tipo_certificado']) ? $evento['tipo_certificado'] : '';
+  $tem_certificado = isset($evento['certificado']) && (int)$evento['certificado'] === 1;
+  
+  if ($tem_certificado) {
+    // Se tem certificado, verifica o tipo
+    if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensão') {
+      $certificado = $tipo_certificado;
+    } else {
+      // Se for "Outro" ou qualquer outro valor, exibe apenas "Sim"
+      $certificado = 'Sim';
+    }
+  } else {
+    // Se não tem certificado
+    $certificado = 'Não';
+  }
+  
+  // Verifica se o evento já foi finalizado
+  $dataHoraAtual = new DateTime();
+  $dataConclusaoEvento = new DateTime($evento['conclusao']);
+  $eventoFinalizado = ($dataConclusaoEvento < $dataHoraAtual);
+  
   $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
   // Ajustar caminho da imagem relativo a esta pasta
@@ -158,7 +179,13 @@
   }
 
   .Local {
-    grid-column: span 8 / span 8;
+    grid-column: span 4 / span 4;
+    grid-row-start: 2;
+  }
+
+  .CargaHoraria {
+    grid-column: span 4 / span 4;
+    grid-column-start: 5;
     grid-row-start: 2;
   }
 
@@ -262,6 +289,38 @@
     grid-column: span 2 / span 2;
     grid-column-start: 7;
     grid-row-start: 9;
+  }
+  
+  .BotaoInscrever button,
+  .BotaoInscrever .botao-finalizado {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.35rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: block;
+  }
+  
+  .BotaoInscrever button {
+    background-color: var(--botao);
+    color: var(--branco);
+  }
+  
+  .BotaoInscrever button:hover {
+    background-color: var(--botao-hover, #5a52d5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .BotaoInscrever .botao-finalizado {
+    background-color: var(--cinza-escuro);
+    color: var(--branco);
+    cursor: not-allowed;
+    opacity: 0.8;
   }
 
   /* Imagem */
@@ -917,6 +976,15 @@
           <label>Local:</label>
           <div id="event-local" class="caixa-valor"><?= htmlspecialchars($evento['lugar']) ?></div>
         </div>
+        <div class="CargaHoraria grupo-campo">
+          <label>Carga Horária:</label>
+          <div class="caixa-valor"><?php 
+            $carga_horaria = isset($evento['duracao']) && $evento['duracao'] > 0 ? floatval($evento['duracao']) : 0;
+            $horas = intval($carga_horaria);
+            $minutos = round(($carga_horaria - $horas) * 60);
+            echo str_pad($horas, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos, 2, '0', STR_PAD_LEFT);
+          ?></div>
+        </div>
         <div class="DataHorarioInicio grupo-campo">
           <label>Data e Horário de Início do Evento:</label>
           <div class="campo-data-horario">
@@ -975,7 +1043,13 @@
           <button class="botao">Ser Colaborador</button>
         </div>
         <div class="BotaoInscrever">
-          <button class="botao">Inscreva-se</button>
+          <?php if ($eventoFinalizado): ?>
+            <div class="botao-finalizado">
+              Evento Finalizado
+            </div>
+          <?php else: ?>
+            <button class="botao">Inscreva-se</button>
+          <?php endif; ?>
         </div>
       </div>
     </main>

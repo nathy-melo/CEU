@@ -177,7 +177,7 @@ function mostrarNotificacoes() {
         }
         
         html += `
-            <div class="notificacao-item ${lida ? 'lida' : ''}" data-id="${notif.id}" data-notif-id="${notif.id}" data-cod-evento="${codEvento || ''}">
+            <div class="notificacao-item ${lida ? 'lida' : ''}" data-id="${notif.id}" data-notif-id="${notif.id}" data-cod-evento="${codEvento || ''}" onclick="irParaEvento(${codEvento || 0}, ${notif.id})" style="cursor: pointer;">
                 <div class="notificacao-topo">
                     <span class="notificacao-tipo-badge ${tipoClass}">
                         ${traduzirTipo(notif.tipo, true)}
@@ -895,5 +895,25 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
-// Log final desabilitado para reduzir ruído no console
-
+// Função para redirecionar ao clicar na notificação
+function irParaEvento(codEvento, notifId) {
+    if (!codEvento || codEvento === 0) return;
+    
+    // Marca notificação como lida
+    marcarComoLida(notifId);
+    
+    // Redireciona para o evento
+    const tipoUsuario = window.location.pathname.includes('Participante') ? 'Participante' : 
+                       window.location.pathname.includes('Organizador') ? 'Organizador' : 'Publicas';
+    
+    let urlEvento = '';
+    if (tipoUsuario === 'Participante') {
+        urlEvento = `../PaginasParticipante/ContainerParticipante.php?pagina=evento&id=${codEvento}`;
+    } else if (tipoUsuario === 'Organizador') {
+        urlEvento = `../PaginasOrganizador/ContainerOrganizador.php?pagina=evento&id=${codEvento}`;
+    } else {
+        urlEvento = `../PaginasPublicas/EventoPublico.php?codEvento=${codEvento}`;
+    }
+    
+    window.location.href = urlEvento;
+}

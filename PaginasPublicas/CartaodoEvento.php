@@ -14,7 +14,7 @@
     }
     include_once('../BancoDados/conexao.php');
 
-    $id_evento = isset($_GET['id']) ? (int)$_GET['id'] : 1;
+    $id_evento = isset($_GET['cod_evento']) ? (int)$_GET['cod_evento'] : (isset($_GET['id']) ? (int)$_GET['id'] : 1);
     $sql = "SELECT e.*, u.Nome as nome_organizador 
             FROM evento e 
             LEFT JOIN organiza o ON e.cod_evento = o.cod_evento 
@@ -47,6 +47,9 @@
         }
 
         $nome_organizador = isset($evento['nome_organizador']) && $evento['nome_organizador'] !== '' ? $evento['nome_organizador'] : 'Não informado';
+        
+        // Carga horária do banco de dados
+        $carga_horaria = isset($evento['duracao']) && $evento['duracao'] > 0 ? floatval($evento['duracao']) : 0;
     } else {
         // Se não encontrou o evento, usar dados padrão
         $evento = array(
@@ -68,9 +71,31 @@
         $hora_inicio_inscricao = '-';
         $hora_fim_inscricao = '-';
         $nome_organizador = 'Não informado';
+        $carga_horaria = 0;
     }
 
-    $certificado = (isset($evento['certificado']) && (int)$evento['certificado'] === 1) ? 'Sim' : 'Não';
+    // Define o texto para exibição de certificado
+    $tipo_certificado = isset($evento['tipo_certificado']) ? $evento['tipo_certificado'] : '';
+    $tem_certificado = isset($evento['certificado']) && (int)$evento['certificado'] === 1;
+    
+    if ($tem_certificado) {
+        // Se tem certificado, verifica o tipo
+        if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensão') {
+            $certificado_display = $tipo_certificado;
+        } else {
+            // Se for "Outro" ou qualquer outro valor, exibe apenas "Sim"
+            $certificado_display = 'Sim';
+        }
+    } else {
+        // Se não tem certificado
+        $certificado_display = 'Não';
+    }
+
+    // Verifica se o evento já foi finalizado
+    $dataHoraAtual = new DateTime();
+    $dataConclusaoEvento = new DateTime($evento['conclusao']);
+    $eventoFinalizado = ($dataConclusaoEvento < $dataHoraAtual);
+
     $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
     // Ajustar caminho da imagem relativo a esta pasta - usar CEU-Logo.png como padrão
@@ -155,7 +180,13 @@
         }
 
         .Local {
-            grid-column: span 8 / span 8;
+            grid-column: span 4 / span 4;
+            grid-row-start: 2;
+        }
+
+        .CargaHoraria {
+            grid-column: span 4 / span 4;
+            grid-column-start: 5;
             grid-row-start: 2;
         }
 
@@ -677,6 +708,14 @@
                 <label>Local:</label>
                 <div class="caixa-valor"><?php echo htmlspecialchars($evento['lugar']); ?></div>
             </div>
+            <div class="CargaHoraria grupo-campo">
+                <label>Carga Horária:</label>
+                <div class="caixa-valor"><?php 
+                    $horas = intval($carga_horaria);
+                    $minutos = round(($carga_horaria - $horas) * 60);
+                    echo str_pad($horas, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos, 2, '0', STR_PAD_LEFT);
+                ?></div>
+            </div>
             <div class="DataHorarioInicio grupo-campo">
                 <label>Data e Horário de Início do Evento:</label>
                 <div class="campo-data-horario">
@@ -719,13 +758,13 @@
             </div>
             <div class="Certificado grupo-campo">
                 <label>Certificado:</label>
-                <div class="caixa-valor"><?php echo $certificado; ?></div>
+                <div class="caixa-valor"><?php echo htmlspecialchars($certificado_display); ?></div>
             </div>
             <div class="Imagem campo-imagem">
                 <div class="carrossel-imagens">
-                    <button class="carrossel-btn carrossel-anterior" onclick="mudarImagem(-1)">â®œ</button>
+                    <button class="carrossel-btn carrossel-anterior" onclick="mudarImagem(-1)">⮜</button>
                     <img id="imagem-carrossel" src="<?php echo htmlspecialchars($imagem_src); ?>" alt="Imagem do evento">
-                    <button class="carrossel-btn carrossel-proxima" onclick="mudarImagem(1)">â®ž</button>
+                    <button class="carrossel-btn carrossel-proxima" onclick="mudarImagem(1)">⮞</button>
                 </div>
             </div>
             <div class="Descricao grupo-campo">
@@ -749,9 +788,9 @@
 
         <div id="modal-imagem" class="modal-imagem">
             <button onclick="fecharModalImagem()" class="modal-imagem-btn-fechar">&times;</button>
-            <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">â®œ</button>
+            <button class="carrossel-btn carrossel-anterior modal-imagem-btn-anterior" onclick="mudarImagemModal(-1)">⮜</button>
             <img id="imagem-ampliada" src="" alt="Imagem ampliada" class="modal-imagem-img">
-            <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">â®ž</button>
+            <button class="carrossel-btn carrossel-proxima modal-imagem-btn-proxima" onclick="mudarImagemModal(1)">⮞</button>
         </div>
 
         <!-- Modal Compartilhar -->

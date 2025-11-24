@@ -85,8 +85,22 @@ function carregarEventosDoServidor() {
                     else duracaoFaixa = 'mais_5h';
                 }
                 
-                const cert = (parseInt(evento.certificado) === 1) ? 'sim' : 'nao';
-                const certTexto = (cert === 'sim') ? 'Sim' : 'Não';
+                // Certificado: considerar tipo_certificado
+                const tipoCertificado = evento.tipo_certificado || '';
+                const temCertificado = parseInt(evento.certificado) === 1;
+                let certTexto, cert;
+                
+                if (temCertificado) {
+                    if (tipoCertificado === 'Ensino' || tipoCertificado === 'Pesquisa' || tipoCertificado === 'Extensao') {
+                        certTexto = tipoCertificado;
+                    } else {
+                        certTexto = 'Sim';
+                    }
+                    cert = 'sim';
+                } else {
+                    certTexto = 'Não';
+                    cert = 'nao';
+                }
 
                 // Caminho da imagem do evento, com fallback para imagem padrão
                 const imagemEvento = (evento.imagem && String(evento.imagem).trim() !== '')

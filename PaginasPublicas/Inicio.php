@@ -344,8 +344,21 @@
               $duracaoFaixa = 'mais_20h';
             }
           }
-          // Certificado: simples sim/nao
-          $cert = ((int)$ev['certificado'] === 1) ? 'sim' : 'nao';
+          // Certificado: considerar tipo_certificado
+          $tipo_certificado = $ev['tipo_certificado'] ?? '';
+          $tem_certificado = ((int)$ev['certificado'] === 1);
+          
+          if ($tem_certificado) {
+            if ($tipo_certificado === 'Ensino' || $tipo_certificado === 'Pesquisa' || $tipo_certificado === 'Extensao') {
+              $certTexto = $tipo_certificado;
+            } else {
+              $certTexto = 'Sim';
+            }
+            $cert = 'sim';
+          } else {
+            $certTexto = 'Não';
+            $cert = 'nao';
+          }
 
           // Preparar caminho da imagem
           $imagem_evento = isset($ev['imagem']) && $ev['imagem'] !== '' ? $ev['imagem'] : 'ImagensEventos/CEU-ImagemEvento.png';
@@ -409,7 +422,7 @@
                     <img src="../Imagens/info-certificado.svg" alt="" />
                   </span>
                   <span class="evento-info-texto"><span class="evento-info-label">Certificado:</span>
-                    <?= ($cert === 'sim' ? 'Sim' : 'Não') ?>
+                    <?= htmlspecialchars($ev['certificado'] == 1 ? 'Sim' : 'Não') ?>
                   </span>
                 </li>
               </ul>

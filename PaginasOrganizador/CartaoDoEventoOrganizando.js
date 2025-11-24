@@ -779,6 +779,8 @@
     modoEdicao = false;
 
     try {
+      document.querySelectorAll('.asterisco-obrigatorio').forEach(el => el.remove());
+      
       // Restaurar dados originais
       const eventName = document.getElementById('event-name');
       const eventLocal = document.getElementById('event-local');
@@ -884,6 +886,7 @@
       const inputModalidade = document.getElementById('input-modalidade');
       const inputCertificado = document.getElementById('input-certificado');
       const inputDescricao = document.getElementById('input-descricao');
+      const inputCargaHoraria = document.getElementById('input-carga-horaria');
 
       // Prepara FormData
       const formData = new FormData();
@@ -903,6 +906,33 @@
       formData.append('modalidade', inputModalidade.value);
       formData.append('certificado', inputCertificado.value);
       formData.append('descricao', inputDescricao.value);
+      formData.append('duracao', inputCargaHoraria.value);
+
+      // Validação adicional de datas de inscrição
+      if (inputDataInicioInscricao.value && inputHorarioInicioInscricao.value) {
+        const dataInicioInscricaoValida = new Date(inputDataInicioInscricao.value + 'T' + inputHorarioInicioInscricao.value);
+        if (isNaN(dataInicioInscricaoValida.getTime())) {
+          alert('Data ou horário de início das inscrições inválidos.');
+          return;
+        }
+      }
+      
+      if (inputDataFimInscricao.value && inputHorarioFimInscricao.value) {
+        const dataFimInscricaoValida = new Date(inputDataFimInscricao.value + 'T' + inputHorarioFimInscricao.value);
+        if (isNaN(dataFimInscricaoValida.getTime())) {
+          alert('Data ou horário de fim das inscrições inválidos.');
+          return;
+        }
+      }
+
+      // Confirmação antes de salvar alterações
+      const confirmacao = confirm(
+        'Ao salvar as alterações, todos os participantes inscritos neste evento serão notificados sobre as mudanças realizadas. Deseja continuar?'
+      );
+      
+      if (!confirmacao) {
+        return;
+      }
 
       // Adiciona imagens se houver novas
       const inputImagem = document.getElementById('input-imagem');
@@ -1078,6 +1108,8 @@
             // Se não há imagens e não havia imagens originais, mantém o estado atual
 
             modoEdicao = false;
+
+            document.querySelectorAll('.asterisco-obrigatorio').forEach(el => el.remove());
 
             // Mostrar caixas de valor e esconder inputs
             document.querySelectorAll('.caixa-valor').forEach(el => {
