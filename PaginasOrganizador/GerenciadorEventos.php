@@ -151,7 +151,7 @@ try {
     }
 
     // ===========================
-    // LISTAR EVENTOS DE COLABORAÇÍO
+    // LISTAR EVENTOS DE COLABORAÇÃO
     // ===========================
     if ($action === 'listar_colaboracao') {
         garantirEsquemaColaboradores($conexao);

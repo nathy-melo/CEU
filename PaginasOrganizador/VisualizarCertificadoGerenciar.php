@@ -124,13 +124,13 @@ if (!$arquivoExiste) {
         $dados = mysqli_fetch_assoc($resDados);
         mysqli_stmt_close($stmtDados);
 
-        $debugLog[] = "📊 Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÍO ENCONTRADOS");
+        $debugLog[] = "Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÃO ENCONTRADOS");
 
         if ($dados) {
             // Incluir o autoload de bibliotecas
             $autoloadPath = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
             $autoloadExiste = file_exists($autoloadPath);
-            $debugLog[] = "📚 Autoload: " . ($autoloadExiste ? "EXISTE" : "NÍO EXISTE") . " em $autoloadPath";
+            $debugLog[] = "Autoload: " . ($autoloadExiste ? "EXISTE" : "NÃO EXISTE") . " em $autoloadPath";
 
             if ($autoloadExiste) {
                 require_once $autoloadPath;
@@ -178,7 +178,7 @@ if (!$arquivoExiste) {
                     }
                 }
 
-                $debugLog[] = "📄 Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÍO ENCONTRADO");
+                $debugLog[] = "Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÃO ENCONTRADO");
 
                 if ($templatePath) {
                     // Preparar dados para preenchimento
@@ -228,7 +228,7 @@ if (!$arquivoExiste) {
                     if ($sucesso) {
                         // Atualizar verificação
                         $arquivoExiste = file_exists($arquivoPdf);
-                        $debugLog[] = "✅ PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÍO");
+                        $debugLog[] = "PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÃO");
 
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {

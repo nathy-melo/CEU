@@ -9,7 +9,7 @@ if (!isset($_SESSION['cpf'])) {
     exit;
 }
 
-// ParÍ¢metros obrigatórios
+// Parâmetros obrigatórios
 $codigoVerificacao = isset($_GET['codigo']) ? trim($_GET['codigo']) : '';
 
 if (!$codigoVerificacao) {
@@ -191,13 +191,13 @@ if (!$arquivoExiste) {
         $dados = mysqli_fetch_assoc($resDados);
         mysqli_stmt_close($stmtDados);
 
-        $debugLog[] = "ðŸ“Š Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÍO ENCONTRADOS");
+        $debugLog[] = "Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÃO ENCONTRADOS");
 
         if ($dados) {
             // Incluir o autoload de bibliotecas
             $autoloadPath = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
             $autoloadExiste = file_exists($autoloadPath);
-            $debugLog[] = "ðŸ“š Autoload: " . ($autoloadExiste ? "EXISTE" : "NÍO EXISTE") . " em $autoloadPath";
+            $debugLog[] = "Autoload: " . ($autoloadExiste ? "EXISTE" : "NÃO EXISTE") . " em $autoloadPath";
 
             if ($autoloadExiste) {
                 require_once $autoloadPath;
@@ -205,11 +205,11 @@ if (!$arquivoExiste) {
 
             // Carregar ProcessadorTemplate e tentar gerar
             require_once __DIR__ . '/../Certificacao/ProcessadorTemplate.php';
-            $debugLog[] = "âœ… ProcessadorTemplate carregado";
+            $debugLog[] = "ProcessadorTemplate carregado";
 
             try {
                 $proc = new \CEU\Certificacao\ProcessadorTemplate($autoloadPath);
-                $debugLog[] = "âœ… ProcessadorTemplate instanciado";
+                $debugLog[] = "ProcessadorTemplate instanciado";
 
                 // Obter template do modelo
                 $modelo = $certificado['modelo'] ?? 'universal';
@@ -245,7 +245,7 @@ if (!$arquivoExiste) {
                     }
                 }
 
-                $debugLog[] = "ðŸ“„ Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÍO ENCONTRADO");
+                $debugLog[] = "Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÃO ENCONTRADO");
 
                 if ($templatePath) {
                     // Preparar dados para preenchimento
@@ -282,12 +282,12 @@ if (!$arquivoExiste) {
                     // Extrair nome do arquivo original da coluna 'arquivo'
                     $arquivoOriginal = basename($certificado['arquivo']);
                     $caminhoSaida = $pastaSaida . '/' . $arquivoOriginal;
-                    $debugLog[] = "ðŸ’¾ Caminho de saída: $caminhoSaida";
+                    $debugLog[] = "Caminho de saída: $caminhoSaida";
 
                     // Gerar PDF
-                    $debugLog[] = "ðŸš€ Iniciando geração do PDF...";
+                    $debugLog[] = "Iniciando geração do PDF...";
                     $resultado = $proc->gerarPdfDeModelo($templatePath, $dadosCert, $caminhoSaida);
-                    $debugLog[] = "ðŸ“‹ Resultado da geração: " . json_encode($resultado, JSON_UNESCAPED_UNICODE);
+                    $debugLog[] = "Resultado da geração: " . json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
                     // Verifica sucesso (pode ser 'sucesso' ou 'success')
                     $sucesso = ($resultado['sucesso'] ?? $resultado['success'] ?? false);
@@ -295,11 +295,11 @@ if (!$arquivoExiste) {
                     if ($sucesso) {
                         // Atualizar verificação
                         $arquivoExiste = file_exists($arquivoPdf);
-                        $debugLog[] = "âœ… PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÍO");
+                        $debugLog[] = "PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÃO");
 
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {
-                            $debugLog[] = "ðŸ”„ Recarregando página para exibir o certificado...";
+                            $debugLog[] = "Recarregando página para exibir o certificado...";
                             echo "<script>window.location.reload();</script>";
                             exit;
                         }
@@ -573,7 +573,7 @@ if (!$arquivoExiste) {
     <script>
         // Logs de debug da regeneração do certificado
         <?php if (!empty($debugLog)): ?>
-            console.group('ðŸ”§ DEBUG: Regeneração do Certificado');
+            console.group('DEBUG: Regeneração do Certificado');
             <?php foreach ($debugLog as $log): ?>
                 console.log(<?php echo json_encode($log, JSON_UNESCAPED_UNICODE); ?>);
             <?php endforeach; ?>

@@ -234,7 +234,7 @@ if (!$arquivoExiste) {
                         ? 'ModeloExemploOrganizador'
                         : 'ModeloExemplo';
 
-                    $debugLog[] = "âš ï¸ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
+                    $debugLog[] = "⚠️ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
 
                     foreach ($possiveisExtensoes as $ext) {
                         $caminho = __DIR__ . "/../Certificacao/templates/$modeloPadrao.$ext";
@@ -295,7 +295,7 @@ if (!$arquivoExiste) {
                     if ($sucesso) {
                         // Atualizar verificação
                         $arquivoExiste = file_exists($arquivoPdf);
-                        $debugLog[] = "… PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NO");
+                        $debugLog[] = "✅ PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÃO");
 
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {
@@ -314,7 +314,7 @@ if (!$arquivoExiste) {
                 $debugLog[] = "📍 Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
             }
         } else {
-            $debugLog[] = "❌ Não foi possvel buscar dados do evento/usuário";
+            $debugLog[] = "❌ Não foi possível buscar dados do evento/usuário";
         }
     } catch (Exception $e) {
         $debugLog[] = "❌ ERRO GERAL: " . $e->getMessage();
@@ -573,7 +573,7 @@ if (!$arquivoExiste) {
     <script>
         // Logs de debug da regeneração do certificado
         <?php if (!empty($debugLog)): ?>
-            console.group('ðŸ”§ DEBUG: Regeneração do Certificado');
+            console.group('DEBUG: Regeneração do Certificado');
             <?php foreach ($debugLog as $log): ?>
                 console.log(<?php echo json_encode($log, JSON_UNESCAPED_UNICODE); ?>);
             <?php endforeach; ?>
