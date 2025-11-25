@@ -15,29 +15,29 @@ function validarLogin() {
     var email = campoEmail.value.trim();
     var senha = campoSenha.value.trim();
 
-    if (!email || (!senha && !MODO_TESTE_LOGIN)) {
-        mostrarMensagem('⚠️ Todos os campos são obrigatórios!', 'erro', 'erro-login');
+    // Validação campo por campo para mensagens específicas
+    if (!email) {
+        mostrarMensagem('⚠️ O e-mail é obrigatório!', 'erro', 'erro-login');
+        campoEmail.focus();
         return false;
     }
 
     if (!validarEmail(email)) {
-        mostrarMensagem('⚠️ Por favor, insira um e-mail válido!', 'erro', 'erro-login');
+        mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-login');
+        campoEmail.focus();
         return false;
     }
 
-    if (!MODO_TESTE_LOGIN && senha.length < 8) {
+    if (!senha) {
+        mostrarMensagem('⚠️ A senha é obrigatória!', 'erro', 'erro-login');
+        campoSenha.focus();
+        return false;
+    }
+
+    if (senha.length < 8) {
         mostrarMensagem('⚠️ A senha deve ter pelo menos 8 caracteres!', 'erro', 'erro-login');
+        campoSenha.focus();
         return false;
-    }
-
-    // Se estiver em modo debug e senha estiver vazia, define uma senha padrão
-    if (MODO_TESTE_LOGIN && !senha) {
-        campoSenha.value = '12345678'; // Senha padrão para testes
-        console.log('🔧 [DEBUG] Senha padrão aplicada para testes');
-    }
-
-    if (MODO_TESTE_LOGIN) {
-        console.log('🔧 [DEBUG] Modo debug ativo - validações de senha desativadas');
     }
 
     mostrarMensagem('🔄 Verificando suas credenciais...', 'info', 'erro-login');

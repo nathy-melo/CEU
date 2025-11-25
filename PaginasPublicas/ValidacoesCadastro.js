@@ -6,6 +6,7 @@ var VALIDAR_CPF = false;           // true = valida CPF, false = não valida
 var VALIDAR_EMAIL = false;         // true = valida email, false = não valida  
 var VALIDAR_SENHA = false;         // true = valida senha, false = não valida
 var SENHA_MINIMA = 0;             // mínimo de caracteres (0 = desativar)
+var NOME_MINIMO = 0;              // mínimo de caracteres (0 = desativar)
 // ================================================
 
 function validarCadastroParticipante() {
@@ -23,8 +24,22 @@ function validarCadastroParticipante() {
     var confirmar = campoConfirmar ? campoConfirmar.value.trim() : '';
     var termos = campoTermos ? campoTermos.checked : false;
 
-    if (!nome || !cpf || !email || !senha || !confirmar) {
-        mostrarMensagem('⚠️ Todos os campos são obrigatórios!', 'erro', 'erro-cadastro');
+    // Validação campo por campo para mensagens específicas
+    if (!nome) {
+        mostrarMensagem('⚠️ O nome completo é obrigatório!', 'erro', 'erro-cadastro');
+        if (campoNome) campoNome.focus();
+        return false;
+    }
+
+    if (nome.length < NOME_MINIMO) {
+        mostrarMensagem('⚠️ O nome completo deve ter pelo menos ' + NOME_MINIMO + ' caracteres!', 'erro', 'erro-cadastro');
+        if (campoNome) campoNome.focus();
+        return false;
+    }
+
+    if (!cpf) {
+        mostrarMensagem('⚠️ O CPF é obrigatório!', 'erro', 'erro-cadastro');
+        if (campoCPF) campoCPF.focus();
         return false;
     }
 
@@ -81,46 +96,82 @@ function validarCadastroOrganizador() {
     var confirmar = campoConfirmar ? campoConfirmar.value.trim() : '';
     var termos = campoTermos ? campoTermos.checked : false;
 
-    if (!codigo || !nome || !cpf || !email || !senha || !confirmar) {
-        mostrarMensagem('⚠️ Todos os campos são obrigatórios!', 'erro', 'erro-cadastro');
+    if (!codigo) {
+        mostrarMensagem('⚠️ O código de acesso é obrigatório!', 'erro', 'erro-cadastro');
+        if (campoCodigo) campoCodigo.focus();
         return false;
     }
 
-    // Validação específica do código de organizador (novo formato)
     if (codigo.length !== 8) {
         mostrarMensagem('⚠️ O código de acesso deve ter exatamente 8 caracteres!', 'erro', 'erro-cadastro');
+        if (campoCodigo) campoCodigo.focus();
         return false;
     }
 
     if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(codigo)) {
         mostrarMensagem('⚠️ Código inválido! Use apenas: A-Z (exceto I, O) e números 2-9 (exceto 0, 1)', 'erro', 'erro-cadastro');
+        if (campoCodigo) campoCodigo.focus();
         return false;
     }
 
-    if (VALIDAR_CPF) {
-        if (!validarCPF(cpf)) {
-            mostrarMensagem('⚠️ CPF inválido!', 'erro', 'erro-cadastro');
-            return false;
-        }
+    if (!nome) {
+        mostrarMensagem('⚠️ O nome completo é obrigatório!', 'erro', 'erro-cadastro');
+        if (campoNome) campoNome.focus();
+        return false;
     }
 
-    if (VALIDAR_EMAIL) {
-        if (!validarEmail(email)) {
-            mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
-            return false;
-        }
+    if (nome.length < NOME_MINIMO) {
+        mostrarMensagem('⚠️ O nome completo deve ter pelo menos ' + NOME_MINIMO + ' caracteres!', 'erro', 'erro-cadastro');
+        if (campoNome) campoNome.focus();
+        return false;
     }
 
-    if (VALIDAR_SENHA) {
-        if (SENHA_MINIMA > 0 && senha.length < SENHA_MINIMA) {
-            mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
-            return false;
-        }
+    if (!cpf) {
+        mostrarMensagem('⚠️ O CPF é obrigatório!', 'erro', 'erro-cadastro');
+        if (campoCPF) campoCPF.focus();
+        return false;
+    }
 
-        if (senha !== confirmar) {
-            mostrarMensagem('⚠️ As senhas não coincidem!', 'erro', 'erro-cadastro');
-            return false;
-        }
+    if (VALIDAR_CPF && !validarCPF(cpf)) {
+        mostrarMensagem('⚠️ CPF inválido!', 'erro', 'erro-cadastro');
+        if (campoCPF) campoCPF.focus();
+        return false;
+    }
+
+    if (!email) {
+        mostrarMensagem('⚠️ O e-mail é obrigatório!', 'erro', 'erro-cadastro');
+        if (campoEmail) campoEmail.focus();
+        return false;
+    }
+
+    if (VALIDAR_EMAIL && !validarEmail(email)) {
+        mostrarMensagem('⚠️ Formato de e-mail inválido!', 'erro', 'erro-cadastro');
+        if (campoEmail) campoEmail.focus();
+        return false;
+    }
+
+    if (!senha) {
+        mostrarMensagem('⚠️ A senha é obrigatória!', 'erro', 'erro-cadastro');
+        if (campoSenha) campoSenha.focus();
+        return false;
+    }
+
+    if (VALIDAR_SENHA && SENHA_MINIMA > 0 && senha.length < SENHA_MINIMA) {
+        mostrarMensagem('⚠️ A senha deve ter pelo menos ' + SENHA_MINIMA + ' caracteres!', 'erro', 'erro-cadastro');
+        if (campoSenha) campoSenha.focus();
+        return false;
+    }
+
+    if (!confirmar) {
+        mostrarMensagem('⚠️ A confirmação de senha é obrigatória!', 'erro', 'erro-cadastro');
+        if (campoConfirmar) campoConfirmar.focus();
+        return false;
+    }
+
+    if (senha !== confirmar) {
+        mostrarMensagem('⚠️ As senhas não coincidem!', 'erro', 'erro-cadastro');
+        if (campoConfirmar) campoConfirmar.focus();
+        return false;
     }
 
     if (!termos) {

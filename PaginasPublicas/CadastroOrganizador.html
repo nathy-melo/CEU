@@ -37,7 +37,7 @@
             position: absolute;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 11px 0 var(--sombra-forte);
-            transition: min-height 0.25s ease;
+            transition: height 0.3s ease;
         }
 
         .cartao-cadastro-titulo {
@@ -100,7 +100,7 @@
             color: var(--branco);
             font-family: 'Inter', sans-serif;
             font-weight: 400;
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             line-height: 1.32;
             text-align: center;
             letter-spacing: -0.022em;
@@ -125,9 +125,10 @@
             margin-bottom: 6.776em;
         }
 
+        /* Ajusta margem quando há aviso para manter proporções */
         #main-content.conteudo-principal--com-aviso .cartao-cadastro-formulario {
-            margin-top: 0.8em;
-            margin-bottom: 3.0em;
+            margin-top: 0.5em;
+            margin-bottom: 3.5em;
         }
 
         .formulario-grupo {
@@ -165,10 +166,6 @@
             max-width: 100%;
             position: absolute;
             left: 0;
-            bottom: 4.5em;
-        }
-
-        #main-content.conteudo-principal--com-aviso .cartao-cadastro-termos {
             bottom: 4.5em;
         }
 
@@ -341,10 +338,6 @@
             max-width: 100%;
         }
 
-        #main-content.conteudo-principal--com-aviso .aviso-codigo-organizador {
-            margin-bottom: 0.55em;
-        }
-
         /* caixa de mensagens compartilhada */
         #erro-cadastro {
             display: none;
@@ -395,8 +388,10 @@
             width: 100%;
             position: absolute;
             transform: translate(-50%, calc(-50% + 17.4em));
+            transition: transform 0.3s ease;
         }
 
+        /* Desce o botão quando há aviso */
         #main-content.conteudo-principal--com-aviso .div-botao-solicitar-codigo {
             transform: translate(-50%, calc(-50% + 17.4em + var(--altura-extra-aviso)));
         }
