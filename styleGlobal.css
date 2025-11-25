@@ -1242,9 +1242,8 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
-  background: url('Imagens/Seta_Direita_Menu.svg') center/contain no-repeat;
+  background: url('Imagens/Seta_Direita_Menu_Branca.svg') center/contain no-repeat;
   transition: transform 0.3s ease;
-  filter: invert(100%) !important;
   opacity: 1 !important;
 }
 

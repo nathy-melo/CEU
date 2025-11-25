@@ -246,7 +246,23 @@ function exibirErroURLPadrao() {
         case 'codigo_invalido':
             mensagem = '⚠️ Código de acesso inválido!';
             break;
+        case 'erro_desconhecido':
+            // Se veio de uma área logada, provavelmente é sessão expirada
+            if (document.referrer.includes('/PaginasParticipante/') || 
+                document.referrer.includes('/PaginasOrganizador/')) {
+                mensagem = '⏰ Sua sessão expirou por inatividade. Faça login novamente.';
+            } else {
+                mensagem = '❌ Erro desconhecido. Tente novamente.';
+            }
+            break;
         default:
+            // Se não reconheceu o erro e veio de área logada, trata como sessão expirada
+            if (document.referrer.includes('/PaginasParticipante/') || 
+                document.referrer.includes('/PaginasOrganizador/')) {
+                mensagem = '⏰ Sua sessão pode ter expirado. Faça login novamente.';
+            } else {
+                mensagem = '❌ Erro desconhecido. Tente novamente.';
+            }
             break;
     }
 

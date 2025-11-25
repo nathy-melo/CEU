@@ -68,7 +68,7 @@
 
     // Função para mostrar modal de sessão expirada
     function mostrarModalSessaoExpirada() {
-        // console.log('MOSTRAR MODAL SESSÃO EXPIRADA - Iniciando'); // Debug desabilitado
+        console.log('🔒 SESSÃO EXPIRADA - Mostrando modal para o usuário');
 
         // Remove modal antigo se existir
         const modalSessaoExistente = document.getElementById('modalSessaoExpirada');
@@ -80,7 +80,7 @@
         const modalSessaoExpirada = document.createElement('div');
         modalSessaoExpirada.id = 'modalSessaoExpirada';
         modalSessaoExpirada.className = 'modal-personalizado mostrar';
-        modalSessaoExpirada.style.zIndex = '9999'; // Garantir que fica no topo
+        modalSessaoExpirada.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 999999;';
 
         modalSessaoExpirada.innerHTML = `
             <div class="conteudo-modal-personalizado">
@@ -96,33 +96,52 @@
         // Adiciona ao body
         document.body.appendChild(modalSessaoExpirada);
 
-        // console.log('MODAL SESSÃO EXPIRADA - Adicionado ao DOM'); // Debug desabilitado
-
-        // Adiciona evento ao botão (sem redirecionamento automático)
+        // Adiciona evento ao botão
         const btnLogin = modalSessaoExpirada.querySelector('#btnFazerLoginNovamente');
-        btnLogin.addEventListener('click', function () {
-            console.log('Usuário clicou para fazer login - redirecionando'); // Debug
-            window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada';
-        });
+        if (btnLogin) {
+            btnLogin.addEventListener('click', function () {
+                window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada';
+            });
+            
+            // Efeito hover
+            btnLogin.addEventListener('mouseenter', function() {
+                this.style.opacity = '0.9';
+            });
+            btnLogin.addEventListener('mouseleave', function() {
+                this.style.opacity = '1';
+            });
+        }
 
         // Impede fechamento do modal clicando fora
         modalSessaoExpirada.addEventListener('click', function (evento) {
-            evento.stopPropagation();
+            if (evento.target === modalSessaoExpirada) {
+                evento.stopPropagation();
+                evento.preventDefault();
+            }
         });
 
         // Bloqueia tentativas de fechar com ESC
-        document.addEventListener('keydown', function (evento) {
+        const bloquearESC = function (evento) {
             if (evento.key === 'Escape') {
                 evento.preventDefault();
                 evento.stopPropagation();
             }
-        });
+        };
+        document.addEventListener('keydown', bloquearESC);
+
+        // Armazena referência para cleanup futuro se necessário
+        modalSessaoExpirada._bloquearESC = bloquearESC;
     }
 
     // Função para verificar sessão no servidor
     function verificarSessaoAtivaNoServidor() {
         fetch('./VerificarSessao.php')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Resposta HTTP ' + response.status);
+                }
+                return response.json();
+            })
             .then(dadosResposta => {
                 // Log apenas se sessão não estiver ativa (importante)
                 if (!dadosResposta.ativa) {
@@ -141,8 +160,6 @@
 
     // Função para mostrar aviso de sessão prestes a expirar
     function mostrarAvisoSessaoProximaExpiracao() {
-        console.log('📢 Executando função mostrarAvisoSessaoProximaExpiracao()');
-
         // Remove modal antigo se existir
         removerModalAvisoSessao();
 
@@ -150,6 +167,8 @@
         const modalAvisoSessao = document.createElement('div');
         modalAvisoSessao.id = 'avisoSessaoExpirando';
         modalAvisoSessao.className = 'modal-personalizado mostrar';
+        modalAvisoSessao.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 999998; animation: slideIn 0.3s ease;';
+
         modalAvisoSessao.innerHTML = `
             <div class="conteudo-modal-personalizado">
                 <div class="cabecalho-modal-personalizado">⏰ Atenção!</div>
@@ -159,8 +178,24 @@
                 </div>
             </div>
         `;
+
+        // Adiciona animação CSS inline
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
         document.body.appendChild(modalAvisoSessao);
-        console.log('✅ Modal de aviso adicionado ao DOM');
     }
 
     // Função para verificar inatividade
@@ -176,17 +211,14 @@
 
         // Se passou do tempo limite, expira a sessão
         if (tempoInativo >= tempoLimiteSessaoInatividade) {
-            console.log('Sessão expirada por inatividade - MOSTRANDO MODAL');
             pararVerificacaoSessao();
 
             // Expira a sessão no servidor também, mas SEMPRE mostra modal
             fetch('./VerificarSessao.php?forcar_expiracao=1')
                 .then(() => {
-                    // console.log('Sessão expirada no servidor - mostrando modal'); // Debug reduzido
                     mostrarModalSessaoExpirada();
                 })
                 .catch(() => {
-                    console.log('Erro ao expirar no servidor - mostrando modal mesmo assim');
                     mostrarModalSessaoExpirada();
                 });
             return;
@@ -202,10 +234,6 @@
 
     // Função para iniciar verificação de sessão
     function iniciarVerificacaoSessao(tempoSessaoSegundos = 300) {
-        // Log inicial desabilitado para reduzir ruído no console
-        // console.log(`Iniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
-
-
         // Para qualquer verificação anterior
         pararVerificacaoSessao();
 
@@ -214,25 +242,18 @@
         timestampUltimaAtividade = Date.now();
         modalAvisoSessaoAtivo = false;
 
-        // console.log('Última atividade inicial:', new Date(timestampUltimaAtividade).toLocaleTimeString()); // Debug desabilitado
-
         // Adiciona listeners de atividade
         adicionarListenersAtividadeUsuario();
 
-        // Verifica a sessão no servidor a cada 5 segundos (para detecção de logout em outra aba)
-        intervaloVerificacaoSessao = setInterval(verificarSessaoAtivaNoServidor, 5000);
+        // Verifica a sessão no servidor a cada 30 segundos (para detecção de logout em outra aba)
+        intervaloVerificacaoSessao = setInterval(verificarSessaoAtivaNoServidor, 30000);
 
         // Verifica inatividade a cada 1 segundo
         intervaloVerificacaoInatividade = setInterval(verificarInatividade, 1000);
-
-        // console.log('Sistema de verificação de sessão iniciado'); // Debug desabilitado
     }
 
     // Função para parar verificação de sessão
     function pararVerificacaoSessao() {
-        // console.log('Parando verificação de sessão'); // Debug desabilitado
-
-        // Remove listeners de atividade
         removerListenersAtividadeUsuario();
 
         if (intervaloVerificacaoSessao) {
@@ -244,18 +265,15 @@
             intervaloVerificacaoInatividade = null;
         }
 
-        // Remove modal de aviso se estiver ativo
         removerModalAvisoSessao();
     }
 
     // Função para reiniciar verificação de sessão (útil após navegação)
     function reiniciarVerificacaoSessao(tempoSessaoSegundos = 300) {
-        // Log desabilitado para reduzir ruído no console
-        // console.log(`Reiniciando verificação de sessão com ${tempoSessaoSegundos} segundos (${tempoSessaoSegundos/60} minutos)`);
         pararVerificacaoSessao();
         setTimeout(() => {
             iniciarVerificacaoSessao(tempoSessaoSegundos);
-        }, 100); // Pequeno delay para garantir limpeza completa
+        }, 100);
     }
 
     // Torna as funções globais
@@ -301,8 +319,6 @@
 
         if (usuarioEstaLogado) {
             iniciarVerificacaoSessao(300); // 300 segundos (5 minutos)
-            // Log inicial desabilitado para reduzir ruído no console
-            // console.log('Sistema de verificação de sessão iniciado automaticamente (5 minutos de inatividade + 1 minuto de extensão)');
         }
     });
 })();

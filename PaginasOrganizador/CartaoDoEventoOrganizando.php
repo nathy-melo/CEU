@@ -181,6 +181,16 @@
       margin-bottom: 0.35rem;
     }
 
+    /* Asterisco de campo obrigatório - esconde por padrão */
+    .rotulo-campo span[style*="--vermelho"] {
+      display: none;
+    }
+
+    /* Mostra asterisco apenas quando está em modo de edição */
+    .cartao-evento.modo-edicao .rotulo-campo span[style*="--vermelho"] {
+      display: inline;
+    }
+
     /* Classe unificada para todos os campos de input */
     .campo-input,
     .campo-select,
@@ -524,7 +534,7 @@
       grid-row-start: 9;
     }
 
-    .BotaoParticipantes {
+    .BotaoGerenciar {
       grid-column: span 2 / span 2;
       grid-column-start: 4;
       grid-row-start: 9;
@@ -595,7 +605,7 @@
 
     .botao-voltar,
     .botao-editar,
-    .botao-participantes,
+    .botao-gerenciar,
     .botao-compartilhar,
     .botao-cancelar,
     .botao-excluir,
@@ -618,7 +628,7 @@
 
     .botao-voltar:hover,
     .botao-editar:hover,
-    .botao-participantes:hover,
+    .botao-gerenciar:hover,
     .botao-compartilhar:hover,
     .botao-cancelar:hover,
     .botao-excluir:hover,
@@ -1453,8 +1463,8 @@
         <div class="BotaoVoltar botao">
           <button id="btn-voltar" class="botao-voltar">Voltar</button>
         </div>
-        <div class="BotaoParticipantes botao">
-          <button id="btn-participantes" class="botao-participantes">Gerenciar</button>
+        <div class="BotaoGerenciar botao">
+          <button id="btn-gerenciar" class="botao-gerenciar">Gerenciar</button>
         </div>
         <div class="BotaoEditar botao">
           <button id="btn-editar" class="botao-editar">Editar</button>
@@ -1997,7 +2007,7 @@
       carregarFavoritos();
     });
   </script>
-  <script src="CartaoDoEventoOrganizando.js"></script>
+  <script src="CartaoDoEventoOrganizando.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

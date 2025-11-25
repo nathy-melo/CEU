@@ -49,18 +49,45 @@
 
   function carregarDadosEventoDoServidor(codigoEvento) {
     if (!codigoEvento) {
-      alert('Código do evento não fornecido');
+      console.warn('Código do evento não fornecido para carregar dados');
       return;
+    }
+
+    // CRÍTICO: Verifica se dados já estão no DOM antes de fazer AJAX
+    const eventNameEl = document.getElementById('event-name');
+    const eventLocalEl = document.getElementById('event-local');
+    const eventDescriptionEl = document.getElementById('description');
+    
+    if (eventNameEl && eventLocalEl && eventDescriptionEl) {
+      const hasContent = eventNameEl.textContent.trim() !== '' && 
+                        eventLocalEl.textContent.trim() !== '' &&
+                        eventDescriptionEl.textContent.trim() !== '';
+      
+      if (hasContent) {
+        // Dados já estão na página - não faz AJAX
+        return;
+      }
     }
 
     codigoEventoAtual = codigoEvento;
 
     fetch('GerenciadorEventos.php?action=detalhe&cod_evento=' + codigoEvento)
-      .then(respostaServidor => respostaServidor.json())
+      .then(respostaServidor => {
+        if (!respostaServidor.ok) {
+          throw new Error('Resposta do servidor: ' + respostaServidor.status);
+        }
+        // Verifica se a resposta é JSON antes de tentar fazer parse
+        const contentType = respostaServidor.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Resposta não é JSON - servidor retornou HTML/erro PHP');
+        }
+        return respostaServidor.json();
+      })
       .then(dadosRecebidos => {
         if (dadosRecebidos.erro) {
-          alert('Erro ao carregar evento: ' + dadosRecebidos.erro);
-          history.back();
+          console.error('Erro ao carregar evento:', dadosRecebidos.erro);
+          // NÃO redireciona - apenas loga o erro
+          // Se os dados já estão na página (carregados pelo PHP), continua normalmente
           return;
         }
 
@@ -69,9 +96,9 @@
         }
       })
       .catch(erroRequisicao => {
-        console.error('Erro ao carregar evento:', erroRequisicao);
-        alert('Erro ao carregar dados do evento');
-        history.back();
+        console.error('Erro ao carregar evento via AJAX:', erroRequisicao);
+        // NÃO mostra alert nem redireciona
+        // Se os dados já estão na página, continua funcionando
       });
   }
 
@@ -638,7 +665,8 @@
     }
   }
 
-  function irParaParticipantes() {
+  // Função para ir para a página de gerenciar evento (participantes, colaboradores, etc)
+  function irParaGerenciar() {
     if (!codigoEventoAtual) {
       alert('Erro: Código do evento não disponível. Recarregue a página.');
       return;
@@ -653,6 +681,10 @@
     modoEdicao = true;
 
     try {
+      // Adiciona classe para indicar modo de edição
+      const cartao = document.querySelector('.cartao-evento');
+      if (cartao) cartao.classList.add('modo-edicao');
+
       // NÃO sobrescrever dadosOriginaisEvento aqui - ele já foi preenchido com dados completos do servidor
       // Apenas salvamos as imagens atuais caso o usuário cancele
       const imagensAtuais = [...listaImagensEvento];
@@ -711,15 +743,18 @@
       console.error('Erro ao editar evento:', error);
       alert('Erro ao ativar modo de edição: ' + error.message);
       modoEdicao = false;
+      // Remove classe em caso de erro
+      const cartao = document.querySelector('.cartao-evento');
+      if (cartao) cartao.classList.remove('modo-edicao');
     }
   }
 
   function trocarParaBotoesEdicao() {
     const btnVoltar = document.getElementById('btn-voltar');
-    const btnParticipantes = document.getElementById('btn-participantes');
+    const btnGerenciar = document.getElementById('btn-gerenciar');
     const btnEditar = document.getElementById('btn-editar');
 
-    if (!btnVoltar || !btnParticipantes || !btnEditar) {
+    if (!btnVoltar || !btnGerenciar || !btnEditar) {
       return;
     }
 
@@ -729,9 +764,9 @@
     btnVoltar.onclick = cancelarEdicao;
 
     // Botão Excluir
-    btnParticipantes.textContent = 'Excluir Evento';
-    btnParticipantes.className = 'botao-excluir';
-    btnParticipantes.onclick = excluirEvento;
+    btnGerenciar.textContent = 'Excluir Evento';
+    btnGerenciar.className = 'botao-excluir';
+    btnGerenciar.onclick = excluirEvento;
 
     // Botão Salvar
     btnEditar.textContent = 'Salvar';
@@ -741,10 +776,10 @@
 
   function trocarParaBotoesVisualizacao() {
     const btnVoltar = document.getElementById('btn-voltar');
-    const btnParticipantes = document.getElementById('btn-participantes');
+    const btnGerenciar = document.getElementById('btn-gerenciar');
     const btnEditar = document.getElementById('btn-editar');
 
-    if (!btnVoltar || !btnParticipantes || !btnEditar) {
+    if (!btnVoltar || !btnGerenciar || !btnEditar) {
       return;
     }
 
@@ -759,11 +794,11 @@
       }
     };
 
-    // Botão Participantes
-    btnParticipantes.textContent = 'Participantes';
-    btnParticipantes.className = 'botao-participantes';
-    btnParticipantes.onclick = function () {
-      irParaParticipantes();
+    // Botão Gerenciar (anteriormente Participantes)
+    btnGerenciar.textContent = 'Gerenciar';
+    btnGerenciar.className = 'botao-gerenciar';
+    btnGerenciar.onclick = function () {
+      irParaGerenciar();
     };
 
     // Botão Editar
@@ -779,6 +814,10 @@
     modoEdicao = false;
 
     try {
+      // Remove classe de modo de edição
+      const cartao = document.querySelector('.cartao-evento');
+      if (cartao) cartao.classList.remove('modo-edicao');
+
       document.querySelectorAll('.asterisco-obrigatorio').forEach(el => el.remove());
       
       // Restaurar dados originais
@@ -1108,6 +1147,10 @@
             // Se não há imagens e não havia imagens originais, mantém o estado atual
 
             modoEdicao = false;
+
+            // Remove classe de modo de edição
+            const cartao = document.querySelector('.cartao-evento');
+            if (cartao) cartao.classList.remove('modo-edicao');
 
             document.querySelectorAll('.asterisco-obrigatorio').forEach(el => el.remove());
 
@@ -1455,7 +1498,7 @@
   function inicializarCartaoEventoOrganizando() {
     const btnVoltar = document.getElementById('btn-voltar');
     const btnCompartilhar = document.getElementById('btn-compartilhar');
-    const btnParticipantes = document.getElementById('btn-participantes');
+    const btnGerenciar = document.getElementById('btn-gerenciar');
     const btnEditar = document.getElementById('btn-editar');
     const imagemCarrossel = document.getElementById('imagem-carrossel');
     const inputImagem = document.getElementById('input-imagem');
@@ -1465,7 +1508,7 @@
     const btnAdicionarMaisImgs = document.getElementById('btn-adicionar-mais-imagens');
 
     // Configura os botões principais (btn-compartilhar foi removido e substituído pelos botões de ação)
-    if (btnVoltar && btnParticipantes && btnEditar) {
+    if (btnVoltar && btnGerenciar && btnEditar) {
       btnVoltar.onclick = function () {
         if (typeof carregarPagina === 'function') {
           carregarPagina('meusEventos');
@@ -1477,7 +1520,7 @@
       if (btnCompartilhar) {
         btnCompartilhar.onclick = abrirModalCompartilhar;
       }
-      btnParticipantes.onclick = irParaParticipantes;
+      btnGerenciar.onclick = irParaGerenciar;
       btnEditar.onclick = editarEvento;
     }
 
@@ -1561,30 +1604,42 @@
     if (!codEvento && window.codEventoAtual) {
       codEvento = window.codEventoAtual;
     }
-
-    // Verifica se os dados já estão carregados na página (quando vem do PHP)
-    const eventNameEl = document.getElementById('event-name');
-    const eventLocalEl = document.getElementById('event-local');
-    // Verifica se os elementos existem e têm conteúdo real (não são valores padrão)
-    const dadosJaCarregados = eventNameEl && eventNameEl.textContent.trim() !== '' && 
-                              eventNameEl.textContent.trim() !== 'Evento X' && 
-                              eventLocalEl && eventLocalEl.textContent.trim() !== '' &&
-                              eventLocalEl.textContent.trim() !== 'Auditório';
-
-    if (dadosJaCarregados && codEvento) {
-      // Dados já vêm do PHP, apenas carrega imagens e inicializa
+    
+    // Define codigoEventoAtual globalmente
+    if (codEvento) {
       codigoEventoAtual = codEvento;
-      // Pequeno delay para garantir que o DOM está totalmente renderizado
-      setTimeout(() => {
-        carregarImagensEvento(codEvento);
-        // Aguarda carregarImagensEvento terminar antes de inicializar dados
+    }
+
+    // AGUARDA DOM estar completamente pronto antes de verificar conteúdo
+    // Isso previne race condition onde JS executa antes do PHP renderizar
+    if (codEvento) {
+      // Delay para garantir que DOM está completo (especialmente em F5 com cache)
+      // requestAnimationFrame + setTimeout garante que renderização visual está completa
+      requestAnimationFrame(() => {
         setTimeout(() => {
-          inicializarDadosOriginaisDaPagina();
-        }, 100);
-      }, 50);
-    } else if (codEvento) {
-      // Dados não estão na página, carrega via AJAX
-      carregarDadosEventoDoServidor(codEvento);
+          const eventNameEl = document.getElementById('event-name');
+          const eventLocalEl = document.getElementById('event-local');
+          const eventDescriptionEl = document.getElementById('description');
+          
+          const temElementos = eventNameEl && eventLocalEl && eventDescriptionEl;
+          
+          // NOVA LÓGICA: Se os elementos HTML existem, NUNCA faz AJAX
+          // Porque se a página foi carregada, o PHP já renderizou os dados
+          // O problema é que em F5 o conteúdo pode ainda não estar visível no textContent
+          if (temElementos) {
+            // Elementos existem = página foi renderizada pelo PHP
+            // NUNCA faz AJAX, apenas inicializa
+            carregarImagensEvento(codEvento);
+            setTimeout(() => {
+              inicializarDadosOriginaisDaPagina();
+            }, 100);
+          } else {
+            // Elementos não existem = precisa carregar via AJAX
+            // (cenário raro, apenas se página for carregada dinamicamente)
+            carregarDadosEventoDoServidor(codEvento);
+          }
+        }, 250);
+      });
     } else {
       // Se não há código do evento, tenta carregar imagens da imagem atual
       const imgCarrossel = document.getElementById('imagem-carrossel');
