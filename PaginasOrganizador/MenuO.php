@@ -24,7 +24,7 @@ try {
             }
             mysqli_stmt_close($stmt);
         }
-        // NÍO fechar $conexao aqui
+        // NÃO fechar $conexao aqui
         // mysqli_close($conexao);
     }
 } catch (Throwable $e) { /* usa padrão */ }

@@ -2621,13 +2621,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <!-- FIM ABA: PARTICIPANTES -->
 
-                <!-- ABA: ORGANIZAÇÍO -->
+                <!-- ABA: ORGANIZAÇÃO -->
                 <div class="conteudo-aba" id="aba-organizacao">
                     <div style="text-align: center; padding: 40px; color: var(--texto);">
                         <p>Carregando conteúdo...</p>
                     </div>
                 </div>
-                <!-- FIM ABA: ORGANIZAÇÍO -->
+                <!-- FIM ABA: ORGANIZAÇÃO -->
 
             </div>
 
@@ -2884,7 +2884,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             carregarConteudoAba(nomeAba, abaElement);
         }
 
-        // ==== FUNÇÍO PARA CARREGAR CONTEÚDO DINÂMICO DAS ABAS ====
+        // ==== FUNÇÃO PARA CARREGAR CONTEÚDO DINÂMICO DAS ABAS ====
         function carregarConteudoAba(nomeAba, abaElement) {
             // Define o arquivo de conteúdo para cada aba
             const arquivosConteudo = {
@@ -2939,7 +2939,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
         }
 
-        // ==== FUNÇÍO PARA EXECUTAR SCRIPTS DO CONTEÚDO CARREGADO ====
+        // ==== FUNÇÃO PARA EXECUTAR SCRIPTS DO CONTEÚDO CARREGADO ====
         function executarScriptsDoConteudo(elemento) {
             const scripts = elemento.querySelectorAll('script');
 
@@ -3028,7 +3028,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             inicializarEventos();
         }
 
-        // ==== FUNÇÍO PARA CARREGAR DADOS DO EVENTO ====
+        // ==== FUNÇÃO PARA CARREGAR DADOS DO EVENTO ====
         function carregarDadosEvento() {
             fetch(`GerenciarEvento.php?action=buscar&cod_evento=${codEventoAtual}`)
                 .then(response => response.json())
@@ -3875,7 +3875,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return;
             }
 
-            if (!confirm(`ATENÇÍO: Excluir ${participantesSelecionados.size} participante(s)?\n\nEsta ação não pode ser desfeita!`)) {
+            if (!confirm(`ATENÇÃO: Excluir ${participantesSelecionados.size} participante(s)?\n\nEsta ação não pode ser desfeita!`)) {
                 return;
             }
 

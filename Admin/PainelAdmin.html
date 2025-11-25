@@ -1112,7 +1112,7 @@
                 currentData.usuarios = [];
 
                 // Mostrar loading
-                document.getElementById('usuariosContainer').innerHTML = '<p>ðŸ”„ Carregando usuários...</p>';
+                document.getElementById('usuariosContainer').innerHTML = '<p>🔄️ Carregando usuários...</p>';
 
                 const result = await apiCall('usuarios');
                 currentData.usuarios = result.data;
@@ -1138,7 +1138,7 @@
                 currentData.codigos = [];
 
                 // Mostrar loading
-                document.getElementById('codigosContainer').innerHTML = '<p>ðŸ”„ Carregando códigos...</p>';
+                document.getElementById('codigosContainer').innerHTML = '<p>🔄️ Carregando códigos...</p>';
 
                 const result = await apiCall('codigos');
                 currentData.codigos = result.data;
@@ -1558,7 +1558,7 @@
                 const filtroStatus = document.getElementById('filtroStatusSenha')?.value || 'pendente';
 
                 // Mostrar loading
-                document.getElementById('senhasContainer').innerHTML = '<p>ðŸ”„ Carregando solicitações...</p>';
+                document.getElementById('senhasContainer').innerHTML = '<p>🔄️ Carregando solicitações...</p>';
 
                 const result = await apiCall(`senhas&status=${filtroStatus}`);
                 currentData.senhas = result.data;

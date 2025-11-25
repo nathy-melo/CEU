@@ -1788,7 +1788,7 @@
                 }
                 atualizarIconeFavorito(btnFav, novoEstado);
                 // Atualizar TODOS os botões de favorito com o mesmo código na página (atualização imediata)
-                // Buscar especificamente os botões que NÍO estão no modal de favoritos
+                // Buscar especificamente os botões que NÃO estão no modal de favoritos
                 const atualizarTodosBotoes = () => {
                     const modalFavoritos = document.getElementById('modal-favoritos');
                     const todosBotoes = document.querySelectorAll('.BotaoFavoritoCard');

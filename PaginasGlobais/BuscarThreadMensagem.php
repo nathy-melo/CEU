@@ -52,7 +52,7 @@ $cpfDestinatarioInicial = $notifInicial['cpf_destinatario']; // CPF da notifica�
 // Participante 1: usuário atual
 // Participante 2: o outro (pode ser o remetente ou destinatário da mensagem inicial)
 // Se o remetente da mensagem inicial é o usuário atual, então o outro participante é o destinatário
-// Se o remetente da mensagem inicial NÍO é o usuário atual, então o outro participante é o remetente
+// Se o remetente da mensagem inicial NÃO é o usuário atual, então o outro participante é o remetente
 $ehMinhaMensagemInicial = ($cpfRemetenteInicial === $cpfUsuario);
 $outroParticipante = $ehMinhaMensagemInicial ? $cpfDestinatarioInicial : $cpfRemetenteInicial;
 
