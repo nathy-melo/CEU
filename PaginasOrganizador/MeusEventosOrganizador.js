@@ -209,11 +209,11 @@ function inicializarFiltroEventos() {
     const containerColaboracao = document.getElementById('colaboracao-container');
     
     // Garante que o botão de adicionar evento funcione (fallback para AJAX)
-    const botaoAdicionar = containerEventos ? containerEventos.querySelector('.CaixaDoEventoAdicionar') : null;
-    if (botaoAdicionar) {
+    let botaoAdicionarInicial = containerEventos ? containerEventos.querySelector('.CaixaDoEventoAdicionar') : null;
+    if (botaoAdicionarInicial) {
         // Remove listeners antigos se existirem
-        const novoBotao = botaoAdicionar.cloneNode(true);
-        botaoAdicionar.parentNode.replaceChild(novoBotao, botaoAdicionar);
+        const novoBotao = botaoAdicionarInicial.cloneNode(true);
+        botaoAdicionarInicial.parentNode.replaceChild(novoBotao, botaoAdicionarInicial);
         // Adiciona listener como fallback
         novoBotao.addEventListener('click', function(e) {
             e.preventDefault();
@@ -225,14 +225,6 @@ function inicializarFiltroEventos() {
             }
         });
     }
-
-    // Elementos que devem ser ocultados durante a pesquisa
-    const tituloMeusEventos = document.querySelector('.titulo-meus-eventos');
-    const tituloOrganizacao = document.querySelector('.titulo-organizacao');
-    const wrapperMeusEventos = tituloMeusEventos ? tituloMeusEventos.closest('.section-title-wrapper') : null;
-    const wrapperOrganizacao = document.querySelector('.secao-colaboracao');
-    const divisoria = document.querySelector('.divisoria-secoes');
-    // botaoAdicionar já foi declarado acima, reutiliza a mesma variável
 
     // Cria mensagem de "Sem resultados"
     let mensagemSemResultados = document.createElement('div');
@@ -247,6 +239,15 @@ function inicializarFiltroEventos() {
 
     function filtrarEventosPorTermoBusca() {
         const termoBusca = campoInputPesquisa.value.trim().toLowerCase();
+        
+        // Pega referências atualizadas dos elementos
+        const tituloMeusEventos = document.querySelector('.titulo-meus-eventos');
+        const tituloOrganizacao = document.querySelector('.titulo-organizacao');
+        const wrapperMeusEventos = tituloMeusEventos ? tituloMeusEventos.closest('.section-title-wrapper') : null;
+        const wrapperOrganizacao = document.querySelector('.secao-colaboracao');
+        const divisoria = document.querySelector('.divisoria-secoes');
+        const botaoAdicionar = containerEventos ? containerEventos.querySelector('.CaixaDoEventoAdicionar') : null;
+        
         const todosEventos = [
             ...containerEventos.querySelectorAll('.CaixaDoEvento'),
             ...containerColaboracao.querySelectorAll('.CaixaDoEvento')

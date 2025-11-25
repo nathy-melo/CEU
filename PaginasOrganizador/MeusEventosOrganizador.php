@@ -214,7 +214,6 @@ function formatar($txt) {
             padding-right: 0 !important;
         }
 
-
         /* Container de conteúdo com padding-top para compensar a barra */
         .conteudo-eventos {
             width: 100%;
