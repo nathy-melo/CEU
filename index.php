@@ -11,6 +11,7 @@ session_start();
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/CEU/manifest.json" />
+    <link rel="icon" type="image/png" href="/CEU/Imagens/CEU-Logo-1x1.png" />
     <link rel="apple-touch-icon" href="/CEU/Imagens/CEU-Logo-1x1.png" />
     <title>CEU - Controle de Eventos Unificado</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
