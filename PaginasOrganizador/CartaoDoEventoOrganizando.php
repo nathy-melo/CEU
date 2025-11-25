@@ -1,58 +1,49 @@
-﻿<!DOCTYPE html>
-<html lang="pt-br">
+﻿<?php
+// Sessão e banco - DEVE VIR ANTES DE QUALQUER HTML
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartão do Evento</title>
-  <link rel="stylesheet" href="../styleGlobal.css" />
-  <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
-  <?php
-  // Sessão e banco
-  if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-  }
-  
-  // Evita cache do navegador
-  header("Cache-Control: no-cache, no-store, must-revalidate");
-  header("Pragma: no-cache");
-  header("Expires: 0");
-  
-  include_once('../BancoDados/conexao.php');
+// Evita cache do navegador
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 
-  // Aceita tanto 'id' quanto 'cod_evento' para compatibilidade
-  $id_evento = isset($_GET['cod_evento']) ? (int)$_GET['cod_evento'] : (isset($_GET['id']) ? (int)$_GET['id'] : 0);
-  $cpfUsuario = $_SESSION['cpf'] ?? null;
+include_once('../BancoDados/conexao.php');
 
-  if ($id_evento <= 0) {
-    header('Location: ContainerOrganizador.php?pagina=meusEventos');
-    exit;
-  }
+// Aceita tanto 'id' quanto 'cod_evento' para compatibilidade
+$id_evento = isset($_GET['cod_evento']) ? (int)$_GET['cod_evento'] : (isset($_GET['id']) ? (int)$_GET['id'] : 0);
+$cpfUsuario = $_SESSION['cpf'] ?? null;
 
-  // Verifica permissão (organizador OU colaborador)
-  $sqlPermissao = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?
-                  UNION
-                  SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?
-                  LIMIT 1";
-  $stmtPermissao = mysqli_prepare($conexao, $sqlPermissao);
-  if ($stmtPermissao && $cpfUsuario) {
-    mysqli_stmt_bind_param($stmtPermissao, "isis", $id_evento, $cpfUsuario, $id_evento, $cpfUsuario);
-    mysqli_stmt_execute($stmtPermissao);
-    $resultadoPermissao = mysqli_stmt_get_result($stmtPermissao);
-    if (!mysqli_fetch_assoc($resultadoPermissao)) {
-      mysqli_stmt_close($stmtPermissao);
-      mysqli_close($conexao);
-      header('Location: ContainerOrganizador.php?pagina=meusEventos');
-      exit;
-    }
+if ($id_evento <= 0) {
+  header('Location: ContainerOrganizador.php?pagina=meusEventos');
+  exit;
+}
+
+// Verifica permissão (organizador OU colaborador)
+$sqlPermissao = "SELECT 1 FROM organiza WHERE cod_evento = ? AND CPF = ?
+                UNION
+                SELECT 1 FROM colaboradores_evento WHERE cod_evento = ? AND CPF = ?
+                LIMIT 1";
+$stmtPermissao = mysqli_prepare($conexao, $sqlPermissao);
+if ($stmtPermissao && $cpfUsuario) {
+  mysqli_stmt_bind_param($stmtPermissao, "isis", $id_evento, $cpfUsuario, $id_evento, $cpfUsuario);
+  mysqli_stmt_execute($stmtPermissao);
+  $resultadoPermissao = mysqli_stmt_get_result($stmtPermissao);
+  if (!mysqli_fetch_assoc($resultadoPermissao)) {
     mysqli_stmt_close($stmtPermissao);
-  } else {
     mysqli_close($conexao);
     header('Location: ContainerOrganizador.php?pagina=meusEventos');
     exit;
   }
+  mysqli_stmt_close($stmtPermissao);
+} else {
+  mysqli_close($conexao);
+  header('Location: ContainerOrganizador.php?pagina=meusEventos');
+  exit;
+}
 
-  // Busca dados do evento
+// Busca dados do evento
   $sql = "SELECT e.*, u.Nome as nome_organizador 
           FROM evento e 
           LEFT JOIN organiza o ON e.cod_evento = o.cod_evento 
@@ -139,7 +130,16 @@
 
   mysqli_stmt_close($stmt);
   mysqli_close($conexao);
-  ?>
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartão do Evento</title>
+  <link rel="stylesheet" href="../styleGlobal.css" />
+  <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
   <style>
     .secao-detalhes-evento {
       width: 100%;

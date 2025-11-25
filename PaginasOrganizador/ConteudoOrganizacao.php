@@ -90,13 +90,13 @@
 </div>
 
 <!-- Modal Adicionar Organizador -->
-<div class="modal-overlay" id="modalAdicionarColaborador">
+<div class="modal-overlay" id="modalAdicionarColaborador" onclick="if(event.target.id === 'modalAdicionarColaborador') fecharModalAdicionarColaborador();">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Adicionar Organizador</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalAdicionarColaborador(); event.stopPropagation();">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalAdicionarColaborador();">&times;</button>
         </div>
-        <form id="formAdicionarColaborador" onsubmit="salvarNovoColaborador(event); event.stopPropagation();">
+        <form id="formAdicionarColaborador" onsubmit="salvarNovoColaborador(event);">
             <div class="form-group">
                 <label for="add-cpf-colab">CPF*</label>
                 <input type="text" id="add-cpf-colab" maxlength="14" placeholder="000.000.000-00" required onblur="verificarCPFColaborador()">
@@ -118,29 +118,22 @@
                 <input type="text" id="add-ra-colab" maxlength="7">
             </div>
 
-            <div class="form-group">
-                <label for="add-tipo-colab">Tipo*</label>
-                <select id="add-tipo-colab" required style="width: 100%; padding: 12px; border: 1px solid var(--azul-escuro); border-radius: 8px; font-size: 15px;">
-                    <option value="Organizador">Organizador</option>
-                </select>
-            </div>
-
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalAdicionarColaborador(); event.stopPropagation();">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Adicionar</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalAdicionarColaborador();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar">Adicionar</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Enviar Mensagem -->
-<div class="modal-overlay" id="modalEnviarMensagemOrg">
+<div class="modal-overlay" id="modalEnviarMensagemOrg" onclick="if(event.target.id === 'modalEnviarMensagemOrg') fecharModalMensagemOrganizacao();">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Enviar Mensagem aos Membros da Organização</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalMensagemOrganizacao(); event.stopPropagation();">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalMensagemOrganizacao();">&times;</button>
         </div>
-        <form id="formEnviarMensagemOrg" onsubmit="enviarMensagemOrganizacao(event); event.stopPropagation();">
+        <form id="formEnviarMensagemOrg" onsubmit="enviarMensagemOrganizacao(event);">
             <div class="form-group">
                 <label for="msg-titulo-org">Título da Notificação*</label>
                 <input type="text" id="msg-titulo-org" maxlength="100" required>
@@ -153,25 +146,29 @@
             </div>
 
             <div class="form-group">
-                <small id="info-destinatarios-org" style="color: #666;">A mensagem será enviada para todos os membros da organização</small>
+                <label for="msg-todos-org" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="msg-todos-org" checked style="width: 20px; height: 20px;">
+                    <span>Enviar para todos os membros</span>
+                </label>
+                <small id="info-destinatarios-org" style="color: #666; display: block; margin-top: 8px;">A mensagem será enviada para todos os membros da organização</small>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemOrganizacao(); event.stopPropagation();">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Enviar Notificação</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemOrganizacao();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar">Enviar Notificação</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Editar Membro -->
-<div id="modalEditarMembro" class="modal-overlay">
+<div id="modalEditarMembro" class="modal-overlay" onclick="if(event.target.id === 'modalEditarMembro') fecharModalEditarMembro();">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
             <h3>Editar Membro da Organização</h3>
-            <button class="botao-fechar" onclick="fecharModalEditarMembro(); event.stopPropagation()">×</button>
+            <button class="botao-fechar" onclick="fecharModalEditarMembro()">×</button>
         </div>
-        <form id="formEditarMembro" onsubmit="salvarEdicaoMembro(event); event.stopPropagation()">
+        <form id="formEditarMembro" onsubmit="salvarEdicaoMembro(event);">
             <input type="hidden" id="edit-cpf-org">
 
             <div class="campo-formulario">
@@ -194,16 +191,9 @@
                 <input type="text" id="edit-ra-org" required>
             </div>
 
-            <div class="campo-formulario">
-                <label for="edit-tipo-org">Tipo</label>
-                <select id="edit-tipo-org" required>
-                    <option value="Organizador">Organizador</option>
-                </select>
-            </div>
-
             <div class="botoes-modal">
-                <button type="button" class="botao-secundario" onclick="fecharModalEditarMembro(); event.stopPropagation()">Cancelar</button>
-                <button type="submit" class="botao-primario" onclick="event.stopPropagation()">Salvar Alterações</button>
+                <button type="button" class="botao-secundario" onclick="fecharModalEditarMembro()">Cancelar</button>
+                <button type="submit" class="botao-primario">Salvar Alterações</button>
             </div>
         </form>
     </div>
@@ -400,6 +390,13 @@
     function abrirModalAdicionarColaborador() {
         const modal = document.getElementById('modalAdicionarColaborador');
         if (modal) {
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+            
+            document.body.style.overflow = 'hidden';
             modal.classList.add('ativo');
         }
     }
@@ -412,19 +409,38 @@
         document.getElementById('add-nome-colab').disabled = false;
         document.getElementById('add-email-colab').disabled = false;
         document.getElementById('add-ra-colab').disabled = false;
+        document.body.style.overflow = '';
     }
 
     function abrirModalMensagemOrganizacao() {
         const modal = document.getElementById('modalEnviarMensagemOrg');
         if (modal) {
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+            
+            document.body.style.overflow = 'hidden';
             modal.classList.add('ativo');
 
             // Atualizar informação de destinatários
             const infoDestinatarios = document.getElementById('info-destinatarios-org');
-            if (infoDestinatarios && typeof todosOrganizacao !== 'undefined') {
-                const total = todosOrganizacao.length;
-                const texto = total === 1 ? 'membro' : 'membros';
-                infoDestinatarios.textContent = `A mensagem será enviada para todos os membros da organização (${total} ${texto})`;
+            const checkTodos = document.getElementById('msg-todos-org');
+            
+            if (membrosSelecionados.size > 0) {
+                if (checkTodos) checkTodos.checked = false;
+                const texto = membrosSelecionados.size === 1 ? 'membro selecionado' : 'membros selecionados';
+                if (infoDestinatarios) {
+                    infoDestinatarios.textContent = `Enviando para ${membrosSelecionados.size} ${texto}`;
+                }
+            } else {
+                if (checkTodos) checkTodos.checked = true;
+                if (infoDestinatarios && typeof todosOrganizacao !== 'undefined') {
+                    const total = todosOrganizacao.length;
+                    const texto = total === 1 ? 'membro' : 'membros';
+                    infoDestinatarios.textContent = `A mensagem será enviada para todos os membros da organização (${total} ${texto})`;
+                }
             }
         }
     }
@@ -432,6 +448,7 @@
     function fecharModalMensagemOrganizacao() {
         document.getElementById('modalEnviarMensagemOrg').classList.remove('ativo');
         document.getElementById('formEnviarMensagemOrg').reset();
+        document.body.style.overflow = '';
     }
 
     // Inicializa as ações rápidas
@@ -470,6 +487,23 @@
                     valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
                     valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
                     e.target.value = valor;
+                }
+            });
+        }
+
+        // Listener para o checkbox de enviar para todos
+        const checkTodosOrg = document.getElementById('msg-todos-org');
+        if (checkTodosOrg && !checkTodosOrg.dataset.bound) {
+            checkTodosOrg.dataset.bound = '1';
+            checkTodosOrg.addEventListener('change', function(e) {
+                const infoDestinatarios = document.getElementById('info-destinatarios-org');
+                if (!e.target.checked && membrosSelecionados.size > 0) {
+                    const texto = membrosSelecionados.size === 1 ? 'membro selecionado' : 'membros selecionados';
+                    infoDestinatarios.textContent = `Enviando para ${membrosSelecionados.size} ${texto}`;
+                } else if (e.target.checked && todosOrganizacao) {
+                    const total = todosOrganizacao.length;
+                    const texto = total === 1 ? 'membro' : 'membros';
+                    infoDestinatarios.textContent = `A mensagem será enviada para todos os membros da organização (${total} ${texto})`;
                 }
             });
         }
@@ -519,7 +553,6 @@
         const nome = document.getElementById('add-nome-colab').value;
         const email = document.getElementById('add-email-colab').value;
         const ra = document.getElementById('add-ra-colab').value;
-        const tipo = document.getElementById('add-tipo-colab').value;
 
         try {
             const response = await fetch('GerenciarEvento.php', {
@@ -533,8 +566,7 @@
                     cpf: cpf,
                     nome: nome,
                     email: email,
-                    ra: ra,
-                    tipo: tipo
+                    ra: ra
                 })
             });
 
@@ -558,11 +590,14 @@
 
         const titulo = document.getElementById('msg-titulo-org').value;
         const conteudo = document.getElementById('msg-conteudo-org').value;
+        const enviarTodos = document.getElementById('msg-todos-org').checked;
 
-        const destinatarios = todosOrganizacao.map(m => m.cpf);
+        const destinatarios = enviarTodos ?
+            todosOrganizacao.map(m => m.cpf) :
+            Array.from(membrosSelecionados);
 
         if (destinatarios.length === 0) {
-            alert('Não há membros para enviar mensagem');
+            alert('Selecione pelo menos um membro ou marque "Enviar para todos"');
             return;
         }
 
@@ -605,15 +640,21 @@
         document.getElementById('edit-nome-org').value = membro.nome || '';
         document.getElementById('edit-email-org').value = membro.email || '';
         document.getElementById('edit-ra-org').value = membro.ra || '';
-        document.getElementById('edit-tipo-org').value = membro.tipo || 'Colaborador';
         document.getElementById('edit-cpf-display-org').value = cpf;
 
-        document.getElementById('modalEditarMembro').classList.add('ativo');
+        const modal = document.getElementById('modalEditarMembro');
+        const modaisGlobais = document.getElementById('modais-globais');
+        if (modal && modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+            modaisGlobais.appendChild(modal);
+        }
+        document.body.style.overflow = 'hidden';
+        modal.classList.add('ativo');
     }
 
     function fecharModalEditarMembro() {
         document.getElementById('modalEditarMembro').classList.remove('ativo');
         document.getElementById('formEditarMembro').reset();
+        document.body.style.overflow = '';
     }
 
     async function salvarEdicaoMembro(event) {
@@ -623,7 +664,6 @@
         const nome = document.getElementById('edit-nome-org').value;
         const email = document.getElementById('edit-email-org').value;
         const ra = document.getElementById('edit-ra-org').value;
-        const tipo = document.getElementById('edit-tipo-org').value;
 
         try {
             const response = await fetch('GerenciarEvento.php', {
@@ -637,8 +677,7 @@
                     cpf: cpf,
                     nome: nome,
                     email: email,
-                    ra: ra,
-                    tipo: tipo
+                    ra: ra
                 })
             });
 

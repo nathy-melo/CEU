@@ -65,19 +65,36 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/CEU/manifest.json" />
     <?php
-        // Cache-busting para CSS global (evita centralização por CSS antigo em cache SW/navegador)
-        $__cssPath = realpath(__DIR__ . '/../styleGlobal.css');
-        $__cssVer = $__cssPath ? filemtime($__cssPath) : time();
-        $__cssMobilePath = realpath(__DIR__ . '/../styleGlobalMobile.css');
-        $__cssMobileVer = $__cssMobilePath ? filemtime($__cssMobilePath) : time();
+    // Cache-busting para CSS global (evita centralização por CSS antigo em cache SW/navegador)
+    $__cssPath = realpath(__DIR__ . '/../styleGlobal.css');
+    $__cssVer = $__cssPath ? filemtime($__cssPath) : time();
+    $__cssMobilePath = realpath(__DIR__ . '/../styleGlobalMobile.css');
+    $__cssMobileVer = $__cssMobilePath ? filemtime($__cssMobilePath) : time();
     ?>
     <link rel="stylesheet" href="../styleGlobal.css?v=<?= $__cssVer ?>" />
     <link rel="stylesheet" href="../styleGlobalMobile.css?v=<?= $__cssMobileVer ?>" media="(max-width: 767px)" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
     <script src="/CEU/pwa-config.js" defer></script>
+    <style>
+        /* Container para modais globais - não deve interferir com position:fixed dos modais */
+        #modais-globais {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Os modais dentro dele devem ter pointer-events normal */
+        #modais-globais>* {
+            pointer-events: auto;
+        }
+    </style>
 </head>
 
-<body <?php 
+<body <?php
         $paginaAtual = $pagina ?? ($_GET['pagina'] ?? 'inicio');
         $classes = [];
         // Páginas com barra de pesquisa precisam começar do topo
@@ -90,7 +107,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         if (!empty($classes)) {
             echo 'class="' . implode(' ', $classes) . '"';
         }
-    ?>>
+        ?>>
     <?php
     // Definição das páginas permitidas e resolução do arquivo a incluir
     $paginasPermitidas = [
@@ -129,6 +146,9 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <div id="conteudo-dinamico">
         <?php include $arquivo; ?>
     </div>
+
+    <!-- Container para modais (fora do conteudo-dinamico para position:fixed funcionar corretamente) -->
+    <div id="modais-globais"></div>
 
     <script>
         // =========================
@@ -225,7 +245,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         function atualizarClasseBody(pagina) {
             const b = document.body;
             if (!b) return;
-            
+
             // Páginas com barra de pesquisa precisam começar do topo
             const paginasComBarraPesquisa = ['inicio', 'eventosInscritos', 'meusEventos'];
             if (paginasComBarraPesquisa.includes(pagina)) {
@@ -233,7 +253,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             } else {
                 b.classList.remove('pagina-com-barra-pesquisa');
             }
-            
+
             // Páginas que precisam começar do topo (não centralizadas)
             if (pagina === 'eventosInscritos') {
                 b.classList.add('pagina-lista-eventos');
@@ -492,7 +512,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             if (window.adicionarEventoScriptExecutado) {
                 delete window.adicionarEventoScriptExecutado;
             }
-            
+
             // Limpa atributos de listener do formulário se existir
             setTimeout(() => {
                 const formEvento = document.getElementById('form-evento');
@@ -576,12 +596,12 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 
         // Marca que JS está pronto IMEDIATAMENTE para prevenir FOUC
         document.documentElement.classList.add('js-loading');
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             // Marca que o DOM está pronto
             document.body.classList.add('js-ready');
             document.documentElement.classList.remove('js-loading');
-            
+
             // Força scroll para o topo ao carregar/recarregar a página
             window.scrollTo(0, 0);
 
@@ -603,4 +623,3 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 </body>
 
 </html>
-

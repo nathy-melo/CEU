@@ -42,10 +42,6 @@
                     <span>Enviar Mensagem</span>
                     <img src="../Imagens/Email.svg" alt="Mensagem icon">
                 </button>
-                <button class="botao botao-acao" id="btn-enviar-mensagem-cpf">
-                    <span>Enviar para CPF</span>
-                    <img src="../Imagens/Email.svg" alt="Mensagem CPF icon">
-                </button>
                 <button class="botao botao-acao" id="btn-importar-inscritos">
                     <span>Importar Lista de Inscritos</span>
                     <img src="../Imagens/Importar_lista.svg" alt="Importar icon">
@@ -110,13 +106,13 @@
 </div>
 
 <!-- Modal Adicionar Participante -->
-<div class="modal-overlay" id="modalAdicionarParticipante">
-    <div class="modal-editar">
+<div class="modal-overlay" id="modalAdicionarParticipante" onclick="if(event.target.id === 'modalAdicionarParticipante') fecharModalAdicionar();">
+    <div class="modal-editar" onclick="event.stopPropagation();">
         <div class="modal-header">
             <h2>Adicionar Participante</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalAdicionar(); event.stopPropagation();">&times;</button>
+            <button class="btn-fechar-modal" onclick="event.stopPropagation(); fecharModalAdicionar();">&times;</button>
         </div>
-        <form id="formAdicionarParticipante" onsubmit="salvarNovoParticipante(event); event.stopPropagation();">
+        <form id="formAdicionarParticipante" onsubmit="salvarNovoParticipante(event);">
             <div class="form-group">
                 <label for="add-cpf">CPF*</label>
                 <input type="text" id="add-cpf" maxlength="14" placeholder="000.000.000-00" required>
@@ -139,21 +135,21 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalAdicionar(); event.stopPropagation();">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Adicionar Participante</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="event.stopPropagation(); fecharModalAdicionar();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar">Adicionar Participante</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Enviar Mensagem -->
-<div class="modal-overlay" id="modalEnviarMensagemPart">
+<div class="modal-overlay" id="modalEnviarMensagemPart" onclick="if(event.target.id === 'modalEnviarMensagemPart') fecharModalMensagemPart();">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Enviar Mensagem aos Participantes</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalMensagemPart(); event.stopPropagation();">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalMensagemPart();">&times;</button>
         </div>
-        <form id="formEnviarMensagemPart" onsubmit="enviarMensagemParticipantes(event); event.stopPropagation();">
+        <form id="formEnviarMensagemPart" onsubmit="enviarMensagemParticipantes(event);">
             <div class="form-group">
                 <label for="msg-titulo-part">Título da Notificação*</label>
                 <input type="text" id="msg-titulo-part" maxlength="100" required>
@@ -174,21 +170,21 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemPart(); event.stopPropagation();">Cancelar</button>
-                <button type="submit" class="btn-modal btn-salvar" onclick="event.stopPropagation();">Enviar Notificação</button>
+                <button type="button" class="btn-modal btn-cancelar" onclick="fecharModalMensagemPart();">Cancelar</button>
+                <button type="submit" class="btn-modal btn-salvar">Enviar Notificação</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Editar Dados -->
-<div class="modal-overlay" id="modalEditarDadosPart">
+<div class="modal-overlay" id="modalEditarDadosPart" onclick="if(event.target.id === 'modalEditarDadosPart') fecharModalEditarPart();">
     <div class="modal-editar">
         <div class="modal-header">
             <h2>Editar Dados do Participante</h2>
-            <button class="btn-fechar-modal" onclick="fecharModalEditarPart(); event.stopPropagation();">&times;</button>
+            <button class="btn-fechar-modal" onclick="fecharModalEditarPart();">&times;</button>
         </div>
-        <form id="formEditarDadosPart" onsubmit="salvarEdicaoPart(event); event.stopPropagation();">
+        <form id="formEditarDadosPart" onsubmit="salvarEdicaoPart(event);">
             <input type="hidden" id="edit-cpf-part">
 
             <div class="form-group">
@@ -229,13 +225,19 @@
     }
 
     // ===== FUNÇÕES DE IMPORTAR/EXPORTAR (DECLARADAS NO INÍCIO) =====
-    
+
     // Salva o HTML original do modal de importação
     window.modalImportacaoOriginalHTML = null;
 
     window.importarListaPresenca = function() {
         const modal = document.getElementById('modalInfoImportacao');
         if (modal) {
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+
             // Salva o HTML original na primeira vez
             if (!window.modalImportacaoOriginalHTML) {
                 const modalBody = modal.querySelector('.modal-body');
@@ -243,17 +245,18 @@
                     window.modalImportacaoOriginalHTML = modalBody.innerHTML;
                 }
             }
-            
+
             // Restaura o HTML original toda vez que abrir
             const modalBody = modal.querySelector('.modal-body');
             if (modalBody && window.modalImportacaoOriginalHTML) {
                 modalBody.innerHTML = window.modalImportacaoOriginalHTML;
             }
-            
+
             // Limpa qualquer arquivo selecionado anteriormente
             window.arquivoSelecionado = null;
-            
-            modal.style.display = 'flex';
+
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('ativo');
             window.tipoImportacaoAtual = 'presenca';
         }
     };
@@ -261,7 +264,14 @@
     window.exportarListaPresenca = function() {
         const modal = document.getElementById('modalEscolherFormato');
         if (modal) {
-            modal.style.display = 'flex';
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('ativo');
             window.tipoExportacaoAtual = 'presenca';
         }
     };
@@ -269,6 +279,12 @@
     window.importarListaInscritos = function() {
         const modal = document.getElementById('modalInfoImportacao');
         if (modal) {
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+
             // Salva o HTML original na primeira vez
             if (!window.modalImportacaoOriginalHTML) {
                 const modalBody = modal.querySelector('.modal-body');
@@ -276,17 +292,18 @@
                     window.modalImportacaoOriginalHTML = modalBody.innerHTML;
                 }
             }
-            
+
             // Restaura o HTML original toda vez que abrir
             const modalBody = modal.querySelector('.modal-body');
             if (modalBody && window.modalImportacaoOriginalHTML) {
                 modalBody.innerHTML = window.modalImportacaoOriginalHTML;
             }
-            
+
             // Limpa qualquer arquivo selecionado anteriormente
             window.arquivoSelecionado = null;
-            
-            modal.style.display = 'flex';
+
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('ativo');
             window.tipoImportacaoAtual = 'inscritos';
         }
     };
@@ -294,7 +311,14 @@
     window.exportarListaInscritos = function() {
         const modal = document.getElementById('modalEscolherFormato');
         if (modal) {
-            modal.style.display = 'flex';
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('ativo');
             window.tipoExportacaoAtual = 'inscritos';
         }
     };
@@ -302,7 +326,8 @@
     window.fecharModalFormato = function() {
         const modal = document.getElementById('modalEscolherFormato');
         if (modal) {
-            modal.style.display = 'none';
+            modal.classList.remove('ativo');
+            document.body.style.overflow = '';
         }
     };
 
@@ -314,23 +339,24 @@
             if (modalBody && window.modalImportacaoOriginalHTML) {
                 modalBody.innerHTML = window.modalImportacaoOriginalHTML;
             }
-            
+
             // Limpa o arquivo selecionado
             window.arquivoSelecionado = null;
-            
-            modal.style.display = 'none';
+
+            modal.classList.remove('ativo');
+            document.body.style.overflow = '';
         }
     };
 
     window.executarExportacao = function(formato) {
         const tipo = window.tipoExportacaoAtual || 'presenca';
         const action = tipo === 'presenca' ? 'exportar_presenca' : 'exportar_inscritos';
-        
+
         if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
             alert('Código do evento não encontrado');
             return;
         }
-        
+
         const url = `GerenciarEvento.php?action=${action}&formato=${formato}&cod_evento=${codEventoAtual}`;
         const link = document.createElement('a');
         link.href = url;
@@ -338,7 +364,7 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         window.fecharModalFormato();
     };
 
@@ -364,7 +390,7 @@
             // Atualiza o modal para mostrar o arquivo selecionado
             const modalBody = document.querySelector('#modalInfoImportacao .info-importacao');
             const tamanhoMB = (arquivo.size / 1024 / 1024).toFixed(2);
-            
+
             modalBody.innerHTML = `
                 <div class="info-item" style="text-align: center; padding: 20px;">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--azul-escuro)" stroke-width="2" style="margin-bottom: 16px;">
@@ -394,13 +420,13 @@
             // Armazena o arquivo para uso posterior
             window.arquivoSelecionado = arquivo;
         };
-        
+
         input.click();
     };
 
     window.cancelarImportacao = function() {
         window.arquivoSelecionado = null;
-        
+
         // Restaura o HTML original do modal
         const modal = document.getElementById('modalInfoImportacao');
         if (modal && window.modalImportacaoOriginalHTML) {
@@ -409,7 +435,7 @@
                 modalBody.innerHTML = window.modalImportacaoOriginalHTML;
             }
         }
-        
+
         // Fecha o modal
         window.fecharModalImportacao();
     };
@@ -532,9 +558,14 @@
                 </td>
                 <td class="coluna-modificar">
                     <div class="grupo-acoes">
-                        <button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaPart('${p.cpf}')">
-                            <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
-                        </button>
+                        ${p.presenca_confirmada ? 
+                            `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoPart('${p.cpf}')">
+                                <span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt="">
+                            </button>` :
+                            `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaPart('${p.cpf}')">
+                                <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
+                            </button>`
+                        }
                         <button class="botao botao-acao-tabela botao-vermelho" onclick="excluirParticipantePart('${p.cpf}')">
                             <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
                         </button>
@@ -786,6 +817,32 @@
             .catch(() => alert('Erro ao confirmar presença'));
     }
 
+    function emitirCertificadoPart(cpf) {
+        if (!confirm('Emitir certificado para este participante?')) return;
+
+        fetch('GerenciarEvento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'emitir_certificado',
+                    cod_evento: codEventoAtual,
+                    cpf: cpf
+                })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.sucesso) {
+                    alert('Certificado emitido com sucesso!');
+                    carregarParticipantes();
+                } else {
+                    alert('Erro: ' + (d.erro || 'Erro desconhecido'));
+                }
+            })
+            .catch(() => alert('Erro ao emitir certificado'));
+    }
+
     function excluirParticipantePart(cpf) {
         if (!confirm('Tem certeza que deseja excluir este participante?')) return;
 
@@ -825,7 +882,13 @@
         document.getElementById('edit-email-part').value = participante.email;
         document.getElementById('edit-ra-part').value = participante.ra || '';
 
-        document.getElementById('modalEditarDadosPart').classList.add('ativo');
+        const modal = document.getElementById('modalEditarDadosPart');
+        const modaisGlobais = document.getElementById('modais-globais');
+        if (modal && modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+            modaisGlobais.appendChild(modal);
+        }
+        document.body.style.overflow = 'hidden';
+        modal.classList.add('ativo');
     }
 
     function verificarCertificadoPart(codigo) {
@@ -833,13 +896,13 @@
             alert('Código de verificação não disponível');
             return;
         }
-        
+
         // Usa a variável global codEventoAtual que já está definida no GerenciarEvento.php
         if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
             alert('Erro: código do evento não encontrado');
             return;
         }
-        
+
         // Navega para visualizar o certificado dentro do container
         window.location.href = `ContainerOrganizador.php?pagina=visualizarCertificadoGerenciar&codigo=${encodeURIComponent(codigo)}&cod_evento=${codEventoAtual}`;
     }
@@ -855,16 +918,37 @@
     }
 
     function abrirModalAdicionar() {
-        document.getElementById('modalAdicionarParticipante').classList.add('ativo');
+        const modal = document.getElementById('modalAdicionarParticipante');
+        if (modal) {
+            // Move modal para fora do conteudo-dinamico
+            const modaisGlobais = document.getElementById('modais-globais');
+            if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+                modaisGlobais.appendChild(modal);
+            }
+            
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('ativo');
+        }
     }
 
     function fecharModalAdicionar() {
-        document.getElementById('modalAdicionarParticipante').classList.remove('ativo');
-        document.getElementById('formAdicionarParticipante').reset();
-        document.getElementById('msg-cpf-existente').style.display = 'none';
-        document.getElementById('add-nome').disabled = false;
-        document.getElementById('add-email').disabled = false;
-        document.getElementById('add-ra').disabled = false;
+        const modal = document.getElementById('modalAdicionarParticipante');
+        if (modal) {
+            modal.classList.remove('ativo');
+        }
+        const form = document.getElementById('formAdicionarParticipante');
+        if (form) {
+            form.reset();
+        }
+        const msgCpf = document.getElementById('msg-cpf-existente');
+        if (msgCpf) msgCpf.style.display = 'none';
+        const addNome = document.getElementById('add-nome');
+        const addEmail = document.getElementById('add-email');
+        const addRa = document.getElementById('add-ra');
+        if (addNome) addNome.disabled = false;
+        if (addEmail) addEmail.disabled = false;
+        if (addRa) addRa.disabled = false;
+        document.body.style.overflow = '';
     }
 
     async function verificarCPFExistente() {
@@ -944,6 +1028,12 @@
     }
 
     function abrirModalMensagemPart() {
+        const modal = document.getElementById('modalEnviarMensagemPart');
+        const modaisGlobais = document.getElementById('modais-globais');
+        if (modal && modaisGlobais && modal.parentElement.id !== 'modais-globais') {
+            modaisGlobais.appendChild(modal);
+        }
+        
         const msgSel = document.getElementById('msg-selecionados-part');
         const checkTodos = document.getElementById('msg-todos-part');
 
@@ -956,12 +1046,14 @@
             msgSel.style.display = 'none';
         }
 
-        document.getElementById('modalEnviarMensagemPart').classList.add('ativo');
+        document.body.style.overflow = 'hidden';
+        modal.classList.add('ativo');
     }
 
     function fecharModalMensagemPart() {
         document.getElementById('modalEnviarMensagemPart').classList.remove('ativo');
         document.getElementById('formEnviarMensagemPart').reset();
+        document.body.style.overflow = '';
     }
 
     async function enviarMensagemParticipantes(event) {
@@ -1016,6 +1108,7 @@
     function fecharModalEditarPart() {
         document.getElementById('modalEditarDadosPart').classList.remove('ativo');
         document.getElementById('formEditarDadosPart').reset();
+        document.body.style.overflow = '';
     }
 
     async function salvarEdicaoPart(event) {
@@ -1400,723 +1493,725 @@
 </div>
 
 <style>
-/* Estilos dos Modais */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 10000;
-    justify-content: center;
-    align-items: center;
-}
+    /* Estilos dos Modais */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+    }
 
-.modal-overlay.ativo {
-    display: flex;
-}
+    .modal-overlay.ativo {
+        display: flex;
+    }
 
-.modal-conteudo {
-    background: white;
-    border-radius: 12px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    z-index: 10001;
-}
+    .modal-conteudo {
+        background: white;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+    }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e0e0e0;
-}
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e0e0e0;
+    }
 
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--azul-escuro);
-}
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--azul-escuro);
+    }
 
-.btn-fechar-modal {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #666;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background-color 0.2s;
-}
+    .btn-fechar-modal {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #666;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+    }
 
-.btn-fechar-modal:hover {
-    background-color: #f0f0f0;
-}
+    .btn-fechar-modal:hover {
+        background-color: #f0f0f0;
+    }
 
-.modal-body {
-    padding: 24px;
-}
+    .modal-body {
+        padding: 24px;
+    }
 
-.modal-footer {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    padding: 16px 24px;
-    border-top: 1px solid #e0e0e0;
-}
-
-/* Estilos dos botões de formato */
-.formatos-exportacao {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-}
-
-.btn-formato {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 20px;
-    background: var(--branco);
-    border: 2px solid var(--azul-escuro);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 15px;
-}
-
-.btn-formato:hover {
-    border-color: var(--azul-escuro);
-    background-color: #f0f7ff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(101, 152, 210, 0.3);
-}
-
-.btn-formato img {
-    width: 48px;
-    height: 48px;
-}
-
-.btn-formato span {
-    font-weight: 600;
-    color: var(--azul-escuro);
-    font-size: 1.1rem;
-}
-
-.btn-formato small {
-    color: var(--texto);
-    font-size: 0.85rem;
-}
-
-/* Estilos da informação de importação */
-.info-importacao {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.info-item h3 {
-    margin: 0 0 8px 0;
-    color: var(--azul-escuro);
-    font-size: 1.1rem;
-}
-
-.info-item p {
-    margin: 0;
-    color: var(--texto);
-    line-height: 1.6;
-}
-
-.info-item ul {
-    margin: 8px 0 0 0;
-    padding-left: 20px;
-    color: var(--texto);
-}
-
-.info-item li {
-    margin: 4px 0;
-    line-height: 1.6;
-}
-
-.botao-primario {
-    background-color: var(--azul-escuro);
-    color: var(--branco);
-    padding: 12px 28px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 15px;
-    transition: all 0.2s;
-}
-
-.botao-primario:hover {
-    background-color: var(--azul-escuro);
-    opacity: 0.9;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(101, 152, 210, 0.3);
-}
-
-.botao-secundario {
-    background-color: var(--branco);
-    color: var(--azul-escuro);
-    padding: 12px 28px;
-    border: 2px solid var(--azul-escuro);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 15px;
-    transition: all 0.2s;
-}
-
-.botao-secundario:hover {
-    background-color: #f0f7ff;
-    transform: translateY(-1px);
-}
-
-/* ===== ESTILOS PARA LAYOUT COMPACTO E VISÍVEL ===== */
-.secao-superior-compacta {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.barra-pesquisa-wrapper-compacta {
-    width: 100%;
-    margin-bottom: 4px;
-}
-
-.barra-pesquisa-wrapper-compacta .barra-pesquisa-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.barra-pesquisa-wrapper-compacta .barra-pesquisa {
-    width: 100%;
-    max-width: 580px;
-    display: flex;
-    justify-content: center;
-}
-
-.acoes-rapidas-wrapper {
-    width: 100%;
-}
-
-.secao-titulo-compacta {
-    color: var(--branco);
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 8px 0;
-    text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.3px;
-}
-
-.secao-acoes-massa-compacta {
-    margin-top: 8px;
-    margin-bottom: 12px;
-}
-
-.secao-acoes-massa-compacta .acoes-em-massa {
-    margin-top: 4px;
-}
-
-/* Reduzir espaçamento geral da seção de gerenciamento */
-.secao-gerenciamento {
-    gap: 10px;
-    padding: 0;
-}
-
-/* Melhorar visibilidade dos botões de ação */
-.botao-acao {
-    background-color: var(--branco) !important;
-    border: 2px solid rgba(101, 152, 210, 0.3) !important;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-}
-
-.botao-acao:hover {
-    transform: translateY(-3px) !important;
-    box-shadow: 0 6px 20px rgba(101, 152, 210, 0.25), 0 3px 8px rgba(0, 0, 0, 0.15) !important;
-    border-color: var(--azul-escuro) !important;
-    background-color: #f0f7ff !important;
-}
-
-.botao-acao:active {
-    transform: translateY(-1px) !important;
-}
-
-/* Melhorar visibilidade dos botões de ação em massa */
-.botao-em-massa {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-    font-weight: 700 !important;
-    transition: all 0.2s ease !important;
-    border: 2px solid transparent !important;
-}
-
-.botao-em-massa:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.15) !important;
-    filter: brightness(1.1) !important;
-}
-
-.botao-em-massa:active {
-    transform: translateY(0) !important;
-}
-
-.botao-em-massa.botao-branco {
-    border-color: rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12) !important;
-}
-
-.botao-em-massa.botao-branco:hover {
-    background-color: #f8f9fa !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-}
-
-/* Reduzir espaçamento antes da lista */
-.secao-gerenciamento > div:last-child {
-    margin-top: 8px;
-}
-
-.contador-participantes {
-    margin-bottom: 12px !important;
-}
-
-.envoltorio-tabela {
-    margin-top: 0 !important;
-}
-
-/* Melhorar grade de ações */
-.grade-acoes-gerenciamento {
-    gap: 10px !important;
-}
-
-/* ===== RESPONSIVIDADE PARA TABLETS (768px - 1024px) ===== */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .secao-superior-compacta {
+    .modal-footer {
+        display: flex;
         gap: 12px;
-        margin-bottom: 14px;
+        justify-content: flex-end;
+        padding: 16px 24px;
+        border-top: 1px solid #e0e0e0;
     }
-    
-    .barra-pesquisa-wrapper-compacta .barra-pesquisa {
-        max-width: 100%;
-    }
-    
-    .secao-titulo-compacta {
-        font-size: 17px;
-        margin-bottom: 10px;
-    }
-    
-    .grade-acoes-gerenciamento {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
-        gap: 10px !important;
-        max-width: 100% !important;
-    }
-    
-    .botao-acao {
-        padding: 10px 14px !important;
-        font-size: 12px !important;
-    }
-    
-    .botao-acao span {
-        font-size: 12px !important;
-    }
-    
-    .botao-acao img {
-        height: 18px !important;
-        width: 18px !important;
-    }
-    
-    .secao-acoes-massa-compacta {
-        margin-top: 10px;
-        margin-bottom: 14px;
-    }
-    
-    .acoes-em-massa {
-        gap: 12px !important;
-        flex-wrap: wrap !important;
-    }
-    
-    .botao-em-massa {
-        padding: 6px 18px !important;
-        font-size: 14px !important;
-    }
-    
-    .botao-em-massa img {
-        height: 20px !important;
-    }
-    
-    .secao-gerenciamento {
-        gap: 12px;
-    }
-    
-    .contador-participantes {
-        padding: 12px 20px !important;
-        margin-bottom: 14px !important;
-    }
-    
-    .contador-participantes span {
-        font-size: 15px !important;
-    }
-}
 
-/* ===== RESPONSIVIDADE PARA CELULARES (até 768px) ===== */
-@media (max-width: 768px) {
-    .secao-superior-compacta {
+    /* Estilos dos botões de formato */
+    .formatos-exportacao {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+    }
+
+    .btn-formato {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 8px;
-        margin-bottom: 10px;
+        padding: 20px;
+        background: var(--branco);
+        border: 2px solid var(--azul-escuro);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 15px;
     }
-    
+
+    .btn-formato:hover {
+        border-color: var(--azul-escuro);
+        background-color: #f0f7ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(101, 152, 210, 0.3);
+    }
+
+    .btn-formato img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .btn-formato span {
+        font-weight: 600;
+        color: var(--azul-escuro);
+        font-size: 1.1rem;
+    }
+
+    .btn-formato small {
+        color: var(--cinza-escuro);
+        font-size: 0.85rem;
+    }
+
+    /* Estilos da informação de importação */
+    .info-importacao {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .info-item h3 {
+        margin: 0 0 8px 0;
+        color: var(--azul-escuro);
+        font-size: 1.1rem;
+    }
+
+    .info-item p {
+        margin: 0;
+        color: var(--cinza-escuro);
+        line-height: 1.6;
+    }
+
+    .info-item ul {
+        margin: 8px 0 0 0;
+        padding-left: 20px;
+        color: var(--cinza-escuro);
+    }
+
+    .info-item li {
+        margin: 4px 0;
+        line-height: 1.6;
+    }
+
+    .botao-primario {
+        background-color: var(--azul-escuro);
+        color: var(--branco);
+        padding: 12px 28px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.2s;
+    }
+
+    .botao-primario:hover {
+        background-color: var(--azul-escuro);
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(101, 152, 210, 0.3);
+    }
+
+    .botao-secundario {
+        background-color: var(--branco);
+        color: var(--azul-escuro);
+        padding: 12px 28px;
+        border: 2px solid var(--azul-escuro);
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.2s;
+    }
+
+    .botao-secundario:hover {
+        background-color: #f0f7ff;
+        transform: translateY(-1px);
+    }
+
+    /* ===== ESTILOS PARA LAYOUT COMPACTO E VISÍVEL ===== */
+    .secao-superior-compacta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
     .barra-pesquisa-wrapper-compacta {
-        margin-bottom: 6px;
+        width: 100%;
+        margin-bottom: 4px;
     }
-    
+
+    .barra-pesquisa-wrapper-compacta .barra-pesquisa-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
     .barra-pesquisa-wrapper-compacta .barra-pesquisa {
-        max-width: 100%;
+        width: 100%;
+        max-width: 580px;
+        display: flex;
+        justify-content: center;
     }
-    
-    .campo-pesquisa-wrapper {
-        width: 100% !important;
-        max-width: 100% !important;
+
+    .acoes-rapidas-wrapper {
+        width: 100%;
     }
-    
+
     .secao-titulo-compacta {
-        font-size: 16px;
-        margin-bottom: 8px;
-        padding: 0 10px;
+        color: var(--branco);
+        font-size: 18px;
+        font-weight: 700;
+        text-align: center;
+        margin: 0 0 8px 0;
+        text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.3px;
     }
-    
-    .grade-acoes-gerenciamento {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
-        gap: 8px !important;
-        max-width: 100% !important;
-    }
-    
-    .botao-acao {
-        padding: 10px 12px !important;
-        font-size: 11px !important;
-        min-height: 44px !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-    }
-    
-    .botao-acao span {
-        font-size: 11px !important;
-        white-space: normal !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-    }
-    
-    .botao-acao img {
-        height: 18px !important;
-        width: 18px !important;
-    }
-    
+
     .secao-acoes-massa-compacta {
         margin-top: 8px;
         margin-bottom: 12px;
     }
-    
-    .acoes-em-massa {
-        flex-direction: column !important;
-        gap: 10px !important;
-        align-items: stretch !important;
-    }
-    
-    .botao-em-massa {
-        width: 100% !important;
-        padding: 10px 16px !important;
-        font-size: 14px !important;
-        justify-content: center !important;
-        border-radius: 8px !important;
-    }
-    
-    .botao-em-massa img {
-        height: 20px !important;
-    }
-    
-    .secao-gerenciamento {
-        gap: 8px;
-        padding: 0 8px;
-    }
-    
-    .contador-participantes {
-        padding: 10px 16px !important;
-        margin-bottom: 10px !important;
-        border-radius: 8px !important;
-    }
-    
-    .contador-participantes span {
-        font-size: 14px !important;
-    }
-    
-    .envoltorio-tabela {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-    
-    .tabela-participantes {
-        font-size: 12px !important;
-        min-width: 600px !important;
-    }
-    
-    .tabela-participantes th,
-    .tabela-participantes td {
-        padding: 8px 10px !important;
-        font-size: 12px !important;
-    }
-    
-    .coluna-dados {
-        max-width: 250px !important;
-    }
-    
-    .coluna-dados p {
-        font-size: 11px !important;
-        margin: 0 0 2px 0 !important;
-    }
-    
-    .coluna-dados strong {
-        font-size: 11px !important;
-    }
-    
-    .grupo-acoes,
-    .grupo-status {
-        min-width: 150px !important;
-        gap: 4px !important;
-    }
-    
-    .botao-acao-tabela {
-        padding: 6px 10px !important;
-        font-size: 11px !important;
-    }
-    
-    .botao-acao-tabela img {
-        height: 16px !important;
-        width: 16px !important;
-    }
-    
-    .linha-status {
-        font-size: 11px !important;
-        gap: 6px !important;
-    }
-    
-    .emblema-status {
-        font-size: 10px !important;
-        padding: 2px 8px !important;
-    }
-    
-    .emblema-status img {
-        height: 14px !important;
-        width: 14px !important;
-    }
-}
 
-/* ===== RESPONSIVIDADE PARA CELULARES PEQUENOS (até 480px) ===== */
-@media (max-width: 480px) {
-    .secao-superior-compacta {
-        gap: 6px;
-        margin-bottom: 8px;
+    .secao-acoes-massa-compacta .acoes-em-massa {
+        margin-top: 4px;
     }
-    
-    .secao-titulo-compacta {
-        font-size: 14px;
-        margin-bottom: 6px;
-        padding: 0 5px;
+
+    /* Reduzir espaçamento geral da seção de gerenciamento */
+    .secao-gerenciamento {
+        gap: 10px;
+        padding: 0;
     }
-    
-    .grade-acoes-gerenciamento {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 6px !important;
-    }
-    
+
+    /* Melhorar visibilidade dos botões de ação */
     .botao-acao {
-        padding: 8px 10px !important;
-        font-size: 10px !important;
-        min-height: 40px !important;
+        background-color: var(--branco) !important;
+        border: 2px solid rgba(101, 152, 210, 0.3) !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
     }
-    
-    .botao-acao span {
-        font-size: 10px !important;
+
+    .botao-acao:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 6px 20px rgba(101, 152, 210, 0.25), 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+        border-color: var(--azul-escuro) !important;
+        background-color: #f0f7ff !important;
     }
-    
-    .botao-acao img {
-        height: 16px !important;
-        width: 16px !important;
+
+    .botao-acao:active {
+        transform: translateY(-1px) !important;
     }
-    
-    .secao-acoes-massa-compacta {
-        margin-top: 6px;
-        margin-bottom: 10px;
-    }
-    
-    .acoes-em-massa {
-        gap: 8px !important;
-    }
-    
+
+    /* Melhorar visibilidade dos botões de ação em massa */
     .botao-em-massa {
-        padding: 8px 14px !important;
-        font-size: 13px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+        font-weight: 700 !important;
+        transition: all 0.2s ease !important;
+        border: 2px solid transparent !important;
     }
-    
-    .secao-gerenciamento {
-        gap: 6px;
-        padding: 0 5px;
+
+    .botao-em-massa:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+        filter: brightness(1.1) !important;
     }
-    
+
+    .botao-em-massa:active {
+        transform: translateY(0) !important;
+    }
+
+    .botao-em-massa.botao-branco {
+        border-color: rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .botao-em-massa.botao-branco:hover {
+        background-color: #f8f9fa !important;
+        border-color: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Reduzir espaçamento antes da lista */
+    .secao-gerenciamento>div:last-child {
+        margin-top: 8px;
+    }
+
     .contador-participantes {
-        padding: 8px 12px !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 12px !important;
     }
-    
-    .contador-participantes span {
-        font-size: 13px !important;
-    }
-    
-    .tabela-participantes {
-        min-width: 550px !important;
-    }
-    
-    .tabela-participantes th,
-    .tabela-participantes td {
-        padding: 6px 8px !important;
-        font-size: 11px !important;
-    }
-}
 
-/* ===== AJUSTES ADICIONAIS PARA RESPONSIVIDADE ===== */
-
-/* Barra de pesquisa responsiva */
-@media (max-width: 768px) {
-    .campo-pesquisa {
-        font-size: 14px !important;
-        padding: 0 12px !important;
-    }
-    
-    .botao-pesquisa {
-        width: 50px !important;
-        height: 50px !important;
-    }
-    
-    .icone-pesquisa {
-        width: 50px !important;
-        height: 50px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .campo-pesquisa {
-        font-size: 13px !important;
-        padding: 0 10px !important;
-    }
-    
-    .botao-pesquisa {
-        width: 45px !important;
-        height: 45px !important;
-    }
-    
-    .icone-pesquisa {
-        width: 45px !important;
-        height: 45px !important;
-    }
-}
-
-/* Modais responsivos */
-@media (max-width: 768px) {
-    .modal-editar,
-    .modal-conteudo {
-        width: 95% !important;
-        max-width: 95% !important;
-        padding: 20px 16px !important;
-        margin: 10px !important;
-    }
-    
-    .modal-header {
-        padding: 16px !important;
-    }
-    
-    .modal-header h2 {
-        font-size: 1.3rem !important;
-    }
-    
-    .modal-body {
-        padding: 16px !important;
-    }
-    
-    .modal-footer {
-        padding: 12px 16px !important;
-        flex-direction: column-reverse !important;
-        gap: 8px !important;
-    }
-    
-    .btn-modal {
-        width: 100% !important;
-        padding: 12px !important;
-    }
-    
-    .form-group {
-        margin-bottom: 16px !important;
-    }
-    
-    .form-group input,
-    .form-group textarea {
-        font-size: 14px !important;
-        padding: 10px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-editar,
-    .modal-conteudo {
-        width: 98% !important;
-        padding: 16px 12px !important;
-    }
-    
-    .modal-header h2 {
-        font-size: 1.2rem !important;
-    }
-    
-    .formatos-exportacao {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-    }
-    
-    .btn-formato {
-        padding: 16px !important;
-    }
-}
-
-/* Ajustes para tabela em telas pequenas - melhorar scroll horizontal */
-@media (max-width: 768px) {
     .envoltorio-tabela {
-        position: relative !important;
+        margin-top: 0 !important;
     }
-    
-    .envoltorio-tabela::before {
-        content: '← Role para ver mais →';
-        display: block;
-        text-align: center;
-        padding: 8px;
-        background: rgba(101, 152, 210, 0.1);
-        color: var(--azul-escuro);
-        font-size: 12px;
-        font-weight: 600;
-        border-radius: 8px 8px 0 0;
+
+    /* Melhorar grade de ações */
+    .grade-acoes-gerenciamento {
+        gap: 10px !important;
     }
-}
+
+    /* ===== RESPONSIVIDADE PARA TABLETS (768px - 1024px) ===== */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .secao-superior-compacta {
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+            max-width: 100%;
+        }
+
+        .secao-titulo-compacta {
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .grade-acoes-gerenciamento {
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+            gap: 10px !important;
+            max-width: 100% !important;
+        }
+
+        .botao-acao {
+            padding: 10px 14px !important;
+            font-size: 12px !important;
+        }
+
+        .botao-acao span {
+            font-size: 12px !important;
+        }
+
+        .botao-acao img {
+            height: 18px !important;
+            width: 18px !important;
+        }
+
+        .secao-acoes-massa-compacta {
+            margin-top: 10px;
+            margin-bottom: 14px;
+        }
+
+        .acoes-em-massa {
+            gap: 12px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .botao-em-massa {
+            padding: 6px 18px !important;
+            font-size: 14px !important;
+        }
+
+        .botao-em-massa img {
+            height: 20px !important;
+        }
+
+        .secao-gerenciamento {
+            gap: 12px;
+        }
+
+        .contador-participantes {
+            padding: 12px 20px !important;
+            margin-bottom: 14px !important;
+        }
+
+        .contador-participantes span {
+            font-size: 15px !important;
+        }
+    }
+
+    /* ===== RESPONSIVIDADE PARA CELULARES (até 768px) ===== */
+    @media (max-width: 768px) {
+        .secao-superior-compacta {
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .barra-pesquisa-wrapper-compacta {
+            margin-bottom: 6px;
+        }
+
+        .barra-pesquisa-wrapper-compacta .barra-pesquisa {
+            max-width: 100%;
+        }
+
+        .campo-pesquisa-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .secao-titulo-compacta {
+            font-size: 16px;
+            margin-bottom: 8px;
+            padding: 0 10px;
+        }
+
+        .grade-acoes-gerenciamento {
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+            gap: 8px !important;
+            max-width: 100% !important;
+        }
+
+        .botao-acao {
+            padding: 10px 12px !important;
+            font-size: 11px !important;
+            min-height: 44px !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+        }
+
+        .botao-acao span {
+            font-size: 11px !important;
+            white-space: normal !important;
+            text-align: center !important;
+            line-height: 1.2 !important;
+        }
+
+        .botao-acao img {
+            height: 18px !important;
+            width: 18px !important;
+        }
+
+        .secao-acoes-massa-compacta {
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .acoes-em-massa {
+            flex-direction: column !important;
+            gap: 10px !important;
+            align-items: stretch !important;
+        }
+
+        .botao-em-massa {
+            width: 100% !important;
+            padding: 10px 16px !important;
+            font-size: 14px !important;
+            justify-content: center !important;
+            border-radius: 8px !important;
+        }
+
+        .botao-em-massa img {
+            height: 20px !important;
+        }
+
+        .secao-gerenciamento {
+            gap: 8px;
+            padding: 0 8px;
+        }
+
+        .contador-participantes {
+            padding: 10px 16px !important;
+            margin-bottom: 10px !important;
+            border-radius: 8px !important;
+        }
+
+        .contador-participantes span {
+            font-size: 14px !important;
+        }
+
+        .envoltorio-tabela {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .tabela-participantes {
+            font-size: 12px !important;
+            min-width: 600px !important;
+        }
+
+        .tabela-participantes th,
+        .tabela-participantes td {
+            padding: 8px 10px !important;
+            font-size: 12px !important;
+        }
+
+        .coluna-dados {
+            max-width: 250px !important;
+        }
+
+        .coluna-dados p {
+            font-size: 11px !important;
+            margin: 0 0 2px 0 !important;
+        }
+
+        .coluna-dados strong {
+            font-size: 11px !important;
+        }
+
+        .grupo-acoes,
+        .grupo-status {
+            min-width: 150px !important;
+            gap: 4px !important;
+        }
+
+        .botao-acao-tabela {
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+        }
+
+        .botao-acao-tabela img {
+            height: 16px !important;
+            width: 16px !important;
+        }
+
+        .linha-status {
+            font-size: 11px !important;
+            gap: 6px !important;
+        }
+
+        .emblema-status {
+            font-size: 10px !important;
+            padding: 2px 8px !important;
+        }
+
+        .emblema-status img {
+            height: 14px !important;
+            width: 14px !important;
+        }
+    }
+
+    /* ===== RESPONSIVIDADE PARA CELULARES PEQUENOS (até 480px) ===== */
+    @media (max-width: 480px) {
+        .secao-superior-compacta {
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .secao-titulo-compacta {
+            font-size: 14px;
+            margin-bottom: 6px;
+            padding: 0 5px;
+        }
+
+        .grade-acoes-gerenciamento {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 6px !important;
+        }
+
+        .botao-acao {
+            padding: 8px 10px !important;
+            font-size: 10px !important;
+            min-height: 40px !important;
+        }
+
+        .botao-acao span {
+            font-size: 10px !important;
+        }
+
+        .botao-acao img {
+            height: 16px !important;
+            width: 16px !important;
+        }
+
+        .secao-acoes-massa-compacta {
+            margin-top: 6px;
+            margin-bottom: 10px;
+        }
+
+        .acoes-em-massa {
+            gap: 8px !important;
+        }
+
+        .botao-em-massa {
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+        }
+
+        .secao-gerenciamento {
+            gap: 6px;
+            padding: 0 5px;
+        }
+
+        .contador-participantes {
+            padding: 8px 12px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .contador-participantes span {
+            font-size: 13px !important;
+        }
+
+        .tabela-participantes {
+            min-width: 550px !important;
+        }
+
+        .tabela-participantes th,
+        .tabela-participantes td {
+            padding: 6px 8px !important;
+            font-size: 11px !important;
+        }
+    }
+
+    /* ===== AJUSTES ADICIONAIS PARA RESPONSIVIDADE ===== */
+
+    /* Barra de pesquisa responsiva */
+    @media (max-width: 768px) {
+        .campo-pesquisa {
+            font-size: 14px !important;
+            padding: 0 12px !important;
+        }
+
+        .botao-pesquisa {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        .icone-pesquisa {
+            width: 50px !important;
+            height: 50px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .campo-pesquisa {
+            font-size: 13px !important;
+            padding: 0 10px !important;
+        }
+
+        .botao-pesquisa {
+            width: 45px !important;
+            height: 45px !important;
+        }
+
+        .icone-pesquisa {
+            width: 45px !important;
+            height: 45px !important;
+        }
+    }
+
+    /* Modais responsivos */
+    @media (max-width: 768px) {
+
+        .modal-editar,
+        .modal-conteudo {
+            width: 95% !important;
+            max-width: 95% !important;
+            padding: 20px 16px !important;
+            margin: 10px !important;
+        }
+
+        .modal-header {
+            padding: 16px !important;
+        }
+
+        .modal-header h2 {
+            font-size: 1.3rem !important;
+        }
+
+        .modal-body {
+            padding: 16px !important;
+        }
+
+        .modal-footer {
+            padding: 12px 16px !important;
+            flex-direction: column-reverse !important;
+            gap: 8px !important;
+        }
+
+        .btn-modal {
+            width: 100% !important;
+            padding: 12px !important;
+        }
+
+        .form-group {
+            margin-bottom: 16px !important;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            font-size: 14px !important;
+            padding: 10px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        .modal-editar,
+        .modal-conteudo {
+            width: 98% !important;
+            padding: 16px 12px !important;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem !important;
+        }
+
+        .formatos-exportacao {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+
+        .btn-formato {
+            padding: 16px !important;
+        }
+    }
+
+    /* Ajustes para tabela em telas pequenas - melhorar scroll horizontal */
+    @media (max-width: 768px) {
+        .envoltorio-tabela {
+            position: relative !important;
+        }
+
+        .envoltorio-tabela::before {
+            content: '← Role para ver mais →';
+            display: block;
+            text-align: center;
+            padding: 8px;
+            background: rgba(101, 152, 210, 0.1);
+            color: var(--azul-escuro);
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+    }
 </style>
