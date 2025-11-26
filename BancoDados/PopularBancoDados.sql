@@ -1,0 +1,703 @@
+-- Script para Popular o Banco de Dados CEU com dados fictícios
+-- Execute este script após criar o banco de dados principal
+-- Senha padrão para todos: senha123 (hash: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi)
+
+USE CEU_bd;
+
+-- ====================================
+-- CÓDIGOS DE ORGANIZADOR (10 códigos válidos)
+-- ====================================
+INSERT INTO codigos_organizador (codigo, ativo, usado, criado_por, observacoes) VALUES 
+('4CT5LTDW', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('BF8T5H7L', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('9TDMW2Z4', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('45TYGRSW', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('KA9JA7RP', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('BF3EF84L', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('CMQ6KXNS', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('B7KQZDU7', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('JA2PM4H4', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('HG69KZMJ', 1, 0, 'SISTEMA', 'Código disponível para organização');
+
+-- ====================================
+-- USUÁRIOS PARTICIPANTES (40 participantes comuns)
+-- ====================================
+-- Senha: senha123
+-- Hash: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+
+INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES
+-- Participantes 1-10
+('12345678911', 'Ana Clara Silva', 'ana.silva@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024001', NULL, 0, 0),
+('23456789012', 'Bruno Henrique Costa', 'bruno.costa@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024002', NULL, 0, 1),
+('34567890123', 'Carla Fernanda Souza', 'carla.souza@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024003', NULL, 0, 0),
+('45678901234', 'Daniel Rodrigues Lima', 'daniel.lima@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024004', NULL, 0, 1),
+('56789012345', 'Eduarda Santos Almeida', 'eduarda.almeida@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024005', NULL, 0, 0),
+('67890123456', 'Felipe Augusto Pereira', 'felipe.pereira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024006', NULL, 0, 1),
+('78901234567', 'Gabriela Martins Rocha', 'gabriela.rocha@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024007', NULL, 0, 0),
+('89012345678', 'Henrique Vieira Nascimento', 'henrique.nascimento@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024008', NULL, 0, 0),
+('90123456789', 'Isabela Cristina Oliveira', 'isabela.oliveira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024009', NULL, 0, 1),
+('01234567890', 'João Pedro Barbosa', 'joao.barbosa@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024010', NULL, 0, 0),
+
+-- Participantes 11-20
+('11234567890', 'Kelly Vitória Mendes', 'kelly.mendes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024011', NULL, 0, 1),
+('21234567890', 'Lucas Gabriel Cardoso', 'lucas.cardoso@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024012', NULL, 0, 0),
+('31234567890', 'Mariana Beatriz Dias', 'mariana.dias@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024013', NULL, 0, 1),
+('41234567890', 'Nicolas Eduardo Ribeiro', 'nicolas.ribeiro@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024014', NULL, 0, 0),
+('51234567890', 'Olivia Fernandes Castro', 'olivia.castro@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024015', NULL, 0, 1),
+('61234567890', 'Paulo Henrique Gomes', 'paulo.gomes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024016', NULL, 0, 0),
+('71234567890', 'Rafaela Cristine Moreira', 'rafaela.moreira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024017', NULL, 0, 1),
+('81234567890', 'Samuel José Correia', 'samuel.correia@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024018', NULL, 0, 0),
+('91234567890', 'Thais Amanda Freitas', 'thais.freitas@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024019', NULL, 0, 0),
+('10234567890', 'Vitor Hugo Pinto', 'vitor.pinto@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024020', NULL, 0, 1),
+
+-- Participantes 21-30
+('12345098765', 'Bruna Camila Reis', 'bruna.reis@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024021', NULL, 0, 0),
+('23456098765', 'Caio Matheus Azevedo', 'caio.azevedo@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024022', NULL, 0, 1),
+('34567098765', 'Diana Laura Monteiro', 'diana.monteiro@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024023', NULL, 0, 0),
+('45678098765', 'Eduardo Cesar Teixeira', 'eduardo.teixeira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024024', NULL, 0, 1),
+('56789098765', 'Fernanda Luiza Campos', 'fernanda.campos@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024025', NULL, 0, 0),
+('67890098765', 'Gustavo Rafael Nunes', 'gustavo.nunes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024026', NULL, 0, 1),
+('78901098765', 'Helena Sofia Araújo', 'helena.araujo@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024027', NULL, 0, 0),
+('89012098765', 'Igor Alexandre Batista', 'igor.batista@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024028', NULL, 0, 0),
+('90123098765', 'Juliana Carolina Barros', 'juliana.barros@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024029', NULL, 0, 1),
+('01234098765', 'Kaique Leonardo Silva', 'kaique.silva@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024030', NULL, 0, 0),
+
+-- Participantes 31-40
+('11223344556', 'Larissa Fernanda Cruz', 'larissa.cruz@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024031', NULL, 0, 1),
+('22334455667', 'Marcos Vinicius Cunha', 'marcos.cunha@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024032', NULL, 0, 0),
+('33445566778', 'Natália Eduarda Farias', 'natalia.farias@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024033', NULL, 0, 1),
+('44556677889', 'Otávio Guilherme Soares', 'otavio.soares@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024034', NULL, 0, 0),
+('55667788990', 'Patricia Regina Lopes', 'patricia.lopes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024035', NULL, 0, 1),
+('66778899001', 'Renan Felipe Duarte', 'renan.duarte@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024036', NULL, 0, 0),
+('77889900112', 'Sabrina Leticia Carvalho', 'sabrina.carvalho@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024037', NULL, 0, 1),
+('88990011223', 'Thiago André Miranda', 'thiago.miranda@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024038', NULL, 0, 0),
+('99001122334', 'Vanessa Louise Macedo', 'vanessa.macedo@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024039', NULL, 0, 0),
+('00112233445', 'Wesley Bruno Ferreira', 'wesley.ferreira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024040', NULL, 0, 1);
+
+-- ====================================
+-- USUÁRIOS ORGANIZADORES (10 organizadores com códigos)
+-- ====================================
+INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES
+('10987654321', 'Amanda Cristina', 'amanda@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'HG69KZMJ', 1, 0),
+('20987654321', 'Bernardo Silva', 'bernardo@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'BF8T5H7L', 1, 1),
+('30987654321', 'Camila Rodrigues', 'camila@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, '9TDMW2Z4', 1, 0),
+('40987654321', 'Diego Santos', 'diego@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, '45TYGRSW', 1, 1),
+('50987654321', 'Eliane Costa', 'eliane@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'KA9JA7RP', 1, 0),
+('60987654321', 'Fábio Almeida', 'fabio@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'BF3EF84L', 1, 1),
+('70987654321', 'Giulia Pereira', 'giulia@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'CMQ6KXNS', 1, 0),
+('80987654321', 'Hugo Martins', 'hugo@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'B7KQZDU7', 1, 0),
+('90987654321', 'Ingrid Souza', 'ingrid@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'JA2PM4H4', 1, 1),
+('09876543210', 'Jonas Lima', 'jonas@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'HG69KZMJ', 1, 0);
+-- Atualizar códigos como usados
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '10987654321' WHERE codigo = 'HG69KZMJ';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '20987654321' WHERE codigo = 'BF8T5H7L';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '30987654321' WHERE codigo = '9TDMW2Z4';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '40987654321' WHERE codigo = '45TYGRSW';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '50987654321' WHERE codigo = 'KA9JA7RP';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '60987654321' WHERE codigo = 'BF3EF84L';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '70987654321' WHERE codigo = 'CMQ6KXNS';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '80987654321' WHERE codigo = 'B7KQZDU7';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '90987654321' WHERE codigo = 'JA2PM4H4';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '09876543210' WHERE codigo = 'HG69KZMJ';
+-- ====================================
+-- INSCRIÇÕES NOS EVENTOS (pelo menos 20 pessoas por evento)
+-- ====================================
+
+-- Evento 1: Workshop de JavaScript (25 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('12345678911', 1, 'ativa', 1, 1),
+('23456789012', 1, 'ativa', 1, 1),
+('34567890123', 1, 'ativa', 1, 0),
+('45678901234', 1, 'ativa', 1, 1),
+('56789012345', 1, 'ativa', 1, 1),
+('67890123456', 1, 'ativa', 0, 0),
+('78901234567', 1, 'ativa', 1, 1),
+('89012345678', 1, 'ativa', 1, 0),
+('90123456789', 1, 'ativa', 1, 1),
+('01234567890', 1, 'ativa', 0, 0),
+('11234567890', 1, 'ativa', 1, 1),
+('21234567890', 1, 'ativa', 1, 1),
+('31234567890', 1, 'ativa', 1, 0),
+('41234567890', 1, 'ativa', 1, 1),
+('51234567890', 1, 'ativa', 0, 0),
+('61234567890', 1, 'ativa', 1, 1),
+('71234567890', 1, 'ativa', 1, 1),
+('81234567890', 1, 'ativa', 1, 1),
+('91234567890', 1, 'ativa', 0, 0),
+('10234567890', 1, 'ativa', 1, 1),
+('12345098765', 1, 'ativa', 1, 0),
+('23456098765', 1, 'ativa', 1, 1),
+('34567098765', 1, 'ativa', 1, 1),
+('45678098765', 1, 'ativa', 1, 1),
+('56789098765', 1, 'ativa', 0, 0);
+
+-- Evento 2: Palestra sobre IA (22 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('67890098765', 2, 'ativa', 1, 1),
+('78901098765', 2, 'ativa', 1, 1),
+('89012098765', 2, 'ativa', 1, 0),
+('90123098765', 2, 'ativa', 1, 1),
+('01234098765', 2, 'ativa', 0, 0),
+('11223344556', 2, 'ativa', 1, 1),
+('22334455667', 2, 'ativa', 1, 1),
+('33445566778', 2, 'ativa', 1, 1),
+('44556677889', 2, 'ativa', 1, 0),
+('55667788990', 2, 'ativa', 1, 1),
+('66778899001', 2, 'ativa', 0, 0),
+('77889900112', 2, 'ativa', 1, 1),
+('88990011223', 2, 'ativa', 1, 1),
+('99001122334', 2, 'ativa', 1, 1),
+('00112233445', 2, 'ativa', 1, 0),
+('12345678911', 2, 'ativa', 1, 1),
+('23456789012', 2, 'ativa', 0, 0),
+('34567890123', 2, 'ativa', 1, 1),
+('45678901234', 2, 'ativa', 1, 1),
+('56789012345', 2, 'ativa', 1, 1),
+('67890123456', 2, 'ativa', 1, 1),
+('78901234567', 2, 'ativa', 1, 0);
+
+-- Evento 3: Curso de Python (30 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('89012345678', 3, 'ativa', 1, 1),
+('90123456789', 3, 'ativa', 1, 1),
+('01234567890', 3, 'ativa', 1, 1),
+('11234567890', 3, 'ativa', 1, 0),
+('21234567890', 3, 'ativa', 1, 1),
+('31234567890', 3, 'ativa', 0, 0),
+('41234567890', 3, 'ativa', 1, 1),
+('51234567890', 3, 'ativa', 1, 1),
+('61234567890', 3, 'ativa', 1, 1),
+('71234567890', 3, 'ativa', 1, 1),
+('81234567890', 3, 'ativa', 1, 0),
+('91234567890', 3, 'ativa', 1, 1),
+('10234567890', 3, 'ativa', 0, 0),
+('12345098765', 3, 'ativa', 1, 1),
+('23456098765', 3, 'ativa', 1, 1),
+('34567098765', 3, 'ativa', 1, 1),
+('45678098765', 3, 'ativa', 1, 1),
+('56789098765', 3, 'ativa', 1, 0),
+('67890098765', 3, 'ativa', 1, 1),
+('78901098765', 3, 'ativa', 0, 0),
+('89012098765', 3, 'ativa', 1, 1),
+('90123098765', 3, 'ativa', 1, 1),
+('01234098765', 3, 'ativa', 1, 1),
+('11223344556', 3, 'ativa', 1, 1),
+('22334455667', 3, 'ativa', 1, 0),
+('33445566778', 3, 'ativa', 1, 1),
+('44556677889', 3, 'ativa', 0, 0),
+('55667788990', 3, 'ativa', 1, 1),
+('66778899001', 3, 'ativa', 1, 1),
+('77889900112', 3, 'ativa', 1, 1);
+
+-- Evento 4: Semana da Tecnologia (28 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('88990011223', 4, 'ativa', 1, 1),
+('99001122334', 4, 'ativa', 1, 0),
+('00112233445', 4, 'ativa', 1, 1),
+('12345678911', 4, 'ativa', 1, 1),
+('23456789012', 4, 'ativa', 0, 0),
+('34567890123', 4, 'ativa', 1, 1),
+('45678901234', 4, 'ativa', 1, 1),
+('56789012345', 4, 'ativa', 1, 1),
+('67890123456', 4, 'ativa', 1, 1),
+('78901234567', 4, 'ativa', 1, 0),
+('89012345678', 4, 'ativa', 1, 1),
+('90123456789', 4, 'ativa', 0, 0),
+('01234567890', 4, 'ativa', 1, 1),
+('11234567890', 4, 'ativa', 1, 1),
+('21234567890', 4, 'ativa', 1, 1),
+('31234567890', 4, 'ativa', 1, 1),
+('41234567890', 4, 'ativa', 1, 0),
+('51234567890', 4, 'ativa', 1, 1),
+('61234567890', 4, 'ativa', 0, 0),
+('71234567890', 4, 'ativa', 1, 1),
+('81234567890', 4, 'ativa', 1, 1),
+('91234567890', 4, 'ativa', 1, 1),
+('10234567890', 4, 'ativa', 1, 1),
+('12345098765', 4, 'ativa', 1, 0),
+('23456098765', 4, 'ativa', 1, 1),
+('34567098765', 4, 'ativa', 0, 0),
+('45678098765', 4, 'ativa', 1, 1),
+('56789098765', 4, 'ativa', 1, 1);
+
+-- Evento 5: Minicurso de Git (20 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('67890098765', 5, 'ativa', 1, 0),
+('78901098765', 5, 'ativa', 1, 0),
+('89012098765', 5, 'ativa', 0, 0),
+('90123098765', 5, 'ativa', 1, 0),
+('01234098765', 5, 'ativa', 1, 0),
+('11223344556', 5, 'ativa', 1, 0),
+('22334455667', 5, 'ativa', 1, 0),
+('33445566778', 5, 'ativa', 0, 0),
+('44556677889', 5, 'ativa', 1, 0),
+('55667788990', 5, 'ativa', 1, 0),
+('66778899001', 5, 'ativa', 1, 0),
+('77889900112', 5, 'ativa', 1, 0),
+('88990011223', 5, 'ativa', 0, 0),
+('99001122334', 5, 'ativa', 1, 0),
+('00112233445', 5, 'ativa', 1, 0),
+('12345678911', 5, 'ativa', 1, 0),
+('23456789012', 5, 'ativa', 1, 0),
+('34567890123', 5, 'ativa', 0, 0),
+('45678901234', 5, 'ativa', 1, 0),
+('56789012345', 5, 'ativa', 1, 0);
+
+-- Evento 6: Workshop de Design UX (24 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('67890123456', 6, 'ativa', 1, 1),
+('78901234567', 6, 'ativa', 1, 1),
+('89012345678', 6, 'ativa', 1, 0),
+('90123456789', 6, 'ativa', 0, 0),
+('01234567890', 6, 'ativa', 1, 1),
+('11234567890', 6, 'ativa', 1, 1),
+('21234567890', 6, 'ativa', 1, 1),
+('31234567890', 6, 'ativa', 1, 1),
+('41234567890', 6, 'ativa', 1, 0),
+('51234567890', 6, 'ativa', 1, 1),
+('61234567890', 6, 'ativa', 0, 0),
+('71234567890', 6, 'ativa', 1, 1),
+('81234567890', 6, 'ativa', 1, 1),
+('91234567890', 6, 'ativa', 1, 1),
+('10234567890', 6, 'ativa', 1, 1),
+('12345098765', 6, 'ativa', 1, 0),
+('23456098765', 6, 'ativa', 1, 1),
+('34567098765', 6, 'ativa', 0, 0),
+('45678098765', 6, 'ativa', 1, 1),
+('56789098765', 6, 'ativa', 1, 1),
+('67890098765', 6, 'ativa', 1, 1),
+('78901098765', 6, 'ativa', 1, 1),
+('89012098765', 6, 'ativa', 1, 0),
+('90123098765', 6, 'ativa', 1, 1);
+
+-- Evento 7: Hackathon CEU 2025 (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 7, 'ativa', 1, 1),
+('11223344556', 7, 'ativa', 1, 1),
+('22334455667', 7, 'ativa', 1, 1),
+('33445566778', 7, 'ativa', 0, 0),
+('44556677889', 7, 'ativa', 1, 1),
+('55667788990', 7, 'ativa', 1, 1),
+('66778899001', 7, 'ativa', 1, 1),
+('77889900112', 7, 'ativa', 1, 0),
+('88990011223', 7, 'ativa', 1, 1),
+('99001122334', 7, 'ativa', 0, 0),
+('00112233445', 7, 'ativa', 1, 1),
+('12345678911', 7, 'ativa', 1, 1),
+('23456789012', 7, 'ativa', 1, 1),
+('34567890123', 7, 'ativa', 1, 1),
+('45678901234', 7, 'ativa', 1, 0),
+('56789012345', 7, 'ativa', 1, 1),
+('67890123456', 7, 'ativa', 0, 0),
+('78901234567', 7, 'ativa', 1, 1),
+('89012345678', 7, 'ativa', 1, 1),
+('90123456789', 7, 'ativa', 1, 1),
+('01234567890', 7, 'ativa', 1, 1),
+('11234567890', 7, 'ativa', 1, 0),
+('21234567890', 7, 'ativa', 1, 1),
+('31234567890', 7, 'ativa', 0, 0),
+('41234567890', 7, 'ativa', 1, 1),
+('51234567890', 7, 'ativa', 1, 1);
+
+-- Evento 8: Seminário de Inovação (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 8, 'ativa', 1, 1),
+('11223344556', 8, 'ativa', 1, 1),
+('22334455667', 8, 'ativa', 1, 1),
+('33445566778', 8, 'ativa', 0, 0),
+('44556677889', 8, 'ativa', 1, 1),
+('55667788990', 8, 'ativa', 1, 1),
+('66778899001', 8, 'ativa', 1, 1),
+('77889900112', 8, 'ativa', 1, 0),
+('88990011223', 8, 'ativa', 1, 1),
+('99001122334', 8, 'ativa', 0, 0),
+('00112233445', 8, 'ativa', 1, 1),
+('12345678911', 8, 'ativa', 1, 1),
+('23456789012', 8, 'ativa', 1, 1),
+('34567890123', 8, 'ativa', 1, 1),
+('45678901234', 8, 'ativa', 1, 0),
+('56789012345', 8, 'ativa', 1, 1),
+('67890123456', 8, 'ativa', 0, 0),
+('78901234567', 8, 'ativa', 1, 1),
+('89012345678', 8, 'ativa', 1, 1),
+('90123456789', 8, 'ativa', 1, 1),
+('01234567890', 8, 'ativa', 1, 1),
+('11234567890', 8, 'ativa', 1, 0),
+('21234567890', 8, 'ativa', 1, 1),
+('31234567890', 8, 'ativa', 0, 0),
+('41234567890', 8, 'ativa', 1, 1),
+('51234567890', 8, 'ativa', 1, 1);
+
+-- Evento 9: Palestra de Empreendedorismo (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 9, 'ativa', 1, 1),
+('11223344556', 9, 'ativa', 1, 1),
+('22334455667', 9, 'ativa', 1, 1),
+('33445566778', 9, 'ativa', 0, 0),
+('44556677889', 9, 'ativa', 1, 1),
+('55667788990', 9, 'ativa', 1, 1),
+('66778899001', 9, 'ativa', 1, 1),
+('77889900112', 9, 'ativa', 1, 0),
+('88990011223', 9, 'ativa', 1, 1),
+('99001122334', 9, 'ativa', 0, 0),
+('00112233445', 9, 'ativa', 1, 1),
+('12345678911', 9, 'ativa', 1, 1),
+('23456789012', 9, 'ativa', 1, 1),
+('34567890123', 9, 'ativa', 1, 1),
+('45678901234', 9, 'ativa', 1, 0),
+('56789012345', 9, 'ativa', 1, 1),
+('67890123456', 9, 'ativa', 0, 0),
+('78901234567', 9, 'ativa', 1, 1),
+('89012345678', 9, 'ativa', 1, 1),
+('90123456789', 9, 'ativa', 1, 1),
+('01234567890', 9, 'ativa', 1, 1),
+('11234567890', 9, 'ativa', 1, 0),
+('21234567890', 9, 'ativa', 1, 1),
+('31234567890', 9, 'ativa', 0, 0),
+('41234567890', 9, 'ativa', 1, 1),
+('51234567890', 9, 'ativa', 1, 1);
+
+-- Evento 10: Workshop de Marketing Digital (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 10, 'ativa', 1, 1),
+('11223344556', 10, 'ativa', 1, 1),
+('22334455667', 10, 'ativa', 1, 1),
+('33445566778', 10, 'ativa', 0, 0),
+('44556677889', 10, 'ativa', 1, 1),
+('55667788990', 10, 'ativa', 1, 1),
+('66778899001', 10, 'ativa', 1, 1),
+('77889900112', 10, 'ativa', 1, 0),
+('88990011223', 10, 'ativa', 1, 1),
+('99001122334', 10, 'ativa', 0, 0),
+('00112233445', 10, 'ativa', 1, 1),
+('12345678911', 10, 'ativa', 1, 1),
+('23456789012', 10, 'ativa', 1, 1),
+('34567890123', 10, 'ativa', 1, 1),
+('45678901234', 10, 'ativa', 1, 0),
+('56789012345', 10, 'ativa', 1, 1),
+('67890123456', 10, 'ativa', 0, 0),
+('78901234567', 10, 'ativa', 1, 1),
+('89012345678', 10, 'ativa', 1, 1),
+('90123456789', 10, 'ativa', 1, 1),
+('01234567890', 10, 'ativa', 1, 1),
+('11234567890', 10, 'ativa', 1, 0),
+('21234567890', 10, 'ativa', 1, 1),
+('31234567890', 10, 'ativa', 0, 0),
+('41234567890', 10, 'ativa', 1, 1),
+('51234567890', 10, 'ativa', 1, 1);
+
+-- Evento 11: Curso de React (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 11, 'ativa', 1, 1),
+('11223344556', 11, 'ativa', 1, 1),
+('22334455667', 11, 'ativa', 1, 1),
+('33445566778', 11, 'ativa', 0, 0),
+('44556677889', 11, 'ativa', 1, 1),
+('55667788990', 11, 'ativa', 1, 1),
+('66778899001', 11, 'ativa', 1, 1),
+('77889900112', 11, 'ativa', 1, 0),
+('88990011223', 11, 'ativa', 1, 1),
+('99001122334', 11, 'ativa', 0, 0),
+('00112233445', 11, 'ativa', 1, 1),
+('12345678911', 11, 'ativa', 1, 1),
+('23456789012', 11, 'ativa', 1, 1),
+('34567890123', 11, 'ativa', 1, 1),
+('45678901234', 11, 'ativa', 1, 0),
+('56789012345', 11, 'ativa', 1, 1),
+('67890123456', 11, 'ativa', 0, 0),
+('78901234567', 11, 'ativa', 1, 1),
+('89012345678', 11, 'ativa', 1, 1),
+('90123456789', 11, 'ativa', 1, 1),
+('01234567890', 11, 'ativa', 1, 1),
+('11234567890', 11, 'ativa', 1, 0),
+('21234567890', 11, 'ativa', 1, 1),
+('31234567890', 11, 'ativa', 0, 0),
+('41234567890', 11, 'ativa', 1, 1),
+('51234567890', 11, 'ativa', 1, 1);
+
+-- Evento 12: Palestra Sustentabilidade na Tech (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 12, 'ativa', 1, 1),
+('11223344556', 12, 'ativa', 1, 1),
+('22334455667', 12, 'ativa', 1, 1),
+('33445566778', 12, 'ativa', 0, 0),
+('44556677889', 12, 'ativa', 1, 1),
+('55667788990', 12, 'ativa', 1, 1),
+('66778899001', 12, 'ativa', 1, 1),
+('77889900112', 12, 'ativa', 1, 0),
+('88990011223', 12, 'ativa', 1, 1),
+('99001122334', 12, 'ativa', 0, 0),
+('00112233445', 12, 'ativa', 1, 1),
+('12345678911', 12, 'ativa', 1, 1),
+('23456789012', 12, 'ativa', 1, 1),
+('34567890123', 12, 'ativa', 1, 1),
+('45678901234', 12, 'ativa', 1, 0),
+('56789012345', 12, 'ativa', 1, 1),
+('67890123456', 12, 'ativa', 0, 0),
+('78901234567', 12, 'ativa', 1, 1),
+('89012345678', 12, 'ativa', 1, 1),
+('90123456789', 12, 'ativa', 1, 1),
+('01234567890', 12, 'ativa', 1, 1),
+('11234567890', 12, 'ativa', 1, 0),
+('21234567890', 12, 'ativa', 1, 1),
+('31234567890', 12, 'ativa', 0, 0),
+('41234567890', 12, 'ativa', 1, 1),
+('51234567890', 12, 'ativa', 1, 1);
+
+-- Evento 13: Desenvolvimento Mobile (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 13, 'ativa', 1, 1),
+('11223344556', 13, 'ativa', 1, 1),
+('22334455667', 13, 'ativa', 1, 1),
+('33445566778', 13, 'ativa', 0, 0),
+('44556677889', 13, 'ativa', 1, 1),
+('55667788990', 13, 'ativa', 1, 1),
+('66778899001', 13, 'ativa', 1, 1),
+('77889900112', 13, 'ativa', 1, 0),
+('88990011223', 13, 'ativa', 1, 1),
+('99001122334', 13, 'ativa', 0, 0),
+('00112233445', 13, 'ativa', 1, 1),
+('12345678911', 13, 'ativa', 1, 1),
+('23456789012', 13, 'ativa', 1, 1),
+('34567890123', 13, 'ativa', 1, 1),
+('45678901234', 13, 'ativa', 1, 0),
+('56789012345', 13, 'ativa', 1, 1),
+('67890123456', 13, 'ativa', 0, 0),
+('78901234567', 13, 'ativa', 1, 1),
+('89012345678', 13, 'ativa', 1, 1),
+('90123456789', 13, 'ativa', 1, 1),
+('01234567890', 13, 'ativa', 1, 1),
+('11234567890', 13, 'ativa', 1, 0),
+('21234567890', 13, 'ativa', 1, 1),
+('31234567890', 13, 'ativa', 0, 0),
+('41234567890', 13, 'ativa', 1, 1),
+('51234567890', 13, 'ativa', 1, 1);
+
+-- Evento 14: Workshop de Blockchain (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 14, 'ativa', 1, 1),
+('11223344556', 14, 'ativa', 1, 1),
+('22334455667', 14, 'ativa', 1, 1),
+('33445566778', 14, 'ativa', 0, 0),
+('44556677889', 14, 'ativa', 1, 1),
+('55667788990', 14, 'ativa', 1, 1),
+('66778899001', 14, 'ativa', 1, 1),
+('77889900112', 14, 'ativa', 1, 0),
+('88990011223', 14, 'ativa', 1, 1),
+('99001122334', 14, 'ativa', 0, 0),
+('00112233445', 14, 'ativa', 1, 1),
+('12345678911', 14, 'ativa', 1, 1),
+('23456789012', 14, 'ativa', 1, 1),
+('34567890123', 14, 'ativa', 1, 1),
+('45678901234', 14, 'ativa', 1, 0),
+('56789012345', 14, 'ativa', 1, 1),
+('67890123456', 14, 'ativa', 0, 0),
+('78901234567', 14, 'ativa', 1, 1),
+('89012345678', 14, 'ativa', 1, 1),
+('90123456789', 14, 'ativa', 1, 1),
+('01234567890', 14, 'ativa', 1, 1),
+('11234567890', 14, 'ativa', 1, 0),
+('21234567890', 14, 'ativa', 1, 1),
+('31234567890', 14, 'ativa', 0, 0),
+('41234567890', 14, 'ativa', 1, 1),
+('51234567890', 14, 'ativa', 1, 1);
+
+-- Evento 15: Semana da Inovação (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 15, 'ativa', 1, 1),
+('11223344556', 15, 'ativa', 1, 1),
+('22334455667', 15, 'ativa', 1, 1),
+('33445566778', 15, 'ativa', 0, 0),
+('44556677889', 15, 'ativa', 1, 1),
+('55667788990', 15, 'ativa', 1, 1),
+('66778899001', 15, 'ativa', 1, 1),
+('77889900112', 15, 'ativa', 1, 0),
+('88990011223', 15, 'ativa', 1, 1),
+('99001122334', 15, 'ativa', 0, 0),
+('00112233445', 15, 'ativa', 1, 1),
+('12345678911', 15, 'ativa', 1, 1),
+('23456789012', 15, 'ativa', 1, 1),
+('34567890123', 15, 'ativa', 1, 1),
+('45678901234', 15, 'ativa', 1, 0),
+('56789012345', 15, 'ativa', 1, 1),
+('67890123456', 15, 'ativa', 0, 0),
+('78901234567', 15, 'ativa', 1, 1),
+('89012345678', 15, 'ativa', 1, 1),
+('90123456789', 15, 'ativa', 1, 1),
+('01234567890', 15, 'ativa', 1, 1),
+('11234567890', 15, 'ativa', 1, 0),
+('21234567890', 15, 'ativa', 1, 1),
+('31234567890', 15, 'ativa', 0, 0),
+('41234567890', 15, 'ativa', 1, 1),
+('51234567890', 15, 'ativa', 1, 1);
+
+-- Evento 16: Cybersecurity Basics (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 16, 'ativa', 1, 1),
+('11223344556', 16, 'ativa', 1, 1),
+('22334455667', 16, 'ativa', 1, 1),
+('33445566778', 16, 'ativa', 0, 0),
+('44556677889', 16, 'ativa', 1, 1),
+('55667788990', 16, 'ativa', 1, 1),
+('66778899001', 16, 'ativa', 1, 1),
+('77889900112', 16, 'ativa', 1, 0),
+('88990011223', 16, 'ativa', 1, 1),
+('99001122334', 16, 'ativa', 0, 0),
+('00112233445', 16, 'ativa', 1, 1),
+('12345678911', 16, 'ativa', 1, 1),
+('23456789012', 16, 'ativa', 1, 1),
+('34567890123', 16, 'ativa', 1, 1),
+('45678901234', 16, 'ativa', 1, 0),
+('56789012345', 16, 'ativa', 1, 1),
+('67890123456', 16, 'ativa', 0, 0),
+('78901234567', 16, 'ativa', 1, 1),
+('89012345678', 16, 'ativa', 1, 1),
+('90123456789', 16, 'ativa', 1, 1),
+('01234567890', 16, 'ativa', 1, 1),
+('11234567890', 16, 'ativa', 1, 0),
+('21234567890', 16, 'ativa', 1, 1),
+('31234567890', 16, 'ativa', 0, 0),
+('41234567890', 16, 'ativa', 1, 1),
+('51234567890', 16, 'ativa', 1, 1);
+
+-- Evento 17: Conferência de Cloud Computing (26 participantes)
+INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada, certificado_emitido) VALUES
+('01234098765', 17, 'ativa', 1, 1),
+('11223344556', 17, 'ativa', 1, 1),
+('22334455667', 17, 'ativa', 1, 1),
+('33445566778', 17, 'ativa', 0, 0),
+('44556677889', 17, 'ativa', 1, 1),
+('55667788990', 17, 'ativa', 1, 1),
+('66778899001', 17, 'ativa', 1, 1),
+('77889900112', 17, 'ativa', 1, 0),
+('88990011223', 17, 'ativa', 1, 1),
+('99001122334', 17, 'ativa', 0, 0),
+('00112233445', 17, 'ativa', 1, 1),
+('12345678911', 17, 'ativa', 1, 1),
+('23456789012', 17, 'ativa', 1, 1),
+('34567890123', 17, 'ativa', 1, 1),
+('45678901234', 17, 'ativa', 1, 0),
+('56789012345', 17, 'ativa', 1, 1),
+('67890123456', 17, 'ativa', 0, 0),
+('78901234567', 17, 'ativa', 1, 1),
+('89012345678', 17, 'ativa', 1, 1),
+('90123456789', 17, 'ativa', 1, 1),
+('01234567890', 17, 'ativa', 1, 1),
+('11234567890', 17, 'ativa', 1, 0),
+('21234567890', 17, 'ativa', 1, 1),
+('31234567890', 17, 'ativa', 0, 0),
+('41234567890', 17, 'ativa', 1, 1),
+('51234567890', 17, 'ativa', 1, 1);
+
+-- ====================================
+-- COLABORADORES DOS EVENTOS
+-- ====================================
+-- Adicionar alguns organizadores como colaboradores em eventos de outros organizadores
+INSERT INTO colaboradores_evento (cod_evento, CPF, papel, presenca_confirmada, certificado_emitido) VALUES
+-- Evento 1: Workshop de JavaScript
+(1, '20987654321', 'colaborador', 1, 1),
+(1, '30987654321', 'colaborador', 1, 1),
+(1, '23456789012', 'colaborador', 0, 0),
+(1, '34567890123', 'colaborador', 1, 0),
+
+-- Evento 2: Palestra sobre IA
+(2, '40987654321', 'colaborador', 1, 1),
+(2, '50987654321', 'colaborador', 1, 1),
+(2, '45678901234', 'colaborador', 1, 0),
+
+-- Evento 3: Curso de Python
+(3, '10987654321', 'colaborador', 1, 1),
+(3, '60987654321', 'colaborador', 1, 1),
+(3, '56789012345', 'colaborador', 0, 0),
+(3, '67890123456', 'colaborador', 1, 1),
+
+-- Evento 4: Semana da Tecnologia
+(4, '70987654321', 'colaborador', 1, 1),
+(4, '80987654321', 'colaborador', 1, 1),
+(4, '78901234567', 'colaborador', 1, 0),
+(4, '89012345678', 'colaborador', 1, 1),
+
+-- Evento 7: Hackathon CEU 2025
+(7, '90987654321', 'colaborador', 1, 1),
+(7, '09876543210', 'colaborador', 1, 1),
+(7, '90123456789', 'colaborador', 1, 1),
+(7, '01234567890', 'colaborador', 0, 0);
+
+-- ====================================
+-- CERTIFICADOS (Para alguns participantes que completaram eventos)
+-- ====================================
+INSERT INTO certificado (cod_verificacao, modelo, tipo, cpf, cod_evento, dados) VALUES
+-- Evento 1: Workshop de JavaScript
+('JS2025A1', 'ModeloExemplo.pptx', 'Ensino', '12345678911', 1, '{"participante":"Ana Clara Silva","evento":"Workshop de JavaScript","organizador":"Aurora Sobrinho","data":"15/11/2025","carga_horaria":"8","local":"Sala 101"}'),
+('JS2025A2', 'ModeloExemplo.pptx', 'Ensino', '23456789012', 1, '{"participante":"Bruno Henrique Costa","evento":"Workshop de JavaScript","organizador":"Aurora Sobrinho","data":"15/11/2025","carga_horaria":"8","local":"Sala 101"}'),
+('JS2025A3', 'ModeloExemplo.pptx', 'Ensino', '45678901234', 1, '{"participante":"Daniel Rodrigues Lima","evento":"Workshop de JavaScript","organizador":"Aurora Sobrinho","data":"15/11/2025","carga_horaria":"8","local":"Sala 101"}'),
+('JS2025A4', 'ModeloExemplo.pptx', 'Ensino', '56789012345', 1, '{"participante":"Eduarda Santos Almeida","evento":"Workshop de JavaScript","organizador":"Aurora Sobrinho","data":"15/11/2025","carga_horaria":"8","local":"Sala 101"}'),
+('JS2025A5', 'ModeloExemplo.pptx', 'Ensino', '78901234567', 1, '{"participante":"Gabriela Martins Rocha","evento":"Workshop de JavaScript","organizador":"Aurora Sobrinho","data":"15/11/2025","carga_horaria":"8","local":"Sala 101"}'),
+
+-- Evento 2: Palestra sobre IA
+('IA2025B1', 'ModeloExemplo.pptx', 'Pesquisa', '67890098765', 2, '{"participante":"Gustavo Rafael Nunes","evento":"Palestra sobre IA","organizador":"Aurora Sobrinho","data":"20/11/2025","carga_horaria":"2","local":"Auditório Principal"}'),
+('IA2025B2', 'ModeloExemplo.pptx', 'Pesquisa', '78901098765', 2, '{"participante":"Helena Sofia Araújo","evento":"Palestra sobre IA","organizador":"Aurora Sobrinho","data":"20/11/2025","carga_horaria":"2","local":"Auditório Principal"}'),
+('IA2025B3', 'ModeloExemplo.pptx', 'Pesquisa', '90123098765', 2, '{"participante":"Juliana Carolina Barros","evento":"Palestra sobre IA","organizador":"Aurora Sobrinho","data":"20/11/2025","carga_horaria":"2","local":"Auditório Principal"}'),
+
+-- Evento 3: Curso de Python
+('PY2025C1', 'ModeloExemplo.pptx', 'Extensão', '89012345678', 3, '{"participante":"Henrique Vieira Nascimento","evento":"Curso de Python","organizador":"Aurora Sobrinho","data":"02/12/2025","carga_horaria":"40","local":"Laboratório 2"}'),
+('PY2025C2', 'ModeloExemplo.pptx', 'Extensão', '90123456789', 3, '{"participante":"Isabela Cristina Oliveira","evento":"Curso de Python","organizador":"Aurora Sobrinho","data":"02/12/2025","carga_horaria":"40","local":"Laboratório 2"}'),
+('PY2025C3', 'ModeloExemplo.pptx', 'Extensão', '01234567890', 3, '{"participante":"João Pedro Barbosa","evento":"Curso de Python","organizador":"Aurora Sobrinho","data":"02/12/2025","carga_horaria":"40","local":"Laboratório 2"}'),
+('PY2025C4', 'ModeloExemplo.pptx', 'Extensão', '21234567890', 3, '{"participante":"Lucas Gabriel Cardoso","evento":"Curso de Python","organizador":"Aurora Sobrinho","data":"02/12/2025","carga_horaria":"40","local":"Laboratório 2"}'),
+
+-- Evento 6: Workshop de Design UX
+('UX2025D1', 'ModeloExemplo.pptx', 'Pesquisa', '67890123456', 6, '{"participante":"Felipe Augusto Pereira","evento":"Workshop de Design UX","organizador":"Aurora Sobrinho","data":"15/12/2025","carga_horaria":"9","local":"Estudio Criativo"}'),
+('UX2025D2', 'ModeloExemplo.pptx', 'Pesquisa', '78901234567', 6, '{"participante":"Gabriela Martins Rocha","evento":"Workshop de Design UX","organizador":"Aurora Sobrinho","data":"15/12/2025","carga_horaria":"9","local":"Estudio Criativo"}'),
+
+-- Evento 7: Hackathon CEU 2025
+('HK2025E1', 'ModeloExemplo.pptx', 'Extensão', '01234098765', 7, '{"participante":"Kaique Leonardo Silva","evento":"Hackathon CEU 2025","organizador":"Aurora Sobrinho","data":"22/12/2025","carga_horaria":"48","local":"Pavilhão Principal"}'),
+('HK2025E2', 'ModeloExemplo.pptx', 'Extensão', '11223344556', 7, '{"participante":"Larissa Fernanda Cruz","evento":"Hackathon CEU 2025","organizador":"Aurora Sobrinho","data":"22/12/2025","carga_horaria":"48","local":"Pavilhão Principal"}'),
+('HK2025E3', 'ModeloExemplo.pptx', 'Extensão', '22334455667', 7, '{"participante":"Marcos Vinicius Cunha","evento":"Hackathon CEU 2025","organizador":"Aurora Sobrinho","data":"22/12/2025","carga_horaria":"48","local":"Pavilhão Principal"}');
+
+-- ====================================
+-- FAVORITOS (Alguns usuários favoritam eventos)
+-- ====================================
+INSERT INTO favoritos_evento (CPF, cod_evento) VALUES
+('12345678911', 2),
+('12345678911', 3),
+('12345678911', 7),
+('23456789012', 1),
+('23456789012', 4),
+('34567890123', 6),
+('34567890123', 9),
+('45678901234', 5),
+('45678901234', 11),
+('56789012345', 3),
+('67890123456', 7),
+('78901234567', 1),
+('78901234567', 6),
+('89012345678', 3),
+('90123456789', 4),
+('01234567890', 7),
+('11234567890', 2),
+('21234567890', 3),
+('31234567890', 8),
+('41234567890', 9);
+
+-- ====================================
+-- ESTATÍSTICAS FINAIS
+-- ====================================
+SELECT 'RESUMO DA POPULAÇÃO DO BANCO DE DADOS' AS '';
+SELECT COUNT(*) AS 'Total de Usuários' FROM usuario;
+SELECT COUNT(*) AS 'Total de Organizadores' FROM usuario WHERE Organizador = 1;
+SELECT COUNT(*) AS 'Total de Participantes' FROM usuario WHERE Organizador = 0;
+SELECT COUNT(*) AS 'Total de Eventos' FROM evento;
+SELECT COUNT(*) AS 'Total de Inscrições' FROM inscricao;
+SELECT COUNT(*) AS 'Total de Colaboradores' FROM colaboradores_evento;
+SELECT COUNT(*) AS 'Total de Certificados' FROM certificado;
+SELECT COUNT(*) AS 'Total de Favoritos' FROM favoritos_evento;
+
+SELECT '' AS '';
+SELECT 'Inscrições por Evento:' AS '';
+SELECT e.nome AS 'Evento', COUNT(i.CPF) AS 'Participantes Inscritos'
+FROM evento e
+LEFT JOIN inscricao i ON e.cod_evento = i.cod_evento
+GROUP BY e.cod_evento, e.nome
+ORDER BY COUNT(i.CPF) DESC;
+
+COMMIT;

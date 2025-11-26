@@ -846,7 +846,7 @@
                     <input type="text" id="link-inscricao" readonly />
                 </div>
                 <div class="aviso-compartilhar">
-                    <strong>â„¹ï¸ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+                    <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
                 </div>
             </div>
         </div>

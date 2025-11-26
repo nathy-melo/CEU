@@ -131,7 +131,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         'redefinirSenha' => '../PaginasGlobais/RedefinirSenhaConta.html',
         'emailRecuperacao' => '../PaginasGlobais/EmailDeRecuperacao.html',
         'temaDoSite' => '../PaginasGlobais/TemaDoSite.php',
-        'manualDeUso' => '../PaginasGlobais/ManualDeUso.html',
+        'manualDeUso' => '../PaginasGlobais/ManualDeUso.php',
         'duvidasFrequentes' => '../PaginasGlobais/DuvidasFrequentes.html',
         'sobreNos' => '../PaginasGlobais/SobreNos.html',
     ];
@@ -445,7 +445,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 init: () => {}
             },
             'manualDeUso': {
-                html: '../PaginasGlobais/ManualDeUso.html',
+                html: '../PaginasGlobais/ManualDeUso.php',
                 js: [],
                 init: () => {}
             },

@@ -52,5 +52,5 @@
 - Adicionar modelo de certificado ao criar/editar evento  
   **Dificuldade:** Média
 
-- Adicionar botão de "Verificar Certificado" no index  
+- ✅ Adicionar botão de "Verificar Certificado" no index  
   **Dificuldade:** Baixa

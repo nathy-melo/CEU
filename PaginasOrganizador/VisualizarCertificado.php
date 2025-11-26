@@ -234,7 +234,7 @@ if (!$arquivoExiste) {
                         ? 'ModeloExemploOrganizador'
                         : 'ModeloExemplo';
 
-                    $debugLog[] = "âš ï¸ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
+                    $debugLog[] = "ℹ️ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
 
                     foreach ($possiveisExtensoes as $ext) {
                         $caminho = __DIR__ . "/../Certificacao/templates/$modeloPadrao.$ext";

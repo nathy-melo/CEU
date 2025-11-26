@@ -76,7 +76,7 @@
     <!-- Menu fixo -->
     <?php include 'MenuBloqueado.html'; ?>
 
-    <!-- Conteúdo dinÍ¢mico -->
+    <!-- Conteúdo dinâmico -->
     <div id="conteudo-dinamico">
         <?php include $arquivo; ?>
     </div>

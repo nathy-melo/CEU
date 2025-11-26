@@ -125,7 +125,7 @@ CREATE TABLE colaboradores_evento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_evento INT NOT NULL,
     CPF CHAR(11) NOT NULL,
-    papel ENUM('colaborador','coorganizador') NOT NULL DEFAULT 'colaborador',
+    papel ENUM('colaborador') NOT NULL DEFAULT 'colaborador',
     presenca_confirmada TINYINT(1) NOT NULL DEFAULT 0,
     certificado_emitido TINYINT(1) NOT NULL DEFAULT 0,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

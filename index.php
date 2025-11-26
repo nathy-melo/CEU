@@ -598,6 +598,15 @@ session_start();
                     <a href="./PaginasPublicas/ContainerPublico.php?pagina=inicio" class="botao-acao botao-primario">Começar Agora</a>
                     <a href="#sobre" class="botao-acao botao-secundario">Saiba Mais</a>
                 </div>
+                <div class="grupo-botoes-acao" style="margin-top: 1rem;">
+                    <a href="./Certificacao/verificar.php" class="botao-acao botao-secundario" style="width: 100%; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                            <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        Verificar Certificado
+                    </a>
+                </div>
             </div>
 
             <div class="carrossel-imagens-destaque">

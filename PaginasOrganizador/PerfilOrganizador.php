@@ -414,7 +414,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
                         </div>
                     </div>
                     <div class="grupo-formulario">
-                        <label for="ra-input">RA (Registro AcadÍªmico):</label>
+                        <label for="ra-input">RA (Registro Acadêmico):</label>
                         <div class="controle-formulario">
                             <span id="ra-display"><?php echo htmlspecialchars($dadosUsuario['RA'] ?? 'Não informado'); ?></span>
                             <input type="text" id="ra-input" name="ra" value="<?php echo htmlspecialchars($dadosUsuario['RA'] ?? ''); ?>" class="hidden" maxlength="7" placeholder="Ex: 1234567" autocomplete="off">
