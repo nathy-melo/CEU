@@ -1,4 +1,192 @@
-# Como criar uma nova página para funcionar com o menu expansível
+# 🎉 CEU - Controle de Eventos Unificado
+
+Um sistema web moderno e gratuito para gerenciar eventos de forma completa e eficiente. Desenvolvido por estudantes do IFMG Campus Sabará como solução para facilitar a criação, inscrição e certificação de eventos educacionais.
+
+## ✨ Funcionalidades Principais
+
+### Para Participantes
+- 📝 **Inscrição em Eventos**: Cadastro simplificado e validação de dados
+- 🎓 **Certificados Automáticos**: Geração automática de certificados autenticados com verificação
+- 🔐 **Gerenciamento de Conta**: Atualização de perfil e redefinição de senha segura
+- 📱 **Notificações**: Sistema de notificações em tempo real sobre seus eventos
+- ⭐ **Favoritos**: Marque eventos como favoritos para acesso rápido
+
+### Para Organizadores
+- 📊 **Criação de Eventos**: Interface intuitiva para criar e gerenciar eventos
+- 👥 **Gestão de Participantes**: Controle completo de inscrições e presença
+- 🤝 **Colaboradores**: Convide outros organizadores para colaborar
+- 📜 **Emissão de Certificados**: Geração e gerenciamento de certificados
+- 📈 **Análise de Eventos**: Acompanhamento de inscrições e participação
+- 🖼️ **Galeria de Imagens**: Adicione e gerencie imagens de seus eventos
+
+### Recursos Técnicos
+- 🌐 **PWA (Progressive Web App)**: Funciona offline e pode ser instalado como app
+- 📱 **Totalmente Responsivo**: Adaptado para desktop, tablet e mobile
+- 🎨 **Interface Intuitiva**: Design moderno e fácil de usar
+- 🔒 **Segurança**: Autenticação, validação de dados e proteção de sessão
+- 💾 **Banco de Dados Robusto**: MySQL com estrutura bem organizada
+
+## 🚀 Como Começar
+
+### Requisitos
+- PHP 7.4+
+- MySQL 5.7+
+- XAMPP ou servidor similar
+- Navegador moderno com suporte a PWA
+
+### Instalação Rápida
+
+1. **Clone ou copie o projeto** para `htdocs/CEU` do seu XAMPP
+
+2. **Configure o banco de dados** via phpMyAdmin:
+   ```
+   Abra: http://localhost/phpmyadmin
+   1. Crie um banco de dados chamado "CEU_bd"
+   2. Vá para "Importar" e selecione BancoDados/BancodeDadosCEU.sql
+   3. Execute a importação
+   4. Importe também BancoDados/PopularBancoDados.sql (dados iniciais)
+   ```
+
+3. **Inicie o servidor**:
+   - Abra XAMPP Control Panel
+   - Inicie Apache e MySQL
+   - Acesse: http://localhost/CEU
+
+4. **Login de teste**:
+   - Participante ou Organizador conforme populado no banco
+
+## 📁 Estrutura do Projeto
+
+```
+CEU/
+├── index.php                    # Página de boas-vindas
+├── PaginasPublicas/             # Páginas públicas (login, cadastro)
+│   ├── ContainerPublico.php     # Container com menu dinâmico
+│   ├── Inicio.php              # Página inicial autenticada
+│   ├── CadastroParticipante.php # Cadastro de participantes
+│   ├── CadastroOrganizador.php  # Cadastro de organizadores
+│   └── ...
+├── PaginasOrganizador/          # Painel do organizador
+│   ├── ContainerOrganizador.php # Container com menu do organizador
+│   ├── GerenciadorEventos.php   # Criar/editar eventos
+│   ├── GerenciadorColaboradores.php # Gerenciar colaboradores
+│   ├── CertificadosOrganizador.php  # Emitir certificados
+│   └── ...
+├── PaginasParticipante/         # Painel do participante
+├── PaginasGlobais/              # Componentes compartilhados
+│   ├── PainelNotificacoes.php   # Sistema de notificações
+│   ├── BuscarOpcoesFiltro.php   # Filtros de busca
+│   └── ...
+├── Certificacao/                # Sistema de certificados
+│   ├── index.php               # Gerador de certificados
+│   ├── ProcessadorTemplate.php  # Processamento de templates
+│   └── verificar.php           # Verificação de certificados
+├── BancoDados/                  # Scripts SQL
+│   ├── BancodeDadosCEU.sql     # Estrutura das tabelas
+│   ├── PopularBancoDados.sql   # Dados iniciais
+│   └── conexao.php             # Configuração de conexão
+├── Admin/                       # Painel administrativo
+├── sw.js                        # Service Worker (PWA)
+├── manifest.json                # Configuração PWA
+└── pwa-config.js               # Configuração de PWA
+```
+
+## 🔧 Configuração do Banco de Dados
+
+### Arquivo: `BancoDados/conexao.php`
+```php
+$servidor = "localhost";
+$usuario = "root";
+$senha = "";
+$banco = "CEU_bd";
+```
+
+### Estrutura Principal das Tabelas
+- **usuarios**: Dados de login (participantes e organizadores)
+- **participantes**: Perfil de participantes
+- **organizadores**: Perfil de organizadores
+- **eventos**: Informações dos eventos
+- **inscricoes**: Registros de inscrições
+- **certificados**: Certificados emitidos
+- **notificacoes**: Notificações do sistema
+
+## 🎨 Desenvolvimento
+
+### Adicionando Novas Páginas Públicas
+
+1. Crie um arquivo PHP em `PaginasPublicas/`
+2. Use a estrutura padrão:
+```php
+<div id="main-content">
+    <!-- Seu conteúdo aqui -->
+    <h1>Minha Nova Página</h1>
+</div>
+```
+
+3. Registre em `ContainerPublico.php`:
+```php
+$paginasPermitidas = [
+    'inicio' => 'Inicio.php',
+    'minhanova' => 'MinhaNovaPagina.php',
+    // ...
+];
+```
+
+### Estilos
+- CSS Global: `styleGlobal.css` e `styleGlobalMobile.css`
+- O menu adaptável é gerenciado automaticamente via `ContainerPublico.php`
+
+## 🧪 Testes
+
+### Desabilitar Validações (Desenvolvimento)
+
+Edite `PaginasPublicas/ValidacoesCadastro.js`:
+
+```javascript
+// ========== CONFIGURAÇÕES PARA TESTES ==========
+var VALIDAR_CPF = false;    // Desabilita validação de CPF
+var VALIDAR_EMAIL = false;  // Desabilita validação de email
+var VALIDAR_SENHA = false;  // Desabilita validação de senha
+var SENHA_MINIMA = 0;       // Sem mínimo de caracteres
+// ================================================
+```
+
+## 🔐 Segurança
+
+- ✅ Validação de CPF e email no cadastro
+- ✅ Senhas com hash (bcrypt)
+- ✅ Proteção contra SQL injection
+- ✅ Validação de sessão em todas as páginas
+- ✅ Verificação de autenticação
+
+## 📱 PWA (Progressive Web App)
+
+O CEU funciona como uma Progressive Web App:
+- **Offline**: Funciona sem conexão (com cache)
+- **Instalável**: Pode ser instalado como app nativo
+- **Rápido**: Carregamento otimizado com Service Worker
+- **Responsivo**: Funciona em qualquer dispositivo
+
+Configure em `pwa-config.js` e `manifest.json`
+
+## 👥 Equipe de Desenvolvimento
+
+- Ana Clara
+- Caike
+- Jean
+- Júlia
+- Nathally
+- Pâmela
+- Roxane
+- Victória
+
+**Instituto**: IFMG - Campus Sabará  
+**Disciplina**: Projetec  
+**Objetivo**: Facilitar a gestão de eventos e certificação em instituições educacionais
+
+---
+
+## 🔄 Como criar uma nova página para funcionar com o menu expansível
 
 Siga os passos abaixo para garantir que sua nova página funcione corretamente com o menu expansível/retraível e o layout sincronizado:
 

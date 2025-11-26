@@ -224,6 +224,52 @@ function habilitarExtensaoNoIni($iniPath, $ext) {
     return ['success' => true, 'message' => 'Extensão ' . $ext . ' habilitada no php.ini', 'backup' => $backup];
 }
 
+function verificarEHabilitarExtensoes() {
+    $extensoes_necessarias = ['zip', 'gd', 'mbstring'];
+    $resultado = [];
+    
+    foreach ($extensoes_necessarias as $ext) {
+        if (extension_loaded($ext)) {
+            $resultado[$ext] = ['carregada' => true, 'acao' => 'nada'];
+        } else {
+            $resultado[$ext] = ['carregada' => false, 'acao' => 'tentar_habilitar'];
+            
+            // Detecta o php.ini
+            $iniPath = detectarPhpIniCli();
+            if (!$iniPath) {
+                $resultado[$ext]['detalhes'] = 'php.ini não detectado, falha ao habilitar';
+                continue;
+            }
+            
+            // Tenta habilitar
+            $extensoes_alternativas = [
+                'zip' => ['zip', 'php_zip'],
+                'gd' => ['gd', 'php_gd2', 'php_gd'],
+                'mbstring' => ['mbstring', 'php_mbstring'],
+            ];
+            
+            $variantes = $extensoes_alternativas[$ext] ?? [$ext];
+            $habilitada = false;
+            
+            foreach ($variantes as $var) {
+                $res = habilitarExtensaoNoIni($iniPath, $var);
+                if ($res['success']) {
+                    $habilitada = true;
+                    $resultado[$ext]['detalhes'] = $res;
+                    break;
+                }
+            }
+            
+            if (!$habilitada) {
+                $resultado[$ext]['detalhes'] = 'Não foi possível habilitar no php.ini';
+            }
+        }
+    }
+    
+    logMsg('Verificação de extensões: ' . json_encode($resultado));
+    return $resultado;
+}
+
 // ---------------------------- NOVAS FUNÇÕES (Git/Logs/Testes) ---------------------------------
 
 function caminhoGitExe() {
@@ -335,6 +381,26 @@ switch ($action) {
         }
         break;
 
+    case 'verificar_extensoes':
+        try {
+            $resultado = verificarEHabilitarExtensoes();
+            $todos_ok = true;
+            foreach ($resultado as $ext => $info) {
+                if (!$info['carregada']) {
+                    $todos_ok = false;
+                }
+            }
+            echo json_encode([
+                'success' => true,
+                'todos_ok' => $todos_ok,
+                'extensoes' => $resultado,
+                'mensagem' => $todos_ok ? 'Todas as extensões necessárias estão carregadas' : 'Algumas extensões foram habilitadas no php.ini (requer restart do Apache)'
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao verificar extensões: ' . $e->getMessage()]);
+        }
+        break;
+
     case 'instalar_dependencias':
         try {
             $composerLocal = file_exists($libsRoot . '/composer.phar');
@@ -349,6 +415,10 @@ switch ($action) {
                 echo json_encode(['success' => false, 'message' => 'Arquivo composer.json não encontrado em bibliotecas']);
                 break;
             }
+            
+            // Verifica e habilita extensões necessárias ANTES de instalar
+            $verifyExt = verificarEHabilitarExtensoes();
+            logMsg('[instalar_dependencias] Verificação de extensões executada');
             // Detecta conflito composer.json x composer.lock
             $composerJson = @json_decode(@file_get_contents($libsRoot . '/composer.json'), true);
             $composerLock = @json_decode(@file_get_contents($libsRoot . '/composer.lock'), true);

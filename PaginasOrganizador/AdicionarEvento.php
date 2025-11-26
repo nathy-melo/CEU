@@ -1226,7 +1226,7 @@ mysqli_close($conexao);
                     <option value="Sem certificacao">Sem certificação</option>
                     <option value="Ensino">Ensino</option>
                     <option value="Pesquisa">Pesquisa</option>
-                    <option value="Extensao">Extensão</option>
+                    <option value="Extensão">Extensão</option>
                     <option value="Outro">Outro</option>
                 </select>
             </div>

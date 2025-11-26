@@ -268,10 +268,30 @@
                 '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoOrg(\'' + (membro.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
                 '';
 
-            // Botão de emitir certificado só aparece se a presença foi confirmada
-            const btnEmitirCertificado = membro.presenca_confirmada && !membro.certificado_emitido ?
-                '<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoOrganizacao(\'' + membro.cpf + '\')"><span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
-                '';
+            // Progressão de botões de ação:
+            // 1. Se inscrição confirmada mas presença NÃO confirmada → mostrar "Confirmar Presença"
+            // 2. Se presença confirmada mas certificado NÃO emitido → mostrar "Emitir Certificado"
+            // 3. Se certificado emitido → não mostrar nada
+            let btnAcaoPrincipal = '';
+            if (membro.certificado_emitido) {
+                btnAcaoPrincipal = ''; // Nada mostrado
+            } else if (membro.presenca_confirmada) {
+                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoOrganizacao('${membro.cpf}')"><span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>`;
+            } else {
+                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaOrg('${membro.cpf}')"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>`;
+            }
+
+            // Botão excluir: se certificado emitido → cinza + desabilitado com tooltip, senão → vermelho normal
+            let btnExcluir = '';
+            if (membro.certificado_emitido) {
+                btnExcluir = `<button class="botao botao-acao-tabela botao-cinza" disabled title="Certificado do membro já foi emitido. Não é possível excluir o membro.">
+                    <span>Excluir Membro</span><img src="../Imagens/Excluir.svg" alt="">
+                </button>`;
+            } else {
+                btnExcluir = `<button class="botao botao-acao-tabela botao-vermelho" onclick="excluirMembroOrg('${membro.cpf}')">
+                    <span>Excluir Membro</span><img src="../Imagens/Excluir.svg" alt="">
+                </button>`;
+            }
 
             return `
             <tr class="${rowClass}" data-cpf="${membro.cpf}">
@@ -286,10 +306,8 @@
                 </td>
                 <td class="coluna-modificar">
                     <div class="grupo-acoes">
-                        <button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaOrg('${membro.cpf}')">
-                            <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
-                        </button>
-                        ${btnEmitirCertificado}
+                        ${btnAcaoPrincipal}
+                        ${btnExcluir}
                     </div>
                 </td>
                 <td class="coluna-status">
@@ -346,8 +364,8 @@
             alert('Código de verificação não disponível');
             return;
         }
-        // Abre a página de visualização em uma nova aba usando o código
-        const url = `VisualizarCertificado.php?codigo=${encodeURIComponent(codigo)}`;
+        // Abre a página de visualização do certificado em uma nova aba
+        const url = `ContainerOrganizador.php?pagina=visualizarCertificado&codigo=${encodeURIComponent(codigo)}`;
         window.open(url, '_blank');
     }
 
@@ -725,6 +743,9 @@
             alert('Erro ao excluir membro');
         }
     }
+
+    // Alias para usar o mesmo nome em onclick de botões
+    const excluirMembroOrg = excluirMembro;
 
     // ===== FUNÇÕES DE AÇÕES EM MASSA =====
 

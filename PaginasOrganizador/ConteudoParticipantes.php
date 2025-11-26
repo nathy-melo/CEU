@@ -541,6 +541,35 @@
                 '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
                 '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
 
+            // Lógica de progresso: Inscrição → Presença → Certificado
+            let btnAcaoPrincipal = '';
+            if (p.certificado_emitido) {
+                // Se certificado foi emitido, não mostra nada aqui
+                btnAcaoPrincipal = '';
+            } else if (p.presenca_confirmada) {
+                // Se presença está confirmada, mostra botão para emitir certificado
+                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoPart('${p.cpf}')">
+                    <span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt="">
+                </button>`;
+            } else {
+                // Se nem presença está confirmada, mostra botão para confirmar presença
+                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaPart('${p.cpf}')">
+                    <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
+                </button>`;
+            }
+
+            // Botão excluir: desabilitado se certificado foi emitido
+            let btnExcluir = '';
+            if (p.certificado_emitido) {
+                btnExcluir = `<button class="botao botao-acao-tabela botao-cinza" disabled title="Certificado do participante já foi emitido. Não é possível excluir o participante.">
+                    <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
+                </button>`;
+            } else {
+                btnExcluir = `<button class="botao botao-acao-tabela botao-vermelho" onclick="excluirParticipantePart('${p.cpf}')">
+                    <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
+                </button>`;
+            }
+
             const btnCertificado = p.certificado_emitido ?
                 '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoPart(\'' + (p.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
                 '';
@@ -558,17 +587,8 @@
                 </td>
                 <td class="coluna-modificar">
                     <div class="grupo-acoes">
-                        ${p.presenca_confirmada ? 
-                            `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoPart('${p.cpf}')">
-                                <span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt="">
-                            </button>` :
-                            `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaPart('${p.cpf}')">
-                                <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
-                            </button>`
-                        }
-                        <button class="botao botao-acao-tabela botao-vermelho" onclick="excluirParticipantePart('${p.cpf}')">
-                            <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
-                        </button>
+                        ${btnAcaoPrincipal}
+                        ${btnExcluir}
                         <button class="botao botao-acao-tabela botao-neutro" onclick="editarDadosPart('${p.cpf}')">
                             <span>Editar Dados</span><img src="../Imagens/Editar.svg" alt="">
                         </button>
@@ -897,14 +917,9 @@
             return;
         }
 
-        // Usa a variável global codEventoAtual que já está definida no GerenciarEvento.php
-        if (typeof codEventoAtual === 'undefined' || !codEventoAtual) {
-            alert('Erro: código do evento não encontrado');
-            return;
-        }
-
-        // Navega para visualizar o certificado dentro do container
-        window.location.href = `ContainerOrganizador.php?pagina=visualizarCertificadoGerenciar&codigo=${encodeURIComponent(codigo)}&cod_evento=${codEventoAtual}`;
+        // Abre a página de visualização do certificado em uma nova aba
+        const url = `ContainerOrganizador.php?pagina=visualizarCertificado&codigo=${encodeURIComponent(codigo)}`;
+        window.open(url, '_blank');
     }
 
     function formatarCPF(cpf) {

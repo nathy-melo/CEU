@@ -275,7 +275,7 @@
                             </svg>
                             Baixar
                         </a>
-                        <a href="#" class="botao botao-ver" onclick="event.preventDefault(); visualizarCertificado('${cert.cod_verificacao}')">
+                        <a href="#" class="botao botao-ver" onclick="event.preventDefault(); (typeof visualizarCertificado === 'function' ? visualizarCertificado('${cert.cod_verificacao}') : (window.visualizarCertificado ? window.visualizarCertificado('${cert.cod_verificacao}') : alert('Carregando, tente novamente')))">
                             <svg class="icone-botao" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
@@ -314,6 +314,9 @@
         // Navega para a página de visualização dentro do container
         window.location.href = 'ContainerOrganizador.php?pagina=visualizarCertificado&codigo=' + encodeURIComponent(codigo);
     }
+
+    // Expõe globalmente para evitar problemas de escopo
+    window.visualizarCertificado = visualizarCertificado;
 
     function baixarCertificado(arquivo, codigo) {
         const link = document.createElement('a');

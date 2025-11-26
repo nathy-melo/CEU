@@ -411,8 +411,81 @@ class ProcessadorTemplate
     /**
      * Inicia conversão em background e aguarda conclusão.
      */
+    /**
+     * Tenta executar conversão via UNO Socket (Keep-Alive) com fallback para método direto
+     */
+    private function converterViaUnoSocket(string $entrada, string $saidaPdf): array
+    {
+        // Tenta via UNO Socket (Keep-Alive) na porta 2002
+        $host = 'localhost';
+        $port = 2002;
+        $timeout = 5; // 5 segundos para conectar
+        
+        // Tenta conectar ao socket UNO
+        $socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
+        if ($socket) {
+            @fclose($socket);
+            
+            // Socket está disponível - pode usar o Keep-Alive
+            
+            // Converte para UNC path no Windows se necessário
+            $entradaPath = $entrada;
+            if (stripos(PHP_OS, 'WIN') === 0) {
+                $entradaPath = 'file:///' . str_replace('\\', '/', $entrada);
+            } else {
+                $entradaPath = 'file://' . $entrada;
+            }
+            
+            $outDir = dirname($saidaPdf);
+            if (!is_dir($outDir)) { @mkdir($outDir, 0775, true); }
+            
+            $saidaDir = $outDir;
+            if (stripos(PHP_OS, 'WIN') === 0) {
+                $saidaDir = 'file:///' . str_replace('\\', '/', $outDir);
+            } else {
+                $saidaDir = 'file://' . $outDir;
+            }
+            
+            // Comando soffice com UNO Socket
+            $cmd = '"' . $this->sofficePath . '" '
+                . '--headless --nologo --nodefault '
+                . '--nofirststartwizard '
+                . '--convert-to pdf '
+                . '--outdir "' . $outDir . '" '
+                . '"' . $entrada . '"';
+            
+            if (stripos(PHP_OS, 'WIN') === 0) {
+                $cmd = 'START /B "" ' . $cmd;
+                popen($cmd, 'r');
+            } else {
+                $cmd .= ' > /dev/null 2>&1 &';
+                popen($cmd, 'r');
+            }
+            
+            // Arquivo esperado após conversão
+            $esperado = $outDir . DIRECTORY_SEPARATOR . pathinfo($entrada, PATHINFO_FILENAME) . '.pdf';
+            
+            // Aguarda conclusão (máximo 10 segundos com Keep-Alive ativo)
+            if ($this->aguardarConversao($esperado, 10)) {
+                if (realpath($esperado) !== realpath($saidaPdf)) {
+                    @rename($esperado, $saidaPdf);
+                }
+                return ['success' => true, 'pdf' => $saidaPdf, 'via' => 'keepalive'];
+            }
+        }
+        
+        return ['success' => false, 'timeout' => true];
+    }
+
     private function converterViaSofficeBackgroundComAspiracao(string $entrada, string $saidaPdf, ?string $sofficePath = null): array
     {
+        // Tenta primeiro via Keep-Alive (Keep-Alive pode estar rodando)
+        $viaSocket = $this->converterViaUnoSocket($entrada, $saidaPdf);
+        if ($viaSocket['success']) {
+            return $viaSocket;
+        }
+        
+        // Fallback: método direto sem Keep-Alive
         $soffice = $sofficePath ?: $this->sofficePath;
         if (!$soffice || !file_exists($soffice)) {
             return ['success' => false, 'message' => 'LibreOffice (soffice) não encontrado.'];
@@ -439,12 +512,12 @@ class ProcessadorTemplate
         // Arquivo esperado após conversão
         $esperado = $outDir . DIRECTORY_SEPARATOR . pathinfo($entrada, PATHINFO_FILENAME) . '.pdf';
         
-        // Aguarda a conclusão (máximo 30 segundos)
+        // Aguarda a conclusão (máximo 30 segundos no fallback)
         if ($this->aguardarConversao($esperado, 30)) {
             if (realpath($esperado) !== realpath($saidaPdf)) {
                 @rename($esperado, $saidaPdf);
             }
-            return ['success' => true, 'pdf' => $saidaPdf];
+            return ['success' => true, 'pdf' => $saidaPdf, 'via' => 'fallback'];
         }
         
         return ['success' => false, 'message' => 'Timeout: conversão demorou muito'];

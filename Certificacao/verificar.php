@@ -1,3 +1,65 @@
+<?php
+// Handler para requisições AJAX de verificação de certificado
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    
+    $codigo = isset($_POST['codigo']) ? strtoupper(trim($_POST['codigo'])) : '';
+    
+    // Validação básica do código
+    if (!$codigo || !preg_match('/^[A-Z0-9]{6,16}$/', $codigo)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Código de certificado inválido. Deve conter entre 6 e 16 caracteres alfanuméricos.'
+        ]);
+        exit;
+    }
+    
+    // Inclui conexão com banco de dados
+    require_once '../BancoDados/conexao.php';
+    require_once __DIR__ . '/RepositorioCertificados.php';
+    
+    try {
+        // Verifica se conexão existe
+        if (!isset($conexao) || !($conexao instanceof mysqli)) {
+            throw new Exception('Falha ao conectar com o banco de dados.');
+        }
+        
+        // Busca o certificado no banco de dados
+        $repo = new \CEU\Certificacao\RepositorioCertificados($conexao);
+        $certificado = $repo->buscarPorCodigo($codigo);
+        
+        if ($certificado) {
+            // Prepara os dados para retorno
+            $dadosArray = $certificado['dados_array'] ?? [];
+            
+            echo json_encode([
+                'success' => true,
+                'certificado' => [
+                    'codigo' => $certificado['cod_verificacao'] ?? '',
+                    'participante' => $dadosArray['Participante'] ?? $dadosArray['nome_participante'] ?? 'N/A',
+                    'evento' => $dadosArray['NomeEvento'] ?? $dadosArray['nome_evento'] ?? 'N/A',
+                    'organizador' => $dadosArray['Organizador'] ?? $dadosArray['nome_organizador'] ?? 'N/A',
+                    'data' => $dadosArray['Data'] ?? $dadosArray['data_emissao'] ?? 'N/A',
+                    'carga_horaria' => $dadosArray['CargaHoraria'] ?? $dadosArray['carga_horaria'] ?? 'N/A',
+                    'local' => $dadosArray['Local'] ?? $dadosArray['local_evento'] ?? 'N/A',
+                    'arquivo' => $certificado['arquivo'] ?? ''
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Certificado não encontrado em nossa base de dados.'
+            ]);
+        }
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erro ao verificar certificado: ' . $e->getMessage()
+        ]);
+    }
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -414,6 +476,20 @@
         const certificadoInfo = document.getElementById('certificadoInfo');
         const inputCodigo = document.getElementById('codigoCertificado');
 
+        // Verifica se há código na URL ao carregar a página
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const codigoURL = params.get('codigo');
+            
+            if (codigoURL) {
+                inputCodigo.value = codigoURL.toUpperCase();
+                // Faz a verificação automaticamente
+                setTimeout(() => {
+                    form.dispatchEvent(new Event('submit'));
+                }, 500);
+            }
+        });
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -430,13 +506,14 @@
             resultado.style.display = 'none';
 
             try {
-                // Faz a requisição para o backend
-                const response = await fetch('VerificarCertificacao.php', {
+                // Faz a requisição para o backend - fazer fetch para a mesma página
+                const formData = new FormData();
+                formData.append('codigo', codigo);
+                formData.append('ajax', '1');
+
+                const response = await fetch(window.location.pathname, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `codigo=${encodeURIComponent(codigo)}`
+                    body: formData
                 });
 
                 const data = await response.json();
