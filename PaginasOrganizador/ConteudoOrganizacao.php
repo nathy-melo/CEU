@@ -67,7 +67,7 @@
             <span id="total-organizacao">Total de membros: 0</span>
         </div>
 
-        <div class="envoltorio-tabela">
+        <div class="envoltorio-tabela table-wrapper">
             <table class="tabela-participantes">
                 <thead>
                     <tr>
@@ -85,6 +85,11 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Container para cards mobile -->
+        <div class="mobile-cards-container" id="mobile-cards-organizacao">
+            <p style="text-align:center; padding:30px; color:var(--botao);">Carregando membros...</p>
         </div>
     </div>
 </div>
@@ -234,94 +239,176 @@
     function renderizarOrganizacao() {
         const tbody = document.getElementById('tbody-organizacao');
         const totalSpan = document.getElementById('total-organizacao');
+        const mobileContainer = document.getElementById('mobile-cards-organizacao');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-        if (!tbody || !totalSpan) {
+        if (!tbody || !totalSpan || !mobileContainer) {
             return;
         }
 
         totalSpan.textContent = `Total de membros: ${todosOrganizacao.length}`;
 
+        // LIMPA ambos os containers sempre para evitar duplicação
+        tbody.innerHTML = '';
+        mobileContainer.innerHTML = '';
+
         if (todosOrganizacao.length === 0) {
-            tbody.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align: center; padding: 30px; color: var(--botao);">
-                    Nenhum membro encontrado
-                </td>
-            </tr>
-        `;
+            if (isMobile) {
+                mobileContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--botao);">Nenhum membro encontrado</p>';
+            } else {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px; color: var(--botao);">
+                        Nenhum membro encontrado
+                    </td>
+                </tr>
+            `;
+            }
+            window.__lastOrganizacaoIsMobile = isMobile;
             return;
         }
 
-        tbody.innerHTML = todosOrganizacao.map((membro, i) => {
-            const isChecked = membrosSelecionados.has(membro.cpf);
-            const rowClass = isChecked ? 'linha-selecionada' : '';
+        if (isMobile) {
+            // Renderizar cards mobile
+            let cardsHTML = '';
+            todosOrganizacao.forEach((membro, i) => {
+                const statusPresenca = membro.presenca_confirmada ? 'Confirmada' : 'Não Confirmada';
+                const statusCertificado = membro.certificado_emitido ? 'Enviado' : 'Não enviado';
 
-            const statusPresenca = membro.presenca_confirmada ?
-                '<span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span>' :
-                '<span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span>';
+                let btnAcaoPrincipal = '';
+                if (membro.certificado_emitido) {
+                    btnAcaoPrincipal = '';
+                } else if (membro.presenca_confirmada) {
+                    btnAcaoPrincipal = `<button class="btn-small botao-azul" onclick="emitirCertificadoOrganizacao('${membro.cpf}')"><img src="../Imagens/Certificado.svg" alt=""> Emitir Certificado</button>`;
+                } else {
+                    btnAcaoPrincipal = `<button class="btn-small botao-verde" onclick="confirmarPresencaOrg('${membro.cpf}')"><img src="../Imagens/Certo.svg" alt=""> Confirmar Presença</button>`;
+                }
 
-            const statusCertificado = membro.certificado_emitido ?
-                '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
-                '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
+                let btnExcluir = '';
+                if (membro.certificado_emitido) {
+                    btnExcluir = `<button class="btn-small botao-cinza" disabled title="Certificado do membro já foi emitido"><img src="../Imagens/Excluir.svg" alt=""> Excluir</button>`;
+                } else {
+                    btnExcluir = `<button class="btn-small botao-vermelho" onclick="excluirMembroOrg('${membro.cpf}')"><img src="../Imagens/Excluir.svg" alt=""> Excluir</button>`;
+                }
 
-            const btnCertificado = membro.certificado_emitido ?
-                '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoOrg(\'' + (membro.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
-                '';
+                const btnCertificado = membro.certificado_emitido ?
+                    `<button class="btn-small botao-neutro" onclick="verificarCertificadoOrg('${membro.cod_verificacao || ''}')"><img src="../Imagens/Certificado.svg" alt=""> Ver Certificado</button>` : '';
 
-            // Progressão de botões de ação:
-            // 1. Se inscrição confirmada mas presença NÃO confirmada → mostrar "Confirmar Presença"
-            // 2. Se presença confirmada mas certificado NÃO emitido → mostrar "Emitir Certificado"
-            // 3. Se certificado emitido → não mostrar nada
-            let btnAcaoPrincipal = '';
-            if (membro.certificado_emitido) {
-                btnAcaoPrincipal = ''; // Nada mostrado
-            } else if (membro.presenca_confirmada) {
-                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoOrganizacao('${membro.cpf}')"><span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>`;
-            } else {
-                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaOrg('${membro.cpf}')"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>`;
-            }
-
-            // Botão excluir: se certificado emitido → cinza + desabilitado com tooltip, senão → vermelho normal
-            let btnExcluir = '';
-            if (membro.certificado_emitido) {
-                btnExcluir = `<button class="botao botao-acao-tabela botao-cinza" disabled title="Certificado do membro já foi emitido. Não é possível excluir o membro.">
-                    <span>Excluir Membro</span><img src="../Imagens/Excluir.svg" alt="">
-                </button>`;
-            } else {
-                btnExcluir = `<button class="botao botao-acao-tabela botao-vermelho" onclick="excluirMembroOrg('${membro.cpf}')">
-                    <span>Excluir Membro</span><img src="../Imagens/Excluir.svg" alt="">
-                </button>`;
-            }
-
-            return `
-            <tr class="${rowClass}" data-cpf="${membro.cpf}">
-                <td class="coluna-selecionar">
-                    <input type="checkbox" class="checkbox-selecionar-org" id="org-${i}" value="${membro.cpf}" ${isChecked ? 'checked' : ''}>
-                </td>
-                <td class="coluna-dados">
-                    <p><strong>Nome:</strong> ${membro.nome || '-'}</p>
-                    <p><strong>E-mail:</strong> ${membro.email || '-'}</p>
-                    <p><strong>Registro Acadêmico:</strong> ${membro.ra || '-'}</p>
-                    <p><strong>Data de Inscrição:</strong> ${membro.data_inscricao || '-'}</p>
-                </td>
-                <td class="coluna-modificar">
-                    <div class="grupo-acoes">
-                        ${btnAcaoPrincipal}
-                        ${btnExcluir}
+                cardsHTML += `
+                    <div class="mobile-card" data-cpf="${membro.cpf}">
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Selecionar</span>
+                            <span class="mobile-card-value">
+                                <input type="checkbox" class="checkbox-selecionar-org" id="org-mobile-${i}" value="${membro.cpf}">
+                            </span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Nome</span>
+                            <span class="mobile-card-value"><strong>${membro.nome || '-'}</strong></span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">E-mail</span>
+                            <span class="mobile-card-value">${membro.email || '-'}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">RA</span>
+                            <span class="mobile-card-value">${membro.ra || '-'}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Data de Inscrição</span>
+                            <span class="mobile-card-value">${membro.data_inscricao || '-'}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Presença</span>
+                            <span class="mobile-card-value">${statusPresenca}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Certificado</span>
+                            <span class="mobile-card-value">${statusCertificado}</span>
+                        </div>
+                        <div class="mobile-card-actions">
+                            ${btnAcaoPrincipal}
+                            ${btnExcluir}
+                            ${btnCertificado}
+                        </div>
                     </div>
-                </td>
-                <td class="coluna-status">
-                    <div class="grupo-status">
-                        <div class="linha-status"><span>Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                        <div class="linha-status"><span>Presença:</span>${statusPresenca}</div>
-                        <div class="linha-status"><span>Certificado:</span>${statusCertificado}</div>
-                        ${btnCertificado}
-                    </div>
-                </td>
-            </tr>
-        `;
-        }).join('');
+                `;
+            });
+            mobileContainer.innerHTML = cardsHTML;
+        } else {
+            // Renderizar tabela desktop
+            tbody.innerHTML = todosOrganizacao.map((membro, i) => {
+                const isChecked = membrosSelecionados.has(membro.cpf);
+                const rowClass = isChecked ? 'linha-selecionada' : '';
 
+                const statusPresenca = membro.presenca_confirmada ?
+                    '<span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span>' :
+                    '<span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span>';
+
+                const statusCertificado = membro.certificado_emitido ?
+                    '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
+                    '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
+
+                const btnCertificado = membro.certificado_emitido ?
+                    '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoOrg(\'' + (membro.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
+                    '';
+
+                let btnAcaoPrincipal = '';
+                if (membro.certificado_emitido) {
+                    btnAcaoPrincipal = '';
+                } else if (membro.presenca_confirmada) {
+                    btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoOrganizacao('${membro.cpf}')"><span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>`;
+                } else {
+                    btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaOrg('${membro.cpf}')"><span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt=""></button>`;
+                }
+
+                let btnExcluir = '';
+                if (membro.certificado_emitido) {
+                    btnExcluir = `<button class="botao botao-acao-tabela botao-cinza" disabled title="Certificado do membro já foi emitido. Não é possível excluir o membro.">
+                        <span>Excluir Membro</span><img src="../Imagens/Excluir.svg" alt="">
+                    </button>`;
+                } else {
+                    btnExcluir = `<button class="botao botao-acao-tabela botao-vermelho" onclick="excluirMembroOrg('${membro.cpf}')">
+                        <span>Excluir Membro</span><img src="../Imagens/Excluir.svg" alt="">
+                    </button>`;
+                }
+
+                return `
+                <tr class="${rowClass}" data-cpf="${membro.cpf}">
+                    <td class="coluna-selecionar" data-label="Selecionar">
+                        <input type="checkbox" class="checkbox-selecionar-org" id="org-${i}" value="${membro.cpf}" ${isChecked ? 'checked' : ''}>
+                    </td>
+                    <td class="coluna-dados" data-label="Dados do Membro">
+                        <p><strong>Nome:</strong> ${membro.nome || '-'}</p>
+                        <p><strong>E-mail:</strong> ${membro.email || '-'}</p>
+                        <p><strong>Registro Acadêmico:</strong> ${membro.ra || '-'}</p>
+                        <p><strong>Data de Inscrição:</strong> ${membro.data_inscricao || '-'}</p>
+                    </td>
+                    <td class="coluna-modificar" data-label="Modificar">
+                        <div class="grupo-acoes">
+                            ${btnAcaoPrincipal}
+                            ${btnExcluir}
+                        </div>
+                    </td>
+                    <td class="coluna-status" data-label="Status">
+                        <div class="grupo-status">
+                            <div class="linha-status"><span>Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                            <div class="linha-status"><span>Presença:</span>${statusPresenca}</div>
+                            <div class="linha-status"><span>Certificado:</span>${statusCertificado}</div>
+                            ${btnCertificado}
+                        </div>
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+
+        inicializarEventosOrganizacao();
+
+        // Armazena estado para detecção de resize
+        window.__lastOrganizacaoIsMobile = isMobile;
+
+        // Re-inicializa eventos após re-renderizar (quando muda entre mobile/desktop)
         inicializarEventosOrganizacao();
     }
 
@@ -745,7 +832,12 @@
     }
 
     // Alias para usar o mesmo nome em onclick de botões
-    const excluirMembroOrg = excluirMembro;
+    if (typeof excluirMembroOrg === 'undefined') {
+        window.excluirMembroOrg = excluirMembro;
+    } else {
+        // Se já existe, apenas reatribui a função
+        window.excluirMembroOrg = excluirMembro;
+    }
 
     // ===== FUNÇÕES DE AÇÕES EM MASSA =====
 
@@ -913,13 +1005,15 @@
     // ===== FUNÇÕES DE EVENTOS E PESQUISA =====
 
     function inicializarEventosOrganizacao() {
-        // Eventos de checkbox
+        // Eventos de checkbox (funciona para tabela E cards mobile)
         if (!window.__orgCheckboxBound) {
             window.__orgCheckboxBound = true;
             document.addEventListener('change', function(e) {
                 if (e.target.classList && e.target.classList.contains('checkbox-selecionar-org')) {
-                    const tr = e.target.closest('tr');
-                    tr.classList.toggle('linha-selecionada', e.target.checked);
+                    const container = e.target.closest('tr') || e.target.closest('.mobile-card');
+                    if (container) {
+                        container.classList.toggle('linha-selecionada', e.target.checked);
+                    }
                     if (e.target.checked) {
                         membrosSelecionados.add(e.target.value);
                     } else {
@@ -946,14 +1040,16 @@
                 if (todosSelecionados) {
                     document.querySelectorAll('.checkbox-selecionar-org').forEach(cb => {
                         cb.checked = false;
-                        cb.closest('tr').classList.remove('linha-selecionada');
+                        const container = cb.closest('tr') || cb.closest('.mobile-card');
+                        if (container) container.classList.remove('linha-selecionada');
                         membrosSelecionados.delete(cb.value);
                     });
                 } else {
                     membrosSelecionados.clear();
                     document.querySelectorAll('.checkbox-selecionar-org').forEach(cb => {
                         cb.checked = true;
-                        cb.closest('tr').classList.add('linha-selecionada');
+                        const container = cb.closest('tr') || cb.closest('.mobile-card');
+                        if (container) container.classList.add('linha-selecionada');
                         membrosSelecionados.add(cb.value);
                     });
                 }
@@ -1004,18 +1100,33 @@
     }
 
     function filtrarMembros() {
+        const tbody = document.getElementById('tbody-organizacao');
+        const mobileContainer = document.getElementById('mobile-cards-organizacao');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const termo = document.getElementById('busca-organizacao').value.toLowerCase().trim();
-        const linhas = document.querySelectorAll('#tbody-organizacao tr');
 
         if (!termo) {
-            linhas.forEach(linha => linha.style.display = '');
+            if (isMobile && mobileContainer) {
+                mobileContainer.querySelectorAll('.mobile-card').forEach(card => card.style.display = '');
+            } else if (tbody) {
+                tbody.querySelectorAll('tr').forEach(linha => linha.style.display = '');
+            }
             return;
         }
 
-        linhas.forEach(linha => {
-            const texto = linha.textContent.toLowerCase();
-            linha.style.display = texto.includes(termo) ? '' : 'none';
-        });
+        if (isMobile && mobileContainer) {
+            // Filtrar cards mobile
+            mobileContainer.querySelectorAll('.mobile-card').forEach(card => {
+                const texto = card.textContent.toLowerCase();
+                card.style.display = texto.includes(termo) ? '' : 'none';
+            });
+        } else if (tbody) {
+            // Filtrar tabela desktop
+            tbody.querySelectorAll('tr').forEach(linha => {
+                const texto = linha.textContent.toLowerCase();
+                linha.style.display = texto.includes(termo) ? '' : 'none';
+            });
+        }
     }
 
     function atualizarVisibilidadeBotoesAcaoOrg() {
@@ -1036,4 +1147,19 @@
             txtToggle.textContent = todosSelecionados ? 'Desselecionar Todos' : 'Selecionar Todos';
         }
     }
+
+    // Listener para resize: re-renderiza se mudar entre mobile e desktop
+    if (!window.__organizacaoResizeAttached) {
+        window.__organizacaoResizeAttached = true;
+        window.addEventListener('resize', () => {
+            const nowMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (nowMobile !== window.__lastOrganizacaoIsMobile && todosOrganizacao && todosOrganizacao.length > 0) {
+                renderizarOrganizacao();
+            }
+        });
+    }
+
+    // Expõe funções globalmente para serem chamadas por GerenciarEvento.php
+    window.renderizarOrganizacao = renderizarOrganizacao;
+    window.carregarOrganizacao = carregarOrganizacao;
 </script>

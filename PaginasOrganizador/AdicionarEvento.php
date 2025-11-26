@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once('../BancoDados/conexao.php');
 
     $cpfOrganizador = $_SESSION['cpf'] ?? null;
-    
+
     if (!$cpfOrganizador) {
         echo json_encode(['erro' => 'Sessão expirada. Faça login novamente.']);
         exit;
@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $modalidade = $_POST['modalidade'] ?? '';
     $certificado = $_POST['certificado'] ?? '';
     $descricao = $_POST['descricao'] ?? '';
+    $modeloCertificadoParticipante = $_POST['modelo_certificado_participante'] ?? 'ModeloExemplo.pptx';
+    $modeloCertificadoOrganizador = $_POST['modelo_certificado_organizador'] ?? 'ModeloExemploOrganizador.pptx';
 
     // Validação básica
     if (
@@ -90,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-    
+
     // Converte NULL para string vazia para bind_param (será tratado como NULL no banco)
     $inicioInscricaoStr = $inicioInscricao ?? '';
     $fimInscricaoStr = $fimInscricao ?? '';
@@ -98,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Calcula duração em horas
     $intervalo = $dataInicioObj->diff($dataConclusaoObj);
     $duracao = ($intervalo->days * 24) + $intervalo->h + ($intervalo->i / 60);
-    
+
     // Valida: se o evento é no mesmo dia, não pode ter mais de 16 horas
     if ($intervalo->days === 0 && $duracao > 16) {
         echo json_encode(['erro' => 'Um evento de um único dia não pode ter mais de 16 horas de duração.']);
@@ -176,31 +178,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Garante que as colunas de inscrição existem (compatível com MySQL < 8 sem IF NOT EXISTS)
-        function garantirColunaEvento(mysqli $cx, string $coluna, string $definicao) {
+        function garantirColunaEvento(mysqli $cx, string $coluna, string $definicao)
+        {
             $escCol = mysqli_real_escape_string($cx, $coluna);
             $res = mysqli_query($cx, "SHOW COLUMNS FROM evento LIKE '$escCol'");
             if ($res && mysqli_num_rows($res) === 0) {
                 mysqli_query($cx, "ALTER TABLE evento ADD COLUMN `$coluna` $definicao");
             }
-            if ($res) { mysqli_free_result($res); }
+            if ($res) {
+                mysqli_free_result($res);
+            }
         }
         garantirColunaEvento($conexao, 'inicio_inscricao', 'DATETIME NULL');
         garantirColunaEvento($conexao, 'fim_inscricao', 'DATETIME NULL');
         garantirColunaEvento($conexao, 'tipo_certificado', "VARCHAR(50) NULL DEFAULT 'Sem certificacao'");
+        garantirColunaEvento($conexao, 'modelo_certificado_participante', "VARCHAR(255) NULL DEFAULT 'ModeloExemplo.pptx'");
+        garantirColunaEvento($conexao, 'modelo_certificado_organizador', "VARCHAR(255) NULL DEFAULT 'ModeloExemploOrganizador.pptx'");
 
         // Insere evento (mantém campo imagem com a principal para compatibilidade)
-        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao, tipo_certificado) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao, tipo_certificado, modelo_certificado_participante, modelo_certificado_organizador) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
-        // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s)
+        // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s)
         // Para campos NULL, usa string vazia (será tratado como NULL no banco se o campo aceitar NULL)
         $inicioInscricaoFinal = (!empty($inicioInscricaoStr)) ? $inicioInscricaoStr : '';
         $fimInscricaoFinal = (!empty($fimInscricaoStr)) ? $fimInscricaoStr : '';
-        
+
         mysqli_stmt_bind_param(
             $stmtEvento,
-            "isssssssdisssss",
+            "isssssssdisissssss",
             $codEvento,
             $categoria,
             $nome,
@@ -215,7 +222,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $caminhoImagemPrincipal,
             $inicioInscricaoFinal,
             $fimInscricaoFinal,
-            $certificado
+            $certificado,
+            $modeloCertificadoParticipante,
+            $modeloCertificadoOrganizador
         );
 
         if (!mysqli_stmt_execute($stmtEvento)) {
@@ -306,7 +315,7 @@ if ($cpfUsuario) {
         $resultadoConsulta = mysqli_stmt_get_result($declaracaoPreparada);
         $dadosUsuario = mysqli_fetch_assoc($resultadoConsulta);
         mysqli_stmt_close($declaracaoPreparada);
-        
+
         if ($dadosUsuario) {
             $nomeOrganizador = $dadosUsuario['Nome'];
         }
@@ -876,10 +885,21 @@ mysqli_close($conexao);
             grid-row-start: 5;
         }
 
+        .ModeloCertificadoParticipante {
+            grid-column: span 4 / span 4;
+            grid-row-start: 6;
+        }
+
+        .ModeloCertificadoOrganizador {
+            grid-column: span 4 / span 4;
+            grid-column-start: 5;
+            grid-row-start: 6;
+        }
+
         .Imagem {
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
-            grid-row-start: 6;
+            grid-row-start: 7;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -891,18 +911,18 @@ mysqli_close($conexao);
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
             grid-column-start: 5;
-            grid-row-start: 6;
+            grid-row-start: 7;
         }
 
         .BotaoVoltar {
             grid-column: span 2 / span 2;
-            grid-row-start: 9;
+            grid-row-start: 10;
         }
 
         .BotaoCriar {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 9;
+            grid-row-start: 10;
         }
 
         .campo-imagem {
@@ -1141,6 +1161,282 @@ mysqli_close($conexao);
             width: 1rem;
             height: 1rem;
         }
+
+        /* Container para select de modelo com botão */
+        .campo-modelo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .campo-modelo-wrapper .campo-select {
+            flex: 1;
+        }
+
+        .btn-adicionar-modelo {
+            background-color: var(--botao);
+            color: var(--branco);
+            border: none;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            min-width: 2.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0.15rem 0.55rem 0 rgba(0, 0, 0, 0.25);
+            transition: background 0.25s, transform 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-adicionar-modelo:hover {
+            background-color: var(--botao);
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-adicionar-modelo:active {
+            transform: scale(0.95);
+        }
+
+        /* Modal de Upload de Modelo */
+        .modal-template-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-template-content {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10001;
+        }
+
+        .modal-template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            color: #6598D2;
+        }
+
+        .modal-template-header h2 {
+            margin: 0;
+            color: #6598D2;
+            font-size: 24px;
+        }
+
+        .btn-fechar-modal-template {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--azul-escuro);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-fechar-modal-template:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-template-body {
+            padding: 24px;
+            color: #000;
+        }
+
+        .info-modelo {
+            background: rgba(1, 102, 255, 0.1);
+            border-left: 4px solid var(--botao);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #000;
+        }
+
+        .info-modelo h3 {
+            margin: 0 0 12px 0;
+            color: var(--botao);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .info-modelo ul {
+            margin: 8px 0 0 20px;
+            padding: 0;
+            color: #000;
+        }
+
+        .info-modelo li {
+            margin: 6px 0;
+            color: #000;
+        }
+
+        .form-group-upload {
+            margin-bottom: 20px;
+        }
+
+        .form-group-upload label {
+            display: block;
+            margin-bottom: 8px;
+            color: #6598D2;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 24px 16px;
+            background: var(--branco);
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 100px;
+        }
+
+        .file-upload-label:hover {
+            background: #f8f9fa;
+            border-color: var(--botao);
+        }
+
+        .file-upload-icon {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .file-upload-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--botao);
+            margin: 0;
+            padding: 0;
+        }
+
+        .file-upload-text {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-upload-text strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .file-upload-text small {
+            display: block;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .file-selected {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            color: #2e7d32;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal-template-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            margin-top: 28px;
+        }
+
+        .btn-modal-template {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-modal-template:hover {
+            opacity: 0.9;
+        }
+
+        .btn-modal-template:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-cancelar-template {
+            background-color: var(--vermelho);
+            color: var(--branco);
+        }
+
+        .btn-enviar-template {
+            background-color: var(--verde);
+            color: var(--branco);
+        }
+
+        /* Bloqueia scroll da página quando modal está aberto */
+        body.modal-template-aberto {
+            overflow: hidden;
+        }
     </style>
 </head>
 
@@ -1230,6 +1526,24 @@ mysqli_close($conexao);
                     <option value="Outro">Outro</option>
                 </select>
             </div>
+            <div class="ModeloCertificadoParticipante grupo-campo">
+                <label for="modelo-certificado-participante">Modelo de Certificado (Participante):</label>
+                <div class="campo-modelo-wrapper">
+                    <select id="modelo-certificado-participante" name="modelo_certificado_participante" class="campo-select" autocomplete="off">
+                        <option value="ModeloExemplo.pptx" selected>Modelo Padrão</option>
+                    </select>
+                    <button type="button" class="btn-adicionar-modelo" onclick="abrirModalTemplate('participante')" title="Adicionar modelo personalizado">+</button>
+                </div>
+            </div>
+            <div class="ModeloCertificadoOrganizador grupo-campo">
+                <label for="modelo-certificado-organizador">Modelo de Certificado (Organizador):</label>
+                <div class="campo-modelo-wrapper">
+                    <select id="modelo-certificado-organizador" name="modelo_certificado_organizador" class="campo-select" autocomplete="off">
+                        <option value="ModeloExemploOrganizador.pptx" selected>Modelo Padrão</option>
+                    </select>
+                    <button type="button" class="btn-adicionar-modelo" onclick="abrirModalTemplate('organizador')" title="Adicionar modelo personalizado">+</button>
+                </div>
+            </div>
             <div class="Imagem grupo-campo">
                 <div class="campo-imagem" id="campo-imagem" onclick="document.getElementById('input-imagem').click()">
                     <div class="campo-imagem-placeholder" id="placeholder-imagem">
@@ -1297,6 +1611,57 @@ mysqli_close($conexao);
                 </div>
             </div>
         </div>
+
+        <!-- Modal Upload Modelo de Certificado -->
+        <div id="modal-template" class="modal-template-overlay" style="display: none;" onclick="fecharModalTemplateSeForFundo(event)">
+            <div class="modal-template-content" onclick="event.stopPropagation()">
+                <div class="modal-template-header">
+                    <h2>Adicionar Modelo de Certificado</h2>
+                    <button class="btn-fechar-modal-template" onclick="fecharModalTemplate()">&times;</button>
+                </div>
+                <div class="modal-template-body">
+                    <div class="info-modelo">
+                        <h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                                <path d="M9 11H7v6h2M13 11h-2v6h2M17 11h-2v6h2M9.5 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9" />
+                                <circle cx="18.5" cy="5.5" r="2.5" />
+                            </svg>
+                            Informações Importantes
+                        </h3>
+                        <ul>
+                            <li><strong>Formatos aceitos:</strong> PPTX, PPT, ODP</li>
+                            <li><strong>Tamanho máximo:</strong> 50MB</li>
+                            <li><strong>O modelo deve conter marcadores de texto</strong> que serão substituídos pelos dados do certificado (Nome, Evento, Data, etc.)</li>
+                            <li>O arquivo será salvo na pasta de templates e ficará disponível para todos os seus eventos</li>
+                        </ul>
+                    </div>
+                    <div class="form-group-upload">
+                        <label>Selecione o arquivo do modelo</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="template-file-input" class="file-upload-input" accept=".pptx,.ppt,.odp" onchange="arquivoTemplateSelecionado(event)">
+                            <label for="template-file-input" class="file-upload-label">
+                                <div class="file-upload-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                        <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" />
+                                    </svg>
+                                </div>
+                                <div class="file-upload-text">
+                                    <strong>Clique para selecionar</strong>
+                                    <small>ou arraste o arquivo aqui</small>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="file-selected-info" class="file-selected" style="display: none;">
+                            <strong>✓ Arquivo selecionado:</strong> <span id="file-name"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-template-footer">
+                    <button type="button" class="btn-modal-template btn-cancelar-template" onclick="fecharModalTemplate()">Cancelar</button>
+                    <button type="button" class="btn-modal-template btn-enviar-template" id="btn-enviar-template" onclick="enviarModeloTemplate()" disabled>Enviar</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         // Previne execução múltipla do script quando carregado via AJAX
@@ -1310,6 +1675,151 @@ mysqli_close($conexao);
             let imagens = [];
             let indiceAtual = 0;
             let colaboradores = [];
+            let tipoTemplateAtual = null; // 'participante' ou 'organizador'
+
+            // ==== FUNÇÕES DE TEMPLATE DE CERTIFICADO ====
+
+            // Carrega modelos disponíveis ao iniciar a página
+            function carregarModelosDisponiveis() {
+                fetch('ListarModelosCertificado.php')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.sucesso && data.templates) {
+                            atualizarSelectsModelos(data.templates);
+                        }
+                    })
+                    .catch(err => console.error('Erro ao carregar modelos:', err));
+            }
+
+            function atualizarSelectsModelos(templates) {
+                const selectParticipante = document.getElementById('modelo-certificado-participante');
+                const selectOrganizador = document.getElementById('modelo-certificado-organizador');
+
+                // Limpa opções atuais (exceto a primeira que é o padrão)
+                while (selectParticipante.options.length > 1) {
+                    selectParticipante.remove(1);
+                }
+                while (selectOrganizador.options.length > 1) {
+                    selectOrganizador.remove(1);
+                }
+
+                // Adiciona templates personalizados
+                templates.forEach(template => {
+                    if (!template.padrao) {
+                        const optionParticipante = new Option(template.nomeExibicao, template.nome);
+                        const optionOrganizador = new Option(template.nomeExibicao, template.nome);
+                        selectParticipante.add(optionParticipante);
+                        selectOrganizador.add(optionOrganizador);
+                    }
+                });
+            }
+
+            window.abrirModalTemplate = function(tipo) {
+                tipoTemplateAtual = tipo;
+                document.getElementById('modal-template').style.display = 'flex';
+                document.body.classList.add('modal-template-aberto');
+                limparModalTemplate();
+            };
+
+            window.fecharModalTemplate = function() {
+                document.getElementById('modal-template').style.display = 'none';
+                document.body.classList.remove('modal-template-aberto');
+                limparModalTemplate();
+            };
+
+            window.fecharModalTemplateSeForFundo = function(event) {
+                if (event.target.id === 'modal-template') {
+                    fecharModalTemplate();
+                }
+            };
+
+            function limparModalTemplate() {
+                document.getElementById('template-file-input').value = '';
+                document.getElementById('file-selected-info').style.display = 'none';
+                document.getElementById('btn-enviar-template').disabled = true;
+                tipoTemplateAtual = null;
+            }
+
+            window.arquivoTemplateSelecionado = function(event) {
+                const arquivo = event.target.files[0];
+                if (arquivo) {
+                    const extensao = arquivo.name.split('.').pop().toLowerCase();
+                    const extensoesPermitidas = ['pptx', 'ppt', 'odp'];
+
+                    if (!extensoesPermitidas.includes(extensao)) {
+                        alert('Formato não permitido. Use: PPTX, PPT ou ODP');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    const tamanhoMaxMB = 50;
+                    const tamanhoMB = arquivo.size / 1024 / 1024;
+
+                    if (tamanhoMB > tamanhoMaxMB) {
+                        alert(`Arquivo muito grande (${tamanhoMB.toFixed(2)}MB). Tamanho máximo: ${tamanhoMaxMB}MB`);
+                        event.target.value = '';
+                        return;
+                    }
+
+                    document.getElementById('file-name').textContent = arquivo.name;
+                    document.getElementById('file-selected-info').style.display = 'block';
+                    document.getElementById('btn-enviar-template').disabled = false;
+                }
+            };
+
+            window.enviarModeloTemplate = function() {
+                const fileInput = document.getElementById('template-file-input');
+                const arquivo = fileInput.files[0];
+
+                if (!arquivo) {
+                    alert('Nenhum arquivo selecionado');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('modelo_certificado', arquivo);
+
+                const btnEnviar = document.getElementById('btn-enviar-template');
+                btnEnviar.disabled = true;
+                btnEnviar.textContent = 'Enviando...';
+
+                fetch('UploadModeloCertificado.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            alert(data.mensagem || 'Modelo enviado com sucesso!');
+
+                            // Adiciona o novo modelo ao select apropriado
+                            const selectId = tipoTemplateAtual === 'participante' ?
+                                'modelo-certificado-participante' :
+                                'modelo-certificado-organizador';
+                            const select = document.getElementById(selectId);
+                            const novaOpcao = new Option(data.nomeOriginal, data.nomeArquivo);
+                            select.add(novaOpcao);
+                            select.value = data.nomeArquivo;
+
+                            fecharModalTemplate();
+
+                            // Recarrega a lista completa
+                            carregarModelosDisponiveis();
+                        } else {
+                            alert('Erro: ' + (data.erro || 'Erro desconhecido'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Erro ao enviar arquivo: ' + error.message);
+                    })
+                    .finally(() => {
+                        btnEnviar.disabled = false;
+                        btnEnviar.textContent = 'Enviar';
+                    });
+            };
+
+            // ==== FIM FUNÇÕES DE TEMPLATE ====
 
             function validarFormulario() {
                 const nome = document.getElementById('nome').value.trim();
@@ -1330,18 +1840,61 @@ mysqli_close($conexao);
             }
 
             function validarCamposObrigatorios() {
-                const campos = [
-                    { id: 'nome', nome: 'Nome', elemento: document.getElementById('nome') },
-                    { id: 'local', nome: 'Local', elemento: document.getElementById('local') },
-                    { id: 'data-inicio', nome: 'Data de Início', elemento: document.getElementById('data-inicio') },
-                    { id: 'horario-inicio', nome: 'Horário de Início', elemento: document.getElementById('horario-inicio') },
-                    { id: 'data-fim', nome: 'Data de Fim', elemento: document.getElementById('data-fim') },
-                    { id: 'horario-fim', nome: 'Horário de Fim', elemento: document.getElementById('horario-fim') },
-                    { id: 'publico-alvo', nome: 'Público Alvo', elemento: document.getElementById('publico-alvo') },
-                    { id: 'categoria', nome: 'Categoria', elemento: document.getElementById('categoria') },
-                    { id: 'modalidade', nome: 'Modalidade', elemento: document.getElementById('modalidade') },
-                    { id: 'certificado', nome: 'Tipo de Certificado', elemento: document.getElementById('certificado') },
-                    { id: 'descricao', nome: 'Descrição', elemento: document.getElementById('descricao') }
+                const campos = [{
+                        id: 'nome',
+                        nome: 'Nome',
+                        elemento: document.getElementById('nome')
+                    },
+                    {
+                        id: 'local',
+                        nome: 'Local',
+                        elemento: document.getElementById('local')
+                    },
+                    {
+                        id: 'data-inicio',
+                        nome: 'Data de Início',
+                        elemento: document.getElementById('data-inicio')
+                    },
+                    {
+                        id: 'horario-inicio',
+                        nome: 'Horário de Início',
+                        elemento: document.getElementById('horario-inicio')
+                    },
+                    {
+                        id: 'data-fim',
+                        nome: 'Data de Fim',
+                        elemento: document.getElementById('data-fim')
+                    },
+                    {
+                        id: 'horario-fim',
+                        nome: 'Horário de Fim',
+                        elemento: document.getElementById('horario-fim')
+                    },
+                    {
+                        id: 'publico-alvo',
+                        nome: 'Público Alvo',
+                        elemento: document.getElementById('publico-alvo')
+                    },
+                    {
+                        id: 'categoria',
+                        nome: 'Categoria',
+                        elemento: document.getElementById('categoria')
+                    },
+                    {
+                        id: 'modalidade',
+                        nome: 'Modalidade',
+                        elemento: document.getElementById('modalidade')
+                    },
+                    {
+                        id: 'certificado',
+                        nome: 'Tipo de Certificado',
+                        elemento: document.getElementById('certificado')
+                    },
+                    {
+                        id: 'descricao',
+                        nome: 'Descrição',
+                        elemento: document.getElementById('descricao')
+                    }
                 ];
 
                 const camposFaltantes = [];
@@ -1355,7 +1908,7 @@ mysqli_close($conexao);
                         } else {
                             valor = campo.elemento.value.trim();
                         }
-                        
+
                         if (!valor) {
                             camposFaltantes.push(campo.nome);
                             elementosFaltantes.push(campo.elemento);
@@ -1370,7 +1923,10 @@ mysqli_close($conexao);
                     elemento.style.borderColor = '#f44336';
                     elemento.style.boxShadow = '0 0 0 3px rgba(244, 67, 54, 0.2)';
                     if (elemento === elementosFaltantes[0]) {
-                        elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        elemento.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                         elemento.focus();
                     }
                 });
@@ -1470,7 +2026,11 @@ mysqli_close($conexao);
                     return;
                 }
 
-                colaboradores.push({ cpf, nome, email });
+                colaboradores.push({
+                    cpf,
+                    nome,
+                    email
+                });
                 atualizarListaColaboradores();
                 fecharModalColaboradores();
             };
@@ -1640,7 +2200,7 @@ mysqli_close($conexao);
                     e.preventDefault();
 
                     const camposFaltantes = validarCamposObrigatorios();
-                    
+
                     if (camposFaltantes.length > 0) {
                         let mensagem = 'Por favor, preencha os seguintes campos obrigatórios:\n\n';
                         camposFaltantes.forEach((campo, index) => {
@@ -1703,9 +2263,11 @@ mysqli_close($conexao);
             }
 
             validarFormulario();
+
+            // Carrega modelos de certificado disponíveis
+            carregarModelosDisponiveis();
         })();
     </script>
 </body>
 
 </html>
-

@@ -687,17 +687,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Enviar notificação
+    // Enviar notificação (aceita JSON ou POST)
+    $jsonInput = file_get_contents('php://input');
+    $jsonData = json_decode($jsonInput, true);
+    
+    // Determina se é requisição de notificação
+    $isEnviarNotificacao = false;
     if (isset($_POST['action']) && $_POST['action'] === 'enviar_notificacao') {
+        $isEnviarNotificacao = true;
+    } elseif ($jsonData && isset($jsonData['action']) && $jsonData['action'] === 'enviar_notificacao') {
+        $isEnviarNotificacao = true;
+    }
+    
+    if ($isEnviarNotificacao) {
+        // Garantir resposta JSON mesmo se houver avisos/erros gerados internamente
+        header('Content-Type: application/json; charset=utf-8');
+        // Captura qualquer saída acidental (warnings/notices) para evitar que HTML quebre o JSON
+        ob_start();
+        // Não exibir erros diretamente na saída (serão capturados no buffer)
+        ini_set('display_errors', '0');
+        error_reporting(0);
+
         require_once __DIR__ . '/../BancoDados/conexao.php';
 
-        $codEvento = intval($_POST['cod_evento'] ?? 0);
-        $titulo = $_POST['titulo'] ?? '';
-        $conteudo = $_POST['conteudo'] ?? '';
-        $destinatarios = json_decode($_POST['destinatarios'] ?? '[]', true);
+        // Usa dados JSON se disponível, senão usa POST
+        $dados = $jsonData ? $jsonData : $_POST;
+        
+        $codEvento = intval($dados['cod_evento'] ?? 0);
+        $titulo = $dados['titulo'] ?? '';
+        $conteudo = $dados['conteudo'] ?? '';
+        $destinatarios = is_array($dados['destinatarios'] ?? null) ? $dados['destinatarios'] : json_decode($dados['destinatarios'] ?? '[]', true);
 
         if (empty($titulo) || empty($conteudo) || empty($destinatarios)) {
-            echo json_encode(['sucesso' => false, 'erro' => 'Dados incompletos']);
+            echo json_encode(['sucesso' => false, 'erro' => 'dados_incompletos', 'debug' => ['titulo' => $titulo, 'conteudo' => $conteudo, 'destinatarios' => $destinatarios]]);
             exit;
         }
 
@@ -722,7 +744,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_close($stmtPermissao);
 
             $totalEnviadas = 0;
-            $sqlNotificacao = "INSERT INTO notificacoes (CPF, titulo, mensagem, data_criacao, lida) VALUES (?, ?, ?, NOW(), 0)";
+            $cpfRemetente = $_SESSION['cpf'];
+            
+            // Buscar nome do organizador que está enviando
+            $sqlNomeOrg = "SELECT Nome FROM usuario WHERE CPF = ? LIMIT 1";
+            $stmtNomeOrg = mysqli_prepare($conexao, $sqlNomeOrg);
+            mysqli_stmt_bind_param($stmtNomeOrg, "s", $cpfRemetente);
+            mysqli_stmt_execute($stmtNomeOrg);
+            $resultNomeOrg = mysqli_stmt_get_result($stmtNomeOrg);
+            $nomeOrganizador = '';
+            if ($rowOrg = mysqli_fetch_assoc($resultNomeOrg)) {
+                $nomeOrganizador = $rowOrg['Nome'];
+            }
+            mysqli_stmt_close($stmtNomeOrg);
+            
+            // Formata mensagem com CPF do remetente: CPF|||NOME|||TÍTULO|||CONTEÚDO
+            $mensagemFormatada = $cpfRemetente . '|||' . $nomeOrganizador . '|||' . $titulo . '|||' . $conteudo;
+            
+            $sqlNotificacao = "INSERT INTO notificacoes (CPF, titulo, tipo, mensagem, cod_evento, data_criacao, lida) VALUES (?, ?, 'mensagem_organizador', ?, ?, NOW(), 0)";
             $stmtNotificacao = mysqli_prepare($conexao, $sqlNotificacao);
 
             // Verificar se cada CPF é um usuário válido (não precisa estar inscrito)
@@ -737,7 +776,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (mysqli_fetch_assoc($resultVerificar)) {
                     // É um usuário válido, pode enviar mensagem
-                    mysqli_stmt_bind_param($stmtNotificacao, "sss", $cpf, $titulo, $conteudo);
+                    // Bind: CPF (s), titulo (s), mensagem (s), cod_evento (i)
+                    mysqli_stmt_bind_param($stmtNotificacao, "sssi", $cpf, $titulo, $mensagemFormatada, $codEvento);
                     if (mysqli_stmt_execute($stmtNotificacao)) {
                         $totalEnviadas++;
                     }
@@ -749,22 +789,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_close($stmtNotificacao);
             mysqli_close($conexao);
 
+            // Limpa buffer de saída (não envia HTML inesperado) e retorna JSON limpo
+            ob_end_clean();
             echo json_encode(['sucesso' => true, 'total_enviadas' => $totalEnviadas]);
         } catch (Exception $e) {
-            echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()]);
+            // Captura buffer e inclui no debug (sem expor em produção), mas garante JSON válido
+            $captured = '';
+            if (ob_get_length() !== false) {
+                $captured = ob_get_clean();
+            }
+            $resp = ['sucesso' => false, 'erro' => $e->getMessage()];
+            if (!empty($captured)) $resp['debug_output'] = $captured;
+            echo json_encode($resp);
         }
         exit;
     }
 
     // Enviar notificação para CPF específico (permite responder mensagens de usuários não inscritos)
+    $isEnviarNotificacaoCpf = false;
     if (isset($_POST['action']) && $_POST['action'] === 'enviar_notificacao_cpf') {
+        $isEnviarNotificacaoCpf = true;
+    } elseif ($jsonData && isset($jsonData['action']) && $jsonData['action'] === 'enviar_notificacao_cpf') {
+        $isEnviarNotificacaoCpf = true;
+    }
+    
+    if ($isEnviarNotificacaoCpf) {
         header('Content-Type: application/json; charset=utf-8');
         require_once __DIR__ . '/../BancoDados/conexao.php';
 
-        $codEvento = intval($_POST['cod_evento'] ?? 0);
-        $titulo = $_POST['titulo'] ?? '';
-        $conteudo = $_POST['conteudo'] ?? '';
-        $cpfDestinatario = trim($_POST['cpf_destinatario'] ?? '');
+        // Usa dados JSON se disponível, senão usa POST
+        $dados = $jsonData ? $jsonData : $_POST;
+        
+        $codEvento = intval($dados['cod_evento'] ?? 0);
+        $titulo = $dados['titulo'] ?? '';
+        $conteudo = $dados['conteudo'] ?? '';
+        $cpfDestinatario = trim($dados['cpf_destinatario'] ?? '');
 
         if (empty($titulo) || empty($conteudo) || empty($cpfDestinatario)) {
             echo json_encode(['sucesso' => false, 'erro' => 'Dados incompletos'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -1002,8 +1061,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $repositorio = new \CEU\Certificacao\RepositorioCertificados($conexao);
                 $repositorio->garantirEsquema();
 
-                // Gerar código único
-                $codigoVerificacao = $repositorio->gerarCodigoUnico(8);
+                // Verifica se já existe certificado para este CPF + evento
+                $certificadoExistente = $repositorio->buscarPorCpfEvento($cpfParticipante, $codEvento);
+                $codigoVerificacao = $certificadoExistente['cod_verificacao'] ?? $repositorio->gerarCodigoUnico(8);
+                $excluirPdfAnterior = !empty($certificadoExistente); // Flag para deletar PDF antigo se reatualizar
 
                 // Dados para o template
                 $dados = [
@@ -1053,6 +1114,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $dirCertificados = __DIR__ . '/../Certificacao/certificados/';
                 if (!is_dir($dirCertificados)) {
                     mkdir($dirCertificados, 0755, true);
+                }
+
+                // Se certificado existe, remove o arquivo antigo (participante)
+                if ($excluirPdfAnterior && !empty($certificadoExistente['arquivo'])) {
+                    $caminhoAntigoCompleto = __DIR__ . '/../' . $certificadoExistente['arquivo'];
+                    if (file_exists($caminhoAntigoCompleto)) {
+                        @unlink($caminhoAntigoCompleto);
+                    }
                 }
 
                 $nomeArquivo = 'Certificado_CEU_' . $codigoVerificacao . '.pdf';
@@ -1270,8 +1339,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $repositorio = new \CEU\Certificacao\RepositorioCertificados($conexao);
                 $repositorio->garantirEsquema();
 
-                // Gerar código único
-                $codigoVerificacao = $repositorio->gerarCodigoUnico(8);
+                // Verifica se já existe certificado para este CPF + evento
+                $certificadoExistente = $repositorio->buscarPorCpfEvento($cpfParticipante, $codEvento);
+                $codigoVerificacao = $certificadoExistente['cod_verificacao'] ?? $repositorio->gerarCodigoUnico(8);
+                $excluirPdfAnterior = !empty($certificadoExistente); // Flag para deletar PDF antigo se reatualizar
 
                 // Dados para o template
                 $dados = [
@@ -1322,6 +1393,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $dirCertificados = __DIR__ . '/../Certificacao/certificados/';
                 if (!is_dir($dirCertificados)) {
                     mkdir($dirCertificados, 0755, true);
+                }
+
+                // Se certificado existe, remove o arquivo antigo
+                if ($excluirPdfAnterior && !empty($certificadoExistente['arquivo'])) {
+                    $caminhoAntigoCompleto = __DIR__ . '/../' . $certificadoExistente['arquivo'];
+                    if (file_exists($caminhoAntigoCompleto)) {
+                        @unlink($caminhoAntigoCompleto);
+                    }
                 }
 
                 $nomeArquivo = 'Certificado_CEU_' . $codigoVerificacao . '.pdf';
@@ -1486,6 +1565,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     @media (max-width: 768px) {
+        /* SOBRESCREVER PARA MOBILE - MANTER FUNDO MAS REMOVER PADDING */
+        body .container-lista,
+        #main-content .container-lista,
+        div .container-lista {
+            width: calc(100% - 12px) !important;
+            max-width: calc(100% - 12px) !important;
+            margin: 6px !important;
+            padding: 0 6px !important;
+            border-radius: 8px !important;
+            display: block !important;
+            gap: 0 !important;
+        }
+        
+        #main-content.shifted .container-lista,
+        #main-content.filtro-shifted .container-lista,
+        #main-content.shifted.filtro-shifted .container-lista {
+            width: calc(100% - 12px) !important;
+            max-width: calc(100% - 12px) !important;
+            margin: 6px !important;
+            padding: 0 6px !important;
+        }
+        
         .dados-evento-grid {
             grid-template-columns: 1fr;
         }
@@ -1919,28 +2020,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .modal-editar {
         background-color: var(--branco);
         border-radius: 12px;
-        padding: 32px;
+        padding: 24px;
         max-width: 600px;
         width: 90%;
-        max-height: 90vh;
+        max-height: 70vh;
+        min-height: auto;
         overflow-y: auto;
+        overflow-x: hidden;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         position: relative;
         z-index: 10001;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-editar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-editar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+
+    .modal-editar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .modal-editar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
     }
 
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         color: #6598D2;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(101, 152, 210, 0.1);
     }
 
     .modal-header h2 {
         margin: 0;
         color: #6598D2;
-        font-size: 24px;
+        font-size: 20px;
+        flex: 1;
     }
 
     .btn-fechar-modal {
@@ -1964,23 +2090,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 14px;
     }
 
     .form-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         color: #6598D2;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .form-group input {
         width: 100%;
-        padding: 12px;
+        padding: 10px;
         border: 1px solid var(--azul-escuro);
-        border-radius: 8px;
-        font-size: 15px;
+        border-radius: 6px;
+        font-size: 14px;
         box-sizing: border-box;
         background-color: var(--branco);
     }
@@ -1999,9 +2125,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .modal-footer {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         justify-content: flex-end;
-        margin-top: 28px;
+        margin-top: 20px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        flex-wrap: wrap;
     }
 
     .btn-modal {
@@ -2050,6 +2179,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         transition: all 0.3s ease;
         position: relative;
         bottom: -2px;
+    }
+
+    @media (max-width: 768px) {
+        .container-abas {
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            justify-content: center !important;
+        }
+
+        .aba-botao {
+            padding: 10px 16px !important;
+            font-size: 14px !important;
+            flex: 0 1 calc(50% - 4px) !important;
+        }
+
+        .botao-voltar {
+            width: 100% !important;
+            padding: 12px 16px !important;
+            margin: 12px 6px !important;
+            font-size: 14px !important;
+        }
     }
 
     .aba-botao:hover {
@@ -2666,6 +2816,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px;
         }
     }
+
+    /* ===== TRANSFORMAR TABELA EM CARDS NO MOBILE ===== */
+    @media (max-width: 768px) {
+        /* Oculta a tabela e mostra cards */
+        .envoltorio-tabela {
+            overflow: visible !important;
+        }
+
+        .envoltorio-tabela::before {
+            display: none;
+        }
+
+        .tabela-participantes {
+            display: none;
+        }
+
+        /* Container de cards */
+        .envoltorio-tabela::after {
+            content: '';
+            display: block;
+        }
+
+        /* Cria os cards a partir das linhas da tabela */
+        .tabela-participantes tbody tr {
+            display: block;
+            background: var(--branco);
+            border: 1px solid var(--azul-escuro);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabela-participantes tbody tr:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tabela-participantes tbody tr td {
+            display: block;
+            border: none !important;
+            padding: 8px 0 !important;
+            text-align: left !important;
+        }
+
+        .tabela-participantes tbody tr td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--azul-escuro);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .tabela-participantes tbody tr td:first-child {
+            border-bottom: 2px solid var(--azul-escuro);
+            padding-bottom: 12px !important;
+            margin-bottom: 8px;
+            text-align: center !important;
+        }
+
+        .tabela-participantes tbody tr td:first-child::before {
+            content: none;
+        }
+
+        .tabela-participantes thead {
+            display: none;
+        }
+
+        /* Ajusta checkbox de seleção no card */
+        .tabela-participantes tbody tr td.coluna-selecionar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ajusta grupo de ações e status para melhor visualização em card */
+        .grupo-acoes,
+        .grupo-status {
+            min-width: auto;
+            width: 100%;
+        }
+
+        .botao-acao-tabela {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .linha-status {
+            justify-content: space-between;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tabela-participantes tbody tr {
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .tabela-participantes tbody tr td {
+            padding: 6px 0 !important;
+        }
+
+        .tabela-participantes tbody tr td::before {
+            font-size: 11px;
+        }
+
+        .coluna-dados p {
+            font-size: 12px !important;
+        }
+
+        .botao-acao-tabela {
+            padding: 8px 12px !important;
+            font-size: 11px !important;
+        }
+    }
 </style>
 
 <body>
@@ -2897,6 +3163,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Ativa a aba correta
             trocarAba(abaInicial);
+
+            // ==== LISTENER GLOBAL DE RESIZE PARA RECARREGAR CONTEÚDO AO MUDAR ENTRE MOBILE/DESKTOP ====
+            if (!window.__gerenciarEventoResizeAttached) {
+                window.__gerenciarEventoResizeAttached = true;
+                let lastIsMobile = window.matchMedia('(max-width: 768px)').matches;
+                
+                window.addEventListener('resize', () => {
+                    const nowIsMobile = window.matchMedia('(max-width: 768px)').matches;
+                    
+                    // Se mudou entre mobile e desktop
+                    if (nowIsMobile !== lastIsMobile) {
+                        lastIsMobile = nowIsMobile;
+                        console.log('Mudança entre mobile/desktop detectada. Re-renderizando aba atual...');
+                        
+                        // Re-carrega a aba atual chamando a função apropriada
+                        if (abaAtual === 'participantes' && typeof renderizarParticipantes === 'function') {
+                            renderizarParticipantes();
+                        } else if (abaAtual === 'organizacao' && typeof renderizarOrganizacao === 'function') {
+                            renderizarOrganizacao();
+                        }
+                    }
+                });
+            }
         }
 
         function trocarAba(nomeAba) {
@@ -3319,25 +3608,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
 
             // Botões de ação da aba de Organização
-            const bindsOrganizacao = [{
-                    id: 'btn-adicionar-organizacao',
-                    fn: () => alert('Funcionalidade em desenvolvimento: Adicionar organizador pela aba de Organização do evento')
-                },
-                {
-                    id: 'btn-enviar-mensagem-organizacao',
-                    fn: () => alert('Funcionalidade em desenvolvimento: Enviar mensagem para organização')
-                }
-            ];
-            bindsOrganizacao.forEach(({
-                id,
-                fn
-            }) => {
-                const el = document.getElementById(id);
-                if (el && !el.dataset.bound) {
-                    el.dataset.bound = '1';
-                    el.addEventListener('click', fn);
-                }
-            });
+            // NOTA: Os botões de ação da organização são agora gerenciados pelo ConteudoOrganizacao.php
+            // que carrega dinamicamente com a função inicializarAcoesRapidas()
 
             // Botões de ação em massa
             const bindsMassa = [{

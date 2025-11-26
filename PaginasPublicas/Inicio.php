@@ -46,7 +46,6 @@
       width: 10cqi;
       height: 10cqi;
       border-radius: 100%;
-      background: var(--fundo-escuro-transparente);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -58,13 +57,11 @@
 
     .BotaoCompartilharCard:hover {
       transform: scale(1.1);
-      background: var(--fundo-hover-transparente);
     }
 
     .BotaoCompartilharCard img {
       width: 7cqi;
       height: 7cqi;
-      filter: invert(1);
       display: block;
     }
 

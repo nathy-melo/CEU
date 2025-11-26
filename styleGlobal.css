@@ -264,6 +264,8 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .icone-pesquisa img {
@@ -1048,14 +1050,32 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   margin-bottom: 6px !important;
   padding-bottom: 6px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: block !important;
+  width: 100% !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 #notificacoes-lista .notif-remetente-info strong {
   color: var(--botao) !important;
   font-size: 13px !important;
   font-weight: 700 !important;
+  display: inline !important;
+  margin-bottom: 0 !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+#notificacoes-lista .notif-remetente-info > div {
   display: block !important;
-  margin-bottom: 2px !important;
+  width: 100% !important;
+}
+
+#notificacoes-lista .notif-remetente-info div[style*="background"] {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
 }
 
 #notificacoes-lista .notif-evento-nome {

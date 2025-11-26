@@ -194,6 +194,8 @@
       certificado: dadosEvento.certificado,
       certificadoNumerico: dadosEvento.certificado_numerico,
       descricao: dadosEvento.descricao,
+      modeloCertificadoParticipante: dadosEvento.modelo_certificado_participante || 'ModeloExemplo.pptx',
+      modeloCertificadoOrganizador: dadosEvento.modelo_certificado_organizador || 'ModeloExemploOrganizador.pptx',
       imagens: [...listaImagensEvento]
     };
 
@@ -297,6 +299,9 @@
     }
 
     // Salva cópia dos dados originais
+    const modeloParticipanteEl = document.getElementById('modelo-participante');
+    const modeloOrganizadorEl = document.getElementById('modelo-organizador');
+    
     dadosOriginaisEvento = {
       cod_evento: codigoEventoAtual,
       nome: eventNameEl ? eventNameEl.textContent.trim() : '',
@@ -319,6 +324,8 @@
       certificado: certificateEl ? certificateEl.textContent.trim() : '',
       certificadoNumerico: certificateEl && certificateEl.textContent.trim() !== 'Não' ? 1 : 0,
       descricao: descriptionEl ? descriptionEl.textContent.trim() : '',
+      modeloCertificadoParticipante: modeloParticipanteEl ? modeloParticipanteEl.textContent.trim() : 'ModeloExemplo.pptx',
+      modeloCertificadoOrganizador: modeloOrganizadorEl ? modeloOrganizadorEl.textContent.trim() : 'ModeloExemploOrganizador.pptx',
       imagens: imagensParaSalvar
     };
 
@@ -380,7 +387,12 @@
     if (inputPublicoAlvo) inputPublicoAlvo.value = dadosOriginaisEvento.publicoAlvo || '';
     
     if (inputCategoria) {
-      inputCategoria.value = dadosOriginaisEvento.categoria || '';
+      const categoriaValor = dadosOriginaisEvento.categoria || '';
+      inputCategoria.value = categoriaValor;
+      // Se o valor não existir nas opções, tentar encontrar uma correspondência
+      if (inputCategoria.value !== categoriaValor && categoriaValor) {
+        console.warn('Categoria não encontrada nas opções:', categoriaValor);
+      }
     }
     
     if (inputModalidade) inputModalidade.value = dadosOriginaisEvento.modalidade || '';
@@ -400,6 +412,17 @@
     }
     
     if (inputDescricao) inputDescricao.value = dadosOriginaisEvento.descricao || '';
+      
+      // Preenche os modelos de certificado
+      const inputModeloParticipante = document.getElementById('input-modelo-certificado-participante');
+      if (inputModeloParticipante && dadosOriginaisEvento.modeloCertificadoParticipante) {
+        inputModeloParticipante.value = dadosOriginaisEvento.modeloCertificadoParticipante;
+      }
+      
+      const inputModeloOrganizador = document.getElementById('input-modelo-certificado-organizador');
+      if (inputModeloOrganizador && dadosOriginaisEvento.modeloCertificadoOrganizador) {
+        inputModeloOrganizador.value = dadosOriginaisEvento.modeloCertificadoOrganizador;
+      }
   }
 
   async function abrirModalColaboradores() {
@@ -715,6 +738,9 @@
 
       // Preencher inputs com valores usando a função centralizada
       preencherInputsEdicao();
+      
+      // Carregar modelos de certificado disponíveis
+      carregarModelosDisponiveis();
 
       // Habilitar edição de imagem
       const campoImagem = document.getElementById('campo-imagem');
@@ -946,6 +972,12 @@
       formData.append('certificado', inputCertificado.value);
       formData.append('descricao', inputDescricao.value);
       formData.append('duracao', inputCargaHoraria.value);
+      
+      // Adiciona os modelos de certificado
+      const inputModeloParticipante = document.getElementById('input-modelo-certificado-participante');
+      const inputModeloOrganizador = document.getElementById('input-modelo-certificado-organizador');
+      formData.append('modelo_certificado_participante', inputModeloParticipante ? inputModeloParticipante.value : 'ModeloExemplo.pptx');
+      formData.append('modelo_certificado_organizador', inputModeloOrganizador ? inputModeloOrganizador.value : 'ModeloExemploOrganizador.pptx');
 
       // Validação adicional de datas de inscrição
       if (inputDataInicioInscricao.value && inputHorarioInicioInscricao.value) {
@@ -1091,6 +1123,22 @@
             }
 
             if (description) description.textContent = inputDescricao.value;
+            
+            // Atualizar exibição dos modelos de certificado
+            const modeloParticipanteDisplay = document.getElementById('modelo-participante');
+            const modeloOrganizadorDisplay = document.getElementById('modelo-organizador');
+            const inputModeloParticipante = document.getElementById('input-modelo-certificado-participante');
+            const inputModeloOrganizador = document.getElementById('input-modelo-certificado-organizador');
+            
+            if (modeloParticipanteDisplay && inputModeloParticipante) {
+              const valor = inputModeloParticipante.value;
+              modeloParticipanteDisplay.textContent = (valor === 'ModeloExemplo.pptx' ? 'Modelo Padrão' : valor);
+            }
+            
+            if (modeloOrganizadorDisplay && inputModeloOrganizador) {
+              const valor = inputModeloOrganizador.value;
+              modeloOrganizadorDisplay.textContent = (valor === 'ModeloExemploOrganizador.pptx' ? 'Modelo Padrão' : valor);
+            }
 
             // Atualizar dadosOriginaisEvento para refletir as mudanças
             dadosOriginaisEvento.nome = inputNome.value;
@@ -1100,6 +1148,8 @@
             dadosOriginaisEvento.modalidade = inputModalidade.value;
             dadosOriginaisEvento.certificado = inputCertificado.value;
             dadosOriginaisEvento.descricao = inputDescricao.value;
+            dadosOriginaisEvento.modeloCertificadoParticipante = inputModeloParticipante ? inputModeloParticipante.value : 'ModeloExemplo.pptx';
+            dadosOriginaisEvento.modeloCertificadoOrganizador = inputModeloOrganizador ? inputModeloOrganizador.value : 'ModeloExemploOrganizador.pptx';
             
             // Atualizar datas formatadas
             if (inputDataInicio.value) {
@@ -1661,4 +1711,186 @@
   } else {
     inicializarCartaoEventoOrganizando();
   }
+
+  // ====== FUNÇÕES DO MODAL DE TEMPLATE ======
+  let tipoTemplateAtual = null;
+
+  window.abrirModalTemplate = function(tipo) {
+    tipoTemplateAtual = tipo;
+    const modal = document.getElementById('modal-template');
+    if (modal) {
+      modal.classList.add('ativo');
+      bloquearScroll();
+      carregarModelosDisponiveis();
+      limparModalTemplate();
+    }
+  };
+
+  window.fecharModalTemplate = function() {
+    tipoTemplateAtual = null;
+    const modal = document.getElementById('modal-template');
+    if (modal) {
+      modal.classList.remove('ativo');
+      desbloquearScroll();
+      limparModalTemplate();
+    }
+  };
+
+  window.fecharModalTemplateSeForFundo = function(event) {
+    if (event.target.id === 'modal-template') {
+      fecharModalTemplate();
+    }
+  };
+
+  function limparModalTemplate() {
+    const fileInput = document.getElementById('template-file-input');
+    if (fileInput) fileInput.value = '';
+    const fileInfo = document.getElementById('file-selected-info');
+    if (fileInfo) fileInfo.style.display = 'none';
+    const btnEnviar = document.getElementById('btn-enviar-template');
+    if (btnEnviar) btnEnviar.disabled = true;
+  }
+
+  function carregarModelosDisponiveis() {
+    fetch('ListarModelosCertificado.php')
+      .then(r => r.json())
+      .then(data => {
+        if (data.sucesso && data.templates) {
+          atualizarSelectsModelos(data.templates);
+        }
+      })
+      .catch(err => console.error('Erro ao carregar modelos:', err));
+  }
+
+  function atualizarSelectsModelos(templates) {
+    const selectParticipante = document.getElementById('input-modelo-certificado-participante');
+    const selectOrganizador = document.getElementById('input-modelo-certificado-organizador');
+    
+    // Salva os valores atuais selecionados (do select ou do objeto dadosOriginaisEvento)
+    const valorParticipanteAtual = selectParticipante ? selectParticipante.value : 
+                                   (dadosOriginaisEvento.modeloCertificadoParticipante || '');
+    const valorOrganizadorAtual = selectOrganizador ? selectOrganizador.value : 
+                                  (dadosOriginaisEvento.modeloCertificadoOrganizador || '');
+    
+    // Limpa opções atuais (exceto a primeira que é o padrão)
+    while (selectParticipante && selectParticipante.options.length > 1) {
+      selectParticipante.remove(1);
+    }
+    while (selectOrganizador && selectOrganizador.options.length > 1) {
+      selectOrganizador.remove(1);
+    }
+    
+    // Adiciona templates personalizados
+    templates.forEach(template => {
+      if (!template.padrao) {
+        if (selectParticipante) {
+          const optionParticipante = new Option(template.nomeExibicao, template.nome);
+          selectParticipante.add(optionParticipante);
+        }
+        if (selectOrganizador) {
+          const optionOrganizador = new Option(template.nomeExibicao, template.nome);
+          selectOrganizador.add(optionOrganizador);
+        }
+      }
+    });
+    
+    // Restaura os valores selecionados após adicionar as opções
+    if (selectParticipante && valorParticipanteAtual) {
+      selectParticipante.value = valorParticipanteAtual;
+      // Se o valor não existe mais nas opções (arquivo foi deletado), volta ao padrão
+      if (selectParticipante.value !== valorParticipanteAtual) {
+        console.warn('Modelo participante não encontrado:', valorParticipanteAtual, '- usando padrão');
+        selectParticipante.value = 'ModeloExemplo.pptx';
+      }
+    }
+    
+    if (selectOrganizador && valorOrganizadorAtual) {
+      selectOrganizador.value = valorOrganizadorAtual;
+      // Se o valor não existe mais nas opções (arquivo foi deletado), volta ao padrão
+      if (selectOrganizador.value !== valorOrganizadorAtual) {
+        console.warn('Modelo organizador não encontrado:', valorOrganizadorAtual, '- usando padrão');
+        selectOrganizador.value = 'ModeloExemploOrganizador.pptx';
+      }
+    }
+  }
+
+  window.arquivoTemplateSelecionado = function(event) {
+    const arquivo = event.target.files[0];
+    if (arquivo) {
+      const extensao = arquivo.name.split('.').pop().toLowerCase();
+      const extensoesPermitidas = ['pptx', 'ppt', 'odp'];
+      
+      if (!extensoesPermitidas.includes(extensao)) {
+        alert('Formato não permitido. Use: PPTX, PPT ou ODP');
+        event.target.value = '';
+        return;
+      }
+      
+      const tamanhoMaxMB = 50;
+      const tamanhoMB = arquivo.size / 1024 / 1024;
+      
+      if (tamanhoMB > tamanhoMaxMB) {
+        alert(`Arquivo muito grande (${tamanhoMB.toFixed(2)}MB). Tamanho máximo: ${tamanhoMaxMB}MB`);
+        event.target.value = '';
+        return;
+      }
+      
+      document.getElementById('file-name').textContent = arquivo.name;
+      document.getElementById('file-selected-info').style.display = 'block';
+      document.getElementById('btn-enviar-template').disabled = false;
+    }
+  };
+
+  window.enviarModeloTemplate = function() {
+    const fileInput = document.getElementById('template-file-input');
+    const arquivo = fileInput.files[0];
+    
+    if (!arquivo) {
+      alert('Nenhum arquivo selecionado');
+      return;
+    }
+    
+    const formData = new FormData();
+    formData.append('modelo_certificado', arquivo);
+    
+    const btnEnviar = document.getElementById('btn-enviar-template');
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = 'Enviando...';
+    
+    fetch('UploadModeloCertificado.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.sucesso) {
+        alert(data.mensagem || 'Modelo enviado com sucesso!');
+        
+        // Adiciona o novo modelo ao select apropriado
+        const selectId = tipoTemplateAtual === 'participante' 
+          ? 'input-modelo-certificado-participante' 
+          : 'input-modelo-certificado-organizador';
+        const select = document.getElementById(selectId);
+        const novaOpcao = new Option(data.nomeOriginal, data.nomeArquivo);
+        select.add(novaOpcao);
+        select.value = data.nomeArquivo;
+        
+        fecharModalTemplate();
+        
+        // Recarrega a lista completa
+        carregarModelosDisponiveis();
+      } else {
+        alert('Erro: ' + (data.erro || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao enviar arquivo: ' + error.message);
+    })
+    .finally(() => {
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = 'Enviar';
+    });
+  };
+
 })();

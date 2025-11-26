@@ -2,7 +2,7 @@
 
 // ============= MODO TESTE =============
 // Defina como true para desativar algumas validações durante testes
-const MODO_TESTE_LOGIN = true; // Mude para false para ativar validações
+const MODO_TESTE_LOGIN = false; // Mude para false para ativar validações
 
 function validarLogin() {
     var campoEmail = document.getElementById('email');

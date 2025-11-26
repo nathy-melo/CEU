@@ -176,41 +176,64 @@ class GerenciadorNotificacoes {
             });
             const tipoTexto = this.obterTextoTipo(notif.tipo);
             
-            // Formata mensagem se for de participante
-            let mensagemFormatada = this.escaparHTML(notif.mensagem);
+            // Formata mensagem se for de participante ou organizador
             let isMensagemParticipante = notif.tipo === 'mensagem_participante';
+            let isMensagemOrganizador = notif.tipo === 'mensagem_organizador';
             let remetenteInfo = '';
-            let eventoInfo = '';
-            let mensagemTexto = mensagemFormatada;
+            let mensagemTexto = '';
             
-            if (isMensagemParticipante) {
-                // Formato: CPF|||NOME|||EVENTO|||MENSAGEM
+            if (isMensagemParticipante || isMensagemOrganizador) {
+                // Formato: CPF|||NOME|||EVENTO|||MENSAGEM (para participante) ou CPF|||NOME|||TÍTULO|||CONTEÚDO (para organizador)
                 const partes = notif.mensagem.split('|||');
                 if (partes.length >= 4) {
-                    const cpfRemetente = partes[0];
-                    const nomeRemetente = this.escaparHTML(partes[1]);
-                    const nomeEvento = this.escaparHTML(partes[2]);
-                    mensagemTexto = this.escaparHTML(partes.slice(3).join('|||'));
+                    const cpfRemetente = partes[0].trim();
+                    const cpfMascarado = this.mascararCPF(cpfRemetente);
+                    const nomeRemetente = this.escaparHTML(partes[1].trim());
+                    const terceiroItem = this.escaparHTML(partes[2].trim()); // EVENTO ou TÍTULO
+                    const conteudoMsg = this.escaparHTML(partes.slice(3).join('|||').trim());
                     
                     // Trunca mensagem se muito longa
-                    if (mensagemTexto.length > 100) {
-                        mensagemTexto = mensagemTexto.substring(0, 97) + '...';
+                    let mensagemPreview = conteudoMsg;
+                    if (mensagemPreview.length > 80) {
+                        mensagemPreview = mensagemPreview.substring(0, 77) + '...';
+                    }
+                    
+                    // Formata diferente para participante e organizador
+                    let detalhesAdicionais = '';
+                    if (isMensagemParticipante) {
+                        detalhesAdicionais = `💬 <strong>${cpfMascarado}</strong> em ${terceiroItem}`;
+                    } else {
+                        detalhesAdicionais = `💬 <strong>${cpfMascarado}</strong> • ${terceiroItem}`;
                     }
                     
                     remetenteInfo = `<div class="notif-remetente-info">
-                        <strong>${nomeRemetente}</strong>
-                        <span class="notif-evento-nome">${nomeEvento}</span>
+                        <div style="margin-bottom: 4px;">
+                            <div style="font-size: 0.95rem; color: #FFF; font-weight: 600;">${nomeRemetente}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 2px;">${detalhesAdicionais}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 6px; border-radius: 3px; border-left: 3px solid #6598D2; font-size: 0.85rem; line-height: 1.4; color: #FFF; margin-top: 4px;">${mensagemPreview}</div>
                     </div>`;
+                    
+                    // A mensagem já será mostrada no preview acima
+                    mensagemTexto = '';
+                } else {
+                    // Se não conseguir fazer parsing, mostra a mensagem completa
+                    mensagemTexto = this.escaparHTML(notif.mensagem);
+                    if (mensagemTexto.length > 100) {
+                        mensagemTexto = mensagemTexto.substring(0, 97) + '...';
+                    }
                 }
             } else {
+                // Outros tipos de notificação
+                mensagemTexto = this.escaparHTML(notif.mensagem);
                 // Trunca mensagem se muito longa
-                if (mensagemTexto.length > 120) {
-                    mensagemTexto = mensagemTexto.substring(0, 117) + '...';
+                if (mensagemTexto.length > 100) {
+                    mensagemTexto = mensagemTexto.substring(0, 97) + '...';
                 }
             }
 
             html += `
-            <div class="notificacao-item-dropdown ${isMensagemParticipante ? 'notif-mensagem' : ''}" onclick="window.gerenciadorNotificacoes?.marcarComoLida(${notif.id})">
+            <div class="notificacao-item-dropdown ${(isMensagemParticipante || isMensagemOrganizador) ? 'notif-mensagem' : ''}" onclick="window.gerenciadorNotificacoes?.marcarComoLida(${notif.id})">
                 <div class="notificacao-header-dropdown">
                     <div class="notificacao-tipo">
                         ${tipoTexto}
@@ -277,6 +300,7 @@ class GerenciadorNotificacoes {
             'evento_prestes_iniciar': '<img src="../Imagens/notif-relogio.svg" class="notif-icon"> Evento iniciando',
             'novo_participante': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Novo participante',
             'mensagem_participante': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Mensagem',
+            'mensagem_organizador': '<img src="../Imagens/notif-usuario.svg" class="notif-icon"> Mensagem do organizador',
             'solicitacao_colaborador': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Solicitação de colaboração',
             'colaboracao_aprovada': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Colaboração aprovada',
             'colaboracao_recusada': '<img src="../Imagens/notif-geral.svg" class="notif-icon"> Colaboração recusada',
@@ -296,6 +320,17 @@ class GerenciadorNotificacoes {
             "'": '&#039;'
         };
         return texto.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    mascararCPF(cpf) {
+        // Remove caracteres não numéricos
+        const apenasNumeros = cpf.replace(/\D/g, '');
+        if (apenasNumeros.length < 5) return cpf;
+        
+        // Mostra apenas os 3 primeiros e 2 últimos dígitos
+        const primeiros3 = apenasNumeros.substring(0, 3);
+        const ultimos2 = apenasNumeros.substring(apenasNumeros.length - 2);
+        return `${primeiros3}.***.**-${ultimos2}`;
     }
 
     destruir() {

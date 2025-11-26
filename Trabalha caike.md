@@ -17,7 +17,7 @@
 - Corrigir responsividade e otimização do site (está pesado e ruim até em notebook)  
   **Dificuldade:** Alta
 
-- Corrigir parte de certificação que está muito pesada/lenta para emitir certificado  
+- ✅ Corrigir parte de certificação que está muito pesada/lenta para emitir certificado  
   **Dificuldade:** Alta
 
 - ✅ Corrigir setas laterais mudando de cor (branca/preta) de forma inconsistente  
@@ -29,8 +29,11 @@
 - ✅ Corrigir importar/exportar no gerenciador (cores erradas)  
   **Dificuldade:** Baixa - **CONCLUÍDO** (Cores dos modais corrigidas de branco para cinza-escuro)
 
+- ✅ Melhorar mensagem notificação  
+  **Dificuldade:** Baixa - **CONCLUÍDO** (Mensagens agora mostram remetente, evento e conteúdo formatados de forma clara e legível, sem os separadores confusos)
+
 ### 2. Melhorias de Usabilidade e Organização
-- Limitar quantidade de eventos exibidos (máx. 72, inicia com 16, opção de "Ver eventos já finalizados" no rodapé)  
+- Limitar quantidade de eventos exibidos (máx. 72, inicia com 16, opção de "Ver eventos já finalizados" no rodapé e no filtro)  
   **Dificuldade:** Média
 
 - Implementar a mesma limitação de exibição em tabelas de participantes e admin  
@@ -49,8 +52,8 @@
 - ✅ Alterar botão para enviar certificado após confirmação de presença do participante  
   **Dificuldade:** Baixa
 
-- Adicionar modelo de certificado ao criar/editar evento  
-  **Dificuldade:** Média
+- ✅ Adicionar modelo de certificado ao criar/editar evento  
+  **Dificuldade:** Média - **CONCLUÍDO** (Organizador pode selecionar/fazer upload de modelos personalizados de certificado para participantes e organizadores)
 
 - ✅ Adicionar botão de "Verificar Certificado" no index  
   **Dificuldade:** Baixa

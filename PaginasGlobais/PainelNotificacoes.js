@@ -2,9 +2,15 @@
 // PAINEL DE NOTIFICAÇÕES - SISTEMA COMPLETO
 // ==================================================
 
-let notificacoesGlobal = [];
-let filtroAtual = 'todas';
-let intervalID = null;
+if (typeof notificacoesGlobal === 'undefined') {
+    var notificacoesGlobal = [];
+}
+if (typeof filtroAtual === 'undefined') {
+    var filtroAtual = 'todas';
+}
+if (typeof intervalID === 'undefined') {
+    var intervalID = null;
+}
 
 // Log inicial desabilitado para reduzir ruído no console
 
@@ -148,16 +154,18 @@ function mostrarNotificacoes() {
         
         const tipoClass = notif.tipo.replace(/_/g, '-');
         const isMensagemParticipante = notif.tipo === 'mensagem_participante';
+        const isMensagemOrganizador = notif.tipo === 'mensagem_organizador';
+        const isMensagem = isMensagemParticipante || isMensagemOrganizador;
         
-        // Extrai dados se for mensagem de participante
+        // Extrai dados se for mensagem de participante ou organizador
         let cpfRemetente = null;
         let nomeRemetente = '';
-        let nomeEvento = '';
+        let nomeEvento = ''; // Para participante é evento, para organizador é título
         let mensagemTexto = '';
         let codEvento = notif.cod_evento || null;
         
-        if (isMensagemParticipante) {
-            // Formato: CPF|||NOME|||EVENTO|||MENSAGEM
+        if (isMensagem) {
+            // Formato: CPF|||NOME|||EVENTO/TÍTULO|||MENSAGEM/CONTEÚDO
             const partes = notif.mensagem.split('|||');
             if (partes.length >= 4) {
                 cpfRemetente = partes[0];
@@ -167,13 +175,13 @@ function mostrarNotificacoes() {
             }
         }
         
-        // Formata mensagem HTML se for mensagem de participante
+        // Formata mensagem HTML se for mensagem de participante ou organizador
         let mensagemFormatada = notif.mensagem;
         let carregandoThread = false;
-        if (isMensagemParticipante && cpfRemetente) {
-            // Inicialmente mostra mensagem simples, depois carrega thread
+        if (isMensagem && cpfRemetente) {
+            // Inicialmente mostra mensagem simples, depois carrega thread se for de participante
             mensagemFormatada = formatarMensagemSimples(cpfRemetente, nomeRemetente, nomeEvento, mensagemTexto, codEvento);
-            carregandoThread = true;
+            carregandoThread = isMensagemParticipante; // Só carrega thread para mensagens de participante
         }
         
         html += `
@@ -576,9 +584,11 @@ function traduzirTipo(tipo, apenasTexto = false) {
 }
 
 // Variáveis globais para o modal de resposta
-let cpfRemetenteAtual = null;
-let codEventoAtual = null;
-let mensagemOriginalAtual = null;
+if (typeof cpfRemetenteAtual === 'undefined') {
+    window.cpfRemetenteAtual = null;
+    window.codEventoAtual = null;
+    window.mensagemOriginalAtual = null;
+}
 
 // Função para responder mensagem de participante (exposta globalmente)
 window.responderMensagemParticipante = function(cpfRemetente, codEvento, mensagemOriginal) {
@@ -592,9 +602,9 @@ window.responderMensagemParticipante = function(cpfRemetente, codEvento, mensage
         return;
     }
     
-    cpfRemetenteAtual = cpfLimpo;
-    codEventoAtual = codEventoInt;
-    mensagemOriginalAtual = mensagemOriginal || '';
+    window.cpfRemetenteAtual = cpfLimpo;
+    window.codEventoAtual = codEventoInt;
+    window.mensagemOriginalAtual = mensagemOriginal || '';
     
     // Aguarda um pouco para garantir que o DOM está pronto
     setTimeout(() => {
@@ -635,14 +645,14 @@ window.responderMensagemParticipante = function(cpfRemetente, codEvento, mensage
     }, 50);
 };
 
-// Função para fechar modal de resposta
+    // Função para fechar modal de resposta
 window.fecharModalResposta = function() {
     const modal = document.getElementById('modal-resposta-mensagem');
     if (modal) {
         modal.classList.remove('ativo');
         desbloquearScrollModal();
     }
-    cpfRemetenteAtual = null;
+    window.cpfRemetenteAtual = null;
     codEventoAtual = null;
     mensagemOriginalAtual = null;
     
@@ -672,7 +682,7 @@ function atualizarContadorResposta() {
 window.enviarRespostaMensagem = async function(event) {
     event.preventDefault();
     
-    if (!cpfRemetenteAtual || !codEventoAtual) {
+    if (!window.cpfRemetenteAtual || !window.codEventoAtual) {
         alert('Erro: Dados da mensagem não encontrados.');
         return;
     }
@@ -687,7 +697,7 @@ window.enviarRespostaMensagem = async function(event) {
     
     try {
         // Limpa o CPF (remove formatação se houver)
-        const cpfLimpo = cpfRemetenteAtual.replace(/\D/g, '');
+        const cpfLimpo = window.cpfRemetenteAtual.replace(/\D/g, '');
         
         // Verifica se o usuário é organizador ou participante pela URL
         const isOrganizador = window.location.pathname.includes('Organizador');
@@ -836,22 +846,37 @@ function nl2br(text) {
 }
 
 // Função para formatar mensagem simples (fallback)
+function mascararCPF(cpf) {
+    // Remove caracteres não numéricos
+    const apenasNumeros = cpf.replace(/\D/g, '');
+    if (apenasNumeros.length < 5) return cpf;
+    
+    // Mostra apenas os 3 primeiros e 2 últimos dígitos
+    const primeiros3 = apenasNumeros.substring(0, 3);
+    const ultimos2 = apenasNumeros.substring(apenasNumeros.length - 2);
+    return `${primeiros3}.***.**-${ultimos2}`;
+}
+
 function formatarMensagemSimples(cpfRemetente, nomeRemetente, nomeEvento, mensagemTexto, codEvento) {
     const nomeRemetenteEscapado = escapeHtml(nomeRemetente);
     const nomeEventoEscapado = escapeHtml(nomeEvento);
+    const cpfMascarado = mascararCPF(cpfRemetente);
     const mensagemEscapada = nl2br(escapeHtml(mensagemTexto));
     
+    // Trunca mensagem se muito longa para preview
+    let mensagemPreview = mensagemTexto;
+    if (mensagemPreview.length > 150) {
+        mensagemPreview = mensagemPreview.substring(0, 147) + '...';
+    }
+    const mensagemPreviewEscapada = nl2br(escapeHtml(mensagemPreview));
+    
     return '<div class="notif-mensagem-participante" data-cpf-remetente="' + escapeHtml(cpfRemetente) + '" data-cod-evento="' + codEvento + '">' +
-           '<div class="notif-remetente">' +
-           '<strong>De:</strong> ' + nomeRemetenteEscapado + '<br>' +
-           '<small>CPF: ' + escapeHtml(cpfRemetente) + '</small>' +
+           '<div style="background: rgba(101, 152, 210, 0.15); padding: 0.8rem; border-radius: 0.4rem; border-left: 3px solid #6598D2; margin-bottom: 0.8rem;">' +
+           '<strong style="color: #6598D2; font-size: 0.95rem;">📧 ' + nomeRemetenteEscapado + '</strong>' +
+           '<div style="font-size: 0.85rem; opacity: 0.8; margin-top: 4px;">CPF: <strong>' + cpfMascarado + '</strong> em <strong style="color: #FFF;">' + nomeEventoEscapado + '</strong></div>' +
            '</div>' +
-           '<div class="notif-evento">' +
-           '<strong>Evento:</strong> ' + nomeEventoEscapado +
-           '</div>' +
-           '<div class="notif-conteudo">' +
-           '<strong>Mensagem:</strong><br>' +
-           '<div class="notif-texto-mensagem">' + mensagemEscapada + '</div>' +
+           '<div style="background: rgba(0, 0, 0, 0.2); padding: 1rem; border-radius: 0.4rem; border: 1px solid rgba(255, 255, 255, 0.1);">' +
+           '<div style="font-size: 0.9rem; line-height: 1.6; color: #FFF; white-space: pre-wrap; word-wrap: break-word;">' + mensagemPreviewEscapada + '</div>' +
            '</div>' +
            '</div>';
 }

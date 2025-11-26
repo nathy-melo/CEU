@@ -175,8 +175,8 @@ if (!$arquivoExiste) {
     try {
         // Buscar dados completos para regeneração
         $queryDados = "SELECT 
-                            u.Nome, u.CPF, 
-                            e.nome, e.duracao, e.lugar, e.inicio,
+                            u.Nome, u.CPF, u.Email, u.RA,
+                            e.nome, e.duracao, e.lugar, e.inicio, e.tipo_certificado,
                             o.Nome as nome_org
                         FROM usuario u
                         JOIN evento e ON e.cod_evento = ?
@@ -251,14 +251,25 @@ if (!$arquivoExiste) {
                     // Preparar dados para preenchimento
                     $dadosCert = [
                         'NomeParticipante' => $dados['Nome'],
-                        'CPF' => $dados['CPF'],
+                        'Email' => $dados['Email'] ?? '',
+                        'NumeroCPF' => $dados['CPF'],
                         'NomeEvento' => $dados['nome'],
+                        'Categoria' => strtolower($dados['tipo_certificado'] ?? 'sem certificacao'),
                         'LocalEvento' => $dados['lugar'] ?? '',
+                        'Data' => $dados['inicio'] ? date('d/m/Y', strtotime($dados['inicio'])) : '',
                         'DataEvento' => $dados['inicio'] ?? '',
-                        'CargaHoraria' => $dados['duracao'] ?? '',
+                        'CargaHoraria' => $dados['duracao'] ? $dados['duracao'] . ' horas' : '',
+                        'TipoCertificado' => $dados['tipo_certificado'] ?? 'Sem certificacao',
                         'CodigoVerificacao' => $codigoVerificacao,
-                        'DataEmissao' => date('d/m/Y H:i')
+                        'CodigoAutenticador' => $codigoVerificacao,
+                        'DataEmissao' => date('d/m/Y H:i'),
+                        'TipoParticipacao' => strtolower($tipo) === 'organizador' ? 'Organizador' : 'Participante'
                     ];
+
+                    // Adiciona RA se existir
+                    if (!empty($dados['RA'])) {
+                        $dadosCert['RA'] = $dados['RA'];
+                    }
 
                     // Se for certificado de PARTICIPANTE, adiciona o nome do organizador
                     // Se for de ORGANIZADOR, não adiciona (pois a própria pessoa é o organizador)

@@ -254,7 +254,6 @@ function formatar($txt) {
             width: 11cqi;
             height: 11cqi;
             border-radius: 100%;
-            background: var(--fundo-escuro-transparente);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -269,13 +268,11 @@ function formatar($txt) {
 
         .BotaoAcaoCard:hover {
             transform: scale(1.1);
-            background: var(--fundo-hover-transparente);
         }
 
         .BotaoAcaoCard img {
             width: 7cqi;
             height: 7cqi;
-            filter: invert(1);
             display: block;
         }
 
@@ -288,7 +285,6 @@ function formatar($txt) {
             aspect-ratio: 1 / 1;
             flex-shrink: 0;
             border-radius: 100% !important;
-            background: var(--fundo-escuro-transparente);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -298,7 +294,6 @@ function formatar($txt) {
         .BotaoFavoritosTrigger img {
             width: 1.25rem;
             height: 1.25rem;
-            filter: invert(1);
             display: block;
         }
 

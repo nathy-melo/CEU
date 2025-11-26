@@ -263,10 +263,13 @@ try {
                     evento.conclusao,
                     evento.duracao,
                     evento.certificado,
+                    evento.tipo_certificado,
                     evento.modalidade,
                     evento.imagem,
                     evento.inicio_inscricao,
                     evento.fim_inscricao,
+                    evento.modelo_certificado_participante,
+                    evento.modelo_certificado_organizador,
                     usuario.Nome as nome_organizador
                 FROM evento
                 INNER JOIN organiza ON evento.cod_evento = organiza.cod_evento
@@ -352,7 +355,9 @@ try {
                 'data_fim_inscricao' => $dataFimInscricao,
                 'hora_fim_inscricao' => $horaFimInscricao,
                 'data_inicio_inscricao_para_input' => $dataInicioInscricaoParaInput,
-                'data_fim_inscricao_para_input' => $dataFimInscricaoParaInput
+                'data_fim_inscricao_para_input' => $dataFimInscricaoParaInput,
+                'modelo_certificado_participante' => $dadosEvento['modelo_certificado_participante'] ?: 'ModeloExemplo.pptx',
+                'modelo_certificado_organizador' => $dadosEvento['modelo_certificado_organizador'] ?: 'ModeloExemploOrganizador.pptx'
             ];
 
             mysqli_stmt_close($stmt);

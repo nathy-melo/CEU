@@ -42,6 +42,8 @@ $certificadoEvento = $_POST['certificado'] ?? '';
 $descricaoEvento = $_POST['descricao'] ?? '';
 $duracaoEvento = isset($_POST['duracao']) ? floatval($_POST['duracao']) : 0;
 $imagensParaRemover = isset($_POST['imagens_remover']) ? json_decode($_POST['imagens_remover'], true) : [];
+$modeloCertificadoParticipante = $_POST['modelo_certificado_participante'] ?? 'ModeloExemplo.pptx';
+$modeloCertificadoOrganizador = $_POST['modelo_certificado_organizador'] ?? 'ModeloExemploOrganizador.pptx';
 
 // Validação básica dos campos obrigatórios
 if ($codigoEvento <= 0) {
@@ -318,6 +320,8 @@ function garantirColunaEvento(mysqli $cx, string $coluna, string $definicao) {
 garantirColunaEvento($conexao, 'inicio_inscricao', 'DATETIME NULL');
 garantirColunaEvento($conexao, 'fim_inscricao', 'DATETIME NULL');
 garantirColunaEvento($conexao, 'tipo_certificado', "VARCHAR(50) NULL DEFAULT 'Sem certificacao'");
+garantirColunaEvento($conexao, 'modelo_certificado_participante', "VARCHAR(255) NULL DEFAULT 'ModeloExemplo.pptx'");
+garantirColunaEvento($conexao, 'modelo_certificado_organizador', "VARCHAR(255) NULL DEFAULT 'ModeloExemploOrganizador.pptx'");
 
 // Atualiza evento no banco de dados
 if ($deveAtualizarImagem) {
@@ -336,13 +340,15 @@ if ($deveAtualizarImagem) {
                     imagem = ?,
                     inicio_inscricao = ?,
                     fim_inscricao = ?,
-                    tipo_certificado = ?
+                    tipo_certificado = ?,
+                    modelo_certificado_participante = ?,
+                    modelo_certificado_organizador = ?
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
     mysqli_stmt_bind_param(
         $declaracaoAtualizacao,
-        "sssssssdissssis",
+        "sssssssdisssssssi",
         $categoriaEvento,
         $nomeEvento,
         $localEvento,
@@ -357,6 +363,8 @@ if ($deveAtualizarImagem) {
         $inicioInscricao,
         $fimInscricao,
         $certificadoEvento,
+        $modeloCertificadoParticipante,
+        $modeloCertificadoOrganizador,
         $codigoEvento
     );
     
@@ -388,14 +396,16 @@ if ($deveAtualizarImagem) {
                     modalidade = ?,
                     inicio_inscricao = ?,
                     fim_inscricao = ?,
-                    tipo_certificado = ?
+                    tipo_certificado = ?,
+                    modelo_certificado_participante = ?,
+                    modelo_certificado_organizador = ?
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
-    // Tipos corretos: categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), cod_evento(i)
+    // Tipos corretos: categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s), cod_evento(i)
     mysqli_stmt_bind_param(
         $declaracaoAtualizacao,
-        "sssssssdissssis",
+        "ssssssssdisssssi",
         $categoriaEvento,
         $nomeEvento,
         $localEvento,
@@ -409,6 +419,8 @@ if ($deveAtualizarImagem) {
         $inicioInscricao,
         $fimInscricao,
         $certificadoEvento,
+        $modeloCertificadoParticipante,
+        $modeloCertificadoOrganizador,
         $codigoEvento
     );
 }

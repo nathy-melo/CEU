@@ -1919,28 +1919,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .modal-editar {
         background-color: var(--branco);
         border-radius: 12px;
-        padding: 32px;
+        padding: 24px;
         max-width: 600px;
         width: 90%;
-        max-height: 90vh;
+        max-height: 70vh;
+        min-height: auto;
         overflow-y: auto;
+        overflow-x: hidden;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         position: relative;
         z-index: 10001;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-editar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-editar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+
+    .modal-editar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .modal-editar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
     }
 
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         color: #6598D2;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(101, 152, 210, 0.1);
     }
 
     .modal-header h2 {
         margin: 0;
         color: #6598D2;
-        font-size: 24px;
+        font-size: 20px;
+        flex: 1;
     }
 
     .btn-fechar-modal {
@@ -1964,23 +1989,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 14px;
     }
 
     .form-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         color: #6598D2;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .form-group input {
         width: 100%;
-        padding: 12px;
+        padding: 10px;
         border: 1px solid var(--azul-escuro);
-        border-radius: 8px;
-        font-size: 15px;
+        border-radius: 6px;
+        font-size: 14px;
         box-sizing: border-box;
         background-color: var(--branco);
     }
@@ -1999,9 +2024,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .modal-footer {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         justify-content: flex-end;
-        margin-top: 28px;
+        margin-top: 20px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        flex-wrap: wrap;
     }
 
     .btn-modal {
@@ -3319,25 +3347,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
 
             // Botões de ação da aba de Organização
-            const bindsOrganizacao = [{
-                    id: 'btn-adicionar-organizacao',
-                    fn: () => alert('Funcionalidade em desenvolvimento: Adicionar organizador pela aba de Organização do evento')
-                },
-                {
-                    id: 'btn-enviar-mensagem-organizacao',
-                    fn: () => alert('Funcionalidade em desenvolvimento: Enviar mensagem para organização')
-                }
-            ];
-            bindsOrganizacao.forEach(({
-                id,
-                fn
-            }) => {
-                const el = document.getElementById(id);
-                if (el && !el.dataset.bound) {
-                    el.dataset.bound = '1';
-                    el.addEventListener('click', fn);
-                }
-            });
+            // NOTA: Os botões de ação da organização são agora gerenciados pelo ConteudoOrganizacao.php
+            // que carrega dinamicamente com a função inicializarAcoesRapidas()
 
             // Botões de ação em massa
             const bindsMassa = [{

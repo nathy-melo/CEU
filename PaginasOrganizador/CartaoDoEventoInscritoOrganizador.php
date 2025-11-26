@@ -730,7 +730,6 @@
         width: 3.5rem;
         height: 3.5rem;
         border-radius: 100%;
-        background: var(--fundo-escuro-transparente);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -743,13 +742,11 @@
 
     .BotaoAcaoCartao:hover {
         transform: scale(1.1);
-        background: var(--fundo-hover-transparente);
     }
 
     .BotaoAcaoCartao img {
         width: 1.75rem;
         height: 1.75rem;
-        filter: invert(1);
         display: block;
     }
 

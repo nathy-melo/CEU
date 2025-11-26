@@ -45,8 +45,37 @@ $certificado = mysqli_fetch_assoc($resultado);
 mysqli_stmt_close($stmt);
 
 if (!$certificado) {
+    // Se não encontrou pelo código, tenta buscar pelo CPF do usuário + qualquer evento
+    // Isso é um fallback para certificados que podem estar com código inválido
+    $consultaAlternativa = "SELECT 
+                                c.cod_verificacao,
+                                c.cpf,
+                                c.cod_evento,
+                                c.arquivo,
+                                c.modelo,
+                                c.tipo,
+                                c.criado_em,
+                                u.Nome as nome_participante,
+                                e.nome as nome_evento
+                            FROM certificado c
+                            JOIN usuario u ON c.cpf = u.CPF
+                            JOIN evento e ON c.cod_evento = e.cod_evento
+                            WHERE c.cpf = ? 
+                            ORDER BY c.criado_em DESC
+                            LIMIT 1";
+    
+    $stmtAlt = mysqli_prepare($conexao, $consultaAlternativa);
+    $cpfAtual = $_SESSION['cpf'];
+    mysqli_stmt_bind_param($stmtAlt, "s", $cpfAtual);
+    mysqli_stmt_execute($stmtAlt);
+    $resultAlt = mysqli_stmt_get_result($stmtAlt);
+    $certificado = mysqli_fetch_assoc($resultAlt);
+    mysqli_stmt_close($stmtAlt);
+}
+
+if (!$certificado) {
     mysqli_close($conexao);
-    echo "<p style='color: red; padding: 20px;'>Certificado não encontrado.</p>";
+    echo "<p style='color: red; padding: 20px;'>Certificado não encontrado. Código fornecido: " . htmlspecialchars($codigoVerificacao) . "</p>";
     exit;
 }
 
@@ -164,8 +193,9 @@ $nomeEvento = $certificado['nome_evento'];
 $dataEmissao = date('d/m/Y H:i', strtotime($certificado['criado_em']));
 $tipoCertificado = ucfirst($certificado['tipo']);
 
-// Verifica se o arquivo PDF existe
-$arquivoExiste = file_exists($arquivoPdf);
+// Verifica se o arquivo PDF existe (com path normalizado para file_exists)
+$arquivoPdfReal = str_replace('/', DIRECTORY_SEPARATOR, $arquivoPdf);
+$arquivoExiste = file_exists($arquivoPdfReal);
 $debugLog = []; // Array para logs de debug
 
 // Se não existe, tenta regenerar silenciosamente
@@ -175,8 +205,8 @@ if (!$arquivoExiste) {
     try {
         // Buscar dados completos para regeneração
         $queryDados = "SELECT 
-                            u.Nome, u.CPF, 
-                            e.nome, e.duracao, e.lugar, e.inicio,
+                            u.Nome, u.CPF, u.Email, u.RA,
+                            e.nome, e.duracao, e.lugar, e.inicio, e.tipo_certificado,
                             o.Nome as nome_org
                         FROM usuario u
                         JOIN evento e ON e.cod_evento = ?
@@ -251,14 +281,25 @@ if (!$arquivoExiste) {
                     // Preparar dados para preenchimento
                     $dadosCert = [
                         'NomeParticipante' => $dados['Nome'],
-                        'CPF' => $dados['CPF'],
+                        'Email' => $dados['Email'] ?? '',
+                        'NumeroCPF' => $dados['CPF'],
                         'NomeEvento' => $dados['nome'],
+                        'Categoria' => strtolower($dados['tipo_certificado'] ?? 'sem certificacao'),
                         'LocalEvento' => $dados['lugar'] ?? '',
+                        'Data' => $dados['inicio'] ? date('d/m/Y', strtotime($dados['inicio'])) : '',
                         'DataEvento' => $dados['inicio'] ?? '',
-                        'CargaHoraria' => $dados['duracao'] ?? '',
+                        'CargaHoraria' => $dados['duracao'] ? $dados['duracao'] . ' horas' : '',
+                        'TipoCertificado' => $dados['tipo_certificado'] ?? 'Sem certificacao',
                         'CodigoVerificacao' => $codigoVerificacao,
-                        'DataEmissao' => date('d/m/Y H:i')
+                        'CodigoAutenticador' => $codigoVerificacao,
+                        'DataEmissao' => date('d/m/Y H:i'),
+                        'TipoParticipacao' => strtolower($tipo) === 'organizador' ? 'Organizador' : 'Participante'
                     ];
+
+                    // Adiciona RA se existir
+                    if (!empty($dados['RA'])) {
+                        $dadosCert['RA'] = $dados['RA'];
+                    }
 
                     // Se for certificado de PARTICIPANTE, adiciona o nome do organizador
                     // Se for de ORGANIZADOR, não adiciona (pois a própria pessoa é o organizador)
@@ -281,7 +322,7 @@ if (!$arquivoExiste) {
 
                     // Extrair nome do arquivo original da coluna 'arquivo'
                     $arquivoOriginal = basename($certificado['arquivo']);
-                    $caminhoSaida = $pastaSaida . '/' . $arquivoOriginal;
+                    $caminhoSaida = $pastaSaida . DIRECTORY_SEPARATOR . $arquivoOriginal;
                     $debugLog[] = "Caminho de saída: $caminhoSaida";
 
                     // Gerar PDF
@@ -293,9 +334,9 @@ if (!$arquivoExiste) {
                     $sucesso = ($resultado['sucesso'] ?? $resultado['success'] ?? false);
 
                     if ($sucesso) {
-                        // Atualizar verificação
-                        $arquivoExiste = file_exists($arquivoPdf);
-                        $debugLog[] = "PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NÃO");
+                        // Atualizar verificação com caminho normalizado
+                        $arquivoExiste = file_exists($arquivoPdfReal);
+                        $debugLog[] = "PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NAO");
 
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {

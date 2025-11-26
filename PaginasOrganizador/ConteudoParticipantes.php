@@ -83,7 +83,7 @@
             <span id="total-participantes">Total de participantes: 0</span>
         </div>
 
-        <div class="envoltorio-tabela">
+        <div class="envoltorio-tabela table-wrapper">
             <table class="tabela-participantes">
                 <thead>
                     <tr>
@@ -101,6 +101,11 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Container para cards mobile -->
+        <div class="mobile-cards-container" id="mobile-cards-participantes">
+            <p style="text-align:center; padding:30px; color:var(--botao);">Carregando participantes...</p>
         </div>
     </div>
 </div>
@@ -520,100 +525,185 @@
     function renderizarParticipantes() {
         const tbody = document.getElementById('tbody-participantes');
         const totalSpan = document.getElementById('total-participantes');
+        const mobileContainer = document.getElementById('mobile-cards-participantes');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-        if (!tbody || !totalSpan) {
+        if (!tbody || !totalSpan || !mobileContainer) {
             return;
         }
 
         totalSpan.textContent = `Total de participantes: ${todosParticipantes.length}`;
 
+        // LIMPA ambos os containers sempre para evitar duplicação
+        tbody.innerHTML = '';
+        mobileContainer.innerHTML = '';
+
         if (todosParticipantes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">Nenhum participante inscrito neste evento ainda</td></tr>';
+            if (isMobile) {
+                mobileContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--botao);">Nenhum participante inscrito neste evento ainda</p>';
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">Nenhum participante inscrito neste evento ainda</td></tr>';
+            }
+            window.__lastParticipantesIsMobile = isMobile;
             return;
         }
 
-        tbody.innerHTML = todosParticipantes.map((p, i) => {
-            const statusPresenca = p.presenca_confirmada ?
-                '<span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span>' :
-                '<span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span>';
+        if (isMobile) {
+            // Renderizar cards mobile
+            let cardsHTML = '';
+            todosParticipantes.forEach((p, i) => {
+                const statusPresenca = p.presenca_confirmada ? 'Confirmada' : 'Não Confirmada';
+                const statusCertificado = p.certificado_emitido ? 'Enviado' : 'Não enviado';
 
-            const statusCertificado = p.certificado_emitido ?
-                '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
-                '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
+                let btnAcaoPrincipal = '';
+                if (p.certificado_emitido) {
+                    btnAcaoPrincipal = '';
+                } else if (p.presenca_confirmada) {
+                    btnAcaoPrincipal = `<button class="btn-small botao-azul" onclick="emitirCertificadoPart('${p.cpf}')"><img src="../Imagens/Certificado.svg" alt=""> Emitir Certificado</button>`;
+                } else {
+                    btnAcaoPrincipal = `<button class="btn-small botao-verde" onclick="confirmarPresencaPart('${p.cpf}')"><img src="../Imagens/Certo.svg" alt=""> Confirmar Presença</button>`;
+                }
 
-            // Lógica de progresso: Inscrição → Presença → Certificado
-            let btnAcaoPrincipal = '';
-            if (p.certificado_emitido) {
-                // Se certificado foi emitido, não mostra nada aqui
-                btnAcaoPrincipal = '';
-            } else if (p.presenca_confirmada) {
-                // Se presença está confirmada, mostra botão para emitir certificado
-                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoPart('${p.cpf}')">
-                    <span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt="">
-                </button>`;
-            } else {
-                // Se nem presença está confirmada, mostra botão para confirmar presença
-                btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaPart('${p.cpf}')">
-                    <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
-                </button>`;
-            }
+                let btnExcluir = '';
+                if (p.certificado_emitido) {
+                    btnExcluir = `<button class="btn-small botao-cinza" disabled title="Certificado do participante já foi emitido"><img src="../Imagens/Excluir.svg" alt=""> Excluir</button>`;
+                } else {
+                    btnExcluir = `<button class="btn-small botao-vermelho" onclick="excluirParticipantePart('${p.cpf}')"><img src="../Imagens/Excluir.svg" alt=""> Excluir</button>`;
+                }
 
-            // Botão excluir: desabilitado se certificado foi emitido
-            let btnExcluir = '';
-            if (p.certificado_emitido) {
-                btnExcluir = `<button class="botao botao-acao-tabela botao-cinza" disabled title="Certificado do participante já foi emitido. Não é possível excluir o participante.">
-                    <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
-                </button>`;
-            } else {
-                btnExcluir = `<button class="botao botao-acao-tabela botao-vermelho" onclick="excluirParticipantePart('${p.cpf}')">
-                    <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
-                </button>`;
-            }
+                const btnCertificado = p.certificado_emitido ?
+                    `<button class="btn-small botao-neutro" onclick="verificarCertificadoPart('${p.cod_verificacao || ''}')"><img src="../Imagens/Certificado.svg" alt=""> Ver Certificado</button>` : '';
 
-            const btnCertificado = p.certificado_emitido ?
-                '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoPart(\'' + (p.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
-                '';
-
-            return `
-            <tr data-cpf="${p.cpf}">
-                <td class="coluna-selecionar">
-                    <input type="checkbox" class="checkbox-selecionar checkbox-part" id="part-${i}" value="${p.cpf}">
-                </td>
-                <td class="coluna-dados">
-                    <p><strong>Nome:</strong> ${p.nome}</p>
-                    <p><strong>E-mail:</strong> ${p.email}</p>
-                    <p><strong>Registro Acadêmico:</strong> ${p.ra}</p>
-                    <p><strong>Data de Inscrição:</strong> ${p.data_inscricao}</p>
-                </td>
-                <td class="coluna-modificar">
-                    <div class="grupo-acoes">
-                        ${btnAcaoPrincipal}
-                        ${btnExcluir}
-                        <button class="botao botao-acao-tabela botao-neutro" onclick="editarDadosPart('${p.cpf}')">
-                            <span>Editar Dados</span><img src="../Imagens/Editar.svg" alt="">
-                        </button>
+                cardsHTML += `
+                    <div class="mobile-card" data-cpf="${p.cpf}">
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Selecionar</span>
+                            <span class="mobile-card-value">
+                                <input type="checkbox" class="checkbox-selecionar checkbox-part" id="part-mobile-${i}" value="${p.cpf}">
+                            </span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Nome</span>
+                            <span class="mobile-card-value"><strong>${p.nome}</strong></span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">E-mail</span>
+                            <span class="mobile-card-value">${p.email}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">RA</span>
+                            <span class="mobile-card-value">${p.ra}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Data de Inscrição</span>
+                            <span class="mobile-card-value">${p.data_inscricao}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Presença</span>
+                            <span class="mobile-card-value">${statusPresenca}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Certificado</span>
+                            <span class="mobile-card-value">${statusCertificado}</span>
+                        </div>
+                        <div class="mobile-card-actions">
+                            ${btnAcaoPrincipal}
+                            ${btnExcluir}
+                            <button class="btn-small botao-neutro" onclick="editarDadosPart('${p.cpf}')"><img src="../Imagens/Editar.svg" alt=""> Editar Dados</button>
+                            ${btnCertificado}
+                        </div>
                     </div>
-                </td>
-                <td class="coluna-status">
-                    <div class="grupo-status">
-                        <div class="linha-status"><span>Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
-                        <div class="linha-status"><span>Presença:</span>${statusPresenca}</div>
-                        <div class="linha-status"><span>Certificado:</span>${statusCertificado}</div>
-                        ${btnCertificado}
-                    </div>
-                </td>
-            </tr>
-        `;
-        }).join('');
+                `;
+            });
+            mobileContainer.innerHTML = cardsHTML;
+        } else {
+            // Renderizar tabela desktop
+            tbody.innerHTML = todosParticipantes.map((p, i) => {
+                const statusPresenca = p.presenca_confirmada ?
+                    '<span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span>' :
+                    '<span class="emblema-status negado">Não Confirmada <img src="../Imagens/Errado.svg" alt=""></span>';
+
+                const statusCertificado = p.certificado_emitido ?
+                    '<span class="emblema-status confirmado">Enviado <img src="../Imagens/Certo.svg" alt=""></span>' :
+                    '<span class="emblema-status negado">Não enviado <img src="../Imagens/Errado.svg" alt=""></span>';
+
+                let btnAcaoPrincipal = '';
+                if (p.certificado_emitido) {
+                    btnAcaoPrincipal = '';
+                } else if (p.presenca_confirmada) {
+                    btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-azul" onclick="emitirCertificadoPart('${p.cpf}')">
+                        <span>Emitir Certificado</span><img src="../Imagens/Certificado.svg" alt="">
+                    </button>`;
+                } else {
+                    btnAcaoPrincipal = `<button class="botao botao-acao-tabela botao-verde" onclick="confirmarPresencaPart('${p.cpf}')">
+                        <span>Confirmar Presença</span><img src="../Imagens/Certo.svg" alt="">
+                    </button>`;
+                }
+
+                let btnExcluir = '';
+                if (p.certificado_emitido) {
+                    btnExcluir = `<button class="botao botao-acao-tabela botao-cinza" disabled title="Certificado do participante já foi emitido. Não é possível excluir o participante.">
+                        <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
+                    </button>`;
+                } else {
+                    btnExcluir = `<button class="botao botao-acao-tabela botao-vermelho" onclick="excluirParticipantePart('${p.cpf}')">
+                        <span>Excluir Participante</span><img src="../Imagens/Excluir.svg" alt="">
+                    </button>`;
+                }
+
+                const btnCertificado = p.certificado_emitido ?
+                    '<button class="botao botao-acao-tabela botao-neutro" onclick="verificarCertificadoPart(\'' + (p.cod_verificacao || '') + '\')"><span>Verificar Certificado</span><img src="../Imagens/Certificado.svg" alt=""></button>' :
+                    '';
+
+                return `
+                <tr data-cpf="${p.cpf}">
+                    <td class="coluna-selecionar" data-label="Selecionar">
+                        <input type="checkbox" class="checkbox-selecionar checkbox-part" id="part-${i}" value="${p.cpf}">
+                    </td>
+                    <td class="coluna-dados" data-label="Dados do Participante">
+                        <p><strong>Nome:</strong> ${p.nome}</p>
+                        <p><strong>E-mail:</strong> ${p.email}</p>
+                        <p><strong>Registro Acadêmico:</strong> ${p.ra}</p>
+                        <p><strong>Data de Inscrição:</strong> ${p.data_inscricao}</p>
+                    </td>
+                    <td class="coluna-modificar" data-label="Modificar">
+                        <div class="grupo-acoes">
+                            ${btnAcaoPrincipal}
+                            ${btnExcluir}
+                            <button class="botao botao-acao-tabela botao-neutro" onclick="editarDadosPart('${p.cpf}')">
+                                <span>Editar Dados</span><img src="../Imagens/Editar.svg" alt="">
+                            </button>
+                        </div>
+                    </td>
+                    <td class="coluna-status" data-label="Status">
+                        <div class="grupo-status">
+                            <div class="linha-status"><span>Inscrição:</span><span class="emblema-status confirmado">Confirmada <img src="../Imagens/Certo.svg" alt=""></span></div>
+                            <div class="linha-status"><span>Presença:</span>${statusPresenca}</div>
+                            <div class="linha-status"><span>Certificado:</span>${statusCertificado}</div>
+                            ${btnCertificado}
+                        </div>
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+
+        // Armazena estado para detecção de resize
+        window.__lastParticipantesIsMobile = isMobile;
+
+        // Re-inicializa eventos após re-renderizar (quando muda entre mobile/desktop)
+        inicializarEventosParticipantes();
     }
 
     // Função para inicializar eventos
     function inicializarEventosParticipantes() {
-        // Checkboxes de seleção
+        // Checkboxes de seleção (funciona para tabela E cards mobile)
         document.addEventListener('change', function(e) {
             if (e.target.classList && e.target.classList.contains('checkbox-part')) {
-                const tr = e.target.closest('tr');
-                tr.classList.toggle('linha-selecionada', e.target.checked);
+                const container = e.target.closest('tr') || e.target.closest('.mobile-card');
+                if (container) {
+                    container.classList.toggle('linha-selecionada', e.target.checked);
+                }
                 e.target.checked ? participantesSelecionados.add(e.target.value) : participantesSelecionados.delete(e.target.value);
                 atualizarVisibilidadeBotoesAcaoPart();
                 atualizarTextoBotaoTogglePart();
@@ -635,14 +725,16 @@
                 if (todosSelecionados) {
                     document.querySelectorAll('.checkbox-part').forEach(cb => {
                         cb.checked = false;
-                        cb.closest('tr').classList.remove('linha-selecionada');
+                        const container = cb.closest('tr') || cb.closest('.mobile-card');
+                        if (container) container.classList.remove('linha-selecionada');
                         participantesSelecionados.delete(cb.value);
                     });
                 } else {
                     participantesSelecionados.clear();
                     document.querySelectorAll('.checkbox-part').forEach(cb => {
                         cb.checked = true;
-                        cb.closest('tr').classList.add('linha-selecionada');
+                        const container = cb.closest('tr') || cb.closest('.mobile-card');
+                        if (container) container.classList.add('linha-selecionada');
                         participantesSelecionados.add(cb.value);
                     });
                 }
@@ -786,25 +878,49 @@
 
     function filtrarParticipantes() {
         const tbody = document.getElementById('tbody-participantes');
-        if (!tbody || todosParticipantes.length === 0) return;
+        const mobileContainer = document.getElementById('mobile-cards-participantes');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+        if (!isMobile && (!tbody || todosParticipantes.length === 0)) return;
+        if (isMobile && (!mobileContainer || todosParticipantes.length === 0)) return;
 
         const termo = (document.getElementById('busca-participantes')?.value || '').toLowerCase();
         let visiveis = 0;
 
-        tbody.querySelectorAll('tr').forEach(linha => {
-            if (!linha.hasAttribute('data-cpf')) return;
-            const match = linha.textContent.toLowerCase().includes(termo);
-            linha.style.display = match ? '' : 'none';
-            if (match) visiveis++;
-        });
+        if (isMobile) {
+            // Filtrar cards mobile
+            mobileContainer.querySelectorAll('.mobile-card').forEach(card => {
+                const match = card.textContent.toLowerCase().includes(termo);
+                card.style.display = match ? '' : 'none';
+                if (match) visiveis++;
+            });
+        } else {
+            // Filtrar tabela desktop
+            tbody.querySelectorAll('tr').forEach(linha => {
+                if (!linha.hasAttribute('data-cpf')) return;
+                const match = linha.textContent.toLowerCase().includes(termo);
+                linha.style.display = match ? '' : 'none';
+                if (match) visiveis++;
+            });
+        }
 
         const idMsg = 'linha-sem-resultados-busca-part';
+        const container = isMobile ? mobileContainer : tbody;
         const existente = document.getElementById(idMsg);
+        
         if (visiveis === 0 && !existente) {
-            const tr = document.createElement('tr');
-            tr.id = idMsg;
-            tr.innerHTML = '<td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">Nenhum participante encontrado para a busca</td>';
-            tbody.appendChild(tr);
+            if (isMobile) {
+                const div = document.createElement('div');
+                div.id = idMsg;
+                div.style.cssText = 'text-align: center; padding: 30px; color: var(--botao);';
+                div.textContent = 'Nenhum participante encontrado para a busca';
+                container.appendChild(div);
+            } else {
+                const tr = document.createElement('tr');
+                tr.id = idMsg;
+                tr.innerHTML = '<td colspan="4" style="text-align: center; padding: 30px; color: var(--botao);">Nenhum participante encontrado para a busca</td>';
+                container.appendChild(tr);
+            }
         } else if (visiveis > 0 && existente) {
             existente.remove();
         }
@@ -1402,6 +1518,21 @@
 
     // Inicializa quando o conteúdo for carregado
     carregarParticipantes();
+
+    // Listener para resize: re-renderiza se mudar entre mobile e desktop
+    if (!window.__participantesResizeAttached) {
+        window.__participantesResizeAttached = true;
+        window.addEventListener('resize', () => {
+            const nowMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (nowMobile !== window.__lastParticipantesIsMobile && todosParticipantes && todosParticipantes.length > 0) {
+                renderizarParticipantes();
+            }
+        });
+    }
+
+    // Expõe funções globalmente para serem chamadas por GerenciarEvento.php
+    window.renderizarParticipantes = renderizarParticipantes;
+    window.carregarParticipantes = carregarParticipantes;
 </script>
 
 <!-- Modal: Escolher Formato de Exportação -->
@@ -2227,6 +2358,122 @@
             font-size: 12px;
             font-weight: 600;
             border-radius: 8px 8px 0 0;
+        }
+    }
+
+    /* ===== TRANSFORMAR TABELA EM CARDS NO MOBILE ===== */
+    @media (max-width: 768px) {
+        /* Oculta a tabela e mostra cards */
+        .envoltorio-tabela {
+            overflow: visible !important;
+        }
+
+        .envoltorio-tabela::before {
+            display: none;
+        }
+
+        .tabela-participantes {
+            display: none;
+        }
+
+        /* Container de cards */
+        .envoltorio-tabela::after {
+            content: '';
+            display: block;
+        }
+
+        /* Cria os cards a partir das linhas da tabela usando JavaScript */
+        .tabela-participantes tbody tr {
+            display: block;
+            background: var(--branco);
+            border: 1px solid var(--azul-escuro);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabela-participantes tbody tr:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tabela-participantes tbody tr td {
+            display: block;
+            border: none !important;
+            padding: 8px 0 !important;
+            text-align: left !important;
+        }
+
+        .tabela-participantes tbody tr td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--azul-escuro);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .tabela-participantes tbody tr td:first-child {
+            border-bottom: 2px solid var(--azul-escuro);
+            padding-bottom: 12px !important;
+            margin-bottom: 8px;
+            text-align: center !important;
+        }
+
+        .tabela-participantes tbody tr td:first-child::before {
+            content: none;
+        }
+
+        .tabela-participantes thead {
+            display: none;
+        }
+
+        /* Ajusta checkbox de seleção no card */
+        .tabela-participantes tbody tr td.coluna-selecionar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ajusta grupo de ações e status para melhor visualização em card */
+        .grupo-acoes,
+        .grupo-status {
+            min-width: auto;
+            width: 100%;
+        }
+
+        .botao-acao-tabela {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .linha-status {
+            justify-content: space-between;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tabela-participantes tbody tr {
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .tabela-participantes tbody tr td {
+            padding: 6px 0 !important;
+        }
+
+        .tabela-participantes tbody tr td::before {
+            font-size: 11px;
+        }
+
+        .coluna-dados p {
+            font-size: 12px !important;
+        }
+
+        .botao-acao-tabela {
+            padding: 8px 12px !important;
+            font-size: 11px !important;
         }
     }
 </style>

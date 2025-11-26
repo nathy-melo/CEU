@@ -1,6 +1,7 @@
 <?php
 // Endpoint para abrir/baixar certificado pelo código salvo no banco
 use CEU\Certificacao\RepositorioCertificados;
+use CEU\Certificacao\ProcessadorTemplate;
 
 $base = __DIR__;
 
@@ -19,6 +20,8 @@ if (!isset($conexao) || !($conexao instanceof mysqli)) {
 }
 
 require_once $base . '/RepositorioCertificados.php';
+require_once $base . '/ProcessadorTemplate.php';
+
 $repo = new RepositorioCertificados($conexao);
 $repo->garantirEsquema();
 
@@ -53,10 +56,68 @@ if (!$arquivoRel || strpos($arquivoRel, 'certificados/') !== 0) {
 }
 
 $caminhoArquivo = realpath($base . '/' . $arquivoRel);
+
+// Se arquivo não existe, tenta regenerar do banco de dados
 if (!$caminhoArquivo || !file_exists($caminhoArquivo)) {
-    http_response_code(404);
-    echo 'Arquivo do certificado não encontrado.';
-    exit;
+    // Verifica se temos dados no banco para regenerar
+    if (empty($registro['dados_array']) && empty($registro['dados'])) {
+        http_response_code(404);
+        echo 'Arquivo do certificado não encontrado e dados insuficientes para regeneração.';
+        exit;
+    }
+
+    try {
+        // Extrai dados JSON
+        $dados = $registro['dados_array'] ?? json_decode($registro['dados'], true) ?? [];
+        if (empty($dados)) {
+            throw new Exception('Dados do certificado vazios.');
+        }
+
+        // Localiza template
+        $modelo = $registro['modelo'] ?? 'certificado.docx';
+        $templatePath = $base . '/templates/' . $modelo;
+        if (!file_exists($templatePath)) {
+            throw new Exception('Template não encontrado: ' . $modelo);
+        }
+
+        // Garante diretório certificados
+        $dirCertificados = $base . '/certificados';
+        if (!is_dir($dirCertificados)) {
+            @mkdir($dirCertificados, 0775, true);
+        }
+
+        // Regenera PDF
+        $nomeArquivo = basename($arquivoRel);
+        $caminhoArquivo = $dirCertificados . DIRECTORY_SEPARATOR . $nomeArquivo;
+        
+        $autoloadPath = $base . DIRECTORY_SEPARATOR . 'bibliotecas' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+        if (!file_exists($autoloadPath)) {
+            throw new Exception('Autoload das bibliotecas não encontrado.');
+        }
+
+        $processador = new ProcessadorTemplate($autoloadPath);
+        $resultado = $processador->gerarPdfDeModelo($templatePath, $dados, $caminhoArquivo);
+
+        if (!$resultado['success']) {
+            throw new Exception('Falha ao gerar PDF: ' . ($resultado['message'] ?? 'Erro desconhecido'));
+        }
+
+        // Atualiza banco com novo caminho
+        $repo->salvarCertificado(
+            $codigo,
+            'certificados/' . $nomeArquivo,
+            $registro['modelo'] ?? null,
+            $registro['tipo'] ?? null,
+            $dados,
+            null,
+            null
+        );
+
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo 'Erro ao regenerar certificado: ' . htmlspecialchars($e->getMessage());
+        exit;
+    }
 }
 
 // Entrega inline no navegador

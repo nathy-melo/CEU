@@ -22,7 +22,9 @@ CREATE TABLE evento(
     modalidade ENUM('Presencial','Online','Híbrido') NOT NULL DEFAULT 'Presencial',
     imagem VARCHAR(255) NULL,
     inicio_inscricao DATETIME NULL,
-    fim_inscricao DATETIME NULL
+    fim_inscricao DATETIME NULL,
+    modelo_certificado_participante VARCHAR(255) NULL DEFAULT 'ModeloExemplo.pptx' COMMENT 'Nome do arquivo do modelo de certificado para participantes',
+    modelo_certificado_organizador VARCHAR(255) NULL DEFAULT 'ModeloExemploOrganizador.pptx' COMMENT 'Nome do arquivo do modelo de certificado para organizadores'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE certificado(
@@ -169,16 +171,19 @@ CREATE TABLE favoritos_evento (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
-('12345678901', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
-('123', 'Caike', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
-('1234', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0),
+('00247160127', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
+('12345678901', 'Caike Moreira', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
+('00247160126', 'Caike', 'ck@pceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', NULL, 0, 0),
 ('36528418080', 'Jean Victor Gonçalves Martins', 'jeanvictornet@gmail.com', '$2y$10$nC1jU07miJxHZ2n1xP9RDe9Lco.wPGE1KlLeXt1ZKLTVJTmGrtTJq', NULL, 0, 1),
-('59015506680', 'Jean Martins', 'j@gmail.com', '$2y$10$nC1jU07miJxHZ2n1xP9RDe9Lco.wPGE1KlLeXt1ZKLTVJTmGrtTJq', 'JEAN001', 1, 1);
+('59015506680', 'Jean Martins', 'j@gmail.com', '$2y$10$nC1jU07miJxHZ2n1xP9RDe9Lco.wPGE1KlLeXt1ZKLTVJTmGrtTJq', 'JEAN001', 1, 1),
+('67860353024', 'Aurora Sobrinho', 'aurora.sobrinho@ceu.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '4CT5LTDW', 1, 0),
+('14614273041', 'Elisa Sangalo', 'elisa.sangalo@ceu.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 0, 0);
 
 INSERT INTO codigos_organizador (codigo, ativo, usado, data_criacao, data_uso, usado_por, criado_por, observacoes) VALUES 
-('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código utilizado pela Aurora'),
-('CAIKE001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '123', 'SISTEMA', 'Código de teste - Caike - ck@ceu.com'),
-('JEAN001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '59015506680', 'SISTEMA', 'Código utilizado por Jean Martins');
+('CAIKE123', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '00247160127', 'SISTEMA', 'Código utilizado pela Aurora'),
+('CAIKE001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '12345678901', 'SISTEMA', 'Código de teste - Caike - ck@ceu.com'),
+('JEAN001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '59015506680', 'SISTEMA', 'Código utilizado por Jean Martins'),
+('4CT5LTDW', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '67860353024', 'SISTEMA', 'Código para Aurora Sobrinho');
 
 INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, tipo_certificado, modalidade, imagem, inicio_inscricao, fim_inscricao) VALUES
 (1, 'Workshop', 'Workshop de JavaScript', 'Sala 101', 'Aprenda conceitos básicos e avançados de JavaScript.', 'Todos', '2025-11-15 09:00:00', '2025-11-15 17:00:00', 8.0, 1, 'Ensino', 'Presencial', '/ImagensEventos/JavaScript_Workshop.png', '2025-10-15 08:00:00', '2025-11-14 23:59:59'),
@@ -224,18 +229,77 @@ INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (13, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0);
 
 INSERT INTO organiza (cod_evento, CPF) VALUES
-(1, '12345678901'), (2, '12345678901'), (3, '12345678901'), (4, '12345678901'),
-(5, '12345678901'), (6, '12345678901'), (7, '12345678901'), (8, '12345678901'),
-(9, '12345678901'), (10, '12345678901'), (11, '12345678901'), (12, '12345678901'),
-(13, '12345678901'), (14, '12345678901'), (15, '12345678901'), (16, '12345678901'),
-(17, '12345678901');
+(1, '12345678901'), (2, '67860353024'), (3, '00247160127'), (4, '00247160127'),
+(5, '00247160127'), (6, '00247160127'), (7, '12345678901'), (8, '12345678901'),
+(9, '00247160127'), (10, '00247160127'), (11, '00247160127'), (12, '00247160127'),
+(13, '00247160127'), (14, '00247160127'), (15, '00247160127'), (16, '00247160127'),
+(17, '00247160127');
 
 INSERT INTO colaboradores_evento (cod_evento, CPF, papel, criado_em) VALUES
-(1, '123', 'colaborador', CURRENT_TIMESTAMP),
-(7, '123', 'colaborador', CURRENT_TIMESTAMP);
+(1, '12345678901', 'colaborador', CURRENT_TIMESTAMP),
+(7, '12345678901', 'colaborador', CURRENT_TIMESTAMP),
+(1, '67860353024', 'colaborador', CURRENT_TIMESTAMP),
+(7, '67860353024', 'colaborador', CURRENT_TIMESTAMP);
 
 INSERT INTO inscricao (CPF, cod_evento, data_inscricao, status, presenca_confirmada, certificado_emitido) VALUES
-('1234', 1, CURRENT_TIMESTAMP, 'ativa', 0, 0);
+('00247160126', 1, CURRENT_TIMESTAMP, 'ativa', 0, 0),
+('14614273041', 1, CURRENT_TIMESTAMP, 'ativa', 1, 1),
+('14614273041', 2, CURRENT_TIMESTAMP, 'ativa', 1, 1);
+
+INSERT INTO certificado (cod_verificacao, modelo, tipo, arquivo, dados, cpf, cod_evento, criado_em) VALUES
+('ELSA001', 'ModeloExemplo.pptx', 'Participante', 'Certificacao/certificados/Certificado_CEU_ELSA001.pdf', 
+        JSON_OBJECT(
+            'NomeParticipante', 'Elisa Sangalo',
+            'Email', 'elisa@email.com',
+            'NumeroCPF', '14614273041',
+            'NomeEvento', 'Workshop de JavaScript',
+            'Categoria', 'ensino',
+            'LocalEvento', 'Sala 101',
+            'Data', '15/11/2025',
+            'DataEvento', '15/11/2025',
+            'CargaHoraria', '8 horas',
+            'TipoCertificado', 'Ensino',
+            'CodigoVerificacao', 'ELSA001',
+            'CodigoAutenticador', 'ELSA001',
+            'TipoParticipacao', 'Participante',
+            'NomeOrganizador', 'Aurora Sobrinho'
+        ),
+        '14614273041', 1, CURRENT_TIMESTAMP),
+('ELSA002', 'ModeloExemplo.pptx', 'Participante', 'Certificacao/certificados/Certificado_CEU_ELSA002.pdf',
+        JSON_OBJECT(
+            'NomeParticipante', 'Elisa Sangalo',
+            'Email', 'elisa@email.com',
+            'NumeroCPF', '14614273041',
+            'NomeEvento', 'Palestra sobre IA',
+            'Categoria', 'extensão',
+            'LocalEvento', 'Auditório Principal',
+            'Data', '20/11/2025',
+            'DataEvento', '20/11/2025',
+            'CargaHoraria', '2 horas',
+            'TipoCertificado', 'Extensão',
+            'CodigoVerificacao', 'ELSA002',
+            'CodigoAutenticador', 'ELSA002',
+            'TipoParticipacao', 'Participante',
+            'NomeOrganizador', 'Bernardo Silva'
+        ),
+        '14614273041', 2, CURRENT_TIMESTAMP),
+('AURO001', 'ModeloExemploOrganizador.pptx', 'Organizador', 'Certificacao/certificados/Certificado_CEU_AURO001.pdf',
+        JSON_OBJECT(
+            'NomeParticipante', 'Aurora Sobrinho',
+            'Email', 'aurora@ceu.edu.br',
+            'NumeroCPF', '67860353024',
+            'NomeEvento', 'Workshop de JavaScript',
+            'Categoria', 'ensino',
+            'LocalEvento', 'Sala 101',
+            'Data', '15/11/2025',
+            'DataEvento', '15/11/2025',
+            'CargaHoraria', '8 horas',
+            'TipoCertificado', 'Ensino',
+            'CodigoVerificacao', 'AURO001',
+            'CodigoAutenticador', 'AURO001',
+            'TipoParticipacao', 'Organizador'
+        ),
+        '67860353024', 1, CURRENT_TIMESTAMP);
 
 COMMIT;
 

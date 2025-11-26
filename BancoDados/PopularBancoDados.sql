@@ -1,6 +1,6 @@
 -- Script para Popular o Banco de Dados CEU com dados fictícios
 -- Execute este script após criar o banco de dados principal
--- Senha padrão para todos: senha123 (hash: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi)
+-- Senha padrão para todos: senha123 (hash: $2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.)
 
 USE CEU_bd;
 
@@ -8,7 +8,7 @@ USE CEU_bd;
 -- CÓDIGOS DE ORGANIZADOR (10 códigos válidos)
 -- ====================================
 INSERT INTO codigos_organizador (codigo, ativo, usado, criado_por, observacoes) VALUES 
-('4CT5LTDW', 1, 0, 'SISTEMA', 'Código disponível para organização'),
+('4CT5L8DW', 1, 0, 'SISTEMA', 'Código disponível para organização'),
 ('BF8T5H7L', 1, 0, 'SISTEMA', 'Código disponível para organização'),
 ('9TDMW2Z4', 1, 0, 'SISTEMA', 'Código disponível para organização'),
 ('45TYGRSW', 1, 0, 'SISTEMA', 'Código disponível para organização'),
@@ -23,73 +23,73 @@ INSERT INTO codigos_organizador (codigo, ativo, usado, criado_por, observacoes) 
 -- USUÁRIOS PARTICIPANTES (40 participantes comuns)
 -- ====================================
 -- Senha: senha123
--- Hash: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+-- Hash: $2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES
 -- Participantes 1-10
-('12345678911', 'Ana Clara Silva', 'ana.silva@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024001', NULL, 0, 0),
-('23456789012', 'Bruno Henrique Costa', 'bruno.costa@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024002', NULL, 0, 1),
-('34567890123', 'Carla Fernanda Souza', 'carla.souza@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024003', NULL, 0, 0),
-('45678901234', 'Daniel Rodrigues Lima', 'daniel.lima@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024004', NULL, 0, 1),
-('56789012345', 'Eduarda Santos Almeida', 'eduarda.almeida@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024005', NULL, 0, 0),
-('67890123456', 'Felipe Augusto Pereira', 'felipe.pereira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024006', NULL, 0, 1),
-('78901234567', 'Gabriela Martins Rocha', 'gabriela.rocha@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024007', NULL, 0, 0),
-('89012345678', 'Henrique Vieira Nascimento', 'henrique.nascimento@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024008', NULL, 0, 0),
-('90123456789', 'Isabela Cristina Oliveira', 'isabela.oliveira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024009', NULL, 0, 1),
-('01234567890', 'João Pedro Barbosa', 'joao.barbosa@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024010', NULL, 0, 0),
+('12345678911', 'Ana Clara Silva', 'ana.silva@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024001', NULL, 0, 0),
+('23456789012', 'Bruno Henrique Costa', 'bruno.costa@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024002', NULL, 0, 1),
+('34567890123', 'Carla Fernanda Souza', 'carla.souza@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024003', NULL, 0, 0),
+('45678901234', 'Daniel Rodrigues Lima', 'daniel.lima@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024004', NULL, 0, 1),
+('56789012345', 'Eduarda Santos Almeida', 'eduarda.almeida@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024005', NULL, 0, 0),
+('67890123456', 'Felipe Augusto Pereira', 'felipe.pereira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024006', NULL, 0, 1),
+('78901234567', 'Gabriela Martins Rocha', 'gabriela.rocha@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024007', NULL, 0, 0),
+('89012345678', 'Henrique Vieira Nascimento', 'henrique.nascimento@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024008', NULL, 0, 0),
+('90123456789', 'Isabela Cristina Oliveira', 'isabela.oliveira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024009', NULL, 0, 1),
+('01234567890', 'João Pedro Barbosa', 'joao.barbosa@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024010', NULL, 0, 0),
 
 -- Participantes 11-20
-('11234567890', 'Kelly Vitória Mendes', 'kelly.mendes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024011', NULL, 0, 1),
-('21234567890', 'Lucas Gabriel Cardoso', 'lucas.cardoso@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024012', NULL, 0, 0),
-('31234567890', 'Mariana Beatriz Dias', 'mariana.dias@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024013', NULL, 0, 1),
-('41234567890', 'Nicolas Eduardo Ribeiro', 'nicolas.ribeiro@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024014', NULL, 0, 0),
-('51234567890', 'Olivia Fernandes Castro', 'olivia.castro@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024015', NULL, 0, 1),
-('61234567890', 'Paulo Henrique Gomes', 'paulo.gomes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024016', NULL, 0, 0),
-('71234567890', 'Rafaela Cristine Moreira', 'rafaela.moreira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024017', NULL, 0, 1),
-('81234567890', 'Samuel José Correia', 'samuel.correia@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024018', NULL, 0, 0),
-('91234567890', 'Thais Amanda Freitas', 'thais.freitas@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024019', NULL, 0, 0),
-('10234567890', 'Vitor Hugo Pinto', 'vitor.pinto@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024020', NULL, 0, 1),
+('11234567890', 'Kelly Vitória Mendes', 'kelly.mendes@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024011', NULL, 0, 1),
+('21234567890', 'Lucas Gabriel Cardoso', 'lucas.cardoso@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024012', NULL, 0, 0),
+('31234567890', 'Mariana Beatriz Dias', 'mariana.dias@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024013', NULL, 0, 1),
+('41234567890', 'Nicolas Eduardo Ribeiro', 'nicolas.ribeiro@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024014', NULL, 0, 0),
+('51234567890', 'Olivia Fernandes Castro', 'olivia.castro@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024015', NULL, 0, 1),
+('61234567890', 'Paulo Henrique Gomes', 'paulo.gomes@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024016', NULL, 0, 0),
+('71234567890', 'Rafaela Cristine Moreira', 'rafaela.moreira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024017', NULL, 0, 1),
+('81234567890', 'Samuel José Correia', 'samuel.correia@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024018', NULL, 0, 0),
+('91234567890', 'Thais Amanda Freitas', 'thais.freitas@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024019', NULL, 0, 0),
+('10234567890', 'Vitor Hugo Pinto', 'vitor.pinto@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024020', NULL, 0, 1),
 
 -- Participantes 21-30
-('12345098765', 'Bruna Camila Reis', 'bruna.reis@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024021', NULL, 0, 0),
-('23456098765', 'Caio Matheus Azevedo', 'caio.azevedo@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024022', NULL, 0, 1),
-('34567098765', 'Diana Laura Monteiro', 'diana.monteiro@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024023', NULL, 0, 0),
-('45678098765', 'Eduardo Cesar Teixeira', 'eduardo.teixeira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024024', NULL, 0, 1),
-('56789098765', 'Fernanda Luiza Campos', 'fernanda.campos@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024025', NULL, 0, 0),
-('67890098765', 'Gustavo Rafael Nunes', 'gustavo.nunes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024026', NULL, 0, 1),
-('78901098765', 'Helena Sofia Araújo', 'helena.araujo@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024027', NULL, 0, 0),
-('89012098765', 'Igor Alexandre Batista', 'igor.batista@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024028', NULL, 0, 0),
-('90123098765', 'Juliana Carolina Barros', 'juliana.barros@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024029', NULL, 0, 1),
-('01234098765', 'Kaique Leonardo Silva', 'kaique.silva@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024030', NULL, 0, 0),
+('12345098765', 'Bruna Camila Reis', 'bruna.reis@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024021', NULL, 0, 0),
+('23456098765', 'Caio Matheus Azevedo', 'caio.azevedo@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024022', NULL, 0, 1),
+('34567098765', 'Diana Laura Monteiro', 'diana.monteiro@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024023', NULL, 0, 0),
+('45678098765', 'Eduardo Cesar Teixeira', 'eduardo.teixeira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024024', NULL, 0, 1),
+('56789098765', 'Fernanda Luiza Campos', 'fernanda.campos@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024025', NULL, 0, 0),
+('67890098765', 'Gustavo Rafael Nunes', 'gustavo.nunes@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024026', NULL, 0, 1),
+('78901098765', 'Helena Sofia Araújo', 'helena.araujo@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024027', NULL, 0, 0),
+('89012098765', 'Igor Alexandre Batista', 'igor.batista@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024028', NULL, 0, 0),
+('90123098765', 'Juliana Carolina Barros', 'juliana.barros@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024029', NULL, 0, 1),
+('01234098765', 'Kaique Leonardo Silva', 'kaique.silva@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024030', NULL, 0, 0),
 
 -- Participantes 31-40
-('11223344556', 'Larissa Fernanda Cruz', 'larissa.cruz@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024031', NULL, 0, 1),
-('22334455667', 'Marcos Vinicius Cunha', 'marcos.cunha@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024032', NULL, 0, 0),
-('33445566778', 'Natália Eduarda Farias', 'natalia.farias@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024033', NULL, 0, 1),
-('44556677889', 'Otávio Guilherme Soares', 'otavio.soares@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024034', NULL, 0, 0),
-('55667788990', 'Patricia Regina Lopes', 'patricia.lopes@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024035', NULL, 0, 1),
-('66778899001', 'Renan Felipe Duarte', 'renan.duarte@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024036', NULL, 0, 0),
-('77889900112', 'Sabrina Leticia Carvalho', 'sabrina.carvalho@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024037', NULL, 0, 1),
-('88990011223', 'Thiago André Miranda', 'thiago.miranda@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024038', NULL, 0, 0),
-('99001122334', 'Vanessa Louise Macedo', 'vanessa.macedo@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024039', NULL, 0, 0),
-('00112233445', 'Wesley Bruno Ferreira', 'wesley.ferreira@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024040', NULL, 0, 1);
+('11223344556', 'Larissa Fernanda Cruz', 'larissa.cruz@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024031', NULL, 0, 1),
+('22334455667', 'Marcos Vinicius Cunha', 'marcos.cunha@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024032', NULL, 0, 0),
+('33445566778', 'Natália Eduarda Farias', 'natalia.farias@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024033', NULL, 0, 1),
+('44556677889', 'Otávio Guilherme Soares', 'otavio.soares@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024034', NULL, 0, 0),
+('55667788990', 'Patricia Regina Lopes', 'patricia.lopes@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024035', NULL, 0, 1),
+('66778899001', 'Renan Felipe Duarte', 'renan.duarte@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024036', NULL, 0, 0),
+('77889900112', 'Sabrina Leticia Carvalho', 'sabrina.carvalho@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024037', NULL, 0, 1),
+('88990011223', 'Thiago André Miranda', 'thiago.miranda@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024038', NULL, 0, 0),
+('99001122334', 'Vanessa Louise Macedo', 'vanessa.macedo@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024039', NULL, 0, 0),
+('00112233445', 'Wesley Bruno Ferreira', 'wesley.ferreira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024040', NULL, 0, 1);
 
 -- ====================================
 -- USUÁRIOS ORGANIZADORES (10 organizadores com códigos)
 -- ====================================
 INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES
-('10987654321', 'Amanda Cristina', 'amanda@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'HG69KZMJ', 1, 0),
-('20987654321', 'Bernardo Silva', 'bernardo@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'BF8T5H7L', 1, 1),
-('30987654321', 'Camila Rodrigues', 'camila@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, '9TDMW2Z4', 1, 0),
-('40987654321', 'Diego Santos', 'diego@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, '45TYGRSW', 1, 1),
-('50987654321', 'Eliane Costa', 'eliane@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'KA9JA7RP', 1, 0),
-('60987654321', 'Fábio Almeida', 'fabio@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'BF3EF84L', 1, 1),
-('70987654321', 'Giulia Pereira', 'giulia@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'CMQ6KXNS', 1, 0),
-('80987654321', 'Hugo Martins', 'hugo@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'B7KQZDU7', 1, 0),
-('90987654321', 'Ingrid Souza', 'ingrid@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'JA2PM4H4', 1, 1),
-('09876543210', 'Jonas Lima', 'jonas@ceu.edu.br', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'HG69KZMJ', 1, 0);
+('10987654321', 'Amanda Cristina', 'amanda@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, '4CT5L8DW', 1, 0),
+('20987654321', 'Bernardo Silva', 'bernardo@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'BF8T5H7L', 1, 1),
+('30987654321', 'Camila Rodrigues', 'camila@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, '9TDMW2Z4', 1, 0),
+('40987654321', 'Diego Santos', 'diego@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, '45TYGRSW', 1, 1),
+('50987654321', 'Eliane Costa', 'eliane@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'KA9JA7RP', 1, 0),
+('60987654321', 'Fábio Almeida', 'fabio@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'BF3EF84L', 1, 1),
+('70987654321', 'Giulia Pereira', 'giulia@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'CMQ6KXNS', 1, 0),
+('80987654321', 'Hugo Martins', 'hugo@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'B7KQZDU7', 1, 0),
+('90987654321', 'Ingrid Souza', 'ingrid@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'JA2PM4H4', 1, 1),
+('09876543210', 'Jonas Lima', 'jonas@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'HG69KZMJ', 1, 0);
 -- Atualizar códigos como usados
-UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '10987654321' WHERE codigo = 'HG69KZMJ';
+UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '10987654321' WHERE codigo = '4CT5L8DW';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '20987654321' WHERE codigo = 'BF8T5H7L';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '30987654321' WHERE codigo = '9TDMW2Z4';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '40987654321' WHERE codigo = '45TYGRSW';
