@@ -1024,8 +1024,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Buscar dados do evento (incluindo tipo_certificado)
-            $consultaEvento = "SELECT nome, inicio, conclusao, lugar, duracao, tipo_certificado FROM evento WHERE cod_evento = ?";
+            // Buscar dados do evento (incluindo tipo_certificado e duracao_organizador)
+            $consultaEvento = "SELECT nome, inicio, conclusao, lugar, duracao, duracao_organizador, tipo_certificado FROM evento WHERE cod_evento = ?";
             $stmtEvento = mysqli_prepare($conexao, $consultaEvento);
             mysqli_stmt_bind_param($stmtEvento, "i", $codEvento);
             mysqli_stmt_execute($stmtEvento);
@@ -1302,8 +1302,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Buscar dados do evento (incluindo tipo_certificado)
-            $consultaEvento = "SELECT nome, inicio, conclusao, lugar, duracao, tipo_certificado FROM evento WHERE cod_evento = ?";
+            // Buscar dados do evento (incluindo tipo_certificado e duracao_organizador)
+            $consultaEvento = "SELECT nome, inicio, conclusao, lugar, duracao, duracao_organizador, tipo_certificado FROM evento WHERE cod_evento = ?";
             $stmtEvento = mysqli_prepare($conexao, $consultaEvento);
             mysqli_stmt_bind_param($stmtEvento, "i", $codEvento);
             mysqli_stmt_execute($stmtEvento);
@@ -1344,7 +1344,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $codigoVerificacao = $certificadoExistente['cod_verificacao'] ?? $repositorio->gerarCodigoUnico(8);
                 $excluirPdfAnterior = !empty($certificadoExistente); // Flag para deletar PDF antigo se reatualizar
 
-                // Dados para o template
+                // Dados para o template do organizador
+                // Usa duracao_organizador (sempre preenchida, copiada do participante se não definida)
+                $cargaHorariaOrganizador = isset($dadosEvento['duracao_organizador']) && $dadosEvento['duracao_organizador'] > 0
+                    ? $dadosEvento['duracao_organizador']
+                    : $dadosEvento['duracao'];
+                
                 $dados = [
                     'NomeParticipante' => $dadosPresenca['Nome'],
                     'Email' => $dadosPresenca['Email'],
@@ -1355,7 +1360,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'LocalEvento' => $dadosEvento['lugar'] ?? 'Online',
                     'Data' => date('d/m/Y', strtotime($dadosEvento['inicio'])),
                     'DataEvento' => date('d/m/Y', strtotime($dadosEvento['inicio'])),
-                    'CargaHoraria' => $dadosEvento['duracao'] ? $dadosEvento['duracao'] . ' horas' : 'A definir',
+                    'CargaHoraria' => $cargaHorariaOrganizador ? $cargaHorariaOrganizador . ' horas' : 'A definir',
                     'TipoCertificado' => $dadosEvento['tipo_certificado'] ?? 'Sem certificacao',
                     'CodigoVerificacao' => $codigoVerificacao,
                     'CodigoAutenticador' => $codigoVerificacao,
@@ -1758,7 +1763,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .contador-participantes {
-        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
         padding: 14px 24px;
         background: linear-gradient(135deg, #6598D2 0%, #5080BE 100%);
         border-radius: 10px;
@@ -1771,6 +1780,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-size: 16px;
         font-weight: 600;
         text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .contador-participantes label {
+        color: var(--branco);
+        font-weight: 500;
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #navegacao-paginas-tabela {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #navegacao-paginas-tabela .botao {
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
     }
 
     .envoltorio-tabela {
@@ -2458,6 +2489,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         justify-content: center;
     }
 
+    .barra-pesquisa-wrapper-compacta .barra-pesquisa-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .botao-filtrar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--branco);
+        border: 1px solid var(--cinza-claro);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        color: #000;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .botao-filtrar:hover {
+        border-color: #000;
+        transform: translateY(-1px);
+    }
+
+    .botao-filtrar img {
+    flex-shrink: 0;
+    height: 60%;
+    width: auto;
+    margin-left: clamp(6px, 1.2vw, 8px);
+    }
+
     .acoes-rapidas-wrapper {
         width: 100%;
     }
@@ -2547,6 +2612,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 8px 10px !important;
             font-size: 13px !important;
         }
+
+        .botao-filtrar {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+
+        .botao-filtrar img {
+            height: 16px;
+            width: 16px;
+        }
     }
 
     /* ===== RESPONSIVIDADE PARA CELULARES (até 768px) ===== */
@@ -2562,6 +2637,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .barra-pesquisa-wrapper-compacta .barra-pesquisa {
             max-width: 100%;
+        }
+
+        .barra-pesquisa-wrapper-compacta .barra-pesquisa-container {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .botao-filtrar {
+            width: 100%;
+            justify-content: center;
+            padding: 10px 16px;
         }
 
         .secao-titulo-compacta {
@@ -2616,11 +2702,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .contador-participantes {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
             padding: 10px 16px;
+            gap: 0.75rem;
         }
 
         .contador-participantes span {
             font-size: 14px;
+        }
+        
+        .contador-participantes label {
+            font-size: 13px;
+        }
+        
+        .contador-participantes select {
+            font-size: 13px !important;
         }
 
         .envoltorio-tabela {
@@ -3449,9 +3547,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!window.__listaDocChangeBound) {
                 window.__listaDocChangeBound = true;
                 document.addEventListener('change', function(e) {
-                    if (e.target.classList && e.target.classList.contains('checkbox-selecionar')) {
+                    if (e.target && e.target.classList && e.target.classList.contains('checkbox-selecionar')) {
                         const tr = e.target.closest('tr');
-                        tr.classList.toggle('linha-selecionada', e.target.checked);
+                        if (tr && tr.classList) {
+                            tr.classList.toggle('linha-selecionada', e.target.checked);
+                        }
                         e.target.checked ? participantesSelecionados.add(e.target.value) : participantesSelecionados.delete(e.target.value);
                         atualizarVisibilidadeBotoesAcao();
                         atualizarTextoBotaoToggle();
@@ -3486,7 +3586,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Desselecionar todos
                         document.querySelectorAll('.checkbox-selecionar').forEach(cb => {
                             cb.checked = false;
-                            cb.closest('tr').classList.remove('linha-selecionada');
+                            const tr = cb.closest('tr');
+                            if (tr && tr.classList) {
+                                tr.classList.remove('linha-selecionada');
+                            }
                             participantesSelecionados.delete(cb.value);
                         });
                         txtToggle.textContent = 'Selecionar Todos';
@@ -3495,7 +3598,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         participantesSelecionados.clear();
                         document.querySelectorAll('.checkbox-selecionar').forEach(cb => {
                             cb.checked = true;
-                            cb.closest('tr').classList.add('linha-selecionada');
+                            const tr = cb.closest('tr');
+                            if (tr && tr.classList) {
+                                tr.classList.add('linha-selecionada');
+                            }
                             participantesSelecionados.add(cb.value);
                         });
                         txtToggle.textContent = 'Desselecionar Todos';
@@ -4248,6 +4354,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             carregarParticipantes();
         }
     </script>
+    <script src="../PaginasGlobais/PaginacaoTabelas.js?v=<?php echo time(); ?>"></script>
+    <script src="FiltroParticipantes.js?v=<?php echo time(); ?>"></script>
+    <script src="FiltroOrganizadores.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

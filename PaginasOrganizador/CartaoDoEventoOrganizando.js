@@ -301,6 +301,8 @@
     // Salva cópia dos dados originais
     const modeloParticipanteEl = document.getElementById('modelo-participante');
     const modeloOrganizadorEl = document.getElementById('modelo-organizador');
+    const selectModeloParticipante = document.getElementById('input-modelo-certificado-participante');
+    const selectModeloOrganizador = document.getElementById('input-modelo-certificado-organizador');
     
     dadosOriginaisEvento = {
       cod_evento: codigoEventoAtual,
@@ -324,8 +326,12 @@
       certificado: certificateEl ? certificateEl.textContent.trim() : '',
       certificadoNumerico: certificateEl && certificateEl.textContent.trim() !== 'Não' ? 1 : 0,
       descricao: descriptionEl ? descriptionEl.textContent.trim() : '',
-      modeloCertificadoParticipante: modeloParticipanteEl ? modeloParticipanteEl.textContent.trim() : 'ModeloExemplo.pptx',
-      modeloCertificadoOrganizador: modeloOrganizadorEl ? modeloOrganizadorEl.textContent.trim() : 'ModeloExemploOrganizador.pptx',
+      modeloCertificadoParticipante: (selectModeloParticipante && selectModeloParticipante.value)
+        ? selectModeloParticipante.value
+        : 'ModeloExemplo.pptx',
+      modeloCertificadoOrganizador: (selectModeloOrganizador && selectModeloOrganizador.value)
+        ? selectModeloOrganizador.value
+        : 'ModeloExemploOrganizador.pptx',
       imagens: imagensParaSalvar
     };
 
@@ -355,6 +361,8 @@
     const inputModalidade = document.getElementById('input-modalidade');
     const inputCertificado = document.getElementById('input-certificado');
     const inputDescricao = document.getElementById('input-descricao');
+    const inputCargaHorariaParticipante = document.getElementById('input-carga-horaria-participante');
+    const inputCargaHorariaOrganizador = document.getElementById('input-carga-horaria-organizador');
 
     if (inputNome) inputNome.value = dadosOriginaisEvento.nome || '';
     if (inputLocal) inputLocal.value = dadosOriginaisEvento.local || '';
@@ -422,6 +430,16 @@
       const inputModeloOrganizador = document.getElementById('input-modelo-certificado-organizador');
       if (inputModeloOrganizador && dadosOriginaisEvento.modeloCertificadoOrganizador) {
         inputModeloOrganizador.value = dadosOriginaisEvento.modeloCertificadoOrganizador;
+      }
+
+      // Preenche campos de carga horária - pega os valores dos elementos de visualização
+      if (inputCargaHorariaParticipante) {
+        const cargaParticipanteVis = document.getElementById('carga-horaria-participante-visualizacao');
+        inputCargaHorariaParticipante.value = cargaParticipanteVis ? cargaParticipanteVis.textContent.trim() : '';
+      }
+      if (inputCargaHorariaOrganizador) {
+        const cargaOrganizadorVis = document.getElementById('carga-horaria-organizador-visualizacao');
+        inputCargaHorariaOrganizador.value = cargaOrganizadorVis ? cargaOrganizadorVis.textContent.trim() : '';
       }
   }
 
@@ -951,7 +969,44 @@
       const inputModalidade = document.getElementById('input-modalidade');
       const inputCertificado = document.getElementById('input-certificado');
       const inputDescricao = document.getElementById('input-descricao');
-      const inputCargaHoraria = document.getElementById('input-carga-horaria');
+      const inputCargaHorariaParticipante = document.getElementById('input-carga-horaria-participante');
+      const inputCargaHorariaOrganizador = document.getElementById('input-carga-horaria-organizador');
+
+      // Converte carga horária de HH:MM para decimal
+      function converterHoraParaDecimal(horaStr) {
+        if (!horaStr || horaStr === '-') return 0;
+        const partes = horaStr.split(':');
+        if (partes.length !== 2) return 0;
+        const horas = parseInt(partes[0], 10);
+        const minutos = parseInt(partes[1], 10);
+        return horas + (minutos / 60);
+      }
+
+      // Valida formato HH:MM
+      function validarFormatoHora(horaStr) {
+        if (!horaStr) return true; // Opcional
+        const regex = /^([0-9]{1,3}):([0-5][0-9])$/;
+        return regex.test(horaStr);
+      }
+
+      // Validação de carga horária do participante
+      if (!validarFormatoHora(inputCargaHorariaParticipante.value)) {
+        alert('Formato de carga horária do participante inválido. Use o formato HH:MM (ex: 08:00)');
+        inputCargaHorariaParticipante.focus();
+        return;
+      }
+
+      // Validação de carga horária do organizador (opcional)
+      if (inputCargaHorariaOrganizador.value && !validarFormatoHora(inputCargaHorariaOrganizador.value)) {
+        alert('Formato de carga horária do organizador inválido. Use o formato HH:MM (ex: 16:00)');
+        inputCargaHorariaOrganizador.focus();
+        return;
+      }
+
+      // Converte para decimal
+      const cargaHorariaParticipante = converterHoraParaDecimal(inputCargaHorariaParticipante.value);
+      // Se o organizador não preencheu, será string vazia (PHP vai reconhecer e copiar do participante)
+      const cargaHorariaOrganizador = inputCargaHorariaOrganizador.value ? converterHoraParaDecimal(inputCargaHorariaOrganizador.value) : '';
 
       // Prepara FormData
       const formData = new FormData();
@@ -971,7 +1026,8 @@
       formData.append('modalidade', inputModalidade.value);
       formData.append('certificado', inputCertificado.value);
       formData.append('descricao', inputDescricao.value);
-      formData.append('duracao', inputCargaHoraria.value);
+      formData.append('duracao', cargaHorariaParticipante); // Envia carga horária do participante como 'duracao'
+      formData.append('carga_horaria_organizador', cargaHorariaOrganizador); // Campo novo para organizador - vazio se não preenchido
       
       // Adiciona os modelos de certificado
       const inputModeloParticipante = document.getElementById('input-modelo-certificado-participante');
@@ -998,7 +1054,7 @@
 
       // Confirmação antes de salvar alterações
       const confirmacao = confirm(
-        'Ao salvar as alterações, todos os participantes inscritos neste evento serão notificados sobre as mudanças realizadas. Deseja continuar?'
+        'Ao salvar as alterações, os participantes só serão notificados quando mudanças afetarem informações do evento (nome, datas, local, etc.). Deseja continuar?'
       );
       
       if (!confirmacao) {
@@ -1123,6 +1179,18 @@
             }
 
             if (description) description.textContent = inputDescricao.value;
+            
+            // Atualizar exibição das cargas horárias
+            const cargaParticipanteVis = document.getElementById('carga-horaria-participante-visualizacao');
+            const cargaOrganizadorVis = document.getElementById('carga-horaria-organizador-visualizacao');
+            
+            if (cargaParticipanteVis && inputCargaHorariaParticipante) {
+              cargaParticipanteVis.textContent = inputCargaHorariaParticipante.value;
+            }
+            
+            if (cargaOrganizadorVis && inputCargaHorariaOrganizador) {
+              cargaOrganizadorVis.textContent = inputCargaHorariaOrganizador.value || inputCargaHorariaParticipante.value;
+            }
             
             // Atualizar exibição dos modelos de certificado
             const modeloParticipanteDisplay = document.getElementById('modelo-participante');

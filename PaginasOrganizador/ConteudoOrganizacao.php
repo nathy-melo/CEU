@@ -19,6 +19,10 @@
                         </button>
                     </div>
                 </div>
+                <button class="botao botao-filtrar" id="btn-filtrar-organizadores">
+                    <span>Filtrar</span>
+                    <img src="../Imagens/filtro.png" alt="Filtro">
+                </button>
             </div>
         </div>
 
@@ -65,10 +69,25 @@
     <div>
         <div class="contador-participantes">
             <span id="total-organizacao">Total de membros: 0</span>
+            
+            <!-- Navegação de Páginas -->
+            <div id="navegacao-paginas-tabela-org" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center;"></div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="select-linhas-por-pagina-org" style="font-size: 0.9rem;">Linhas por página:</label>
+                <select id="select-linhas-por-pagina-org" class="botao" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; cursor: pointer; border: 1px solid var(--caixas); border-radius: 0.3rem; background: var(--botao); color: var(--texto);">
+                    <option value="30" selected>30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                    <option value="60">60</option>
+                    <option value="80">80</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
         </div>
 
         <div class="envoltorio-tabela table-wrapper">
-            <table class="tabela-participantes">
+            <table class="tabela-participantes" id="tabela-organizadores">
                 <thead>
                     <tr>
                         <th class="Titulo_Tabela">Selecionar</th>
@@ -374,7 +393,7 @@
                 }
 
                 return `
-                <tr class="${rowClass}" data-cpf="${membro.cpf}">
+                <tr class="${rowClass}" data-cpf="${membro.cpf}" data-tipo="${membro.tipo || ''}">
                     <td class="coluna-selecionar" data-label="Selecionar">
                         <input type="checkbox" class="checkbox-selecionar-org" id="org-${i}" value="${membro.cpf}" ${isChecked ? 'checked' : ''}>
                     </td>
@@ -383,6 +402,7 @@
                         <p><strong>E-mail:</strong> ${membro.email || '-'}</p>
                         <p><strong>Registro Acadêmico:</strong> ${membro.ra || '-'}</p>
                         <p><strong>Data de Inscrição:</strong> ${membro.data_inscricao || '-'}</p>
+                        <p><strong>Tipo:</strong> ${membro.tipo || '-'}</p>
                     </td>
                     <td class="coluna-modificar" data-label="Modificar">
                         <div class="grupo-acoes">
@@ -403,13 +423,39 @@
             }).join('');
         }
 
-        inicializarEventosOrganizacao();
-
         // Armazena estado para detecção de resize
         window.__lastOrganizacaoIsMobile = isMobile;
 
         // Re-inicializa eventos após re-renderizar (quando muda entre mobile/desktop)
         inicializarEventosOrganizacao();
+        
+        // Inicializar paginação de tabelas (apenas para desktop)
+        if (!isMobile && typeof window.inicializarPaginacaoTabela === 'function') {
+            window.inicializarPaginacaoTabela('tabela-organizadores', {
+                linhasPorPagina: 30,
+                maximoLinhas: 100,
+                selectId: 'select-linhas-por-pagina-org'
+            });
+        }
+
+        // Inicializar filtro de organizadores APÓS garantir que tudo está pronto
+        if (!isMobile) {
+            // Usar setTimeout para garantir que a tabela está completamente renderizada
+            setTimeout(function() {
+                if (typeof window.inicializarFiltroOrganizadores === 'function') {
+                    window.inicializarFiltroOrganizadores('tabela-organizadores');
+                    
+                    // Forçar ordenação A-Z imediatamente após inicializar
+                    setTimeout(function() {
+                        if (window.filtroOrganizadoresConfig && window.filtroOrganizadoresConfig.tabelaId) {
+                            if (typeof aplicarOrdenacaoInicialOrg === 'function') {
+                                aplicarOrdenacaoInicialOrg();
+                            }
+                        }
+                    }, 150);
+                }
+            }, 100);
+        }
     }
 
     // Função para emitir certificado

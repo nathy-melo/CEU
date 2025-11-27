@@ -17,6 +17,7 @@ CREATE TABLE evento(
     inicio DATETIME NOT NULL,
     conclusao DATETIME NOT NULL,
     duracao FLOAT, 
+    duracao_organizador FLOAT NULL COMMENT 'Carga horária do organizador (se NULL, usa a mesma do participante)',
     certificado TINYINT(1) NOT NULL DEFAULT 0,
     tipo_certificado VARCHAR(50) NULL DEFAULT 'Sem certificacao',
     modalidade ENUM('Presencial','Online','Híbrido') NOT NULL DEFAULT 'Presencial',

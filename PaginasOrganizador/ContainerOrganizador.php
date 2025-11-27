@@ -73,6 +73,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     ?>
     <link rel="stylesheet" href="../styleGlobal.css?v=<?= $__cssVer ?>" />
     <link rel="stylesheet" href="../styleGlobalMobile.css?v=<?= $__cssMobileVer ?>" media="(max-width: 767px)" />
+    <link rel="stylesheet" href="../styleModais.css" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
     <script src="/CEU/pwa-config.js" defer></script>
     <style>
@@ -268,9 +269,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         const rotas = {
             'inicio': {
                 html: 'InicioOrganizador.php',
-                js: ['../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
+                js: ['../PaginasGlobais/PaginacaoEventos.js', '../PaginasGlobais/Filtro.js', 'InicioOrganizador.js'],
                 init: () => {
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
+                    // Inicializar paginação
+                    if (typeof inicializarPaginacaoEventos === 'function') {
+                        inicializarPaginacaoEventos('eventos-container');
+                    }
                     // Inicializar modais (incluindo listener para fechar ao clicar fora)
                     if (typeof window.inicializarModais === 'function') {
                         window.inicializarModais();
@@ -292,8 +297,12 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             },
             'eventosInscritos': {
                 html: 'EventosInscritosOrganizador.php',
-                js: ['../PaginasGlobais/Filtro.js', 'EventosInscritosOrganizador.js'],
+                js: ['../PaginasGlobais/PaginacaoEventos.js', '../PaginasGlobais/Filtro.js', 'EventosInscritosOrganizador.js'],
                 init: () => {
+                    // Inicializar paginação (sempre mostrar finalizados nesta página)
+                    if (typeof window.inicializarPaginacaoEventos === 'function') {
+                        window.inicializarPaginacaoEventos('eventos-container', true);
+                    }
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
                     // Inicializar modais (incluindo listener para fechar ao clicar fora)
                     if (typeof window.inicializarModais === 'function') {
@@ -316,7 +325,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             },
             'meusEventos': {
                 html: 'MeusEventosOrganizador.php',
-                js: ['../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
+                js: ['../PaginasGlobais/PaginacaoEventos.js', '../PaginasGlobais/Filtro.js', 'MeusEventosOrganizador.js'],
                 init: () => {
                     // Reseta flags de inicialização ao carregar via AJAX
                     if (typeof window.resetarInicializacaoMeusEventos === 'function') {
@@ -325,6 +334,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     // Garante que a função está disponível e inicializa após um pequeno delay
                     // para permitir que o script seja completamente carregado
                     setTimeout(() => {
+                        // Inicializa paginação especial para MeusEventosOrganizador (dois containers)
+                        if (typeof window.inicializarPaginacaoMeusEventosOrganizador === 'function') {
+                            window.inicializarPaginacaoMeusEventosOrganizador();
+                        }
                         // Inicializa modais primeiro
                         if (typeof window.inicializarModais === 'function') {
                             window.inicializarModais();

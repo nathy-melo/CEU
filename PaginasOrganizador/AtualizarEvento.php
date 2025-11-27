@@ -1,6 +1,22 @@
 <?php
+// Captura todos os erros/warnings e evita que sejam exibidos antes do JSON
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+// Handler global de erros para garantir resposta JSON mesmo em caso de fatal error
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['erro' => 'Erro interno do servidor: ' . $error['message'] . ' em ' . $error['file'] . ':' . $error['line']]);
+    }
+});
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
+
+try {
 
 // Verifica se o usuário está logado
 if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
@@ -20,6 +36,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once('../BancoDados/conexao.php');
+
+function normalizarCampoEventoAtualizacao($campo, $valor) {
+    if ($valor === null) {
+        return null;
+    }
+
+    switch ($campo) {
+        case 'duracao':
+        case 'duracao_organizador':
+            return (float) $valor;
+        case 'certificado':
+            return (int) $valor;
+        case 'inicio_inscricao':
+        case 'fim_inscricao':
+            $valorNormalizado = trim((string) $valor);
+            return ($valorNormalizado === '' || $valorNormalizado === '0000-00-00 00:00:00') ? null : $valorNormalizado;
+        default:
+            return trim((string) $valor);
+    }
+}
 
 $cpfOrganizadorLogado = $_SESSION['cpf'];
 
@@ -44,6 +80,16 @@ $duracaoEvento = isset($_POST['duracao']) ? floatval($_POST['duracao']) : 0;
 $imagensParaRemover = isset($_POST['imagens_remover']) ? json_decode($_POST['imagens_remover'], true) : [];
 $modeloCertificadoParticipante = $_POST['modelo_certificado_participante'] ?? 'ModeloExemplo.pptx';
 $modeloCertificadoOrganizador = $_POST['modelo_certificado_organizador'] ?? 'ModeloExemploOrganizador.pptx';
+$duracaoOrganizadorRecebida = $_POST['carga_horaria_organizador'] ?? '';
+
+// Se a carga horária do organizador não foi preenchida (vazia ou 0), copia a do participante
+// Se foi preenchida, usa o valor enviado
+if (!empty($duracaoOrganizadorRecebida) && floatval($duracaoOrganizadorRecebida) > 0) {
+    $duracaoOrganizadorFinal = floatval($duracaoOrganizadorRecebida);
+} else {
+    // Copia do participante
+    $duracaoOrganizadorFinal = $duracaoEvento;
+}
 
 // Validação básica dos campos obrigatórios
 if ($codigoEvento <= 0) {
@@ -91,6 +137,21 @@ if (!$ehOrganizador) {
     }
 }
 
+// Busca dados atuais do evento para detectar quais campos foram alterados
+$sqlEventoAtual = "SELECT categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, duracao_organizador, certificado, modalidade, inicio_inscricao, fim_inscricao, tipo_certificado, modelo_certificado_participante, modelo_certificado_organizador FROM evento WHERE cod_evento = ? LIMIT 1";
+$stmtEventoAtual = mysqli_prepare($conexao, $sqlEventoAtual);
+mysqli_stmt_bind_param($stmtEventoAtual, "i", $codigoEvento);
+mysqli_stmt_execute($stmtEventoAtual);
+$resultadoEventoAtual = mysqli_stmt_get_result($stmtEventoAtual);
+$dadosEventoAntes = mysqli_fetch_assoc($resultadoEventoAtual);
+mysqli_stmt_close($stmtEventoAtual);
+
+if (!$dadosEventoAntes) {
+    echo json_encode(['erro' => 'Evento não encontrado para atualização']);
+    mysqli_close($conexao);
+    exit;
+}
+
 // Combina data e hora para criar timestamps completos
 $dataHoraInicio = $dataInicio . ' ' . $horarioInicio . ':00';
 $dataHoraConclusao = $dataFim . ' ' . $horarioFim . ':00';
@@ -98,17 +159,9 @@ $dataHoraConclusao = $dataFim . ' ' . $horarioFim . ':00';
 // Valida formato de data e hora
 try {
     $objetoDataInicio = new DateTime($dataHoraInicio);
-    $dataConclusaoObj = new DateTime($dataHoraConclusao);
+    $objetoDataConclusao = new DateTime($dataHoraConclusao);
 } catch (Exception $e) {
     echo json_encode(['erro' => 'Data ou horário inválidos. Verifique os valores informados.']);
-    mysqli_close($conexao);
-    exit;
-}
-
-// Valida se a data de conclusão não está no passado
-$dataHoraAtual = new DateTime();
-if ($dataConclusaoObj < $dataHoraAtual) {
-    echo json_encode(['erro' => 'Não é possível editar um evento que já foi finalizado']);
     mysqli_close($conexao);
     exit;
 }
@@ -322,6 +375,7 @@ garantirColunaEvento($conexao, 'fim_inscricao', 'DATETIME NULL');
 garantirColunaEvento($conexao, 'tipo_certificado', "VARCHAR(50) NULL DEFAULT 'Sem certificacao'");
 garantirColunaEvento($conexao, 'modelo_certificado_participante', "VARCHAR(255) NULL DEFAULT 'ModeloExemplo.pptx'");
 garantirColunaEvento($conexao, 'modelo_certificado_organizador', "VARCHAR(255) NULL DEFAULT 'ModeloExemploOrganizador.pptx'");
+garantirColunaEvento($conexao, 'duracao_organizador', 'FLOAT NULL COMMENT "Carga horária do organizador"');
 
 // Atualiza evento no banco de dados
 if ($deveAtualizarImagem) {
@@ -335,6 +389,7 @@ if ($deveAtualizarImagem) {
                     inicio = ?, 
                     conclusao = ?, 
                     duracao = ?, 
+                    duracao_organizador = ?,
                     certificado = ?, 
                     modalidade = ?,
                     imagem = ?,
@@ -346,9 +401,10 @@ if ($deveAtualizarImagem) {
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
-    mysqli_stmt_bind_param(
-        $declaracaoAtualizacao,
-        "sssssssdisssssssi",
+        $tiposComImagem = str_repeat('s', 7) . 'dd' . 'i' . str_repeat('s', 7) . 'i';
+        mysqli_stmt_bind_param(
+            $declaracaoAtualizacao,
+            $tiposComImagem,
         $categoriaEvento,
         $nomeEvento,
         $localEvento,
@@ -357,6 +413,7 @@ if ($deveAtualizarImagem) {
         $dataHoraInicio,
         $dataHoraConclusao,
         $duracaoEmHoras,
+        $duracaoOrganizadorFinal,
         $certificadoBooleano,
         $modalidadeEvento,
         $caminhoNovaImagemPrincipal,
@@ -392,6 +449,7 @@ if ($deveAtualizarImagem) {
                     inicio = ?, 
                     conclusao = ?, 
                     duracao = ?, 
+                    duracao_organizador = ?,
                     certificado = ?, 
                     modalidade = ?,
                     inicio_inscricao = ?,
@@ -402,10 +460,11 @@ if ($deveAtualizarImagem) {
                   WHERE cod_evento = ?";
 
     $declaracaoAtualizacao = mysqli_prepare($conexao, $consultaAtualizacao);
-    // Tipos corretos: categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s), cod_evento(i)
+    // Tipos corretos: categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), duracao_organizador(d), certificado(i), modalidade(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s), cod_evento(i)
+    $tiposSemImagem = str_repeat('s', 7) . 'dd' . 'i' . str_repeat('s', 6) . 'i';
     mysqli_stmt_bind_param(
         $declaracaoAtualizacao,
-        "ssssssssdisssssi",
+        $tiposSemImagem,
         $categoriaEvento,
         $nomeEvento,
         $localEvento,
@@ -414,6 +473,7 @@ if ($deveAtualizarImagem) {
         $dataHoraInicio,
         $dataHoraConclusao,
         $duracaoEmHoras,
+        $duracaoOrganizadorFinal,
         $certificadoBooleano,
         $modalidadeEvento,
         $inicioInscricao,
@@ -429,26 +489,64 @@ if ($deveAtualizarImagem) {
 if (mysqli_stmt_execute($declaracaoAtualizacao)) {
     mysqli_stmt_close($declaracaoAtualizacao);
     
-    // Notifica participantes inscritos sobre a alteração do evento
-    $sqlParticipantes = "SELECT CPF FROM inscreve WHERE cod_evento = ?";
-    $stmtParticipantes = mysqli_prepare($conexao, $sqlParticipantes);
-    mysqli_stmt_bind_param($stmtParticipantes, "i", $codigoEvento);
-    mysqli_stmt_execute($stmtParticipantes);
-    $resultParticipantes = mysqli_stmt_get_result($stmtParticipantes);
-    
-    // Cria notificações para cada participante inscrito
-    if (mysqli_num_rows($resultParticipantes) > 0) {
-        $mensagemNotificacao = "O evento '{$nomeEvento}' foi atualizado pelo organizador. Confira as alterações.";
-        $sqlNotificacao = "INSERT INTO notificacao (CPF, mensagem, tipo, cod_evento, data_hora) VALUES (?, ?, 'evento_atualizado', ?, NOW())";
-        $stmtNotificacao = mysqli_prepare($conexao, $sqlNotificacao);
-        
-        while ($participante = mysqli_fetch_assoc($resultParticipantes)) {
-            mysqli_stmt_bind_param($stmtNotificacao, "ssi", $participante['CPF'], $mensagemNotificacao, $codigoEvento);
-            mysqli_stmt_execute($stmtNotificacao);
+    // Determina se as alterações impactam informações relevantes para os participantes
+    $camposAtualizados = [
+        'categoria' => $categoriaEvento,
+        'nome' => $nomeEvento,
+        'lugar' => $localEvento,
+        'descricao' => $descricaoEvento,
+        'publico_alvo' => $publicoAlvo,
+        'inicio' => $dataHoraInicio,
+        'conclusao' => $dataHoraConclusao,
+        'duracao' => $duracaoEmHoras,
+        'certificado' => $certificadoBooleano,
+        'modalidade' => $modalidadeEvento,
+        'inicio_inscricao' => $inicioInscricao,
+        'fim_inscricao' => $fimInscricao,
+        'tipo_certificado' => $certificadoEvento,
+    ];
+
+    $camposNaoSensiveis = ['duracao_organizador', 'modelo_certificado_participante', 'modelo_certificado_organizador'];
+    $alteracoesSensiveis = false;
+
+    foreach ($camposAtualizados as $campo => $novoValor) {
+        $valorAnterior = $dadosEventoAntes[$campo] ?? null;
+        $valorAnteriorNormalizado = normalizarCampoEventoAtualizacao($campo, $valorAnterior);
+        $novoValorNormalizado = normalizarCampoEventoAtualizacao($campo, $novoValor);
+
+        if ($valorAnteriorNormalizado == $novoValorNormalizado) {
+            continue;
         }
-        mysqli_stmt_close($stmtNotificacao);
+
+        if (!in_array($campo, $camposNaoSensiveis, true)) {
+            $alteracoesSensiveis = true;
+            break;
+        }
     }
-    mysqli_stmt_close($stmtParticipantes);
+    
+    if ($alteracoesSensiveis) {
+        // Notifica participantes inscritos sobre a alteração do evento
+        $sqlParticipantes = "SELECT CPF FROM inscricao WHERE cod_evento = ?";
+        $stmtParticipantes = mysqli_prepare($conexao, $sqlParticipantes);
+        mysqli_stmt_bind_param($stmtParticipantes, "i", $codigoEvento);
+        mysqli_stmt_execute($stmtParticipantes);
+        $resultParticipantes = mysqli_stmt_get_result($stmtParticipantes);
+        
+        if (mysqli_num_rows($resultParticipantes) > 0) {
+            $tituloNotificacao = "Evento Atualizado";
+            $tipoNotificacao = "evento_atualizado";
+            $mensagemNotificacao = "O evento '{$nomeEvento}' foi atualizado pelo organizador. Confira as alterações.";
+            $sqlNotificacao = "INSERT INTO notificacoes (CPF, titulo, tipo, mensagem, cod_evento, data_criacao, lida) VALUES (?, ?, ?, ?, ?, NOW(), 0)";
+            $stmtNotificacao = mysqli_prepare($conexao, $sqlNotificacao);
+            
+            while ($participante = mysqli_fetch_assoc($resultParticipantes)) {
+                mysqli_stmt_bind_param($stmtNotificacao, "ssssi", $participante['CPF'], $tituloNotificacao, $tipoNotificacao, $mensagemNotificacao, $codigoEvento);
+                mysqli_stmt_execute($stmtNotificacao);
+            }
+            mysqli_stmt_close($stmtNotificacao);
+        }
+        mysqli_stmt_close($stmtParticipantes);
+    }
     
     // Insere as novas imagens na tabela imagens_evento (sempre que houver novas imagens)
     if (!empty($novasImagens)) {
@@ -514,3 +612,11 @@ if (mysqli_stmt_execute($declaracaoAtualizacao)) {
 
     echo json_encode(['erro' => 'Erro ao atualizar evento: ' . mysqli_error($conexao)]);
 }
+
+} catch (Exception $e) {
+    if (isset($conexao)) {
+        mysqli_close($conexao);
+    }
+    echo json_encode(['erro' => 'Exceção capturada: ' . $e->getMessage()]);
+}
+?>

@@ -19,6 +19,10 @@
                         </button>
                     </div>
                 </div>
+                <button class="botao botao-filtrar" id="btn-filtrar-participantes">
+                    <span>Filtrar</span>
+                    <img src="../Imagens/filtro.png" alt="Filtro">
+                </button>
             </div>
         </div>
 
@@ -81,10 +85,25 @@
     <div>
         <div class="contador-participantes">
             <span id="total-participantes">Total de participantes: 0</span>
+            
+            <!-- Navegação de Páginas -->
+            <div id="navegacao-paginas-tabela" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center;"></div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="select-linhas-por-pagina" style="font-size: 0.9rem;">Linhas por página:</label>
+                <select id="select-linhas-por-pagina" class="botao" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; cursor: pointer; border: 1px solid var(--caixas); border-radius: 0.3rem; background: var(--botao); color: var(--texto);">
+                    <option value="30" selected>30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                    <option value="60">60</option>
+                    <option value="80">80</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
         </div>
 
         <div class="envoltorio-tabela table-wrapper">
-            <table class="tabela-participantes">
+            <table class="tabela-participantes" id="tabela-participantes">
                 <thead>
                     <tr>
                         <th class="Titulo_Tabela">Selecionar</th>
@@ -693,6 +712,34 @@
 
         // Re-inicializa eventos após re-renderizar (quando muda entre mobile/desktop)
         inicializarEventosParticipantes();
+        
+        // Inicializar paginação de tabelas (apenas para desktop)
+        if (!isMobile && typeof window.inicializarPaginacaoTabela === 'function') {
+            window.inicializarPaginacaoTabela('tabela-participantes', {
+                linhasPorPagina: 30,
+                maximoLinhas: 100,
+                selectId: 'select-linhas-por-pagina'
+            });
+        }
+
+        // Inicializar filtro de participantes APÓS garantir que tudo está pronto
+        if (!isMobile) {
+            // Usar setTimeout para garantir que a tabela está completamente renderizada
+            setTimeout(function() {
+                if (typeof window.inicializarFiltroParticipantes === 'function') {
+                    window.inicializarFiltroParticipantes('tabela-participantes');
+                    
+                    // Forçar ordenação A-Z imediatamente após inicializar
+                    setTimeout(function() {
+                        if (window.filtroParticipantesConfig && window.filtroParticipantesConfig.tabelaId) {
+                            if (typeof aplicarOrdenacaoInicial === 'function') {
+                                aplicarOrdenacaoInicial();
+                            }
+                        }
+                    }, 150);
+                }
+            }, 100);
+        }
     }
 
     // Função para inicializar eventos
@@ -907,7 +954,7 @@
         const idMsg = 'linha-sem-resultados-busca-part';
         const container = isMobile ? mobileContainer : tbody;
         const existente = document.getElementById(idMsg);
-        
+
         if (visiveis === 0 && !existente) {
             if (isMobile) {
                 const div = document.createElement('div');
@@ -1056,7 +1103,7 @@
             if (modaisGlobais && modal.parentElement.id !== 'modais-globais') {
                 modaisGlobais.appendChild(modal);
             }
-            
+
             document.body.style.overflow = 'hidden';
             modal.classList.add('ativo');
         }
@@ -1164,7 +1211,7 @@
         if (modal && modaisGlobais && modal.parentElement.id !== 'modais-globais') {
             modaisGlobais.appendChild(modal);
         }
-        
+
         const msgSel = document.getElementById('msg-selecionados-part');
         const checkTodos = document.getElementById('msg-todos-part');
 
@@ -2363,6 +2410,7 @@
 
     /* ===== TRANSFORMAR TABELA EM CARDS NO MOBILE ===== */
     @media (max-width: 768px) {
+
         /* Oculta a tabela e mostra cards */
         .envoltorio-tabela {
             overflow: visible !important;

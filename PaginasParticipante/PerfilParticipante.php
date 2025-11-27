@@ -432,127 +432,9 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         border: 1px solid #f5c6cb;
     }
 
-    /* Alertas específicos para o modal */
-    .modal-codigo .alert {
-        margin-bottom: 1rem;
-        margin-top: 0.5rem;
-        font-size: 0.9rem;
-        text-align: center;
-    }
-
-    .modal-codigo .alert-success {
-        color: #155724;
-        background-color: #d4edda;
-        border: 1px solid #c3e6cb;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-
-    .modal-codigo .alert-danger {
-        color: #721c24;
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-
-    /* Modal para solicitar código de organizador */
-    .modal-codigo {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: var(--caixas);
-        border-radius: 0.5rem;
-        padding: 2rem;
-        width: 90%;
-        max-width: 400px;
-        box-shadow: 0 0.5rem 2rem var(--sombra-padrao);
-    }
-
-    .modal-titulo {
-        color: var(--branco);
-        font-weight: 700;
-        font-size: 1.5rem;
-        text-align: center;
-        margin-bottom: 1.5rem;
-        text-shadow: 0 0.125rem 0.5rem var(--sombra-padrao);
-    }
-
-    .modal-texto {
-        color: var(--branco);
-        text-align: center;
-        margin-bottom: 1.5rem;
-        line-height: 1.5;
-    }
-
-    .modal-acoes {
-        display: flex;
-        justify-content: space-between;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
-    }
-
-    .modal-acoes .botao {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        width: 7.5rem;
-    }
-
-    .modal-acoes .botao-cancelar {
-        background-color: var(--vermelho);
-    }
-
-    .modal-acoes .botao-salvar {
-        background-color: var(--verde);
-    }
-
-    /* Força centralização do texto nos botões do modal */
-    .modal-codigo .botao {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-    }
-
-    /* Botão solicitar código */
-    .modal-solicitar-codigo {
-        display: flex;
-        justify-content: center;
-        margin-top: 0;
-        margin-bottom: 1.5rem;
-    }
-
-    .modal-solicitar-codigo .botao {
-        width: auto;
-        padding: 0.5rem 1.5rem;
-        font-size: 0.95rem;
-    }
-
-    /* Centralização específica para o botão solicitar código */
-    .modal-codigo #btn-solicitar-codigo {
-        margin: 0 auto;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    .modal-solicitar-codigo {
-        display: flex;
-        justify-content: center;
-        margin-top: 1rem;
-    }
-
-    .modal-input {
+    /* Modal de código agora usa styleModais.css */
+    /* Estilos específicos do input de código */
+    .modal-input-codigo {
         width: 100%;
         padding: 0.75rem;
         border: none;
@@ -562,11 +444,33 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
         text-align: center;
         font-weight: 600;
         letter-spacing: 0.1rem;
+        background: var(--branco);
+        color: var(--cinza-escuro);
     }
 
-    .modal-input:focus {
+    .modal-input-codigo:focus {
         outline: none;
         box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.3);
+    }
+
+    .modal-descricao {
+        color: var(--branco);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .modal-botao-solicitar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-botao-solicitar .modal-btn {
+        width: auto;
+        padding: 0.5rem 1.5rem;
+        font-size: 0.95rem;
     }
 
     /* Ajuste final com maior especificidade para garantir prioridade sobre .botao */
@@ -717,21 +621,25 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     </div>
 
     <!-- Modal para solicitar código de organizador -->
-    <div id="modal-codigo" class="modal-codigo hidden">
-        <div class="modal-content">
-            <h2 class="modal-titulo">Tornar-se Organizador</h2>
-            <p class="modal-texto">Para se tornar um organizador, você precisa de um código de acesso fornecido pela
-                administração.</p>
-            <div id="alert-modal"></div>
-            <label for="input-codigo" class="sr-only">Código de organizador</label>
-            <input type="text" id="input-codigo" name="codigo" class="modal-input"
-                placeholder="Digite o código de organizador" maxlength="8" autocomplete="off">
-            <div class="modal-solicitar-codigo">
-                <button type="button" class="botao" id="btn-solicitar-codigo">Solicitar código de acesso</button>
+    <div id="modal-codigo" class="modal-overlay hidden">
+        <div class="modal-container medio" onclick="event.stopPropagation()">
+            <div class="modal-cabecalho">
+                <h2 class="modal-titulo">Tornar-se Organizador</h2>
+                <button type="button" class="modal-btn-fechar" id="btn-fechar-modal-codigo" aria-label="Fechar">&times;</button>
             </div>
-            <div class="modal-acoes">
-                <button type="button" class="botao botao-cancelar" id="btn-cancelar-modal">Cancelar</button>
-                <button type="button" class="botao botao-salvar" id="btn-confirmar-codigo">Confirmar</button>
+            <div class="modal-corpo">
+                <p class="modal-descricao">Para se tornar um organizador, você precisa de um código de acesso fornecido pela administração.</p>
+                <div id="alert-modal"></div>
+                <label for="input-codigo" class="sr-only">Código de organizador</label>
+                <input type="text" id="input-codigo" name="codigo" class="modal-input-codigo"
+                    placeholder="Digite o código de organizador" maxlength="8" autocomplete="off">
+                <div class="modal-botao-solicitar">
+                    <button type="button" class="modal-btn" id="btn-solicitar-codigo">Solicitar código de acesso</button>
+                </div>
+            </div>
+            <div class="modal-rodape">
+                <button type="button" class="modal-btn cancelar" id="btn-cancelar-modal">Cancelar</button>
+                <button type="button" class="modal-btn confirmar" id="btn-confirmar-codigo">Confirmar</button>
             </div>
         </div>
     </div>

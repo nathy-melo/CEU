@@ -121,6 +121,11 @@ if ($stmtPermissao && $cpfUsuario) {
         $certificado = 'Não';
     }
 
+    // Verifica se o evento já foi finalizado
+    $dataHoraAtual = new DateTime();
+    $dataConclusaoEvento = new DateTime($evento['conclusao']);
+    $eventoFinalizado = ($dataConclusaoEvento < $dataHoraAtual);
+
     // Modalidade
     $modalidade = isset($evento['modalidade']) && $evento['modalidade'] !== '' ? $evento['modalidade'] : 'Presencial';
 
@@ -433,36 +438,41 @@ if ($stmtPermissao && $cpfUsuario) {
     }
 
     .Local {
-      grid-column: span 4 / span 4;
+      grid-column: span 8 / span 8;
       grid-row-start: 2;
     }
 
-    .CargaHoraria {
+    .CargaHorariaParticipante {
+      grid-column: span 4 / span 4;
+      grid-row-start: 3;
+    }
+
+    .CargaHorariaOrganizador {
       grid-column: span 4 / span 4;
       grid-column-start: 5;
-      grid-row-start: 2;
+      grid-row-start: 3;
     }
 
     .DataHorarioInicio {
       grid-column: span 4 / span 4;
-      grid-row-start: 3;
+      grid-row-start: 4;
     }
 
     .DataHorarioFim {
       grid-column: span 4 / span 4;
       grid-column-start: 5;
-      grid-row-start: 3;
+      grid-row-start: 4;
     }
 
     .DataHorarioInscricaoInicio {
       grid-column: span 4 / span 4;
-      grid-row-start: 4;
+      grid-row-start: 5;
     }
 
     .DataHorarioInscricaoFim {
       grid-column: span 4 / span 4;
       grid-column-start: 5;
-      grid-row-start: 4;
+      grid-row-start: 5;
     }
 
     /* Container para campos de data e horário */
@@ -498,42 +508,42 @@ if ($stmtPermissao && $cpfUsuario) {
 
     .PublicoAlvo {
       grid-column: span 2 / span 2;
-      grid-row-start: 5;
+      grid-row-start: 6;
     }
 
     .Categoria {
       grid-column: span 2 / span 2;
       grid-column-start: 3;
-      grid-row-start: 5;
+      grid-row-start: 6;
     }
 
     .Modalidade {
       grid-column: span 2 / span 2;
       grid-column-start: 5;
-      grid-row-start: 5;
+      grid-row-start: 6;
     }
 
     .Certificado {
       grid-column: span 2 / span 2;
       grid-column-start: 7;
-      grid-row-start: 5;
+      grid-row-start: 6;
     }
 
     .ModeloCertificadoParticipante {
       grid-column: span 4 / span 4;
-      grid-row-start: 6;
+      grid-row-start: 7;
     }
 
     .ModeloCertificadoOrganizador {
       grid-column: span 4 / span 4;
       grid-column-start: 5;
-      grid-row-start: 6;
+      grid-row-start: 7;
     }
 
     .Imagem {
       grid-column: span 4 / span 4;
       grid-row: span 3 / span 3;
-      grid-row-start: 7;
+      grid-row-start: 8;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -545,24 +555,24 @@ if ($stmtPermissao && $cpfUsuario) {
       grid-column: span 4 / span 4;
       grid-row: span 3 / span 3;
       grid-column-start: 5;
-      grid-row-start: 7;
+      grid-row-start: 8;
     }
 
     .BotaoVoltar {
       grid-column: span 2 / span 2;
-      grid-row-start: 10;
+      grid-row-start: 11;
     }
 
     .BotaoGerenciar {
       grid-column: span 2 / span 2;
       grid-column-start: 4;
-      grid-row-start: 10;
+      grid-row-start: 11;
     }
 
     .BotaoEditar {
       grid-column: span 2 / span 2;
       grid-column-start: 7;
-      grid-row-start: 10;
+      grid-row-start: 11;
     }
 
     .campo-imagem {
@@ -1042,149 +1052,7 @@ if ($stmtPermissao && $cpfUsuario) {
     }
 
     /* Modal de Compartilhar */
-    .modal-compartilhar {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 10000;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal-compartilhar.ativo {
-      display: flex;
-    }
-
-    .modal-compartilhar .conteudo {
-      background: var(--caixas);
-      color: var(--texto);
-      width: 100%;
-      max-width: 32rem;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
-    }
-
-    .modal-compartilhar .cabecalho {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      font-weight: 800;
-      font-size: 1.25rem;
-    }
-
-    .modal-compartilhar button.fechar {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--texto);
-      transition: opacity 0.2s;
-    }
-
-    .modal-compartilhar button.fechar:hover {
-      opacity: 0.7;
-    }
-
-    .opcoes-compartilhamento {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .btn-compartilhar-app {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s;
-      padding: 0.5rem;
-    }
-
-    .btn-compartilhar-app:hover {
-      transform: translateY(-3px);
-    }
-
-    .icone-app {
-      width: 3.5rem;
-      height: 3.5rem;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .icone-whatsapp {
-      background: #25D366;
-    }
-
-    .icone-instagram {
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    }
-
-    .icone-email {
-      background: #EA4335;
-    }
-
-    .icone-x {
-      background: #000000;
-    }
-
-    .icone-copiar {
-      background: var(--botao);
-    }
-
-    .btn-compartilhar-app span {
-      font-size: 0.75rem;
-      color: var(--branco);
-      font-weight: 500;
-    }
-
-    .campo-link {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .campo-link input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--texto);
-      font-size: 0.85rem;
-      outline: none;
-      font-family: monospace;
-    }
-
-    .aviso-compartilhar {
-      background: rgba(66, 135, 245, 0.1);
-      border-left: 3px solid var(--botao);
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      font-size: 0.8rem;
-      color: var(--texto);
-      line-height: 1.4;
-    }
-
-    .aviso-compartilhar strong {
-      color: var(--botao);
-    }
+    /* Modal de compartilhar agora em styleModais.css */
 
     .mensagem-vazio {
       text-align: center;
@@ -1229,101 +1097,7 @@ if ($stmtPermissao && $cpfUsuario) {
       display: block;
     }
 
-    /* Modal de mensagem ao organizador */
-    .modal-mensagem {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--fundo-escuro-transparente);
-      z-index: 10000;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal-mensagem.ativo {
-      display: flex;
-    }
-
-    .modal-mensagem .conteudo {
-      background: var(--caixas);
-      color: var(--texto);
-      width: 100%;
-      max-width: 32rem;
-      border-radius: 1rem;
-      padding: 1.25rem;
-      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
-    }
-
-    .modal-mensagem .cabecalho {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-      font-weight: 800;
-      font-size: 1.15rem;
-    }
-
-    .modal-mensagem button.fechar {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--texto);
-    }
-
-    .modal-mensagem textarea {
-      width: 100%;
-      min-height: 8rem;
-      resize: vertical;
-      border-radius: 0.5rem;
-      border: 1px solid var(--borda-clara);
-      background: var(--fundo-claro-transparente);
-      color: var(--texto);
-      padding: 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .modal-mensagem .contador-caracteres {
-      text-align: right;
-      font-size: 0.85rem;
-      color: var(--texto);
-      margin-top: 0.5rem;
-      opacity: 0.7;
-    }
-
-    .modal-mensagem .contador-caracteres.limite-alcancado {
-      color: var(--vermelho);
-      opacity: 1;
-      font-weight: 600;
-    }
-
-    .modal-mensagem .acoes {
-      margin-top: 0.75rem;
-      display: flex;
-      gap: 0.75rem;
-      justify-content: space-between;
-    }
-
-    .modal-mensagem .botao-primario {
-      background: var(--botao);
-      color: var(--branco);
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.6rem 1rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .modal-mensagem .botao-secundario {
-      background: var(--vermelho);
-      color: var(--branco);
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.6rem 1rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
+    /* Modal de mensagem agora em styleModais.css */
 
     /* Responsividade - esconder botões em telas menores */
     @media (max-width: 1200px) {
@@ -1880,15 +1654,15 @@ if ($stmtPermissao && $cpfUsuario) {
     <main id="secao-detalhes-evento" class="secao-detalhes-evento">
       <!-- Botões de ação Í  direita do cartão -->
       <div class="botoes-acao-cartao">
-        <button type="button" class="BotaoAcaoCartao BotaoFavoritoCartao botao" title="Favoritar" aria-label="Favoritar"
+        <button type="button" class="BotaoAcaoCartao BotaoFavoritoCartao" title="Favoritar" aria-label="Favoritar"
           data-cod="<?= $id_evento ?>" data-favorito="0">
           <img src="../Imagens/Medalha_linha.svg" alt="Favoritar">
         </button>
-        <button type="button" class="BotaoAcaoCartao BotaoMensagemCartao botao" title="Enviar mensagem ao organizador"
+        <button type="button" class="BotaoAcaoCartao BotaoMensagemCartao" title="Enviar mensagem ao organizador"
           aria-label="Mensagem" data-cod="<?= $id_evento ?>">
           <img src="../Imagens/Carta.svg" alt="Mensagem">
         </button>
-        <button type="button" class="BotaoAcaoCartao BotaoCompartilharCartao botao" title="Compartilhar"
+        <button type="button" class="BotaoAcaoCartao BotaoCompartilharCartao" title="Compartilhar"
           aria-label="Compartilhar" data-cod="<?= $id_evento ?>">
           <img src="../Imagens/Icone_Compartilhar.svg" alt="Compartilhar" />
         </button>
@@ -1911,15 +1685,28 @@ if ($stmtPermissao && $cpfUsuario) {
           <div id="event-local" class="caixa-valor"><?php echo htmlspecialchars($evento['lugar']); ?></div>
           <input type="text" id="input-local" class="campo-input" placeholder="Digite o local do evento" autocomplete="off">
         </div>
-        <div class="CargaHoraria grupo-campo">
-          <span class="rotulo-campo">Carga Horária: <span style="color: var(--vermelho);">*</span></span>
-          <div class="caixa-valor"><?php 
+        <div class="CargaHorariaParticipante grupo-campo">
+          <span class="rotulo-campo">Carga Horária do Participante: <span style="color: var(--vermelho);">*</span></span>
+          <div class="caixa-valor" id="carga-horaria-participante-visualizacao"><?php 
             $carga_horaria = isset($evento['duracao']) && $evento['duracao'] > 0 ? floatval($evento['duracao']) : 0;
             $horas = intval($carga_horaria);
             $minutos = round(($carga_horaria - $horas) * 60);
             echo str_pad($horas, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos, 2, '0', STR_PAD_LEFT);
           ?></div>
-          <input type="number" id="input-carga-horaria" class="campo-input" placeholder="Horas" step="0.5" min="0" max="500" value="<?php echo $carga_horaria; ?>" autocomplete="off" required>
+          <input type="text" id="input-carga-horaria-participante" class="campo-input" placeholder="Ex: 08:00" pattern="[0-9]{2}:[0-9]{2}" title="Formato: HH:MM" value="<?php echo str_pad($horas, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos, 2, '0', STR_PAD_LEFT); ?>" autocomplete="off" required>
+        </div>
+        <div class="CargaHorariaOrganizador grupo-campo">
+          <span class="rotulo-campo">Carga Horária do Organizador:</span>
+          <div class="caixa-valor" id="carga-horaria-organizador-visualizacao"><?php 
+            // Se duracao_organizador é NULL ou 0, copia do participante
+            $carga_horaria_org = isset($evento['duracao_organizador']) && $evento['duracao_organizador'] !== null && $evento['duracao_organizador'] > 0 
+              ? floatval($evento['duracao_organizador']) 
+              : $carga_horaria; // Copia da duração do participante
+            $horas_org = intval($carga_horaria_org);
+            $minutos_org = round(($carga_horaria_org - $horas_org) * 60);
+            echo str_pad($horas_org, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos_org, 2, '0', STR_PAD_LEFT);
+          ?></div>
+          <input type="text" id="input-carga-horaria-organizador" class="campo-input" placeholder="Ex: 16:00" pattern="[0-9]{2}:[0-9]{2}" title="Formato: HH:MM" value="<?php echo str_pad($horas_org, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutos_org, 2, '0', STR_PAD_LEFT); ?>" autocomplete="off">
         </div>
         <div class="DataHorarioInicio grupo-campo">
           <span class="rotulo-campo">Data e Horário de Início do Evento: <span style="color: var(--vermelho);">*</span></span>
@@ -2051,14 +1838,14 @@ if ($stmtPermissao && $cpfUsuario) {
           <div id="description" class="caixa-valor caixa-descricao"><?php echo htmlspecialchars($evento['descricao']); ?></div>
           <textarea id="input-descricao" class="campo-textarea" placeholder="Descreva o evento..." autocomplete="off"><?php echo htmlspecialchars($evento['descricao']); ?></textarea>
         </div>
-        <div class="BotaoVoltar botao">
-          <button id="btn-voltar" class="botao-voltar">Voltar</button>
+        <div class="BotaoVoltar">
+          <button id="btn-voltar" class="botao botao-voltar">Voltar</button>
         </div>
-        <div class="BotaoGerenciar botao">
-          <button id="btn-gerenciar" class="botao-gerenciar">Gerenciar</button>
+        <div class="BotaoGerenciar">
+          <button id="btn-gerenciar" class="botao botao-gerenciar">Gerenciar</button>
         </div>
-        <div class="BotaoEditar botao">
-          <button id="btn-editar" class="botao-editar">Editar</button>
+        <div class="BotaoEditar">
+          <button id="btn-editar" class="botao botao-editar">Editar</button>
         </div>
       </div>
     </main>
@@ -2093,31 +1880,32 @@ if ($stmtPermissao && $cpfUsuario) {
   </div>
 
   <!-- Modal Mensagem ao Organizador -->
-  <div id="modal-mensagem" class="modal-mensagem">
-    <div class="conteudo" onclick="event.stopPropagation()">
-      <div class="cabecalho">
-        <span>Enviar mensagem ao organizador</span>
-        <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+  <div id="modal-mensagem" class="modal-overlay">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <div class="modal-cabecalho">
+        <h2 class="modal-titulo">Enviar mensagem ao organizador</h2>
+        <button type="button" class="modal-btn-fechar" onclick="fecharModalMensagem()" aria-label="Fechar">&times;</button>
       </div>
-      <div>
-        <textarea id="texto-mensagem-organizador" maxlength="500"
+      <div class="modal-corpo">
+        <textarea id="texto-mensagem-organizador" class="modal-mensagem-textarea" maxlength="500"
           placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
         <div id="contador-mensagem-organizador" class="contador-caracteres">0 / 500</div>
-        <div class="acoes">
-          <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
-          <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
+        <div class="modal-mensagem-acoes">
+          <button class="modal-btn cancelar" type="button" onclick="fecharModalMensagem()">Cancelar</button>
+          <button class="modal-btn enviar" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Modal Compartilhar -->
-  <div id="modal-compartilhar" class="modal-compartilhar">
-    <div class="conteudo">
-      <div class="cabecalho">
-        <span>Compartilhar</span>
-        <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
+  <div id="modal-compartilhar" class="modal-overlay">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <div class="modal-cabecalho">
+        <h2 class="modal-titulo">Compartilhar</h2>
+        <button type="button" class="modal-btn-fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">&times;</button>
       </div>
+      <div class="modal-corpo">
 
       <div class="opcoes-compartilhamento">
         <button class="btn-compartilhar-app" onclick="compartilharWhatsApp()" title="Compartilhar no WhatsApp">
@@ -2170,8 +1958,9 @@ if ($stmtPermissao && $cpfUsuario) {
         <input type="text" id="link-inscricao" readonly />
       </div>
 
-      <div class="aviso-compartilhar">
+      <div class="modal-alerta info">
         <strong>ℹ️ Informação:</strong> Este link é para <strong>inscrição no evento</strong>. Para adicionar um novo organizador, use o botão <strong>"+"</strong> ao lado campo "Organizado por:".
+      </div>
       </div>
     </div>
   </div>

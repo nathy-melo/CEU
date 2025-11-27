@@ -39,15 +39,27 @@ function inicializarFiltroEventos() {
                 delete caixa.dataset.hiddenBySearch;
             }
 
-            const hiddenByFilter = caixa.dataset.hiddenByFilter === 'true';
-            const hiddenBySearch = caixa.dataset.hiddenBySearch === 'true';
-            const deveOcultar = hiddenByFilter || hiddenBySearch;
-
-            caixa.style.display = deveOcultar ? 'none' : '';
-            if (!deveOcultar) algumaVisivel = true;
+            // Usa função de atualização de visibilidade se disponível (integração com paginação)
+            if (typeof window.atualizarVisibilidadeEvento === 'function') {
+                window.atualizarVisibilidadeEvento(caixa);
+            } else {
+                // Fallback para comportamento antigo
+                const hiddenByFilter = caixa.dataset.hiddenByFilter === 'true';
+                const hiddenBySearch = caixa.dataset.hiddenBySearch === 'true';
+                const deveOcultar = hiddenByFilter || hiddenBySearch;
+                caixa.style.display = deveOcultar ? 'none' : '';
+            }
+            
+            // Verificar se está visível
+            if (caixa.style.display !== 'none') algumaVisivel = true;
         });
 
         atualizarMensagemSemResultados(algumaVisivel);
+        
+        // Resetar paginação para primeira página e atualizar contador de eventos
+        if (typeof window.resetarPaginacao === 'function') {
+            window.resetarPaginacao('eventos-container');
+        }
     }
 
     if (searchButton) {
@@ -75,6 +87,11 @@ function inicializarFiltroEventos() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar paginação primeiro (se disponível)
+    if (typeof window.inicializarPaginacaoEventos === 'function') {
+        window.inicializarPaginacaoEventos('eventos-container');
+    }
+    
     inicializarFiltroEventos();
 });
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML

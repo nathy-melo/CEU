@@ -40,6 +40,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descricao = $_POST['descricao'] ?? '';
     $modeloCertificadoParticipante = $_POST['modelo_certificado_participante'] ?? 'ModeloExemplo.pptx';
     $modeloCertificadoOrganizador = $_POST['modelo_certificado_organizador'] ?? 'ModeloExemploOrganizador.pptx';
+    $cargaHorariaParticipante = $_POST['carga_horaria_participante'] ?? '';
+    $cargaHorariaOrganizador = $_POST['carga_horaria_organizador'] ?? '';
+
+    // Função para converter HH:MM para decimal
+    function converterHoraParaDecimal($horaStr) {
+        if (empty($horaStr) || $horaStr === '-') return 0;
+        $partes = explode(':', $horaStr);
+        if (count($partes) !== 2) return 0;
+        $horas = intval($partes[0]);
+        $minutos = intval($partes[1]);
+        return $horas + ($minutos / 60.0);
+    }
+
+    // Valida e converte carga horária do participante
+    if (empty($cargaHorariaParticipante)) {
+        echo json_encode(['erro' => 'Carga horária do participante é obrigatória']);
+        exit;
+    }
+    if (!preg_match('/^[0-9]{1,3}:[0-5][0-9]$/', $cargaHorariaParticipante)) {
+        echo json_encode(['erro' => 'Formato de carga horária do participante inválido. Use HH:MM (ex: 08:00)']);
+        exit;
+    }
+    $duracaoParticipante = converterHoraParaDecimal($cargaHorariaParticipante);
+
+    // Valida e converte carga horária do organizador (opcional)
+    // Se não for definido, copia a duração do participante
+    if (!empty($cargaHorariaOrganizador)) {
+        if (!preg_match('/^[0-9]{1,3}:[0-5][0-9]$/', $cargaHorariaOrganizador)) {
+            echo json_encode(['erro' => 'Formato de carga horária do organizador inválido. Use HH:MM (ex: 16:00)']);
+            exit;
+        }
+        $duracaoOrganizador = converterHoraParaDecimal($cargaHorariaOrganizador);
+    } else {
+        // Se não preencheu, copia do participante
+        $duracaoOrganizador = $duracaoParticipante;
+    }
 
     // Validação básica
     if (
@@ -97,11 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $inicioInscricaoStr = $inicioInscricao ?? '';
     $fimInscricaoStr = $fimInscricao ?? '';
 
-    // Calcula duração em horas
-    $intervalo = $dataInicioObj->diff($dataConclusaoObj);
-    $duracao = ($intervalo->days * 24) + $intervalo->h + ($intervalo->i / 60);
+    // Usa a carga horária do participante informada pelo usuário
+    $duracao = $duracaoParticipante;
 
     // Valida: se o evento é no mesmo dia, não pode ter mais de 16 horas
+    $intervalo = $dataInicioObj->diff($dataConclusaoObj);
     if ($intervalo->days === 0 && $duracao > 16) {
         echo json_encode(['erro' => 'Um evento de um único dia não pode ter mais de 16 horas de duração.']);
         exit;
@@ -194,20 +230,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         garantirColunaEvento($conexao, 'tipo_certificado', "VARCHAR(50) NULL DEFAULT 'Sem certificacao'");
         garantirColunaEvento($conexao, 'modelo_certificado_participante', "VARCHAR(255) NULL DEFAULT 'ModeloExemplo.pptx'");
         garantirColunaEvento($conexao, 'modelo_certificado_organizador', "VARCHAR(255) NULL DEFAULT 'ModeloExemploOrganizador.pptx'");
+        garantirColunaEvento($conexao, 'duracao_organizador', 'FLOAT NULL COMMENT "Carga horária do organizador"');
 
         // Insere evento (mantém campo imagem com a principal para compatibilidade)
-        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao, tipo_certificado, modelo_certificado_participante, modelo_certificado_organizador) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sqlEvento = "INSERT INTO evento (cod_evento, categoria, nome, lugar, descricao, publico_alvo, inicio, conclusao, duracao, duracao_organizador, certificado, modalidade, imagem, inicio_inscricao, fim_inscricao, tipo_certificado, modelo_certificado_participante, modelo_certificado_organizador) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
-        // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s)
+        // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), duracao_organizador(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s)
         // Para campos NULL, usa string vazia (será tratado como NULL no banco se o campo aceitar NULL)
         $inicioInscricaoFinal = (!empty($inicioInscricaoStr)) ? $inicioInscricaoStr : '';
         $fimInscricaoFinal = (!empty($fimInscricaoStr)) ? $fimInscricaoStr : '';
+        // duracao_organizador recebe o valor que foi copiado do participante se não preenchido
+        $duracaoOrganizadorFinal = $duracaoOrganizador;
 
         mysqli_stmt_bind_param(
             $stmtEvento,
-            "isssssssdisissssss",
+            "isssssssddisissssss",
             $codEvento,
             $categoria,
             $nome,
@@ -217,6 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $inicio,
             $conclusao,
             $duracao,
+            $duracaoOrganizadorFinal,
             $certificadoBool,
             $modalidade,
             $caminhoImagemPrincipal,
@@ -821,26 +861,37 @@ mysqli_close($conexao);
             grid-row-start: 2;
         }
 
-        .DataHorarioInicio {
+        .CargaHorariaParticipante {
             grid-column: span 4 / span 4;
             grid-row-start: 3;
+        }
+
+        .CargaHorariaOrganizador {
+            grid-column: span 4 / span 4;
+            grid-column-start: 5;
+            grid-row-start: 3;
+        }
+
+        .DataHorarioInicio {
+            grid-column: span 4 / span 4;
+            grid-row-start: 4;
         }
 
         .DataHorarioFim {
             grid-column: span 4 / span 4;
             grid-column-start: 5;
-            grid-row-start: 3;
+            grid-row-start: 4;
         }
 
         .DataHorarioInscricaoInicio {
             grid-column: span 4 / span 4;
-            grid-row-start: 4;
+            grid-row-start: 5;
         }
 
         .DataHorarioInscricaoFim {
             grid-column: span 4 / span 4;
             grid-column-start: 5;
-            grid-row-start: 4;
+            grid-row-start: 5;
         }
 
         /* Container para campos de data e horário */
@@ -864,42 +915,42 @@ mysqli_close($conexao);
 
         .PublicoAlvo {
             grid-column: span 2 / span 2;
-            grid-row-start: 5;
+            grid-row-start: 6;
         }
 
         .Categoria {
             grid-column: span 2 / span 2;
             grid-column-start: 3;
-            grid-row-start: 5;
+            grid-row-start: 6;
         }
 
         .Modalidade {
             grid-column: span 2 / span 2;
             grid-column-start: 5;
-            grid-row-start: 5;
+            grid-row-start: 6;
         }
 
         .Certificado {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 5;
+            grid-row-start: 6;
         }
 
         .ModeloCertificadoParticipante {
             grid-column: span 4 / span 4;
-            grid-row-start: 6;
+            grid-row-start: 7;
         }
 
         .ModeloCertificadoOrganizador {
             grid-column: span 4 / span 4;
             grid-column-start: 5;
-            grid-row-start: 6;
+            grid-row-start: 7;
         }
 
         .Imagem {
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
-            grid-row-start: 7;
+            grid-row-start: 8;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -911,18 +962,18 @@ mysqli_close($conexao);
             grid-column: span 4 / span 4;
             grid-row: span 3 / span 3;
             grid-column-start: 5;
-            grid-row-start: 7;
+            grid-row-start: 8;
         }
 
         .BotaoVoltar {
             grid-column: span 2 / span 2;
-            grid-row-start: 10;
+            grid-row-start: 11;
         }
 
         .BotaoCriar {
             grid-column: span 2 / span 2;
             grid-column-start: 7;
-            grid-row-start: 10;
+            grid-row-start: 11;
         }
 
         .campo-imagem {
@@ -1461,6 +1512,14 @@ mysqli_close($conexao);
                 <label for="local"><span style="color: red;">*</span> Local:</label>
                 <input type="text" id="local" name="local" class="campo-input" placeholder="Digite o local do evento" required autocomplete="off">
             </div>
+            <div class="CargaHorariaParticipante grupo-campo">
+                <label for="carga-horaria-participante"><span style="color: red;">*</span> Carga Horária do Participante:</label>
+                <input type="text" id="carga-horaria-participante" name="carga_horaria_participante" class="campo-input" placeholder="Ex: 08:00" required autocomplete="off" pattern="[0-9]{2}:[0-9]{2}" title="Formato: HH:MM">
+            </div>
+            <div class="CargaHorariaOrganizador grupo-campo">
+                <label for="carga-horaria-organizador">Carga Horária do Organizador:</label>
+                <input type="text" id="carga-horaria-organizador" name="carga_horaria_organizador" class="campo-input" placeholder="Ex: 16:00" autocomplete="off" pattern="[0-9]{2}:[0-9]{2}" title="Formato: HH:MM">
+            </div>
             <div class="DataHorarioInicio grupo-campo">
                 <label for="data-inicio"><span style="color: red;">*</span> Data e Horário de Início do Evento:</label>
                 <div class="campo-data-horario">
@@ -1851,6 +1910,11 @@ mysqli_close($conexao);
                         elemento: document.getElementById('local')
                     },
                     {
+                        id: 'carga-horaria-participante',
+                        nome: 'Carga Horária do Participante',
+                        elemento: document.getElementById('carga-horaria-participante')
+                    },
+                    {
                         id: 'data-inicio',
                         nome: 'Data de Início',
                         elemento: document.getElementById('data-inicio')
@@ -1913,8 +1977,20 @@ mysqli_close($conexao);
                             camposFaltantes.push(campo.nome);
                             elementosFaltantes.push(campo.elemento);
                         } else {
-                            campo.elemento.style.borderColor = '';
-                            campo.elemento.style.boxShadow = '';
+                            // Validação adicional para carga horária
+                            if (campo.id === 'carga-horaria-participante' || campo.id === 'carga-horaria-organizador') {
+                                const regex = /^[0-9]{1,3}:[0-5][0-9]$/;
+                                if (!regex.test(valor)) {
+                                    camposFaltantes.push(campo.nome + ' (formato inválido, use HH:MM)');
+                                    elementosFaltantes.push(campo.elemento);
+                                } else {
+                                    campo.elemento.style.borderColor = '';
+                                    campo.elemento.style.boxShadow = '';
+                                }
+                            } else {
+                                campo.elemento.style.borderColor = '';
+                                campo.elemento.style.boxShadow = '';
+                            }
                         }
                     }
                 });

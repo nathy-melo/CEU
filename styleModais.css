@@ -1,0 +1,636 @@
+/* ========================================
+   ESTILOS PADRONIZADOS PARA MODAIS
+   Sistema de Eventos CEU
+   ======================================== */
+
+/* =====================================
+   OVERLAY BASE
+   ===================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--fundo-escuro-transparente);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.ativo {
+  display: flex;
+}
+
+/* =====================================
+   CONTAINER DO MODAL
+   ===================================== */
+.modal-container {
+  background: var(--caixas);
+  color: var(--branco);
+  border-radius: 1rem;
+  padding: 0;
+  width: 90%;
+  max-width: 32rem;
+  max-height: 85vh;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tamanho médio para modais com mais conteúdo */
+.modal-container.modal-medio {
+  max-width: 42rem;
+}
+
+/* Tamanho grande para modais complexos */
+.modal-container.modal-grande {
+  max-width: 60rem;
+}
+
+/* Modal pequeno para confirmações rápidas */
+.modal-container.modal-pequeno {
+  max-width: 32rem;
+  text-align: center;
+  padding: 1.875rem;
+  border-radius: 1.875rem;
+}
+
+/* =====================================
+   CABEÇALHO DO MODAL
+   ===================================== */
+.modal-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.modal-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--branco);
+  margin: 0;
+}
+
+.modal-btn-fechar {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--branco);
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-btn-fechar:hover {
+  opacity: 0.7;
+  transform: scale(1.1);
+}
+
+/* =====================================
+   CORPO DO MODAL
+   ===================================== */
+.modal-corpo {
+  padding: 1.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  color: var(--branco);
+}
+
+/* Estilo para scrollbar personalizada */
+.modal-corpo::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-corpo::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.modal-corpo::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.modal-corpo::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* =====================================
+   RODAPÉ DO MODAL
+   ===================================== */
+.modal-rodape {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+/* Para modais de confirmação, centralizar botões */
+.modal-rodape.centralizado {
+  justify-content: center;
+}
+
+/* Para botões que ocupam linha inteira */
+.modal-rodape.full-width {
+  flex-direction: column;
+}
+
+/* =====================================
+   BOTÕES DO MODAL
+   ===================================== */
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.625rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+.modal-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 0.35rem 0.7rem rgba(0, 0, 0, 0.25);
+}
+
+.modal-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0.15rem 0.3rem rgba(0, 0, 0, 0.2);
+}
+
+.modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botão Confirmar - Verde */
+.modal-btn.confirmar,
+.modal-btn.btn-confirmar {
+  background: var(--verde);
+  color: var(--branco);
+}
+
+/* Botão Cancelar - Vermelho */
+.modal-btn.cancelar,
+.modal-btn.btn-cancelar {
+  background: var(--vermelho);
+  color: var(--branco);
+}
+
+/* Botão Enviar/Primário - Cor do sistema */
+.modal-btn.enviar,
+.modal-btn.primario,
+.modal-btn.btn-enviar {
+  background: var(--botao);
+  color: var(--branco);
+}
+
+/* Botão Secundário - Transparente com borda */
+.modal-btn.secundario {
+  background: transparent;
+  color: var(--branco);
+  border: 2px solid var(--branco);
+  box-shadow: none;
+}
+
+.modal-btn.secundario:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Botão OK - Cor do sistema */
+.modal-btn.ok {
+  background: var(--botao);
+  color: var(--branco);
+  width: 100%;
+}
+
+/* =====================================
+   ELEMENTOS DE FORMULÁRIO
+   ===================================== */
+.modal-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.modal-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--branco);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.modal-form-group input,
+.modal-form-group textarea,
+.modal-form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--branco);
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.modal-form-group input::placeholder,
+.modal-form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.modal-form-group input:focus,
+.modal-form-group textarea:focus,
+.modal-form-group select:focus {
+  outline: none;
+  border-color: var(--botao);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.modal-form-group input:disabled,
+.modal-form-group textarea:disabled,
+.modal-form-group select:disabled {
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.modal-form-group textarea {
+  resize: vertical;
+  min-height: 8rem;
+  font-family: inherit;
+}
+
+/* =====================================
+   MENSAGENS E ALERTAS
+   ===================================== */
+.modal-alerta {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.modal-alerta.info {
+  background: rgba(66, 135, 245, 0.1);
+  border-left: 3px solid var(--botao);
+  color: var(--branco);
+}
+
+.modal-alerta.sucesso {
+  background: rgba(40, 167, 69, 0.1);
+  border-left: 3px solid var(--verde);
+  color: var(--branco);
+}
+
+.modal-alerta.erro {
+  background: rgba(220, 53, 69, 0.1);
+  border-left: 3px solid var(--vermelho);
+  color: var(--branco);
+}
+
+.modal-alerta.aviso {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 3px solid #ffc107;
+  color: var(--branco);
+}
+
+.modal-alerta strong {
+  font-weight: 700;
+}
+
+/* =====================================
+   CONTADOR DE CARACTERES
+   ===================================== */
+.modal-contador-caracteres {
+  text-align: right;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.5rem;
+}
+
+.modal-contador-caracteres.limite-alcancado {
+  color: var(--vermelho);
+  font-weight: 600;
+}
+
+/* =====================================
+   LISTAS
+   ===================================== */
+.modal-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.modal-item-lista {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: background 0.2s;
+}
+
+.modal-item-lista:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* =====================================
+   MENSAGEM DE VAZIO
+   ===================================== */
+.modal-vazio {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* =====================================
+   LINHA DE SEPARAÇÃO
+   ===================================== */
+.modal-separador {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin: 1.5rem 0;
+}
+
+/* =====================================
+   BLOQUEIO DE SCROLL DA PÁGINA
+   ===================================== */
+body.modal-aberto {
+  overflow: hidden;
+}
+
+/* =====================================
+   RESPONSIVIDADE
+   ===================================== */
+@media (max-width: 768px) {
+  .modal-container {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .modal-cabecalho {
+    padding: 1.25rem 1rem 0.75rem;
+  }
+  
+  .modal-titulo {
+    font-size: 1.1rem;
+  }
+  
+  .modal-corpo {
+    padding: 1rem;
+  }
+  
+  .modal-rodape {
+    padding: 0.75rem 1rem 1rem;
+    flex-direction: column;
+  }
+  
+  .modal-btn {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+  }
+  
+  .modal-rodape.centralizado .modal-btn {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .modal-titulo {
+    font-size: 1rem;
+  }
+  
+  .modal-btn {
+    font-size: 0.95rem;
+  }
+}
+
+/* =====================================
+   ANIMAÇÕES
+   ===================================== */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-overlay.ativo {
+  animation: modalFadeIn 0.2s ease;
+}
+
+.modal-overlay.ativo .modal-container {
+  animation: modalSlideIn 0.3s ease;
+}
+
+/* =====================================
+   MODAL COMPARTILHAR - ESPECÍFICO
+   ===================================== */
+.opcoes-compartilhamento {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-compartilhar-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 0.5rem;
+}
+
+.btn-compartilhar-app:hover {
+  transform: translateY(-3px);
+}
+
+.icone-app {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.icone-whatsapp {
+  background: #25D366;
+}
+
+.icone-instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.icone-email {
+  background: #EA4335;
+}
+
+.icone-x {
+  background: #000000;
+}
+
+.icone-copiar {
+  background: var(--botao);
+}
+
+.btn-compartilhar-app span {
+  font-size: 0.75rem;
+  color: var(--branco);
+  font-weight: 500;
+}
+
+.campo-link {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.campo-link input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--branco);
+  font-size: 0.85rem;
+  outline: none;
+  font-family: monospace;
+}
+
+/* =====================================
+   MODAL FAVORITOS - ESPECÍFICO
+   ===================================== */
+.lista-favoritos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  max-height: 65vh;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.lista-favoritos::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lista-favoritos::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.lista-favoritos::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.lista-favoritos::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* =====================================
+   MODAL DE MENSAGEM
+   ===================================== */
+.modal-mensagem-textarea {
+  width: 100%;
+  min-height: 8rem;
+  max-height: 20rem;
+  resize: vertical;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--branco);
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-mensagem-textarea:focus {
+  border-color: var(--botao);
+}
+
+.modal-mensagem-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.contador-caracteres {
+  text-align: right;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.contador-caracteres.limite-alcancado {
+  color: var(--vermelho);
+  font-weight: 600;
+}
+
+.modal-mensagem-acoes {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+

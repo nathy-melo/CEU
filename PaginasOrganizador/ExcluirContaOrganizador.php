@@ -36,7 +36,7 @@ try {
     // A ordem é CRÍTICA para evitar erros de constraint
     
     // 1. Remove notificações do usuário
-    $sql_notif = "DELETE FROM notificacao WHERE CPF_usuario = ?";
+    $sql_notif = "DELETE FROM notificacoes WHERE CPF = ?";
     $stmt_notif = mysqli_prepare($conexao, $sql_notif);
     if ($stmt_notif) {
         mysqli_stmt_bind_param($stmt_notif, "s", $cpf);

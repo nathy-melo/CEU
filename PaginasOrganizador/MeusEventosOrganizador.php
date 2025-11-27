@@ -297,250 +297,11 @@ function formatar($txt) {
             display: block;
         }
 
-        /* Modal de Favoritos */
-        .modal-favoritos {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--fundo-escuro-transparente);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        .modal-favoritos.ativo { display: flex; }
-        .modal-favoritos .conteudo {
-            background: var(--caixas);
-            color: var(--texto);
-            width: 100%;
-            max-width: 60rem;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
-        }
-        .modal-favoritos .cabecalho {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            font-weight: 800;
-            font-size: 1.25rem;
-        }
-        .modal-favoritos button.fechar {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--texto);
-            transition: opacity 0.2s;
-        }
-        .modal-favoritos button.fechar:hover { opacity: 0.7; }
-        .lista-favoritos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-            max-height: 65vh;
-            overflow-y: auto;
-            padding: 0.25rem;
-        }
-        .lista-favoritos::-webkit-scrollbar { width: 0.5rem; }
-        .lista-favoritos::-webkit-scrollbar-track { background: var(--fundo-claro-transparente); border-radius: 0.25rem; }
-        .lista-favoritos::-webkit-scrollbar-thumb { background: var(--botao); border-radius: 0.25rem; }
-        .lista-favoritos::-webkit-scrollbar-thumb:hover { background: var(--destaque); }
+        /* Modal de Favoritos agora em styleModais.css */
 
-        /* Modal de mensagem ao organizador */
-        .modal-mensagem {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--fundo-escuro-transparente);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        .modal-mensagem.ativo { display: flex; }
-        .modal-mensagem .conteudo {
-            background: var(--caixas);
-            color: var(--texto);
-            width: 100%;
-            max-width: 32rem;
-            border-radius: 1rem;
-            padding: 1.25rem;
-            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
-        }
-        .modal-mensagem .cabecalho {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            font-weight: 800;
-            font-size: 1.15rem;
-        }
-        .modal-mensagem button.fechar {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--texto);
-        }
-        .modal-mensagem textarea {
-            width: 100%;
-            min-height: 8rem;
-            resize: vertical;
-            border-radius: 0.5rem;
-            border: 1px solid var(--borda-clara);
-            background: var(--fundo-claro-transparente);
-            color: var(--texto);
-            padding: 0.75rem;
-            font-size: 0.95rem;
-        }
-        .modal-mensagem .contador-caracteres {
-            text-align: right;
-            font-size: 0.85rem;
-            color: var(--texto);
-            margin-top: 0.5rem;
-            opacity: 0.7;
-        }
-        .modal-mensagem .contador-caracteres.limite-alcancado {
-            color: var(--vermelho);
-            opacity: 1;
-            font-weight: 600;
-        }
-        .modal-mensagem .acoes {
-            margin-top: 0.75rem;
-            display: flex;
-            gap: 0.75rem;
-            justify-content: space-between;
-        }
-        .modal-mensagem .botao-primario {
-            background: var(--botao);
-            color: var(--branco);
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.6rem 1rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .modal-mensagem .botao-secundario {
-            background: var(--vermelho);
-            color: var(--branco);
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.6rem 1rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        /* Modal de mensagem agora em styleModais.css */
 
-        /* Modal de Compartilhar */
-        .modal-compartilhar {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--fundo-escuro-transparente);
-            z-index: 10010;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        .modal-compartilhar.ativo { display: flex; }
-        .modal-compartilhar .conteudo {
-            background: var(--caixas);
-            color: var(--texto);
-            width: 100%;
-            max-width: 32rem;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
-        }
-        .modal-compartilhar .cabecalho {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            font-weight: 800;
-            font-size: 1.25rem;
-        }
-        .modal-compartilhar button.fechar {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--texto);
-            transition: opacity 0.2s;
-        }
-        .modal-compartilhar button.fechar:hover { opacity: 0.7; }
-        .opcoes-compartilhamento {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .btn-compartilhar-app {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.4rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s;
-            padding: 0.5rem;
-        }
-        .btn-compartilhar-app:hover { transform: translateY(-3px); }
-        .icone-app {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        .icone-whatsapp { background: var(--whatsapp); }
-        .icone-instagram {
-            background: linear-gradient(45deg, var(--instagram-inicio) 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, var(--instagram-fim) 100%);
-        }
-        .icone-email { background: var(--email-vermelho); }
-        .icone-x { background: var(--preto); }
-        .icone-copiar { background: var(--botao); }
-        .btn-compartilhar-app span {
-            font-size: 0.75rem;
-            color: var(--branco);
-            font-weight: 500;
-        }
-        .campo-link {
-            background: var(--fundo-claro-transparente);
-            border: 1px solid var(--borda-clara);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .campo-link input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--texto);
-            font-size: 0.85rem;
-            outline: none;
-            font-family: monospace;
-        }
-        .aviso-compartilhar {
-            background: var(--fundo-azul-info);
-            border-left: 3px solid var(--botao);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--texto);
-            line-height: 1.4;
-        }
-        .aviso-compartilhar strong { color: var(--botao); }
+        /* Modal de Compartilhar agora em styleModais.css */
 
         /* Cards de favoritos - mesmo estilo do InicioParticipante.php */
         .favorito-item {
@@ -768,6 +529,7 @@ function formatar($txt) {
                             data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
                             data-localizacao="<?= htmlspecialchars($local) ?>"
                             data-data="<?= $dataInicioISO ?>"
+                            data-data-fim="<?= date('Y-m-d', strtotime($ev['conclusao'])) ?>"
                             data-certificado="<?= $cert ?>"
                             data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
                             <!-- Ações flutuantes: Favoritar, Mensagem, Compartilhar -->
@@ -859,6 +621,7 @@ function formatar($txt) {
                             data-modalidade="<?= htmlspecialchars($modalidadeAttr) ?>"
                             data-localizacao="<?= htmlspecialchars($local) ?>"
                             data-data="<?= $dataInicioISO ?>"
+                            data-data-fim="<?= date('Y-m-d', strtotime($ev['conclusao'])) ?>"
                             data-certificado="<?= $cert ?>"
                             data-cod-evento="<?= (int)$ev['cod_evento'] ?>">
                             <!-- Ações flutuantes: Favoritar, Mensagem, Compartilhar -->
@@ -926,42 +689,45 @@ function formatar($txt) {
     </div>
 
     <!-- Modal Favoritos -->
-    <div id="modal-favoritos" class="modal-favoritos">
-        <div class="conteudo" onclick="event.stopPropagation()">
-            <div class="cabecalho">
-                <span>Meus favoritos</span>
-                <button type="button" class="fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">×</button>
+    <div id="modal-favoritos" class="modal-overlay">
+        <div class="modal-container modal-grande" onclick="event.stopPropagation()">
+            <div class="modal-cabecalho">
+                <h2 class="modal-titulo">Meus favoritos</h2>
+                <button type="button" class="modal-btn-fechar" onclick="fecharModalFavoritos()" aria-label="Fechar">&times;</button>
             </div>
-            <div id="lista-favoritos" class="lista-favoritos"></div>
+            <div class="modal-corpo">
+                <div id="lista-favoritos" class="lista-favoritos"></div>
+            </div>
         </div>
     </div>
 
     <!-- Modal Mensagem ao Organizador -->
-    <div id="modal-mensagem" class="modal-mensagem">
-        <div class="conteudo" onclick="event.stopPropagation()">
-            <div class="cabecalho">
-                <span>Enviar mensagem ao organizador</span>
-                <button type="button" class="fechar" onclick="fecharModalMensagem()" aria-label="Fechar">×</button>
+    <div id="modal-mensagem" class="modal-overlay">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="modal-cabecalho">
+                <h2 class="modal-titulo">Enviar mensagem ao organizador</h2>
+                <button type="button" class="modal-btn-fechar" onclick="fecharModalMensagem()" aria-label="Fechar">&times;</button>
             </div>
-            <div>
-                <textarea id="texto-mensagem-organizador" maxlength="500"
+            <div class="modal-corpo">
+                <textarea id="texto-mensagem-organizador" class="modal-mensagem-textarea" maxlength="500"
                     placeholder="Escreva sua mensagem (máx. 500 caracteres)"></textarea>
                 <div id="contador-mensagem-organizador" class="contador-caracteres">0 / 500</div>
-                <div class="acoes">
-                    <button class="botao-secundario botao" type="button" onclick="fecharModalMensagem()">Cancelar</button>
-                    <button class="botao-primario botao" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
+                <div class="modal-mensagem-acoes">
+                    <button class="modal-btn cancelar" type="button" onclick="fecharModalMensagem()">Cancelar</button>
+                    <button class="modal-btn enviar" type="button" onclick="enviarMensagemOrganizador()">Enviar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal Compartilhar -->
-    <div id="modal-compartilhar" class="modal-compartilhar">
-        <div class="conteudo">
-            <div class="cabecalho">
-                <span>Compartilhar</span>
-                <button type="button" class="fechar" onclick="event.stopPropagation(); fecharModalCompartilhar();" aria-label="Fechar">×</button>
+    <div id="modal-compartilhar" class="modal-overlay">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="modal-cabecalho">
+                <h2 class="modal-titulo">Compartilhar</h2>
+                <button type="button" class="modal-btn-fechar" onclick="fecharModalCompartilhar()" aria-label="Fechar">&times;</button>
             </div>
+            <div class="modal-corpo">
             <div class="opcoes-compartilhamento">
                 <button class="btn-compartilhar-app" onclick="compartilharWhatsApp()" title="Compartilhar no WhatsApp">
                     <div class="icone-app icone-whatsapp">
@@ -1007,8 +773,9 @@ function formatar($txt) {
             <div class="campo-link">
                 <input type="text" id="link-inscricao" readonly />
             </div>
-            <div class="aviso-compartilhar">
+            <div class="modal-alerta info">
                 <strong>ℹ️ Informação:</strong> Compartilhe este evento com seus amigos e familiares!
+            </div>
             </div>
         </div>
     </div>

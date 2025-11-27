@@ -341,11 +341,22 @@ function applyFiltersParticipante() {
             delete card.dataset.hiddenByFilter;
         }
 
-        const hiddenByFilter = card.dataset.hiddenByFilter === 'true';
-        const hiddenBySearch = card.dataset.hiddenBySearch === 'true';
-        const deveOcultar = hiddenByFilter || hiddenBySearch;
-        card.style.display = deveOcultar ? 'none' : '';
+        // Usa função de atualização de visibilidade se disponível (integração com paginação)
+        if (typeof window.atualizarVisibilidadeEvento === 'function') {
+            window.atualizarVisibilidadeEvento(card);
+        } else {
+            // Fallback para comportamento antigo
+            const hiddenByFilter = card.dataset.hiddenByFilter === 'true';
+            const hiddenBySearch = card.dataset.hiddenBySearch === 'true';
+            const deveOcultar = hiddenByFilter || hiddenBySearch;
+            card.style.display = deveOcultar ? 'none' : '';
+        }
     });
+
+    // Resetar paginação para primeira página e atualizar contador de eventos
+    if (typeof window.resetarPaginacao === 'function') {
+        window.resetarPaginacao('eventos-container');
+    }
 
     // Aplicar ordenação alfabética ou restaurar ordem original
     if (ordenacaoSelecionada !== 'nenhuma') {

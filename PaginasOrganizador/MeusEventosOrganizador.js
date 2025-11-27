@@ -256,7 +256,14 @@ function inicializarFiltroEventos() {
 
         if (termoBusca === '') {
             // Sem pesquisa: mostra as seções separadas normalmente
-            todosEventos.forEach(evento => evento.style.display = '');
+            todosEventos.forEach(evento => {
+                delete evento.dataset.hiddenBySearch;
+                if (typeof window.atualizarVisibilidadeEvento === 'function') {
+                    window.atualizarVisibilidadeEvento(evento);
+                } else {
+                    evento.style.display = '';
+                }
+            });
             
             // Mostra todos os elementos das seções (wrappers inteiros)
             if (wrapperMeusEventos) wrapperMeusEventos.style.display = '';
@@ -314,10 +321,18 @@ function inicializarFiltroEventos() {
                     const textoInfo = elementoInfo.textContent.toLowerCase();
 
                     if (textoTitulo.includes(termoBusca) || textoInfo.includes(termoBusca)) {
-                        caixaEvento.style.display = '';
+                        delete caixaEvento.dataset.hiddenBySearch;
                         encontrouResultados = true;
                     } else {
-                        caixaEvento.style.display = 'none';
+                        caixaEvento.dataset.hiddenBySearch = 'true';
+                    }
+
+                    // Usa função de atualização de visibilidade se disponível (integração com paginação)
+                    if (typeof window.atualizarVisibilidadeEvento === 'function') {
+                        window.atualizarVisibilidadeEvento(caixaEvento);
+                    } else {
+                        const deveOcultar = caixaEvento.dataset.hiddenBySearch === 'true';
+                        caixaEvento.style.display = deveOcultar ? 'none' : '';
                     }
                 }
             });
@@ -330,6 +345,11 @@ function inicializarFiltroEventos() {
             if (!encontrouResultados) {
                 containerEventos.appendChild(mensagemSemResultados);
             }
+        }
+
+        // Reaplicar paginação após filtro e atualizar contador de eventos
+        if (typeof window.aplicarPaginacaoMeusEventosOrganizador === 'function') {
+            window.aplicarPaginacaoMeusEventosOrganizador();
         }
     }
 

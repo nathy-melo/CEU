@@ -487,6 +487,12 @@ function inicializarEventosPerfilParticipante() {
         btnTornarOrganizador.addEventListener('click', mostrarModalCodigo);
     }
     
+    // Botão fechar modal (X)
+    const btnFecharModal = document.getElementById('btn-fechar-modal-codigo');
+    if (btnFecharModal) {
+        btnFecharModal.addEventListener('click', esconderModalCodigo);
+    }
+    
     // Botão cancelar modal
     const btnCancelarModal = document.getElementById('btn-cancelar-modal');
     if (btnCancelarModal) {

@@ -11,6 +11,7 @@
     <link rel="manifest" href="/CEU/manifest.json" />
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
+    <link rel="stylesheet" href="../styleModais.css" />
     <link rel="icon" type="image/png" href="../Imagens/CEU-Logo-1x1.png" />
     <script src="/CEU/pwa-config.js" defer></script>
 </head>
@@ -200,8 +201,9 @@
         const rotas = {
             'inicio': {
                 html: 'Inicio.php',
-                js: ['../PaginasGlobais/Filtro.js', 'Inicio.js'],
+                js: ['../PaginasGlobais/PaginacaoEventos.js', '../PaginasGlobais/Filtro.js', 'Inicio.js'],
                 init: () => {
+                    if (typeof window.inicializarPaginacaoEventos === 'function') window.inicializarPaginacaoEventos('eventos-container');
                     if (typeof window.inicializarFiltroEventos === 'function') window.inicializarFiltroEventos();
                     if (typeof window.inicializarFiltro === 'function') window.inicializarFiltro();
                 }

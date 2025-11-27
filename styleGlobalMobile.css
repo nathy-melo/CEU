@@ -2227,7 +2227,7 @@
   
   /* Card selecionado */
   .mobile-card.linha-selecionada {
-    background-color: transparent !important;
+    background-color: #FFF !important;
     border: 2px solid var(--botao) !important;
     border-left: 4px solid var(--botao) !important;
   }

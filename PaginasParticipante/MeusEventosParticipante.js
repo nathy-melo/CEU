@@ -119,6 +119,7 @@ function carregarEventosDoServidor() {
                 div.dataset.localizacao = local;
                 div.dataset.duracao = duracaoFaixa;
                 div.dataset.data = dataISO;
+                div.dataset.dataFim = dataConclusao.toISOString().split('T')[0];
                 div.dataset.certificado = cert;
                 div.setAttribute('data-cod-evento', evento.cod_evento);
 
@@ -194,6 +195,11 @@ function carregarEventosDoServidor() {
                 }
             }, 200);
 
+            // Inicializa a paginação após carregar os eventos (sempre mostra finalizados)
+            if (typeof window.inicializarPaginacaoEventos === 'function') {
+                window.inicializarPaginacaoEventos('eventos-container', true); // true = ocultar filtro de finalizados
+            }
+            
             // Reinicializa os filtros após carregar
             if (typeof window.inicializarFiltroEventos === 'function') {
                 window.inicializarFiltroEventos();
@@ -305,6 +311,11 @@ function inicializarFiltroEventos() {
         // Só mostra "Sem resultados" se houver caixas carregadas mas nenhuma visível
         if ((eventosContainer?.querySelectorAll('.CaixaDoEvento') || []).length > 0) {
             atualizarMensagemSemResultados(algumaVisivel);
+        }
+        
+        // Resetar paginação para primeira página e atualizar contador de eventos
+        if (typeof window.resetarPaginacao === 'function') {
+            window.resetarPaginacao('eventos-container');
         }
     }
 

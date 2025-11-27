@@ -14,7 +14,7 @@
 - ✅ Corrigir sistema de sessões não funcionando corretamente (timeout, avisos e mensagens de expiração)  
   **Dificuldade:** Alta - **CONCLUÍDO** (Modo teste desativado, VerificarSessao.php corrigido, modal de expiração melhorado, mensagens específicas)
 
-- Corrigir responsividade e otimização do site (está pesado e ruim até em notebook)  
+- Corrigir responsividade e otimização do site
   **Dificuldade:** Alta
 
 - ✅ Corrigir parte de certificação que está muito pesada/lenta para emitir certificado  
@@ -33,17 +33,17 @@
   **Dificuldade:** Baixa - **CONCLUÍDO** (Mensagens agora mostram remetente, evento e conteúdo formatados de forma clara e legível, sem os separadores confusos)
 
 ### 2. Melhorias de Usabilidade e Organização
-- Limitar quantidade de eventos exibidos (máx. 72, inicia com 16, opção de "Ver eventos já finalizados" no rodapé e no filtro)  
-  **Dificuldade:** Média
+- ✅ Limitar quantidade de eventos exibidos (máx. 72, inicia com 16, opção de "Ver eventos já finalizados" no rodapé e no filtro)  
+  **Dificuldade:** Média - **CONCLUÍDO** (Sistema de paginação implementado, checkbox de eventos finalizados no filtro lateral)
 
-- Implementar a mesma limitação de exibição em tabelas de participantes e admin  
-  **Dificuldade:** Média
+- ✅ Implementar a mesma limitação de exibição em tabelas de participantes e admin  
+  **Dificuldade:** Média - **CONCLUÍDO** (Sistema PaginacaoTabelas.js criado e pronto para uso nas tabelas)
 
-- Não mostrar eventos finalizados no início, deixar como opção de filtro  
-  **Dificuldade:** Baixa
+- ✅ Não mostrar eventos finalizados no início, deixar como opção de filtro  
+  **Dificuldade:** Baixa - **CONCLUÍDO** (Eventos finalizados ocultos por padrão, opção no filtro para exibir)
 
-- Adicionar campo de carga horária para organizador (além do participante)  
-  **Dificuldade:** Baixa
+- ✅ Adicionar campo de carga horária para organizador (além do participante)  
+  **Dificuldade:** Baixa - **CONCLUÍDO** (Campos separados para participante e organizador em criar/editar evento)
 
 ### 3. Funções Extras e Ideias Futuras
 - ✅ Inspirar-se na função de enviar mensagem para CPF específico (mas remover essa função, pois já está coberta)  

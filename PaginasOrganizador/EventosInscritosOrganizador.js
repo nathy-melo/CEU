@@ -44,15 +44,27 @@ function inicializarFiltroEventos() {
                 delete caixa.dataset.hiddenBySearch;
             }
 
-            const hiddenByFilter = caixa.dataset.hiddenByFilter === 'true';
-            const hiddenBySearch = caixa.dataset.hiddenBySearch === 'true';
-            const deveOcultar = hiddenByFilter || hiddenBySearch;
-
-            caixa.style.display = deveOcultar ? 'none' : '';
-            if (!deveOcultar) algumaVisivel = true;
+            // Usa função de atualização de visibilidade se disponível (integração com paginação)
+            if (typeof window.atualizarVisibilidadeEvento === 'function') {
+                window.atualizarVisibilidadeEvento(caixa);
+            } else {
+                // Fallback para comportamento antigo
+                const hiddenByFilter = caixa.dataset.hiddenByFilter === 'true';
+                const hiddenBySearch = caixa.dataset.hiddenBySearch === 'true';
+                const deveOcultar = hiddenByFilter || hiddenBySearch;
+                caixa.style.display = deveOcultar ? 'none' : '';
+            }
+            
+            // Verificar se está visível
+            if (caixa.style.display !== 'none') algumaVisivel = true;
         });
 
         atualizarMensagemSemResultados(algumaVisivel);
+        
+        // Resetar paginação para primeira página e atualizar contador de eventos
+        if (typeof window.resetarPaginacao === 'function') {
+            window.resetarPaginacao('eventos-container');
+        }
     }
 
     if (searchButton) {
@@ -136,6 +148,7 @@ function carregarEventosDoServidor() {
 
             data.eventos.forEach(evento => {
                 const dataInicio = new Date(evento.inicio.replace(' ', 'T'));
+                const dataConclusao = new Date(evento.conclusao.replace(' ', 'T'));
                 const dataFormatada = dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
                 const dataISO = dataInicio.toISOString().split('T')[0];
                 
@@ -186,6 +199,7 @@ function carregarEventosDoServidor() {
                 div.dataset.localizacao = local;
                 div.dataset.duracao = duracaoFaixa;
                 div.dataset.data = dataISO;
+                div.dataset.dataFim = dataConclusao.toISOString().split('T')[0];
                 div.dataset.certificado = cert;
                 div.setAttribute('data-cod-evento', evento.cod_evento);
 
@@ -265,6 +279,11 @@ function carregarEventosDoServidor() {
             // Reinicializa os filtros após carregar
             if (typeof window.inicializarFiltroEventos === 'function') {
                 window.inicializarFiltroEventos();
+            }
+
+            // Reaplicar paginação após carregar novos eventos
+            if (typeof window.aplicarPaginacaoEventos === 'function') {
+                window.aplicarPaginacaoEventos('eventos-container');
             }
         })
         .catch(error => {
