@@ -545,9 +545,6 @@
         body.modal-aberto #main-content {
             overflow: hidden !important;
         }
-
-        /* Modal de Compartilhar */
-        /* Modal de compartilhar agora em styleModais.css */
     </style>
 </head>
 

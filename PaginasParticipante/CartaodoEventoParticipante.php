@@ -416,10 +416,6 @@
     opacity: 0.95;
   }
 
-  /* Modal de Compartilhar */
-  /* Modal de compartilhar agora em styleModais.css */
-
-  /* Botões de ação direita do cartão */
   .botoes-acao-cartao {
     position: absolute;
     left: calc(50% + 30rem + 1rem);
@@ -441,7 +437,7 @@
     cursor: pointer;
     transition: transform 0.2s ease, background 0.2s ease;
     box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
-    background: #FFF;
+    background: var(--botao);
   }
 
   .BotaoAcaoCartao:hover {
@@ -452,10 +448,8 @@
     width: 1.75rem;
     height: 1.75rem;
     display: block;
+    filter: invert(1);
   }
-
-  /* Modal de mensagem ao organizador */
-  /* Modal de mensagem agora em styleModais.css */
 
   /* Responsividade - esconder botões em telas menores */
   @media (max-width: 1200px) {

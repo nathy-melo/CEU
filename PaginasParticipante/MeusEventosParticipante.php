@@ -48,9 +48,10 @@
             padding: 0;
             cursor: pointer;
             transition: transform 0.2s ease, background 0.2s ease;
-            pointer-events: auto; /* IMPORTANTE: Garantir que o botão seja clicável */
-            position: relative; /* Adicionar contexto de posicionamento */
-            z-index: 100; /* Colocar acima de qualquer outro elemento */
+            pointer-events: auto;
+            position: relative;
+            z-index: 100;
+            background-color: var(--botao);
         }
 
         .BotaoAcaoCard:hover {
@@ -61,9 +62,9 @@
             width: 7cqi;
             height: 7cqi;
             display: block;
+            filter: invert(1);
         }
 
-        /* Modal de Compartilhar - mesmo padrão do InicioParticipante */
         body.modal-aberto {
             overflow: hidden !important;
         }
@@ -71,8 +72,6 @@
         body.modal-aberto #main-content {
             overflow: hidden !important;
         }
-
-        /* Modal compartilhar agora em styleModais.css */
 
         /* Modais de confirmação desinscrição */
         .modal-overlay {
@@ -90,10 +89,6 @@
             display: flex;
         }
 
-        /* CSS dos modais de confirmação agora em styleModais.css */
-
-        /* CSS do modal de mensagem agora em styleModais.css */
-
         /* Botão para abrir lista de favoritos */
         .BotaoFavoritosTrigger {
             width: clamp(30px, 4vw, 48px);
@@ -105,15 +100,14 @@
             justify-content: center;
             border: none;
             cursor: pointer;
+            background-color: var(--branco);
         }
 
         .BotaoFavoritosTrigger img {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: 2rem;
+            height: 2rem;
             display: block;
         }
-
-        /* Modal de Favoritos agora em styleModais.css */
 
         /* Cards de favoritos */
         .favorito-item {
@@ -1319,9 +1313,9 @@
             }, 100);
         }
 
-        // Listeners de clique - usando o mesmo padrão do EventosInscritosOrganizador.php
+        // Listeners de clique
         document.addEventListener('click', async function (e) {
-            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO EventosInscritosOrganizador.php
+            // Botão de inscrever/desinscrever (também nos favoritos)
             let btnInscrever = e.target.closest('.BotaoInscreverCard');
             
             // IMPORTANTE: Também verificar BotaoDesinscreverCard (usado na página de Meus Eventos)
@@ -1717,7 +1711,7 @@
             setTimeout(carregarFavoritos, 50);
         }
 
-        // Carregar inscrições ao iniciar - mesmo padrão do EventosInscritosOrganizador.php
+        // Carregar inscrições ao iniciar
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', carregarInscricoes);
         } else {

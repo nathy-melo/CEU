@@ -648,9 +648,6 @@
     transform: translateY(-2px);
   }
 
-  /* Modal de Compartilhar */
-  /* Modal de compartilhar agora em styleModais.css */
-
   /* Botões de ação Í  direita do cartão */
   .botoes-acao-cartao {
     position: absolute;
@@ -685,8 +682,6 @@
     height: 1.75rem;
     display: block;
   }
-
-  /* Modal de mensagem agora em styleModais.css */
 
   /* Responsividade - esconder botões em telas menores */
   @media (max-width: 1200px) {

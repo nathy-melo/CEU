@@ -65,7 +65,7 @@
       display: block;
     }
 
-    /* Modal de Compartilhar - mesmo padrão do CartaodoEventoParticipante */
+    /* Modal de Compartilhar*/
     body.modal-aberto {
       overflow: hidden !important;
     }
@@ -73,8 +73,6 @@
     body.modal-aberto #main-content {
       overflow: hidden !important;
     }
-
-    /* Modal de compartilhar agora em styleModais.css */
   </style>
 </head>
 
