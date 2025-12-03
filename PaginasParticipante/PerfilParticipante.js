@@ -327,114 +327,173 @@ function salvarPerfil(event) {
 
 // Função para excluir conta
 function excluirConta() {
+    const senhaInput = document.getElementById('senha-confirmar-exclusao');
+    if (!senhaInput) {
+        mostrarAlerta('Erro: campo de senha não encontrado', 'danger');
+        return;
+    }
+    
+    const senha = senhaInput.value.trim();
+    if (!senha) {
+        mostrarAlerta('Por favor, digite sua senha para confirmar', 'danger');
+        return;
+    }
+    
+    const btnConfirmar = document.querySelector('.modal-exclusao-conta .botao-confirmar-exclusao');
+    if (btnConfirmar) {
+        btnConfirmar.disabled = true;
+        btnConfirmar.textContent = 'Processando...';
+    }
+    
     const formData = new FormData();
     formData.append('acao', 'excluir_conta');
+    formData.append('senha', senha);
     
     fetch('PerfilParticipanteAcoes.php', {
         method: 'POST',
-        body: formData
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData,
+        credentials: 'same-origin'
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na resposta do servidor: ' + response.status);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Resposta da exclusão:', data);
+        
+        // Fecha o modal primeiro
+        const modal = document.querySelector('.modal-exclusao-conta');
+        if (modal) {
+            modal.remove();
+            document.body.style.overflow = '';
+            window.modalExclusaoAberto = false;
+        }
+        
         if (data.sucesso) {
-            mostrarAlerta('Conta excluída com sucesso!', 'success');
-            
-            // Limpar timeout anterior se existir
-            if (window.timeoutRedirecionamento) {
-                clearTimeout(window.timeoutRedirecionamento);
-            }
-            
-            window.timeoutRedirecionamento = setTimeout(() => {
-                window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login';
-                window.timeoutRedirecionamento = null;
-            }, 2000);
+            mostrarMensagemExclusaoProgramada(data.data_exclusao, data.email);
+        } else if (data.mensagem && data.mensagem.includes('já existe uma solicitação')) {
+            // Se já existe solicitação pendente, mostra aviso específico
+            mostrarAvisoSolicitacaoPendente(data.data_exclusao);
         } else {
-            mostrarAlerta(data.mensagem || 'Erro ao excluir conta', 'danger');
+            mostrarAlerta(data.mensagem || 'Erro ao solicitar exclusão de conta', 'danger');
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
-        mostrarAlerta('Erro de conexão ao excluir conta', 'danger');
+        console.error('Erro ao excluir conta:', error);
+        mostrarAlerta('Erro de conexão ao excluir conta: ' + error.message, 'danger');
+        if (btnConfirmar) {
+            btnConfirmar.disabled = false;
+            btnConfirmar.textContent = 'Confirmar Exclusão';
+        }
     });
+}
+
+// Função para mostrar aviso de solicitação pendente
+function mostrarAvisoSolicitacaoPendente(dataExclusao) {
+    var mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+    
+    mainContent.innerHTML = '';
+    
+    var container = document.createElement('div');
+    container.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--caixas);border-radius:1em;padding:2.5rem;max-width:600px;margin:2rem auto;box-shadow:0 0.25rem 1rem rgba(0,0,0,0.25)';
+    
+    var dataFormatada = new Date(dataExclusao).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    
+    container.innerHTML = '<div style="margin-bottom:1rem;display:flex;justify-content:center"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--amarelo)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h2 style="color:var(--amarelo);font-size:2rem;margin-bottom:1.5rem;text-align:center">Exclusão Já Programada</h2><div style="color:#fff;font-size:1.1rem;line-height:1.6;text-align:center;margin-bottom:2rem"><p style="margin-bottom:1.5rem;font-size:1.2rem;font-weight:bold;color:var(--amarelo);">Você já possui uma solicitação de exclusão de conta em andamento.</p><p style="margin-bottom:1rem;"><strong>Data programada para exclusão:</strong><br><span style="font-size:1.3rem;color:var(--amarelo);">' + dataFormatada + '</span></p><p style="margin-bottom:1rem;color:var(--amarelo);">Durante este período:</p><ul style="text-align:left;display:inline-block;margin-bottom:1rem;"><li>Você pode cancelar a exclusão a qualquer momento</li><li>Seus dados permanecem intactos</li><li>Você pode continuar usando sua conta normalmente</li></ul><p style="margin-top:1.5rem;padding:1rem;background:rgba(255,193,7,0.1);border-radius:0.5rem;border-left:4px solid var(--amarelo);"><strong>Importante:</strong> Não é possível criar uma nova solicitação enquanto houver uma pendente.</p></div><button type="button" class="botao" onclick="window.location.href=\'ContainerParticipante.php?pagina=perfil\'" style="margin-top:1rem;">Entendi</button>';
+    
+    mainContent.appendChild(container);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function mostrarMensagemExclusaoProgramada(dataExclusao, email) {
+    var mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+    mainContent.innerHTML = '';
+    
+    var container = document.createElement('div');
+    container.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--caixas);border-radius:1em;padding:2.5rem;max-width:600px;margin:2rem auto;box-shadow:0 0.25rem 1rem rgba(0,0,0,0.25)';
+    
+    var dataFormatada = new Date(dataExclusao).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    
+    container.innerHTML = '<div style="margin-bottom:1rem;display:flex;justify-content:center"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amarelo)"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/><path d="M6 19l-2 2"/><path d="M18 19l2 2"/></svg></div><h2 style="color:var(--amarelo);font-size:2rem;margin-bottom:1.5rem;text-align:center">Exclusão Programada</h2><div style="color:#fff;font-size:1.1rem;line-height:1.6;text-align:center;margin-bottom:2rem"><p style="margin-bottom:1rem">Sua solicitação de exclusão de conta foi registrada com sucesso.</p><p style="margin-bottom:1rem"><strong>Data programada para exclusão:</strong><br>' + dataFormatada + '</p><p style="margin-bottom:1rem">Um email de confirmação foi enviado para: <strong>' + email + '</strong></p><p style="margin-bottom:1rem;color:var(--amarelo)">Durante este período de 30 dias:</p><ul style="text-align:left;display:inline-block;margin-bottom:1rem"><li>Você pode cancelar a exclusão acessando sua conta</li><li>Seus dados permanecerão intactos</li><li>Você pode continuar usando sua conta normalmente</li></ul><p style="margin-top:1.5rem;color:var(--vermelho);font-weight:bold;display:flex;align-items:center;gap:0.5rem;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Após 30 dias, sua conta e todos os dados associados serão permanentemente excluídos.</p></div>';
+    
+    var btnVoltar = document.createElement('button');
+    btnVoltar.type = 'button';
+    btnVoltar.className = 'botao';
+    btnVoltar.textContent = 'Entendi';
+    btnVoltar.style.marginTop = '1rem';
+    btnVoltar.onclick = function() { window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login'; };
+    
+    container.appendChild(btnVoltar);
+    mainContent.appendChild(container);
 }
 
 // Função para mostrar o modal de confirmação de exclusão de conta
 function mostrarModalExcluirConta() {
-    var mainContent = document.getElementById('main-content');
-    if (!mainContent) return;
-    // Limpa o conteúdo atual
-    mainContent.innerHTML = '';
-
-    // Cria o container do modal
+    // Previne múltiplas chamadas simultâneas
+    if (window.modalExclusaoAberto) {
+        console.log('Modal já está aberto, ignorando...');
+        return;
+    }
+    window.modalExclusaoAberto = true;
+    
+    const modalExistente = document.querySelector('.modal-exclusao-conta');
+    if (modalExistente) modalExistente.remove();
+    
+    // Previne scroll ao abrir modal
+    document.body.style.overflow = 'hidden';
+    
+    var modalOverlay = document.createElement('div');
+    modalOverlay.className = 'modal-exclusao-conta';
+    modalOverlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(5px)`
+    
     var container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.background = 'var(--caixas)';
-    container.style.borderRadius = '0.7rem';
-    container.style.padding = '2rem 2.5rem 1.5rem 2.5rem';
-    container.style.maxWidth = '32rem';
-    container.style.margin = '3rem auto 0 auto';
-    container.style.width = '100%';
-    container.style.boxShadow = '0 0.25rem 1rem rgba(0,0,0,0.25)';
-
-    // Mensagem
-    var mensagem = document.createElement('div');
-    mensagem.textContent = 'Você tem certeza que deseja excluir a conta?';
-    mensagem.style.whiteSpace = 'nowrap';
-    mensagem.style.color = '#fff';
-    mensagem.style.fontWeight = '700';
-    mensagem.style.fontSize = '1.35rem';
-    mensagem.style.textAlign = 'center';
-    mensagem.style.marginBottom = '2rem';
-    mensagem.style.marginTop = '0.5rem';
-
-    // Botões
+    container.style.cssText = 'background:var(--caixas);border-radius:1rem;padding:2rem 2.5rem;max-width:550px;width:90%;box-shadow:0 0.5rem 2rem rgba(0,0,0,0.5);position:relative;max-height:90vh;overflow-y:auto';
+    
+    container.innerHTML = '<div style="text-align:center;margin-bottom:1rem;display:flex;justify-content:center"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--vermelho)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h2 style="color:var(--vermelho);font-size:1.8rem;font-weight:700;text-align:center;margin-bottom:1.5rem">Confirmar Exclusão de Conta</h2><div style="color:#fff;font-size:1rem;line-height:1.6;margin-bottom:1.5rem"><p style="margin-bottom:1rem;font-weight:bold">Você está prestes a solicitar a exclusão permanente de sua conta.</p><p style="margin-bottom:1rem">Ao confirmar, os seguintes dados serão excluídos após <strong style="color:var(--amarelo)">30 dias</strong>:</p><ul style="margin-left:1.5rem;margin-bottom:1rem"><li>Todos os seus dados pessoais</li><li>Suas inscrições em eventos</li><li>Seus certificados</li><li>Seu histórico de presença</li><li>Todas as notificações</li></ul><p style="margin-bottom:1rem;color:var(--amarelo);font-weight:bold;display:flex;align-items:center;gap:0.5rem"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/></svg>Você terá 30 dias para cancelar esta solicitação caso mude de ideia.</p><p style="margin-bottom:1.5rem">Para confirmar, digite sua senha abaixo:</p></div><div style="margin-bottom:1.5rem"><label style="display:block;color:#fff;font-weight:600;margin-bottom:0.5rem">Senha:</label><input type="password" id="senha-confirmar-exclusao" placeholder="Digite sua senha" style="width:100%;padding:0.75rem;border:2px solid var(--cinza-medio);border-radius:0.5rem;font-size:1rem;background:var(--branco);color:var(--cinza-escuro);box-sizing:border-box"></div>';
+    
     var botoesWrapper = document.createElement('div');
-    botoesWrapper.style.display = 'flex';
-    botoesWrapper.style.flexDirection = 'row';
-    botoesWrapper.style.justifyContent = 'space-between';
-    botoesWrapper.style.alignItems = 'center';
-    botoesWrapper.style.gap = '2.5rem';
-    botoesWrapper.style.width = '100%';
+    botoesWrapper.style.cssText = 'display:flex;gap:1rem;justify-content:center;margin-top:2rem';
     
     var btnCancelar = document.createElement('button');
     btnCancelar.type = 'button';
     btnCancelar.textContent = 'Cancelar';
-    btnCancelar.style.backgroundColor = 'var(--botao)';
-    btnCancelar.style.color = '#fff';
-    btnCancelar.style.border = 'none';
-    btnCancelar.style.borderRadius = '0.3rem';
-    btnCancelar.style.padding = '0.5rem 2.5rem';
-    btnCancelar.style.fontWeight = '700';
-    btnCancelar.style.fontSize = '1.1rem';
-    btnCancelar.style.cursor = 'pointer';
-    btnCancelar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
     btnCancelar.className = 'botao';
-    btnCancelar.onclick = function() { window.location.reload(); };
-
+    btnCancelar.style.cssText = 'background-color:var(--cinza-medio);color:#fff;border:none;border-radius:0.5rem;padding:0.75rem 2rem;font-weight:700;font-size:1rem;cursor:pointer';
+    btnCancelar.onclick = function() { 
+        modalOverlay.remove(); 
+        document.body.style.overflow = '';
+        window.modalExclusaoAberto = false;
+    };
+    
     var btnConfirmar = document.createElement('button');
     btnConfirmar.type = 'button';
-    btnConfirmar.textContent = 'Confirmar';
-    btnConfirmar.style.backgroundColor = 'var(--vermelho)';
-    btnConfirmar.style.color = '#fff';
-    btnConfirmar.style.border = 'none';
-    btnConfirmar.style.borderRadius = '0.3rem';
-    btnConfirmar.style.padding = '0.5rem 2.5rem';
-    btnConfirmar.style.fontWeight = '700';
-    btnConfirmar.style.fontSize = '1.1rem';
-    btnConfirmar.style.cursor = 'pointer';
-    btnConfirmar.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.15)';
-    btnConfirmar.className = 'botao';
+    btnConfirmar.textContent = 'Confirmar Exclusão';
+    btnConfirmar.className = 'botao botao-confirmar-exclusao';
+    btnConfirmar.style.cssText = 'background-color:var(--vermelho);color:#fff;border:none;border-radius:0.5rem;padding:0.75rem 2rem;font-weight:700;font-size:1rem;cursor:pointer';
     btnConfirmar.onclick = excluirConta;
-
+    
     botoesWrapper.appendChild(btnCancelar);
     botoesWrapper.appendChild(btnConfirmar);
-    
-    container.appendChild(mensagem);
     container.appendChild(botoesWrapper);
-    mainContent.appendChild(container);
+    modalOverlay.appendChild(container);
+    document.body.appendChild(modalOverlay);
+    
+    setTimeout(() => document.getElementById('senha-confirmar-exclusao').focus(), 100);
+    
+    document.getElementById('senha-confirmar-exclusao').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') excluirConta();
+    });
+    
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) modalOverlay.remove();
+    });
 }
 
 // Event listeners quando a página carrega
@@ -477,7 +536,32 @@ function inicializarEventosPerfilParticipante() {
     // Botão de excluir conta
     const btnExcluir = document.getElementById('btn-excluir-conta');
     if (btnExcluir) {
-        btnExcluir.addEventListener('click', mostrarModalExcluirConta);
+        btnExcluir.addEventListener('click', function() {
+            // Primeiro verifica se já existe solicitação pendente
+            const formData = new FormData();
+            formData.append('acao', 'excluir_conta');
+            formData.append('verificar_pendente', 'true');
+            
+            fetch('PerfilParticipanteAcoes.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.pendente) {
+                    // Já existe solicitação pendente - mostra aviso
+                    mostrarAvisoSolicitacaoPendente(data.data_exclusao);
+                } else {
+                    // Não existe - mostra modal de confirmação
+                    mostrarModalExcluirConta();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao verificar solicitação:', error);
+                mostrarAlerta('Erro ao verificar solicitação de exclusão', 'danger');
+            });
+        });
     }
     
     // ========== EVENTOS DO MODAL DE CÓDIGO ORGANIZADOR ==========
@@ -622,13 +706,13 @@ window.inicializarEventosPerfilParticipante = inicializarEventosPerfilParticipan
 
 // Função para mostrar modal de código
 function mostrarModalCodigo() {
-    document.getElementById('modal-codigo').classList.remove('hidden');
+    document.getElementById('modal-codigo').classList.add('ativo');
     document.getElementById('input-codigo').focus();
 }
 
 // Função para esconder modal de código
 function esconderModalCodigo() {
-    document.getElementById('modal-codigo').classList.add('hidden');
+    document.getElementById('modal-codigo').classList.remove('ativo');
     document.getElementById('input-codigo').value = '';
     document.getElementById('alert-modal').innerHTML = '';
 }

@@ -75,11 +75,20 @@ function inicializarPainel() {
 window.inicializarPainelNotificacoes = inicializarPainel;
 
 // Aguarda DOM estar pronto (apenas se carregado diretamente)
+function aguardarDOMPainel() {
+    const lista = document.getElementById('lista-notificacoes');
+    if (lista) {
+        inicializarPainel();
+    } else {
+        setTimeout(aguardarDOMPainel, 50);
+    }
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializarPainel);
+    document.addEventListener('DOMContentLoaded', aguardarDOMPainel);
 } else {
-    // DOM já está pronto, espera um tick
-    setTimeout(inicializarPainel, 100);
+    // DOM já está pronto, mas elementos podem não estar (carregamento AJAX)
+    aguardarDOMPainel();
 }
 
 // ==================================================

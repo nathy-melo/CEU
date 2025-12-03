@@ -224,6 +224,17 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             conteudo.appendChild(script);
         }
 
+        // Função de limpeza completa antes de carregar nova página
+        window.limpezaCompleta = function() {
+            // Limpar PDF Manual se existir
+            if (typeof window.cleanupPDFManual === 'function') {
+                window.cleanupPDFManual();
+            }
+            
+            // Limpar outros recursos globais se necessário
+            // Adicione aqui outras funções de cleanup quando necessário
+        };
+
         function executarScriptsNoConteudo(containerEl) {
             if (!containerEl) return;
             const scripts = Array.from(containerEl.querySelectorAll('script'));
@@ -398,9 +409,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'perfil': {
-                html: 'PerfilOrganizador.html',
+                html: 'PerfilOrganizador.php',
                 js: ['PerfilOrganizador.js'],
                 init: () => {
+                    // Reseta flag de inicialização para permitir re-inicialização
+                    if (typeof window.resetarInicializacaoPerfilOrganizador === 'function') {
+                        window.resetarInicializacaoPerfilOrganizador();
+                    }
                     if (typeof window.inicializarEventosPerfilOrganizador === 'function') window.inicializarEventosPerfilOrganizador();
                 }
             },
@@ -475,7 +490,13 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             'adicionarEvento': {
                 html: 'AdicionarEvento.php',
                 js: [],
-                init: () => {}
+                init: () => {
+                    // Limpa flag de script executado para permitir reinicialização
+                    if (window.adicionarEventoScriptExecutado) {
+                        delete window.adicionarEventoScriptExecutado;
+                    }
+                    console.log('[DEBUG] Página AdicionarEvento carregada e pronta');
+                }
             },
             'painelnotificacoes': {
                 html: '../PaginasGlobais/PainelNotificacoes.php',
@@ -630,7 +651,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     </script>
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
-    <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
+    <?php 
+        $notifJsPath = realpath(__DIR__ . '/../PaginasGlobais/GerenciadorNotificacoes.js');
+        $notifJsVer = $notifJsPath ? filemtime($notifJsPath) : time();
+    ?>
+    <script src="../PaginasGlobais/GerenciadorNotificacoes.js?v=<?= $notifJsVer ?>"></script>
     <script src="../PaginasPublicas/ToggleSenha.js"></script>
     <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>

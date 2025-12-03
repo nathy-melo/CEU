@@ -77,11 +77,6 @@ function inicializarFiltroEventos() {
         searchInput.addEventListener('input', filtrarEventos);
     }
 
-    // Inicializa o filtro lateral quando disponível
-    if (typeof inicializarFiltro === 'function') {
-        inicializarFiltro();
-    }
-
     // Primeira avaliação para alinhar com o estado inicial do filtro lateral, se existir
     filtrarEventos();
 }
@@ -93,6 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     inicializarFiltroEventos();
+    
+    // Inicializa o filtro lateral quando disponível
+    if (typeof inicializarFiltro === 'function') {
+        inicializarFiltro();
+    }
 });
 // Se usar AJAX para recarregar a página, chame window.inicializarFiltroEventos() após inserir o HTML
 window.inicializarFiltroEventos = inicializarFiltroEventos;

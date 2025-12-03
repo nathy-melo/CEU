@@ -33,13 +33,19 @@ function prevenirScrollTeclado(e) {
 
 // Funções para controlar os modais de cancelamento
 function abrirModalConfirmarCancelamento() {
-    document.getElementById('modalConfirmarCancelamento').style.display = 'flex';
-    bloquearScroll();
+    const modal = document.getElementById('modalConfirmarCancelamento');
+    if (modal) {
+        modal.classList.add('ativo');
+        bloquearScroll();
+    }
 }
 
 function fecharModalConfirmarCancelamento() {
-    document.getElementById('modalConfirmarCancelamento').style.display = 'none';
-    desbloquearScroll();
+    const modal = document.getElementById('modalConfirmarCancelamento');
+    if (modal) {
+        modal.classList.remove('ativo');
+        desbloquearScroll();
+    }
 }
 
 function confirmarCancelamento() {
@@ -77,13 +83,19 @@ function confirmarCancelamento() {
 }
 
 function abrirModalCancelamentoConfirmado() {
-    document.getElementById('modalCancelamentoConfirmado').style.display = 'flex';
-    bloquearScroll();
+    const modal = document.getElementById('modalCancelamentoConfirmado');
+    if (modal) {
+        modal.classList.add('ativo');
+        bloquearScroll();
+    }
 }
 
 function fecharModalCancelamentoConfirmado() {
-    document.getElementById('modalCancelamentoConfirmado').style.display = 'none';
-    desbloquearScroll();
+    const modal = document.getElementById('modalCancelamentoConfirmado');
+    if (modal) {
+        modal.classList.remove('ativo');
+        desbloquearScroll();
+    }
     // Redirecionar para eventos inscritos após fechar modal
     if (typeof carregarPagina === 'function') {
         carregarPagina('eventosInscritos');

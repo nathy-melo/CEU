@@ -1,4 +1,10 @@
 ﻿<?php
+// Configuração de erros: log para arquivo, não exibe na tela
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../php_errors.log');
+
 // Limpa qualquer output anterior
 ob_start();
 
@@ -9,11 +15,14 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 // Processa o formulário quando enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Limpa qualquer output anterior
-    ob_clean();
-    header('Content-Type: application/json; charset=utf-8');
+    try {
+        // Limpa qualquer output anterior
+        ob_clean();
+        
+        // Define o cabeçalho JSON ANTES de qualquer output
+        header('Content-Type: application/json; charset=utf-8');
 
-    require_once('../BancoDados/conexao.php');
+        require_once('../BancoDados/conexao.php');
 
     $cpfOrganizador = $_SESSION['cpf'] ?? null;
 
@@ -237,6 +246,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmtEvento = mysqli_prepare($conexao, $sqlEvento);
+        if (!$stmtEvento) {
+            throw new Exception('Erro ao preparar inserção do evento: ' . mysqli_error($conexao));
+        }
         // Tipos: cod_evento(i), categoria(s), nome(s), lugar(s), descricao(s), publico_alvo(s), inicio(s), conclusao(s), duracao(d), duracao_organizador(d), certificado(i), modalidade(s), imagem(s), inicio_inscricao(s), fim_inscricao(s), tipo_certificado(s), modelo_certificado_participante(s), modelo_certificado_organizador(s)
         // Para campos NULL, usa string vazia (será tratado como NULL no banco se o campo aceitar NULL)
         $inicioInscricaoFinal = (!empty($inicioInscricaoStr)) ? $inicioInscricaoStr : '';
@@ -246,7 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         mysqli_stmt_bind_param(
             $stmtEvento,
-            "isssssssddisissssss",
+            "isssssssddisssssss",
             $codEvento,
             $categoria,
             $nome,
@@ -275,6 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($imagensUpload)) {
             $sqlImagem = "INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES (?, ?, ?, ?)";
             $stmtImagem = mysqli_prepare($conexao, $sqlImagem);
+            if (!$stmtImagem) {
+                throw new Exception('Erro ao preparar inserção de imagem: ' . mysqli_error($conexao));
+            }
 
             foreach ($imagensUpload as $img) {
                 mysqli_stmt_bind_param($stmtImagem, "isii", $codEvento, $img['caminho'], $img['ordem'], $img['principal']);
@@ -288,6 +303,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Vincula organizador ao evento
         $sqlOrganiza = "INSERT INTO organiza (cod_evento, CPF) VALUES (?, ?)";
         $stmtOrganiza = mysqli_prepare($conexao, $sqlOrganiza);
+        if (!$stmtOrganiza) {
+            throw new Exception('Erro ao preparar vínculo do organizador: ' . mysqli_error($conexao));
+        }
         mysqli_stmt_bind_param($stmtOrganiza, "is", $codEvento, $cpfOrganizador);
 
         if (!mysqli_stmt_execute($stmtOrganiza)) {
@@ -300,11 +318,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $colaboradores = json_decode($_POST['colaboradores'], true);
 
             if (is_array($colaboradores) && count($colaboradores) > 0) {
-                // Garante que a coluna certificado_emitido existe
-                mysqli_query($conexao, "ALTER TABLE colaboradores_evento ADD COLUMN IF NOT EXISTS certificado_emitido tinyint(1) DEFAULT 0");
+                // Garante que a coluna certificado_emitido existe (compatível com MySQL < 8)
+                $resCol = mysqli_query($conexao, "SHOW COLUMNS FROM colaboradores_evento LIKE 'certificado_emitido'");
+                if ($resCol && mysqli_num_rows($resCol) === 0) {
+                    mysqli_query($conexao, "ALTER TABLE colaboradores_evento ADD COLUMN certificado_emitido tinyint(1) DEFAULT 0");
+                }
+                if ($resCol) {
+                    mysqli_free_result($resCol);
+                }
 
                 $sqlColab = "INSERT INTO colaboradores_evento (cod_evento, CPF, certificado_emitido) VALUES (?, ?, 0)";
                 $stmtColab = mysqli_prepare($conexao, $sqlColab);
+                if (!$stmtColab) {
+                    throw new Exception('Erro ao preparar inserção de colaborador: ' . mysqli_error($conexao));
+                }
 
                 foreach ($colaboradores as $colab) {
                     if (isset($colab['cpf']) && !empty($colab['cpf'])) {
@@ -334,7 +361,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_rollback($conexao);
         mysqli_close($conexao);
 
+        error_log('[AdicionarEvento] Erro na transação: ' . $e->getMessage());
         echo json_encode(['erro' => $e->getMessage()]);
+        exit;
+    }
+    } catch (Throwable $th) {
+        // Captura qualquer erro fatal (PHP 7+)
+        ob_clean();
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        error_log('[AdicionarEvento] Erro fatal capturado: ' . $th->getMessage() . ' em ' . $th->getFile() . ':' . $th->getLine());
+        error_log('[AdicionarEvento] Stack trace: ' . $th->getTraceAsString());
+        echo json_encode(['erro' => 'Erro interno no servidor: ' . $th->getMessage()]);
         exit;
     }
 }
@@ -1493,7 +1532,7 @@ mysqli_close($conexao);
 
 <body>
     <div id="main-content">
-        <form id="form-evento" class="cartao-evento">
+        <form id="form-evento" class="cartao-evento" method="post" action="" onsubmit="return false;">
             <div class="Nome grupo-campo">
                 <label for="nome"><span style="color: red;">*</span> Nome:</label>
                 <input type="text" id="nome" name="nome" class="campo-input" placeholder="Digite o nome do evento" required autocomplete="off">
@@ -1725,9 +1764,9 @@ mysqli_close($conexao);
     <script>
         // Previne execução múltipla do script quando carregado via AJAX
         (function() {
-            // Verifica se o script já foi executado
+            // Limpa flag anterior se existir
             if (window.adicionarEventoScriptExecutado) {
-                return;
+                console.log('[DEBUG] Reinicializando script AdicionarEvento');
             }
             window.adicionarEventoScriptExecutado = true;
 
@@ -2272,8 +2311,14 @@ mysqli_close($conexao);
             // CORREÇÃO PRINCIPAL: Adiciona listener do formulário de forma segura
             const formEvento = document.getElementById('form-evento');
             if (formEvento) {
+                console.log('[DEBUG] Formulário encontrado, anexando listener de submit');
+                
+                // Remove listener anterior se existir
+                formEvento.onsubmit = null;
+                
                 formEvento.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    console.log('[DEBUG] Submit interceptado, processando formulário...');
 
                     const camposFaltantes = validarCamposObrigatorios();
 
@@ -2296,27 +2341,35 @@ mysqli_close($conexao);
                     const btnCriar = document.getElementById('btn-criar');
                     btnCriar.disabled = true;
                     btnCriar.textContent = 'Criando...';
+                    
+                    console.log('[DEBUG] Enviando dados para AdicionarEvento.php...');
 
                     fetch('AdicionarEvento.php', {
                             method: 'POST',
                             body: formData
                         })
                         .then(response => {
+                            console.log('[DEBUG] Resposta recebida. Status:', response.status);
+                            console.log('[DEBUG] Content-Type:', response.headers.get('content-type'));
+                            
                             if (!response.ok) {
                                 throw new Error('Erro HTTP: ' + response.status);
                             }
                             const contentType = response.headers.get('content-type');
                             if (!contentType || !contentType.includes('application/json')) {
                                 return response.text().then(text => {
-                                    console.error('Resposta não é JSON:', text);
-                                    throw new Error('Resposta do servidor não é JSON válido');
+                                    console.error('[DEBUG] Resposta NÃO é JSON. Primeiros 500 caracteres:');
+                                    console.error(text.substring(0, 500));
+                                    console.error('[DEBUG] Verifique se há erros PHP sendo exibidos antes do JSON');
+                                    throw new Error('Resposta do servidor não é JSON válido. Verifique o console para detalhes.');
                                 });
                             }
                             return response.json();
                         })
                         .then(data => {
-                            console.log('Resposta do servidor:', data);
+                            console.log('[DEBUG] Resposta JSON do servidor:', data);
                             if (data.sucesso === true) {
+                                console.log('[DEBUG] Evento criado com sucesso!');
                                 alert(data.mensagem || 'Evento criado com sucesso!');
                                 if (typeof carregarPagina === 'function') {
                                     carregarPagina('meusEventos');
@@ -2324,18 +2377,24 @@ mysqli_close($conexao);
                                     window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
                                 }
                             } else {
+                                console.error('[DEBUG] Erro retornado pelo servidor:', data.erro);
                                 alert('Erro ao criar evento: ' + (data.erro || 'Erro desconhecido'));
                                 btnCriar.disabled = false;
                                 btnCriar.textContent = 'Criar evento';
                             }
                         })
                         .catch(error => {
-                            console.error('Erro completo:', error);
-                            alert('Erro ao criar evento: ' + error.message + '. Verifique o console para mais detalhes.');
+                            console.error('[DEBUG] ========== ERRO CAPTURADO ==========');
+                            console.error('[DEBUG] Mensagem:', error.message);
+                            console.error('[DEBUG] Stack:', error.stack);
+                            console.error('[DEBUG] =====================================');
+                            alert('Erro ao criar evento: ' + error.message + '\n\nVerifique o console (F12) para mais detalhes.');
                             btnCriar.disabled = false;
                             btnCriar.textContent = 'Criar evento';
                         });
                 });
+            } else {
+                console.error('[DEBUG] ERRO: Formulário #form-evento não encontrado no DOM!');
             }
 
             validarFormulario();

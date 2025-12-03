@@ -1,4 +1,8 @@
 <?php
+// Desabilita exibição de erros para não quebrar o JSON
+error_reporting(0);
+ini_set('display_errors', 0);
+
 // Inicia a sessão apenas se não houver uma ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
@@ -11,7 +15,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Define o cabeçalho para JSON
+// Define o cabeçalho para JSON ANTES de qualquer output
 header('Content-Type: application/json');
 
 // Verifica se o usuário está logado
@@ -23,162 +27,134 @@ if (!isset($_SESSION['cpf']) || !isset($_SESSION['organizador']) || $_SESSION['o
     exit;
 }
 
+// Verifica se é requisição POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode([
+        'sucesso' => false,
+        'mensagem' => 'Método não permitido.'
+    ]);
+    exit;
+}
+
 // Inclui o arquivo de conexão
 require_once('../BancoDados/conexao.php');
 
 $cpf = $_SESSION['cpf'];
 
-// Inicia uma transação
-mysqli_begin_transaction($conexao);
+// Obtém os dados do POST
+$dados = json_decode(file_get_contents('php://input'), true);
 
-try {
-    // Remove registros relacionados primeiro (devido às chaves estrangeiras)
-    // A ordem é CRÍTICA para evitar erros de constraint
+// Se for apenas para verificar se há solicitação pendente
+if (isset($dados['verificar_pendente']) && $dados['verificar_pendente'] === true) {
+    $sql_check = "SELECT id, data_exclusao_programada FROM solicitacoes_exclusao_conta WHERE CPF = ? AND status = 'pendente'";
+    $stmt_check = mysqli_prepare($conexao, $sql_check);
+    mysqli_stmt_bind_param($stmt_check, "s", $cpf);
+    mysqli_stmt_execute($stmt_check);
+    $resultado_check = mysqli_stmt_get_result($stmt_check);
     
-    // 1. Remove notificações do usuário
-    $sql_notif = "DELETE FROM notificacoes WHERE CPF = ?";
-    $stmt_notif = mysqli_prepare($conexao, $sql_notif);
-    if ($stmt_notif) {
-        mysqli_stmt_bind_param($stmt_notif, "s", $cpf);
-        mysqli_stmt_execute($stmt_notif);
-        mysqli_stmt_close($stmt_notif);
-    }
-    
-    // 2. Remove da tabela de presença
-    $sql_presenca = "DELETE FROM presenca WHERE CPF = ?";
-    $stmt_presenca = mysqli_prepare($conexao, $sql_presenca);
-    if ($stmt_presenca) {
-        mysqli_stmt_bind_param($stmt_presenca, "s", $cpf);
-        mysqli_stmt_execute($stmt_presenca);
-        mysqli_stmt_close($stmt_presenca);
-    }
-    
-    // 3. Remove da lista de espera
-    $sql_espera = "DELETE FROM lista_de_espera WHERE CPF = ?";
-    $stmt_espera = mysqli_prepare($conexao, $sql_espera);
-    if ($stmt_espera) {
-        mysqli_stmt_bind_param($stmt_espera, "s", $cpf);
-        mysqli_stmt_execute($stmt_espera);
-        mysqli_stmt_close($stmt_espera);
-    }
-    
-    // 4. Remove da tabela lista_de_participantes
-    $sql_participantes = "DELETE FROM lista_de_participantes WHERE CPF = ?";
-    $stmt_participantes = mysqli_prepare($conexao, $sql_participantes);
-    if ($stmt_participantes) {
-        mysqli_stmt_bind_param($stmt_participantes, "s", $cpf);
-        mysqli_stmt_execute($stmt_participantes);
-        mysqli_stmt_close($stmt_participantes);
-    }
-    
-    // 5. Remove da tabela organiza
-    $sql_organiza = "DELETE FROM organiza WHERE CPF = ?";
-    $stmt_organiza = mysqli_prepare($conexao, $sql_organiza);
-    if ($stmt_organiza) {
-        mysqli_stmt_bind_param($stmt_organiza, "s", $cpf);
-        mysqli_stmt_execute($stmt_organiza);
-        mysqli_stmt_close($stmt_organiza);
-    }
-    
-    // 6. Remove eventos criados pelo organizador
-    // Primeiro busca os IDs dos eventos para limpar tabelas relacionadas
-    $sql_get_eventos = "SELECT ID_evento FROM evento WHERE CPF_organizador = ?";
-    $stmt_get_eventos = mysqli_prepare($conexao, $sql_get_eventos);
-    if ($stmt_get_eventos) {
-        mysqli_stmt_bind_param($stmt_get_eventos, "s", $cpf);
-        mysqli_stmt_execute($stmt_get_eventos);
-        $result_eventos = mysqli_stmt_get_result($stmt_get_eventos);
-        
-        while ($row = mysqli_fetch_assoc($result_eventos)) {
-            $id_evento = $row['ID_evento'];
-            
-            // Remove registros de presença do evento
-            $sql_del_presenca_evt = "DELETE FROM presenca WHERE ID_evento = ?";
-            $stmt_del_presenca = mysqli_prepare($conexao, $sql_del_presenca_evt);
-            if ($stmt_del_presenca) {
-                mysqli_stmt_bind_param($stmt_del_presenca, "i", $id_evento);
-                mysqli_stmt_execute($stmt_del_presenca);
-                mysqli_stmt_close($stmt_del_presenca);
-            }
-            
-            // Remove lista de espera do evento
-            $sql_del_espera_evt = "DELETE FROM lista_de_espera WHERE ID_evento = ?";
-            $stmt_del_espera = mysqli_prepare($conexao, $sql_del_espera_evt);
-            if ($stmt_del_espera) {
-                mysqli_stmt_bind_param($stmt_del_espera, "i", $id_evento);
-                mysqli_stmt_execute($stmt_del_espera);
-                mysqli_stmt_close($stmt_del_espera);
-            }
-            
-            // Remove participantes do evento
-            $sql_del_part_evt = "DELETE FROM lista_de_participantes WHERE ID_evento = ?";
-            $stmt_del_part = mysqli_prepare($conexao, $sql_del_part_evt);
-            if ($stmt_del_part) {
-                mysqli_stmt_bind_param($stmt_del_part, "i", $id_evento);
-                mysqli_stmt_execute($stmt_del_part);
-                mysqli_stmt_close($stmt_del_part);
-            }
-            
-            // Remove da tabela organiza para este evento
-            $sql_del_org_evt = "DELETE FROM organiza WHERE ID_evento = ?";
-            $stmt_del_org = mysqli_prepare($conexao, $sql_del_org_evt);
-            if ($stmt_del_org) {
-                mysqli_stmt_bind_param($stmt_del_org, "i", $id_evento);
-                mysqli_stmt_execute($stmt_del_org);
-                mysqli_stmt_close($stmt_del_org);
-            }
-        }
-        mysqli_stmt_close($stmt_get_eventos);
-    }
-    
-    // Remove os eventos do organizador
-    $sql_eventos = "DELETE FROM evento WHERE CPF_organizador = ?";
-    $stmt_eventos = mysqli_prepare($conexao, $sql_eventos);
-    if ($stmt_eventos) {
-        mysqli_stmt_bind_param($stmt_eventos, "s", $cpf);
-        mysqli_stmt_execute($stmt_eventos);
-        mysqli_stmt_close($stmt_eventos);
-    }
-
-    // 7. Por último, exclui o usuário da tabela usuario
-    $sql_usuario = "DELETE FROM usuario WHERE CPF = ?";
-    $stmt_usuario = mysqli_prepare($conexao, $sql_usuario);
-    mysqli_stmt_bind_param($stmt_usuario, "s", $cpf);
-    mysqli_stmt_execute($stmt_usuario);
-    
-    if (mysqli_stmt_affected_rows($stmt_usuario) > 0) {
-        // Confirma a transação
-        mysqli_commit($conexao);
-        mysqli_stmt_close($stmt_usuario);
-        
-        // Limpa a sessão
-        $_SESSION = [];
-        session_destroy();
-        
+    if (mysqli_num_rows($resultado_check) > 0) {
+        $solicitacao = mysqli_fetch_assoc($resultado_check);
+        mysqli_stmt_close($stmt_check);
         echo json_encode([
-            'sucesso' => true,
-            'mensagem' => 'Conta excluída com sucesso.'
+            'pendente' => true,
+            'data_exclusao' => $solicitacao['data_exclusao_programada']
         ]);
     } else {
-        // Reverte a transação
-        mysqli_rollback($conexao);
-        mysqli_stmt_close($stmt_usuario);
-        
+        mysqli_stmt_close($stmt_check);
         echo json_encode([
-            'sucesso' => false,
-            'mensagem' => 'Erro ao excluir a conta. Nenhuma conta foi encontrada.'
+            'pendente' => false
         ]);
     }
-} catch (Exception $e) {
-    // Reverte a transação em caso de erro
-    mysqli_rollback($conexao);
+    mysqli_close($conexao);
+    exit;
+}
+
+$senha = $dados['senha'] ?? '';
+
+// Valida senha
+if (empty($senha)) {
+    echo json_encode([
+        'sucesso' => false,
+        'mensagem' => 'Senha é obrigatória para confirmar a exclusão.'
+    ]);
+    exit;
+}
+
+// Verifica se a senha está correta
+$sql_verifica = "SELECT Senha, Email, Nome FROM usuario WHERE CPF = ?";
+$stmt_verifica = mysqli_prepare($conexao, $sql_verifica);
+if (!$stmt_verifica) {
+    echo json_encode([
+        'sucesso' => false,
+        'mensagem' => 'Erro ao preparar consulta.'
+    ]);
+    exit;
+}
+
+mysqli_stmt_bind_param($stmt_verifica, "s", $cpf);
+mysqli_stmt_execute($stmt_verifica);
+$resultado = mysqli_stmt_get_result($stmt_verifica);
+$usuario = mysqli_fetch_assoc($resultado);
+mysqli_stmt_close($stmt_verifica);
+
+if (!$usuario || !password_verify($senha, $usuario['Senha'])) {
+    echo json_encode([
+        'sucesso' => false,
+        'mensagem' => 'Senha incorreta.'
+    ]);
+    mysqli_close($conexao);
+    exit;
+}
+
+// Verifica se já existe uma solicitação pendente
+$sql_check = "SELECT id, data_exclusao_programada FROM solicitacoes_exclusao_conta WHERE CPF = ? AND status = 'pendente'";
+$stmt_check = mysqli_prepare($conexao, $sql_check);
+mysqli_stmt_bind_param($stmt_check, "s", $cpf);
+mysqli_stmt_execute($stmt_check);
+$resultado_check = mysqli_stmt_get_result($stmt_check);
+
+if (mysqli_num_rows($resultado_check) > 0) {
+    $solicitacao = mysqli_fetch_assoc($resultado_check);
+    mysqli_stmt_close($stmt_check);
     
     echo json_encode([
         'sucesso' => false,
-        'mensagem' => 'Erro ao excluir conta: ' . $e->getMessage()
+        'mensagem' => 'Já existe uma solicitação de exclusão pendente para esta conta.',
+        'data_exclusao' => $solicitacao['data_exclusao_programada']
+    ]);
+    mysqli_close($conexao);
+    exit;
+}
+mysqli_stmt_close($stmt_check);
+
+// Cria a solicitação de exclusão (30 dias a partir de agora)
+$data_exclusao = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+$sql_solicita = "INSERT INTO solicitacoes_exclusao_conta (CPF, data_exclusao_programada, status) VALUES (?, ?, 'pendente')";
+$stmt_solicita = mysqli_prepare($conexao, $sql_solicita);
+mysqli_stmt_bind_param($stmt_solicita, "ss", $cpf, $data_exclusao);
+
+if (mysqli_stmt_execute($stmt_solicita)) {
+    mysqli_stmt_close($stmt_solicita);
+    
+    // TODO: Enviar email de confirmação para o usuário
+    // Email deve informar que a conta será excluída em 30 dias
+    // e que ele pode cancelar acessando sua conta
+    
+    echo json_encode([
+        'sucesso' => true,
+        'mensagem' => 'Solicitação de exclusão criada com sucesso. Sua conta será excluída em 30 dias.',
+        'data_exclusao' => $data_exclusao,
+        'email' => $usuario['Email']
+    ]);
+} else {
+    mysqli_stmt_close($stmt_solicita);
+    
+    echo json_encode([
+        'sucesso' => false,
+        'mensagem' => 'Erro ao criar solicitação de exclusão: ' . mysqli_error($conexao)
     ]);
 }
 
-// Fecha a conexão
 mysqli_close($conexao);
 ?>

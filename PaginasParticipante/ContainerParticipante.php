@@ -213,6 +213,17 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             conteudo.appendChild(script);
         }
 
+        // Função de limpeza completa antes de carregar nova página
+        window.limpezaCompleta = function() {
+            // Limpar PDF Manual se existir
+            if (typeof window.cleanupPDFManual === 'function') {
+                window.cleanupPDFManual();
+            }
+            
+            // Limpar outros recursos globais se necessário
+            // Adicione aqui outras funções de cleanup quando necessário
+        };
+
         function executarScriptsNoConteudo(containerEl) {
             if (!containerEl) return;
             const scripts = Array.from(containerEl.querySelectorAll('script'));
@@ -344,7 +355,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             },
             'perfil': {
-                html: 'PerfilParticipante.html',
+                html: 'PerfilParticipante.php',
                 js: ['PerfilParticipante.js'],
                 init: () => {
                     if (typeof window.inicializarEventosPerfilParticipante === 'function') window.inicializarEventosPerfilParticipante();
@@ -525,7 +536,11 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     </script>
     <script src="../PaginasGlobais/GerenciadorTimers.js"></script>
     <script src="../PaginasGlobais/VerificacaoSessao.js"></script>
-    <script src="../PaginasGlobais/GerenciadorNotificacoes.js"></script>
+    <?php 
+        $notifJsPath = realpath(__DIR__ . '/../PaginasGlobais/GerenciadorNotificacoes.js');
+        $notifJsVer = $notifJsPath ? filemtime($notifJsPath) : time();
+    ?>
+    <script src="../PaginasGlobais/GerenciadorNotificacoes.js?v=<?= $notifJsVer ?>"></script>
     <script src="../PaginasPublicas/ToggleSenha.js"></script>
     <script src="../PaginasGlobais/ResponsividadeMobile.js"></script>
 </body>

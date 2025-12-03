@@ -391,10 +391,14 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.6);
-        display: flex;
+        display: none;
         justify-content: center;
         align-items: center;
         z-index: 10000;
+    }
+
+    .modal-overlay.ativo {
+        display: flex;
     }
 
     .modal-cancelamento {
@@ -839,7 +843,7 @@
         </div>
 
         <!-- Modal de Confirmação de Cancelamento -->
-        <div id="modalConfirmarCancelamento" class="modal-overlay" style="display:none;">
+        <div id="modalConfirmarCancelamento" class="modal-overlay">
             <div class="modal-cancelamento">
                 <h2 class="modal-cancelamento-titulo">Você deseja cancelar a inscrição?</h2>
                 <div class="modal-cancelamento-botoes">
@@ -850,7 +854,7 @@
         </div>
 
         <!-- Modal de Sucesso do Cancelamento -->
-        <div id="modalCancelamentoConfirmado" class="modal-overlay" style="display:none;">
+        <div id="modalCancelamentoConfirmado" class="modal-overlay">
             <div class="modal-cancelamento">
                 <h2 class="modal-cancelamento-titulo">Inscrição cancelada com sucesso!</h2>
                 <div class="modal-cancelamento-botoes">
@@ -959,6 +963,11 @@
         // Previne scroll com setas do teclado e Page Up/Down
         function prevenirScrollTeclado(e) {
             if (!document.body.classList.contains('modal-aberto')) return;
+            
+            const elementoAtivo = document.activeElement;
+            const isInputOuTextarea = elementoAtivo && (elementoAtivo.tagName === 'TEXTAREA' || elementoAtivo.tagName === 'INPUT');
+            // Se estiver em input ou textarea, permite digitar normalmente
+            if (isInputOuTextarea) return;
             
             const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
             if (teclas.includes(e.keyCode)) {

@@ -41,10 +41,11 @@ function atribuirEventoRedefinirSenha() {
                 mensagem.style.lineHeight = '1.5';
                 
                 if (data.success) {
-                    mensagem.innerHTML = '✅ Solicitação Enviada!<br><br>' +
-                        'Sua solicitação de redefinição de senha foi registrada.<br>' +
-                        'Um administrador irá processar sua solicitação em breve.<br><br>' +
-                        '<small style="font-size: 0.85em; opacity: 0.9;">Email: ' + email + '</small>';
+                    mensagem.innerHTML = '✅ Email Enviado!<br><br>' +
+                        'Um email de recuperação de senha foi enviado para:<br>' +
+                        '<strong>' + email + '</strong><br><br>' +
+                        'Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.<br><br>' +
+                        '<small style="font-size: 0.85em; opacity: 0.9;">Se não receber o email, verifique a pasta de spam.</small>';
                 } else {
                     mensagem.innerHTML = '⚠️ ' + (data.message || 'Erro ao processar solicitação') + '<br><br>' +
                         '<small style="font-size: 0.85em;">Tente novamente mais tarde.</small>';

@@ -9,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="/CEU/Imagens/CEU-Logo-1x1.png" />
+    <!-- PDF.js Local - Configurar ANTES de usar -->
+    <script src="/CEU/bibliotecas/pdfjs/pdf.min.js"></script>
+    <script>
+        // Configurar worker IMEDIATAMENTE após PDF.js carregar
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '/CEU/bibliotecas/pdfjs/pdf.worker.min.js';
+        }
+    </script>
     <style>
         :root {
             --branco: #FFFFFF;
@@ -525,27 +533,13 @@
             
             window.pdfManualInitialized = true;
 
-            // Carregar PDF.js dinamicamente (evita problemas com AJAX)
-            function loadPDFJS() {
-                return new Promise((resolve, reject) => {
-                    if (window.pdfjsLib) {
-                        resolve(window.pdfjsLib);
-                        return;
-                    }
-
-                    const script = document.createElement('script');
-                    script.src = '/CEU/bibliotecas/pdfjs/pdf.min.js';
-                    script.onload = () => {
-                        if (window.pdfjsLib) {
-                            window.pdfjsLib.GlobalWorkerOptions.workerSrc = '/CEU/bibliotecas/pdfjs/pdf.worker.min.js';
-                            resolve(window.pdfjsLib);
-                        } else {
-                            reject(new Error('pdfjsLib não carregado'));
-                        }
-                    };
-                    script.onerror = () => reject(new Error('Falha ao carregar PDF.js'));
-                    document.head.appendChild(script);
-                });
+            // Aguardar DOM estar pronto (importante para carregamento via AJAX)
+            function aguardarDOM(callback) {
+                if (document.getElementById('pdfCanvas')) {
+                    callback();
+                } else {
+                    setTimeout(() => aguardarDOM(callback), 50);
+                }
             }
 
             const canvas = document.getElementById('pdfCanvas');
@@ -564,37 +558,69 @@
             let searchMatches = [];
             let currentMatchIndex = 0;
             let allPages = [];
-            let pdfjsLib = null;
 
             // Caminho do PDF (URL relativa, não Base64!)
             const pdfPath = '/CEU/PaginasGlobais/ManualdeUsoCEU.pdf';
 
-            // Inicializar após carregar PDF.js
-            loadPDFJS()
-                .then((lib) => {
-                    pdfjsLib = lib;
-                    console.log('PDF.js carregado com sucesso');
+            // Inicializar quando PDF.js estiver disponível
+            function initPDF() {
+                if (!window.pdfjsLib) {
+                    // Se PDF.js ainda não carregou, aguardar
+                    setTimeout(initPDF, 100);
+                    return;
+                }
+
+                // Configurar worker SEMPRE antes de usar PDF.js
+                if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = '/CEU/bibliotecas/pdfjs/pdf.worker.min.js';
+                }
+
+                if (canvas && pdfPath) {
+                    // Adicionar timestamp para evitar cache
+                    const loadingTask = window.pdfjsLib.getDocument({
+                        url: pdfPath,
+                        cMapUrl: '/CEU/bibliotecas/pdfjs/cmaps/',
+                        cMapPacked: true,
+                        disableRange: false,
+                        disableStream: false
+                    });
                     
-                    if (canvas && pdfPath) {
-                        pdfjsLib.getDocument(pdfPath).promise
-                            .then(pdf => {
-                                pdfDoc = pdf;
-                                console.log('PDF carregado com', pdf.numPages, 'páginas');
-                                
-                                // Extrair texto de todas as páginas (LAZY)
-                                extractAllText();
-                                
-                                // Renderizar primeira página
-                                renderPage(1);
-                            })
-                            .catch(err => {
-                                console.error('Erro ao carregar PDF:', err);
-                            });
-                    }
-                })
-                .catch(err => {
-                    console.error('Erro ao carregar PDF.js:', err);
-                });
+                    loadingTask.promise
+                        .then(pdf => {
+                            pdfDoc = pdf;
+                            console.log('PDF carregado com', pdf.numPages, 'páginas');
+                            
+                            // Extrair texto de todas as páginas (LAZY)
+                            extractAllText();
+                            
+                            // Renderizar primeira página
+                            renderPage(1);
+                        })
+                        .catch(err => {
+                            console.error('Erro ao carregar PDF:', err);
+                            // Tentar novamente com configuração simplificada
+                            window.pdfjsLib.getDocument(pdfPath).promise
+                                .then(pdf => {
+                                    pdfDoc = pdf;
+                                    console.log('PDF carregado (fallback) com', pdf.numPages, 'páginas');
+                                    extractAllText();
+                                    renderPage(1);
+                                })
+                                .catch(err2 => {
+                                    console.error('Erro ao carregar PDF (fallback):', err2);
+                                });
+                        });
+                }
+            }
+
+            // Verificar se PDF.js já carregou e aguardar DOM
+            aguardarDOM(() => {
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initPDF);
+                } else {
+                    initPDF();
+                }
+            });
 
             // Extrair texto de todas as páginas (com cache)
             async function extractAllText() {
@@ -811,6 +837,9 @@
             // Cleanup quando a página é removida do DOM
             window.cleanupPDFManual = function() {
                 window.pdfManualInitialized = false;
+                if (pdfDoc) {
+                    pdfDoc.destroy().catch(() => {});
+                }
                 pdfDoc = null;
                 pageNum = 1;
                 pageRendering = false;

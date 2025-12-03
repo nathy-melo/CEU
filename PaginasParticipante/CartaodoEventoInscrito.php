@@ -782,6 +782,11 @@
     function prevenirScrollTeclado(e) {
       if (!document.body.classList.contains('modal-aberto')) return;
       
+      const elementoAtivo = document.activeElement;
+      const isInputOuTextarea = elementoAtivo && (elementoAtivo.tagName === 'TEXTAREA' || elementoAtivo.tagName === 'INPUT');
+      // Se estiver em input ou textarea, permite digitar normalmente
+      if (isInputOuTextarea) return;
+      
       const teclas = [32, 33, 34, 35, 36, 37, 38, 39, 40];
       if (teclas.includes(e.keyCode)) {
         e.preventDefault();

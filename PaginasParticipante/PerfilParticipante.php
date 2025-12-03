@@ -621,7 +621,7 @@ $defaultImg = $siteRoot . '/ImagensPerfis/FotodePerfil.webp';
     </div>
 
     <!-- Modal para solicitar código de organizador -->
-    <div id="modal-codigo" class="modal-overlay hidden">
+    <div id="modal-codigo" class="modal-overlay">
         <div class="modal-container medio" onclick="event.stopPropagation()">
             <div class="modal-cabecalho">
                 <h2 class="modal-titulo">Tornar-se Organizador</h2>

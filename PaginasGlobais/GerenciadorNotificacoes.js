@@ -11,9 +11,15 @@ class GerenciadorNotificacoes {
     }
 
     inicializar() {
+        console.log('[NOTIF DEBUG] Inicializando gerenciador de notificações...');
         // Seleciona elementos que já existem no HTML
         this.caixaNotificacoes = document.getElementById('notificacoes-caixa');
         this.botaoNotificacoes = document.getElementById('botao-notificacoes');
+        
+        console.log('[NOTIF DEBUG] Elementos encontrados:', {
+            caixa: !!this.caixaNotificacoes,
+            botao: !!this.botaoNotificacoes
+        });
         
         if (!this.botaoNotificacoes || !this.caixaNotificacoes) {
             console.warn('Elementos de notificação não encontrados no DOM');
@@ -23,8 +29,8 @@ class GerenciadorNotificacoes {
         // Configura eventos primeiro
         this.configurarEventos();
         
-        // Faz primeira busca IMEDIATAMENTE
-        this.buscarNotificacoes();
+        // Faz primeira busca IMEDIATAMENTE (mas não renderiza lista ainda)
+        this.buscarNotificacoes(true); // true = apenas badge, não lista
         
         // Inicia polling
         this.iniciarPolling();
@@ -64,25 +70,76 @@ class GerenciadorNotificacoes {
     }
 
     configurarEventos() {
-        if (!this.botaoNotificacoes) return;
+        if (!this.botaoNotificacoes) {
+            console.error('[NOTIF DEBUG] botaoNotificacoes não existe!');
+            return;
+        }
 
-        // Remove listeners antigos
+        console.log('[NOTIF DEBUG] Configurando eventos do botão');
+
+        // Remove listeners antigos COMPLETAMENTE
         const botaoNovo = this.botaoNotificacoes.cloneNode(true);
         this.botaoNotificacoes.parentNode.replaceChild(botaoNovo, this.botaoNotificacoes);
         this.botaoNotificacoes = botaoNovo;
 
-        // Clique para abrir/fechar - NÃO adiciona classe 'ativo'
+        console.log('[NOTIF DEBUG] Botão clonado e substituído');
+
+        // Clique para abrir/fechar - usando addEventListener direto
         this.botaoNotificacoes.addEventListener('click', (e) => {
+            console.log('[NOTIF DEBUG] ====== CLIQUE CAPTURADO ======');
+            e.preventDefault();
             e.stopPropagation();
+            
             const caixa = document.getElementById('notificacoes-caixa');
+            if (!caixa) {
+                console.error('[NOTIF DEBUG] Caixa de notificações não encontrada!');
+                return;
+            }
+            
             const isOpen = caixa.classList.contains('mostrar');
+            
+            console.log('[NOTIF DEBUG] Clique no botão. isOpen:', isOpen);
+            console.log('[NOTIF DEBUG] Total de notificações armazenadas:', this.notificacoes.length);
+            
+            if (isOpen) {
+                console.log('[NOTIF DEBUG] Fechando dropdown');
+                caixa.classList.remove('mostrar');
+            } else {
+                console.log('[NOTIF DEBUG] Abrindo dropdown');
+                caixa.classList.add('mostrar');
+                
+                // FORÇAR renderização IMEDIATA
+                console.log('[NOTIF DEBUG] Forçando renderização...');
+                this.atualizarInterface();
+            }
+        }, true); // useCapture = true
+
+        console.log('[NOTIF DEBUG] Listener anexado com sucesso');
+        
+        // TESTE: Adicionar onclick inline também como fallback
+        this.botaoNotificacoes.onclick = (e) => {
+            console.log('[NOTIF DEBUG] ====== ONCLICK INLINE CAPTURADO ======');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const caixa = document.getElementById('notificacoes-caixa');
+            if (!caixa) {
+                console.error('[NOTIF DEBUG] Caixa não encontrada!');
+                return;
+            }
+            
+            const isOpen = caixa.classList.contains('mostrar');
+            console.log('[NOTIF DEBUG] onclick - isOpen:', isOpen);
             
             if (isOpen) {
                 caixa.classList.remove('mostrar');
             } else {
                 caixa.classList.add('mostrar');
+                this.atualizarInterface();
             }
-        });
+        };
+        
+        console.log('[NOTIF DEBUG] Onclick inline também configurado');
 
         // Fecha ao clicar fora
         document.addEventListener('click', (e) => {
@@ -97,18 +154,27 @@ class GerenciadorNotificacoes {
         });
     }
 
-    buscarNotificacoes() {
-        console.log('Buscando notificações do dropdown...');
+    buscarNotificacoes(apenasContador = false) {
+        console.log('[NOTIF DEBUG] Buscando notificações... apenasContador:', apenasContador);
         fetch('../PaginasGlobais/BuscarNotificacoes.php')
             .then(res => {
                 if (!res.ok) throw new Error('Erro HTTP: ' + res.status);
                 return res.json();
             })
             .then(dados => {
-                console.log('Notificações recebidas:', dados);
+                console.log('[NOTIF DEBUG] Notificações recebidas:', dados);
                 if (dados.sucesso) {
                     this.notificacoes = dados.notificacoes || [];
-                    this.atualizarInterface();
+                    console.log('[NOTIF DEBUG] Notificações armazenadas:', this.notificacoes.length);
+                    if (apenasContador) {
+                        console.log('[NOTIF DEBUG] Atualizando apenas badge e sino');
+                        // Apenas atualiza badge e sino, não renderiza lista
+                        this.atualizarBadgeESino();
+                    } else {
+                        console.log('[NOTIF DEBUG] Atualizando interface completa');
+                        // Atualiza tudo
+                        this.atualizarInterface();
+                    }
                 } else {
                     console.error('Erro na resposta:', dados.erro);
                 }
@@ -118,13 +184,11 @@ class GerenciadorNotificacoes {
             });
     }
 
-    atualizarInterface() {
+    atualizarBadgeESino() {
         const total = this.notificacoes.length;
         const badge = document.getElementById('notificacoes-badge');
-        const lista = document.getElementById('notificacoes-lista');
         const botao = document.getElementById('botao-notificacoes');
 
-        // Atualiza badge
         if (badge) {
             if (total > 0) {
                 badge.textContent = total > 99 ? '99+' : total;
@@ -134,8 +198,57 @@ class GerenciadorNotificacoes {
             }
         }
 
-        // Preenche o sino se houver notificações novas
         if (botao) {
+            const svg = botao.querySelector('svg');
+            if (svg) {
+                if (total > 0) {
+                    const paths = svg.querySelectorAll('path');
+                    paths.forEach(path => {
+                        path.setAttribute('fill', 'currentColor');
+                    });
+                } else {
+                    const paths = svg.querySelectorAll('path');
+                    paths.forEach(path => {
+                        path.setAttribute('fill', 'none');
+                    });
+                }
+            }
+        }
+    }
+
+    atualizarInterface() {
+        console.log('[NOTIF DEBUG] === atualizarInterface iniciado ===');
+        const total = this.notificacoes.length;
+        const badge = document.getElementById('notificacoes-badge');
+        const lista = document.getElementById('notificacoes-lista');
+        const botao = document.getElementById('botao-notificacoes');
+
+        console.log('[NOTIF DEBUG] Total:', total);
+        console.log('[NOTIF DEBUG] Elementos:', {
+            badge: !!badge,
+            lista: !!lista,
+            botao: !!botao
+        });
+
+        // Aguarda o DOM estar completamente pronto (importante para carregamento via AJAX)
+        const atualizarQuandoPronto = () => {
+            if (!badge || !lista || !botao) {
+                console.log('[NOTIF DEBUG] Aguardando elementos DOM...');
+                setTimeout(atualizarQuandoPronto, 50);
+                return;
+            }
+            
+            console.log('[NOTIF DEBUG] Todos elementos DOM prontos!');
+
+            // Atualiza badge
+            if (total > 0) {
+                badge.textContent = total > 99 ? '99+' : total;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Preenche o sino se houver notificações novas
             const svg = botao.querySelector('svg');
             if (svg) {
                 if (total > 0) {
@@ -152,23 +265,25 @@ class GerenciadorNotificacoes {
                     });
                 }
             }
-        }
 
-        // Atualiza lista de notificações
-        if (!lista) return;
+            // Atualiza lista de notificações
+            console.log('[NOTIF DEBUG] Renderizando lista. Total:', total);
+            
+            if (total === 0) {
+                console.log('[NOTIF DEBUG] Sem notificações, mostrando mensagem vazia');
+                lista.innerHTML = `
+                    <div class="notificacoes-vazio">
+                        Sem novas notificações
+                    </div>
+                `;
+                this.totalAnterior = 0;
+                return;
+            }
 
-        if (total === 0) {
-            lista.innerHTML = `
-                <div class="notificacoes-vazio">
-                    Sem novas notificações
-                </div>
-            `;
-            this.totalAnterior = 0;
-            return;
-        }
-
-        let html = '';
-        this.notificacoes.forEach((notif) => {
+            console.log('[NOTIF DEBUG] Gerando HTML para', total, 'notificações');
+            let html = '';
+            this.notificacoes.forEach((notif, index) => {
+                console.log('[NOTIF DEBUG] Processando notif', index + 1, '- Tipo:', notif.tipo);
             const data = new Date(notif.data_criacao);
             const hora = data.toLocaleTimeString('pt-BR', { 
                 hour: '2-digit', 
@@ -185,6 +300,7 @@ class GerenciadorNotificacoes {
             if (isMensagemParticipante || isMensagemOrganizador) {
                 // Formato: CPF|||NOME|||EVENTO|||MENSAGEM (para participante) ou CPF|||NOME|||TÍTULO|||CONTEÚDO (para organizador)
                 const partes = notif.mensagem.split('|||');
+                console.log('[NOTIF DEBUG] Mensagem tipo:', notif.tipo, '| Partes:', partes.length);
                 if (partes.length >= 4) {
                     const cpfRemetente = partes[0].trim();
                     const cpfMascarado = this.mascararCPF(cpfRemetente);
@@ -194,28 +310,18 @@ class GerenciadorNotificacoes {
                     
                     // Trunca mensagem se muito longa
                     let mensagemPreview = conteudoMsg;
-                    if (mensagemPreview.length > 80) {
-                        mensagemPreview = mensagemPreview.substring(0, 77) + '...';
+                    if (mensagemPreview.length > 60) {
+                        mensagemPreview = mensagemPreview.substring(0, 57) + '...';
                     }
                     
-                    // Formata diferente para participante e organizador
-                    let detalhesAdicionais = '';
+                    // Formata de forma simples e clara
                     if (isMensagemParticipante) {
-                        detalhesAdicionais = `💬 <strong>${cpfMascarado}</strong> em ${terceiroItem}`;
+                        mensagemTexto = `${nomeRemetente}, CPF ${cpfMascarado}, enviou uma mensagem no evento "${terceiroItem}": ${mensagemPreview}`;
                     } else {
-                        detalhesAdicionais = `💬 <strong>${cpfMascarado}</strong> • ${terceiroItem}`;
+                        mensagemTexto = `${nomeRemetente}, CPF ${cpfMascarado}, enviou: ${mensagemPreview}`;
                     }
                     
-                    remetenteInfo = `<div class="notif-remetente-info">
-                        <div style="margin-bottom: 4px;">
-                            <div style="font-size: 0.95rem; color: #FFF; font-weight: 600;">${nomeRemetente}</div>
-                            <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 2px;">${detalhesAdicionais}</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); padding: 6px; border-radius: 3px; border-left: 3px solid #6598D2; font-size: 0.85rem; line-height: 1.4; color: #FFF; margin-top: 4px;">${mensagemPreview}</div>
-                    </div>`;
-                    
-                    // A mensagem já será mostrada no preview acima
-                    mensagemTexto = '';
+                    remetenteInfo = '';
                 } else {
                     // Se não conseguir fazer parsing, mostra a mensagem completa
                     mensagemTexto = this.escaparHTML(notif.mensagem);
@@ -250,8 +356,35 @@ class GerenciadorNotificacoes {
             `;
         });
 
+        console.log('[NOTIF DEBUG] HTML gerado. Tamanho:', html.length, 'caracteres');
+        console.log('[NOTIF DEBUG] Primeiros 200 caracteres:', html.substring(0, 200));
+        
         lista.innerHTML = html;
+        console.log('[NOTIF DEBUG] HTML inserido na lista');
+        
+        // Forçar reflow para garantir que CSS seja aplicado
+        void lista.offsetHeight;
+        console.log('[NOTIF DEBUG] Reflow forçado');
+        
+        // Verificar se as classes CSS estão aplicadas
+        const items = lista.querySelectorAll('.notificacao-item-dropdown');
+        console.log('[NOTIF DEBUG] Items renderizados:', items.length);
+        if (items.length > 0) {
+            const firstItem = items[0];
+            const computedStyle = window.getComputedStyle(firstItem);
+            console.log('[NOTIF DEBUG] Estilo do primeiro item:', {
+                display: computedStyle.display,
+                padding: computedStyle.padding,
+                background: computedStyle.background
+            });
+        }
+        
         this.totalAnterior = total;
+        console.log('[NOTIF DEBUG] === atualizarInterface concluído ===');
+        };
+
+        // Chamar imediatamente ou aguardar DOM
+        atualizarQuandoPronto();
     }
 
     marcarComoLida(id) {
@@ -346,23 +479,32 @@ class GerenciadorNotificacoes {
 // Inicializa ao carregar a página
 let gerenciadorNotificacoes = null;
 
+console.log('[NOTIF DEBUG] Script GerenciadorNotificacoes.js carregado');
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[NOTIF DEBUG] DOMContentLoaded - Criando gerenciador...');
     // Espera um pouco para garantir que o DOM está pronto
     setTimeout(() => {
         if (!gerenciadorNotificacoes) {
+            console.log('[NOTIF DEBUG] Instanciando GerenciadorNotificacoes...');
             gerenciadorNotificacoes = new GerenciadorNotificacoes();
             window.gerenciadorNotificacoes = gerenciadorNotificacoes;
+            console.log('[NOTIF DEBUG] Gerenciador criado e disponível em window.gerenciadorNotificacoes');
+        } else {
+            console.log('[NOTIF DEBUG] Gerenciador já existe');
         }
     }, 100);
 });
 
 // Reinicializa quando carregar nova página (no seu sistema de rotas)
 document.addEventListener('conteudo-carregado', function() {
+    console.log('[NOTIF DEBUG] conteudo-carregado - Reinicializando...');
     if (gerenciadorNotificacoes) {
         gerenciadorNotificacoes.destruir();
     }
     setTimeout(() => {
         gerenciadorNotificacoes = new GerenciadorNotificacoes();
         window.gerenciadorNotificacoes = gerenciadorNotificacoes;
+        console.log('[NOTIF DEBUG] Gerenciador reinicializado');
     }, 100);
 });

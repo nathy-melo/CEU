@@ -171,6 +171,18 @@ CREATE TABLE favoritos_evento (
     FOREIGN KEY (cod_evento) REFERENCES evento(cod_evento) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE solicitacoes_exclusao_conta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    CPF CHAR(11) NOT NULL,
+    data_solicitacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_exclusao_programada TIMESTAMP NOT NULL,
+    status ENUM('pendente','cancelada','concluida') NOT NULL DEFAULT 'pendente',
+    data_cancelamento TIMESTAMP NULL,
+    data_conclusao TIMESTAMP NULL,
+    FOREIGN KEY (CPF) REFERENCES usuario(CPF) ON DELETE CASCADE,
+    INDEX idx_status_data (status, data_exclusao_programada)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gerencia solicitações de exclusão de conta com período de carência de 30 dias';
+
 INSERT INTO usuario (CPF, Nome, Email, Senha, Codigo, Organizador, TemaSite) VALUES
 ('00247160127', 'Aurora Sobrinho', 'aurora@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', 'CAIKE123', 1, 0),
 ('12345678901', 'Caike Moreira', 'ck@ceu.com', '$2y$10$w1m1cvEFWj4exWSbvll6FugnXw2RoksAEFrMg0FNZH9BAyV2CMFiC', 'CAIKE001', 1, 0),
@@ -230,7 +242,7 @@ INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES
 (13, '/ImagensEventos/CEU-ImagemEvento.png', 1, 0);
 
 INSERT INTO organiza (cod_evento, CPF) VALUES
-(1, '12345678901'), (2, '67860353024'), (3, '00247160127'), (4, '00247160127'),
+(1, '12345678901'), (2, '00247160127'), (3, '67860353024'), (4, '67860353024'),
 (5, '00247160127'), (6, '00247160127'), (7, '12345678901'), (8, '12345678901'),
 (9, '00247160127'), (10, '00247160127'), (11, '00247160127'), (12, '00247160127'),
 (13, '00247160127'), (14, '00247160127'), (15, '00247160127'), (16, '00247160127'),

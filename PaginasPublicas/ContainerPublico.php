@@ -184,6 +184,17 @@
             conteudo.appendChild(script);
         }
 
+        // Função de limpeza completa antes de carregar nova página
+        window.limpezaCompleta = function() {
+            // Limpar PDF Manual se existir
+            if (typeof window.cleanupPDFManual === 'function') {
+                window.cleanupPDFManual();
+            }
+            
+            // Limpar outros recursos globais se necessário
+            // Adicione aqui outras funções de cleanup quando necessário
+        };
+
         // Controla a classe do body por página pública
         function atualizarClasseBody(pagina) {
             const b = document.body;
