@@ -314,11 +314,9 @@ function formatar($txt)
             cursor: pointer;
             transition: transform 0.2s ease, background 0.2s ease;
             pointer-events: auto;
-            /* IMPORTANTE: Garantir que o botão seja clicável */
             position: relative;
-            /* Adicionar contexto de posicionamento */
             z-index: 100;
-            /* Colocar acima de qualquer outro elemento */
+            background-color: var(--botao);
         }
 
         .BotaoAcaoCard:hover {
@@ -329,6 +327,7 @@ function formatar($txt)
             width: 7cqi;
             height: 7cqi;
             display: block;
+            filter: invert(1);
         }
 
         body.modal-aberto {
@@ -350,21 +349,15 @@ function formatar($txt)
             justify-content: center;
             border: none;
             cursor: pointer;
+            background-color: var(--branco);
         }
 
         .BotaoFavoritosTrigger img {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: 2rem;
+            height: 2rem;
             display: block;
         }
 
-        /* Modal de Favoritos agora em styleModais.css */
-
-        /* Modal de mensagem agora em styleModais.css */
-
-        /* Modal de Compartilhar agora em styleModais.css */
-
-        /* Cards de favoritos - mesmo estilo do InicioParticipante.php */
         .favorito-item {
             background-color: var(--branco);
             border-radius: 1cqi;

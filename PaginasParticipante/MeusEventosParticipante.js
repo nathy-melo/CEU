@@ -181,7 +181,7 @@ function carregarEventosDoServidor() {
                 }
             }, 100);
 
-            // Carregar inscrições após carregar eventos para atualizar ícones - mesmo padrão do EventosInscritosOrganizador.php
+            // Carregar inscrições após carregar eventos para atualizar ícones
             setTimeout(() => {
                 if (typeof window.carregarInscricoes === 'function') {
                     window.carregarInscricoes();

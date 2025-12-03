@@ -28,7 +28,6 @@
         transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
       z-index: 50;
       pointer-events: auto;
-      /* IMPORTANTE: Permitir cliques mesmo quando opacity=0 durante hover */
     }
 
     .CaixaDoEvento:hover .AcoesFlutuantes {
@@ -36,7 +35,6 @@
       visibility: visible;
       transform: translateY(0);
       pointer-events: auto;
-      /* Garantir que os botões sejam clicáveis */
     }
 
     .BotaoAcaoCard {
@@ -51,11 +49,9 @@
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease;
       pointer-events: auto;
-      /* IMPORTANTE: Garantir que o botão seja clicável */
       position: relative;
-      /* Adicionar contexto de posicionamento */
       z-index: 100;
-      /* Colocar acima de qualquer outro elemento */
+      background-color: var(--botao);
     }
 
     .BotaoAcaoCard:hover {
@@ -66,9 +62,10 @@
       width: 7cqi;
       height: 7cqi;
       display: block;
+      filter: invert(1);
     }
 
-    /* Modal de Compartilhar - mesmo padrão do CartaodoEventoParticipante */
+    /* Modal de Compartilhar */
     body.modal-aberto {
       overflow: hidden !important;
     }
@@ -77,16 +74,7 @@
       overflow: hidden !important;
     }
 
-    /* CSS do modal compartilhar agora em styleModais.css */
-
-    /* CSS dos elementos de compartilhar agora em styleModais.css */
-
-    /* Modais de confirmação inscrição/desinscrição (padrão dos cartões) */
-    /* CSS dos modais de confirmação agora em styleModais.css */
-
-    /* CSS do modal de mensagem agora em styleModais.css */
-
-    /* Botão para abrir lista de favoritos (esquerda da barra de pesquisa) */
+    /* Botão para abrir lista de favoritos */
     .BotaoFavoritosTrigger {
       width: clamp(30px, 4vw, 48px);
       aspect-ratio: 1 / 1;
@@ -97,17 +85,15 @@
       justify-content: center;
       border: none;
       cursor: pointer;
+      background-color: var(--branco);
     }
 
     .BotaoFavoritosTrigger img {
-      width: 1.25rem;
-      height: 1.25rem;
+      width: 2rem;
+      height: 2rem;
       display: block;
     }
 
-    /* Modal de Favoritos - CSS agora em styleModais.css */
-
-    /* Cards de favoritos - mesmo estilo do .CaixaDoEvento */
     .favorito-item {
       background-color: var(--branco);
       border-radius: 1cqi;

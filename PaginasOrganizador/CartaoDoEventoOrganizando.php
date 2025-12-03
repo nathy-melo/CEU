@@ -1051,9 +1051,6 @@ if ($stmtPermissao && $cpfUsuario) {
       opacity: 0.9;
     }
 
-    /* Modal de Compartilhar */
-    /* Modal de compartilhar agora em styleModais.css */
-
     .mensagem-vazio {
       text-align: center;
       padding: 1rem;
@@ -1085,6 +1082,7 @@ if ($stmtPermissao && $cpfUsuario) {
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease;
       box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
+      background: var(--botao);
     }
 
     .BotaoAcaoCartao:hover {
@@ -1095,9 +1093,8 @@ if ($stmtPermissao && $cpfUsuario) {
       width: 1.75rem;
       height: 1.75rem;
       display: block;
+      filter: invert(1);
     }
-
-    /* Modal de mensagem agora em styleModais.css */
 
     /* Responsividade - esconder botões em telas menores */
     @media (max-width: 1200px) {

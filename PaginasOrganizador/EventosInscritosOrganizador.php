@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <style>
-        /* Modal de Compartilhar agora em styleModais.css */
-
-        /* Botões flutuantes no card */
         .CaixaDoEvento {
             position: relative;
         }
@@ -53,11 +50,9 @@
             cursor: pointer;
             transition: transform 0.2s ease, background 0.2s ease;
             pointer-events: auto;
-            /* IMPORTANTE: Garantir que o botão seja clicável */
             position: relative;
-            /* Adicionar contexto de posicionamento */
             z-index: 100;
-            /* Colocar acima de qualquer outro elemento */
+            background-color: var(--botao);
         }
 
         .BotaoAcaoCard:hover {
@@ -68,6 +63,7 @@
             width: 7cqi;
             height: 7cqi;
             display: block;
+            filter: invert(1);
         }
 
         body.modal-aberto {
@@ -89,17 +85,14 @@
             justify-content: center;
             border: none;
             cursor: pointer;
+            background-color: var(--branco);
         }
 
         .BotaoFavoritosTrigger img {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: 2rem;
+            height: 2rem;
             display: block;
         }
-
-        /* Modal de Favoritos agora em styleModais.css */
-
-        /* Modal de mensagem agora em styleModais.css */
 
         /* Estilos dos favoritos */
         .favorito-item {
@@ -280,8 +273,6 @@
             color: var(--azul-escuro);
             font-weight: 800;
         }
-
-        /* CSS dos modais agora em styleModais.css */
     </style>
 </head>
 
@@ -1521,9 +1512,9 @@
             }
         }
 
-        // Listeners de clique - usando o mesmo padrão do MeusEventosParticipante.php
+        // Listeners de clique
         document.addEventListener('click', async function(e) {
-            // Botão de inscrever/desinscrever (também nos favoritos) - MESMO PADRÃO DO MeusEventosParticipante
+            // Botão de inscrever/desinscrever (também nos favoritos)
             const btnInscrever = e.target.closest('.BotaoInscreverCard');
             if (btnInscrever) {
                 e.preventDefault();
@@ -1864,7 +1855,7 @@
             setTimeout(carregarFavoritos, 50);
         }
 
-        // Carregar inscrições ao iniciar - mesmo padrão do InicioParticipante.php
+        // Carregar inscrições ao iniciar
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', carregarInscricoes);
         } else {
