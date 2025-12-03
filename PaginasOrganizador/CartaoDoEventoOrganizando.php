@@ -1082,6 +1082,7 @@ if ($stmtPermissao && $cpfUsuario) {
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease;
       box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.3);
+      background: var(--botao);
     }
 
     .BotaoAcaoCartao:hover {
@@ -1092,6 +1093,7 @@ if ($stmtPermissao && $cpfUsuario) {
       width: 1.75rem;
       height: 1.75rem;
       display: block;
+      filter: invert(1);
     }
 
     /* Responsividade - esconder botões em telas menores */
