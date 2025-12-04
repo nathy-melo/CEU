@@ -1,6 +1,0 @@
-[28-Nov-2025 15:53:21 Europe/Berlin] [AdicionarEvento] Erro fatal capturado: The number of elements in the type definition string must match the number of bind variables em C:\xampp\htdocs\CEU\PaginasOrganizador\AdicionarEvento.php:259
-[28-Nov-2025 15:53:21 Europe/Berlin] [AdicionarEvento] Stack trace: #0 C:\xampp\htdocs\CEU\PaginasOrganizador\AdicionarEvento.php(259): mysqli_stmt_bind_param(Object(mysqli_stmt), 'isssssssddisiss...', '18', 'Outro', 'a', 'a', 'a', 'a', '2025-11-29 11:0...', '2025-11-29 12:0...', 1.0, 1.0, 1, 'Presencial', 'ImagensEventos/...', '2025-11-28 15:0...', '2025-11-30 15:0...', 'Pesquisa', 'ModeloExemplo.p...', 'ModeloExemploOr...')
-#1 {main}
-[28-Nov-2025 15:57:26 Europe/Berlin] [AdicionarEvento] Erro fatal capturado: The number of elements in the type definition string must match the number of bind variables em C:\xampp\htdocs\CEU\PaginasOrganizador\AdicionarEvento.php:259
-[28-Nov-2025 15:57:26 Europe/Berlin] [AdicionarEvento] Stack trace: #0 C:\xampp\htdocs\CEU\PaginasOrganizador\AdicionarEvento.php(259): mysqli_stmt_bind_param(Object(mysqli_stmt), 'isssssssddissss...', '18', 'Curso', 'a', 'a', 'a', 'a', '2025-11-29 13:0...', '2025-11-29 14:0...', 1.0, 1.0, 1, 'Online', 'ImagensEventos/...', '2025-11-28 12:0...', '2025-11-29 14:0...', 'Pesquisa', 'ModeloExemplo.p...', 'ModeloExemploOr...')
-#1 {main}

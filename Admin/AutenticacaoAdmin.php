@@ -1,13 +1,11 @@
 <?php
 header('Content-Type: application/json');
 
-// Configurações de sessão mais robustas
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_only_cookies', 1);
-ini_set('session.cookie_secure', 0); // Desabilitado para localhost
+ini_set('session.cookie_secure', 0);
 session_start();
 
-// Incluir configurações centralizadas
 require_once 'ConfigAdmin.php';
 
 // Função para verificar se já existe sessão admin ativa
@@ -27,7 +25,6 @@ function createAdminSession()
     $_SESSION['admin_login_time'] = time();
     $_SESSION['admin_ip'] = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
-    // Regenerar ID da sessão por segurança
     session_regenerate_id(true);
 }
 
@@ -41,7 +38,6 @@ function destroyAdminSession()
     session_destroy();
 }
 
-// Verificar se é requisição POST para login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
 
@@ -56,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usuario = trim($input['usuario'] ?? '');
     $senha = trim($input['senha'] ?? '');
 
-    // Validações básicas
     if (empty($usuario) || empty($senha)) {
         echo json_encode([
             'success' => false,
@@ -65,16 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Gerar hashes das credenciais fornecidas
     $usuarioHash = generateSecureHash($usuario);
     $senhaHash = generateSecureHash($senha);
 
-    // Verificar credenciais
     if ($usuarioHash === ADMIN_USER_HASH && $senhaHash === ADMIN_PASS_HASH) {
-        // Credenciais corretas, criar sessão
         createAdminSession();
-
-        // Log da atividade
         logAdminActivity('LOGIN_SUCCESS', "Usuário: $usuario");
 
         echo json_encode([
@@ -92,7 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     }
 } else {
-    // Verificar se admin já está logado
     if (isAdminLoggedIn()) {
         echo json_encode([
             'success' => true,

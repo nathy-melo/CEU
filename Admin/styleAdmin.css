@@ -1,7 +1,4 @@
-/* 
- * CSS Administrativo Unificado - CEU
- * Seguindo o padrão visual do site principal
- */
+/*  CSS Administrativo - CEU */
 
 /* Importar variáveis CSS do site principal */
 :root {
@@ -235,7 +232,6 @@ body::-webkit-scrollbar-track {
     width: 100%;
 }
 
-/* Removido pseudo-ícone para usar somente a seta nativa do navegador */
 .select-wrapper::after {
     display: none;
 }
@@ -257,21 +253,16 @@ select.search-input {
     padding-right: 10px;
 }
 
-/* Oculta seta no IE/Edge legado */
-/* Mostrar seta nativa também em IE/Edge legado */
 select::-ms-expand {
     display: inline;
 }
 
-/* Tentar harmonizar o menu das opções (efeito varia por navegador) */
 .select-wrapper select option {
     background-color: var(--branco);
     color: var(--preto);
 }
 
-/* ============================ */
-/* Dropdown custom (Admin - all screens) */
-/* ============================ */
+/* Mudança no Dropdown */
 .ddl-hidden-native {
     display: none !important;
 }
@@ -360,8 +351,6 @@ select::-ms-expand {
     }
 }
 
-/* Mantemos o select nativo e apenas estilizamos o controle; o menu aberto é do sistema/OS. */
-
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
@@ -407,7 +396,6 @@ select::-ms-expand {
     opacity: 0.9;
 }
 
-/* Garantir que caixas admin usem padrão do site */
 .admin-login-box,
 .test-container,
 .admin-container {
@@ -415,13 +403,11 @@ select::-ms-expand {
     color: var(--branco);
 }
 
-/* Sobrescrever background específico para admin-container */
 .admin-container {
     background-color: var(--caixas) !important;
     color: var(--branco) !important;
 }
 
-/* Containers internos com background claro */
 #eventosContainer,
 #usuariosContainer,
 #codigosContainer,
@@ -434,7 +420,6 @@ select::-ms-expand {
     padding: 15px !important;
 }
 
-/* Botões administrativos seguindo padrão do site */
 .btn,
 .botao,
 .btn-admin-login,
@@ -694,7 +679,6 @@ select::-ms-expand {
     transform: translateY(-1px);
 }
 
-/* Loading screen seguindo padrão do site */
 #loadingScreen {
     background-color: var(--fundo);
     color: var(--branco);
@@ -703,17 +687,13 @@ select::-ms-expand {
 /* Tabelas administrativas */
 .admin-table {
     width: 100%;
-    /* Usar separate/spacing para evitar artefatos nas quinas */
     border-collapse: separate;
     border-spacing: 0;
     margin-top: 0;
     background-color: transparent;
-    /* fundo vem do wrapper */
-    /* Radius e sombra ficam no wrapper para evitar artefatos */
     border-radius: 0;
     overflow: visible;
     box-shadow: none;
-    /* Melhoria responsiva: tamanho mínimo para legibilidade */
     min-width: 600px;
 }
 
@@ -722,9 +702,7 @@ select::-ms-expand {
     padding: 15px;
     text-align: left;
     border-bottom: 1px solid rgba(79, 108, 140, 0.2);
-    /* Usar clamp() para fonte responsiva */
     font-size: clamp(14px, 2vw, 16px);
-    /* Quebra de texto para conteúdo longo */
     word-break: break-word;
     max-width: 300px;
 }
@@ -738,7 +716,6 @@ select::-ms-expand {
     background-color: var(--caixas);
     color: var(--branco);
     font-weight: 600;
-    /* Sticky header para tabelas longas */
     position: sticky;
     top: 0;
     z-index: 10;
@@ -749,7 +726,6 @@ select::-ms-expand {
     transition: background-color 0.2s ease;
 }
 
-/* Wrapper para scroll horizontal em tabelas */
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
@@ -781,16 +757,13 @@ select::-ms-expand {
     background: var(--azul-escuro);
 }
 
-/* =======================================
-   CARDS RESPONSIVOS PARA TABELAS (MOBILE)
-   ======================================= */
+/* CARDS RESPONSIVOS PARA TABELAS (MOBILE) */
 
 /* Container para cards mobile - oculto por padrão no DESKTOP */
 .mobile-cards-container {
     display: none !important;
 }
 
-/* Tabela visível por padrão no DESKTOP */
 .table-wrapper {
     display: block !important;
 }
@@ -883,14 +856,12 @@ select::-ms-expand {
 .stats-card h4 {
     margin: 0;
     color: var(--azul-escuro);
-    /* Usar clamp() para responsividade fluida */
     font-size: clamp(14px, 3vw, 16px);
     font-weight: 600;
     line-height: 1.2;
 }
 
 .stats-card p {
-    /* Usar clamp() para número grande responsivo */
     font-size: clamp(24px, 5vw, 30px);
     margin: 6px 0;
     font-weight: bold;
@@ -898,15 +869,12 @@ select::-ms-expand {
     line-height: 1;
 }
 
-/* Ajustes visuais específicos da seção PWA/Rede */
 #pwarede .stats-card p {
-    /* Reduzir o tamanho da fonte nos cards para evitar "texto grande" */
     font-size: clamp(14px, 3.2vw, 18px);
     font-weight: 600;
 }
 
 #pwarede .admin-container {
-    /* Nesta seção, usamos container claro para melhor contraste com conteúdo detalhado */
     background-color: rgba(255, 255, 255, 0.98) !important;
     color: var(--preto) !important;
     border: 1px solid #dee2e6;
@@ -917,7 +885,6 @@ select::-ms-expand {
 }
 
 #pwarede #pwaDetalhes {
-    /* Garantir contraste de texto sobre fundo claro */
     color: var(--preto) !important;
     background: #f8f9fa !important;
 }
@@ -1077,9 +1044,7 @@ select::-ms-expand {
     color: var(--azul-escuro);
 }
 
-/* =======================================
-   ÍCONES SVG INLINE
-   ======================================= */
+/* Ícones SVG Inline */
 
 /* Classe base para ícones SVG */
 .icon {
@@ -1145,9 +1110,7 @@ h4 .icon {
     margin-right: 8px;
 }
 
-/* =======================================
-   RESPONSIVIDADE
-   ======================================= */
+/* Responsividade */
 
 /* Grid responsivo para forms e controles */
 .responsive-grid {
@@ -1374,7 +1337,6 @@ h4 .icon {
         font-size: 13px;
     }
 
-    /* Botões da tabela empilhados */
     .admin-table td {
         white-space: normal;
     }
@@ -1389,7 +1351,6 @@ h4 .icon {
         gap: 4px;
     }
 
-    /* Ícones menores em mobile */
     .icon {
         width: 14px;
         height: 14px;
@@ -1578,7 +1539,6 @@ h4 .icon {
         font-size: 16px;
     }
 
-    /* Navegação com ícones mais visíveis */
     .admin-nav .btn-secondary {
         padding: 10px;
         font-size: 14px;
@@ -1648,14 +1608,12 @@ h4 .icon {
         /* Tamanho mínimo recomendado para touch */
     }
 
-    /* Remover hover effects em telas touch */
     .btn:hover,
     .btn-small:hover,
     .admin-nav .btn-secondary:hover {
         transform: none;
     }
 
-    /* Feedback visual ao tocar */
     .btn:active,
     .btn-small:active,
     .admin-nav .btn-secondary:active {
@@ -1678,7 +1636,6 @@ h4 .icon {
         padding: 12px;
     }
 
-    /* Navegação em duas colunas no modo paisagem */
     .admin-nav {
         flex-direction: row;
         flex-wrap: wrap;

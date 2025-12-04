@@ -2271,7 +2271,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         color: var(--branco);
     }
 
-    /* Ajuste de colunas da tabela de organização - agora com 4 colunas igual participantes */
     #aba-organizacao .tabela-participantes th:nth-child(1),
     #aba-organizacao .tabela-participantes td:nth-child(1) {
         width: 50px;
