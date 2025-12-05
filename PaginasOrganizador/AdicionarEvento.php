@@ -2384,10 +2384,9 @@ mysqli_close($conexao);
                             }
                         })
                         .catch(error => {
-                            console.error('[DEBUG] ========== ERRO CAPTURADO ==========');
+                            console.error('[DEBUG] ERRO CAPTURADO');
                             console.error('[DEBUG] Mensagem:', error.message);
                             console.error('[DEBUG] Stack:', error.stack);
-                            console.error('[DEBUG] =====================================');
                             alert('Erro ao criar evento: ' + error.message + '\n\nVerifique o console (F12) para mais detalhes.');
                             btnCriar.disabled = false;
                             btnCriar.textContent = 'Criar evento';

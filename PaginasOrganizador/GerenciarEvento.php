@@ -2461,7 +2461,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         filter: brightness(0) invert(1);
     }
 
-    /* ===== ESTILOS PARA LAYOUT COMPACTO ===== */
+    /*  ESTILOS PARA LAYOUT COMPACTO  */
     .secao-superior-compacta {
         display: flex;
         flex-direction: column;
@@ -2560,7 +2560,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         gap: 10px !important;
     }
 
-    /* ===== RESPONSIVIDADE PARA TABLETS (768px - 1024px) ===== */
+    /*  RESPONSIVIDADE PARA TABLETS (768px - 1024px)  */
     @media (min-width: 769px) and (max-width: 1024px) {
         .secao-superior-compacta {
             gap: 12px;
@@ -2623,7 +2623,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    /* ===== RESPONSIVIDADE PARA CELULARES (até 768px) ===== */
+    /*  RESPONSIVIDADE PARA CELULARES (até 768px)  */
     @media (max-width: 768px) {
         .secao-superior-compacta {
             gap: 8px;
@@ -2801,7 +2801,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    /* ===== RESPONSIVIDADE PARA CELULARES PEQUENOS (até 480px) ===== */
+    /*  RESPONSIVIDADE PARA CELULARES PEQUENOS (até 480px)  */
     @media (max-width: 480px) {
         .secao-superior-compacta {
             gap: 6px;
@@ -2839,7 +2839,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    /* ===== AJUSTES ADICIONAIS PARA RESPONSIVIDADE ===== */
+    /*  AJUSTES ADICIONAIS PARA RESPONSIVIDADE  */
 
     /* Barra de pesquisa responsiva */
     @media (max-width: 768px) {
@@ -2914,7 +2914,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    /* ===== TRANSFORMAR TABELA EM CARDS NO MOBILE ===== */
+    /*  TRANSFORMAR TABELA EM CARDS NO MOBILE  */
     @media (max-width: 768px) {
         /* Oculta a tabela e mostra cards */
         .envoltorio-tabela {
@@ -3919,7 +3919,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
         }
 
-        // ========== MODAL ADICIONAR PARTICIPANTE ==========
+        //  MODAL ADICIONAR PARTICIPANTE 
         function abrirModalAdicionar() {
             const modal = document.getElementById('modalAdicionarParticipante');
             const modaisGlobais = document.getElementById('modais-globais');
@@ -4020,7 +4020,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // ========== MODAL ENVIAR MENSAGEM ==========
+        //  MODAL ENVIAR MENSAGEM 
         function abrirModalMensagem() {
             const modal = document.getElementById('modalEnviarMensagem');
             const modaisGlobais = document.getElementById('modais-globais');
@@ -4050,7 +4050,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.body.style.overflow = '';
         }
 
-        // ========== MODAL ENVIAR MENSAGEM PARA CPF ESPECÍFICO ==========
+        //  MODAL ENVIAR MENSAGEM PARA CPF ESPECÍFICO 
         window.abrirModalMensagemCPF = function(cpfPreenchido = '') {
             const modal = document.getElementById('modalEnviarMensagemCPF');
 
@@ -4194,7 +4194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // ========== AÇÕES EM MASSA ==========
+        //  AÇÕES EM MASSA 
         async function confirmarPresencasEmMassa() {
             if (todosParticipantes.length === 0) {
                 alert('Não há participantes inscritos neste evento');

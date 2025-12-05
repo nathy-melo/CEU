@@ -15,7 +15,7 @@ function registrarLog($mensagem) {
     file_put_contents($logFile, "[$timestamp] $mensagem\n", FILE_APPEND);
 }
 
-registrarLog("===== Iniciando processamento de exclusões pendentes =====");
+registrarLog("Iniciando processamento de exclusões pendentes");
 
 try {
     $sql = "SELECT s.id, s.CPF, s.data_exclusao_programada, u.Nome, u.Email 
@@ -98,7 +98,7 @@ try {
         }
     }
     
-    registrarLog("===== Processamento finalizado =====");
+    registrarLog("Processamento finalizado");
     registrarLog("Total: $total | Excluídas: $excluidas | Erros: $erros");
     
 } catch (Exception $e) {
@@ -106,5 +106,5 @@ try {
 }
 
 mysqli_close($conexao);
-registrarLog("===== Fim da execução =====\n");
+registrarLog("Fim da execução\n");
 ?>

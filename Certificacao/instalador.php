@@ -665,7 +665,7 @@ switch ($action) {
         }
         break;
 
-    // ===================== FONTES (Inter) =====================
+    // FONTES (Inter)
     case 'verificar_fonte_inter':
         try {
             $dirFontes = __DIR__ . '/fonts';

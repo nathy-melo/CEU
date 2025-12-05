@@ -350,7 +350,7 @@ if (document.readyState === 'loading') {
     inicializarValidacoesCadastro();
 }
 
-// ================= Envio AJAX Reutilizável =================
+//  Envio AJAX Reutilizável 
 function enviarCadastroAjax(idFormulario, urlDestino) {
     var formulario = document.getElementById(idFormulario);
     if (!formulario) return;

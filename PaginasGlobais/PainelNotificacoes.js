@@ -1,6 +1,4 @@
-// ==================================================
-// PAINEL DE NOTIFICAÇÕES - SISTEMA COMPLETO
-// ==================================================
+// Painel de Notificações
 
 if (typeof notificacoesGlobal === 'undefined') {
     var notificacoesGlobal = [];
@@ -14,9 +12,7 @@ if (typeof intervalID === 'undefined') {
 
 // Log inicial desabilitado para reduzir ruído no console
 
-// ==================================================
-// INICIALIZAÇÃO
-// ==================================================
+// Inicialização
 function inicializarPainel() {
     // Log inicial desabilitado para reduzir ruído no console
     
@@ -91,9 +87,7 @@ if (document.readyState === 'loading') {
     aguardarDOMPainel();
 }
 
-// ==================================================
-// CARREGAR NOTIFICAÇÕES DO SERVIDOR
-// ==================================================
+// Carregar notificações do servidor
 function carregarNotificacoes() {
     // Log desabilitado para reduzir ruído no console
     
@@ -122,9 +116,7 @@ function carregarNotificacoes() {
         });
 }
 
-// ==================================================
-// EXIBIR NOTIFICAÇÕES NA TELA
-// ==================================================
+// Exibir notificações na tela
 function mostrarNotificacoes() {
     const container = document.getElementById('lista-notificacoes');
     const contador = document.getElementById('contador-notificacoes');
@@ -404,9 +396,7 @@ function toggleThread(notifId) {
     }
 }
 
-// ==================================================
-// MENSAGEM DE LISTA VAZIA
-// ==================================================
+// Mensagem de lista vazia
 function mostrarVazio(mensagem) {
     const container = document.getElementById('lista-notificacoes');
     if (container) {
@@ -418,9 +408,7 @@ function mostrarVazio(mensagem) {
     }
 }
 
-// ==================================================
-// EXCLUIR NOTIFICAÇÃO
-// ==================================================
+// Excluir notificações
 function excluirNotificacao(id) {
     if (!confirm('Tem certeza que deseja excluir esta notificação?')) {
         return;
@@ -471,9 +459,7 @@ function excluirNotificacao(id) {
     });
 }
 
-// ==================================================
-// EXCLUIR NOTIFICAÇÃO
-// ==================================================
+// Excluir notificação
 function excluirNotificacao(id) {
     if (!confirm('Tem certeza que deseja excluir esta notificação?')) {
         return;
@@ -524,9 +510,7 @@ function excluirNotificacao(id) {
     });
 }
 
-// ==================================================
-// MARCAR NOTIFICAÇÃO COMO LIDA
-// ==================================================
+// Marcar notificação como lida
 function marcarComoLida(id) {
     // Log desabilitado para reduzir ruído no console
     
@@ -570,9 +554,7 @@ function marcarComoLida(id) {
     });
 }
 
-// ==================================================
-// FUNÇÕES AUXILIARES
-// ==================================================
+// Funções auxiliares
 
 // Traduz tipo de notificação
 function traduzirTipo(tipo, apenasTexto = false) {
@@ -919,9 +901,7 @@ function formatarData(dataStr) {
     }
 }
 
-// ==================================================
-// LIMPEZA AO SAIR DA PÁGINA
-// ==================================================
+// Limpeza ao sair da página
 window.addEventListener('beforeunload', () => {
     if (intervalID) {
         clearInterval(intervalID);

@@ -83,14 +83,10 @@
     </div>
 
     <script>
-        // =========================
         // Variáveis globais
-        // =========================
         let menuContentObserver = null; // Observer para sincronizar menu/conteúdo
 
-        // =========================
         // Funções utilitárias (helpers)
-        // =========================
         function carregarScripts(lista, callback) {
             const alvo = document.getElementById('conteudo-dinamico') || document.body;
             let index = 0;
@@ -206,9 +202,7 @@
             }
         }
 
-        // =========================
         // Definição das rotas
-        // =========================
         const rotas = {
             'inicio': {
                 html: 'Inicio.php',
@@ -294,9 +288,7 @@
         };
         globalThis.rotas = rotas;
 
-        // =========================
         // Funções de navegação e carregamento
-        // =========================
         function executarRota(pagina) {
             const rota = rotas[pagina];
             if (!rota) return;
@@ -351,9 +343,7 @@
                 });
         }
 
-        // =========================
         // Eventos de inicialização
-        // =========================
         
         // Desabilita restauração automática de scroll do navegador
         if ('scrollRestoration' in history) {

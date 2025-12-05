@@ -58,8 +58,6 @@
     margin-right: clamp(150px, 15vw, 300px);
 }
 
-/* ============================= */
-
 /* Scrollbar global */
 html, body {
     scrollbar-width: thin;
@@ -86,8 +84,6 @@ html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
     background: var(--caixas);
     border-radius: 1rem;
 }
-
-/* ============================= */
 
 *,
 *::before,
@@ -175,7 +171,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   margin-top: 0 !important;
 }
 
-/* ====== Botões ====== */
+/* Botões */
 
 .btn, .botao {
   border: none;
@@ -191,7 +187,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   box-shadow: 0rem 0.2rem 0.6rem var(--sombra-leve) !important;
 }
 
-/* ====== Páginas de listagem de eventos ====== */
+/* Páginas de listagem de eventos */
 .barra-pesquisa-container {
   max-width: 100%;
   box-sizing: border-box;
@@ -477,7 +473,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   pointer-events: auto;
 }
 
-/* ====== EventoInfo: lista visual com ícones ====== */
+/* EventoInfo: lista visual com ícones */
 .EventoInfo .evento-info-list {
   list-style: none;
   margin: 0;
@@ -550,7 +546,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   aspect-ratio: 3 / 2;
 }
 
-/* ====== Filtro lateral dos eventos ====== */
+/* Filtro lateral dos eventos */
 .filtro-container {
   max-width: clamp(200px, 18%, 320px);
   width: clamp(200px, 18%, 320px);
@@ -742,7 +738,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   box-shadow: 0 0 0 2px var(--caixas) inset;
 }
 
-/* ====== Estilos dos Menus Laterais ====== */
+/* Estilos dos Menus Laterais */
 
 .Menu {
   position: fixed;
@@ -1282,7 +1278,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   margin-left: clamp(200px, 15%, 300px);
 }
 
-/* ====== Estilos do Modal Personalizado ====== */
+/* Estilos do Modal Personalizado */
 .modal-personalizado {
   display: none;
   position: fixed;
@@ -1351,9 +1347,7 @@ body.pagina-com-barra-pesquisa .barra-pesquisa-container {
   transition: background-color 0.3s ease;
 }
 
-/* ======================= */
 /* Toggle de Senha (Global)*/
-/* ======================= */
 .btn-toggle-senha {
   position: absolute;
   top: 50%;

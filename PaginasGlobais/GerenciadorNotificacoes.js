@@ -86,7 +86,7 @@ class GerenciadorNotificacoes {
 
         // Clique para abrir/fechar - usando addEventListener direto
         this.botaoNotificacoes.addEventListener('click', (e) => {
-            console.log('[NOTIF DEBUG] ====== CLIQUE CAPTURADO ======');
+            console.log('[NOTIF DEBUG] CLIQUE CAPTURADO');
             e.preventDefault();
             e.stopPropagation();
             
@@ -118,7 +118,7 @@ class GerenciadorNotificacoes {
         
         // TESTE: Adicionar onclick inline também como fallback
         this.botaoNotificacoes.onclick = (e) => {
-            console.log('[NOTIF DEBUG] ====== ONCLICK INLINE CAPTURADO ======');
+            console.log('[NOTIF DEBUG] ONCLICK INLINE CAPTURADO');
             e.preventDefault();
             e.stopPropagation();
             

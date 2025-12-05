@@ -1780,7 +1780,7 @@
     inicializarCartaoEventoOrganizando();
   }
 
-  // ====== FUNÇÕES DO MODAL DE TEMPLATE ======
+  //  FUNÇÕES DO MODAL DE TEMPLATE 
   let tipoTemplateAtual = null;
 
   window.abrirModalTemplate = function(tipo) {

@@ -1,11 +1,6 @@
-/* ========================================
-   ESTILOS PADRONIZADOS PARA MODAIS
-   Sistema de Eventos CEU
-   ======================================== */
+/* ESTILOS PADRONIZADOS PARA MODAIS CEU */
 
-/* =====================================
-   OVERLAY BASE
-   ===================================== */
+/* OVERLAY BASE */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -22,9 +17,7 @@
   display: flex;
 }
 
-/* =====================================
-   CONTAINER DO MODAL
-   ===================================== */
+/* CONTAINER DO MODAL */
 .modal-container {
   background: var(--caixas);
   color: var(--branco);
@@ -57,9 +50,7 @@
   border-radius: 1.875rem;
 }
 
-/* =====================================
-   CABEÇALHO DO MODAL
-   ===================================== */
+/* CABEÇALHO DO MODAL */
 .modal-cabecalho {
   display: flex;
   align-items: center;
@@ -98,9 +89,7 @@
   transform: scale(1.1);
 }
 
-/* =====================================
-   CORPO DO MODAL
-   ===================================== */
+/* CORPO DO MODAL */
 .modal-corpo {
   padding: 1.5rem;
   overflow-y: auto;
@@ -128,9 +117,7 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* =====================================
-   RODAPÉ DO MODAL
-   ===================================== */
+/* RODAPÉ DO MODAL */
 .modal-rodape {
   display: flex;
   gap: 0.75rem;
@@ -150,9 +137,7 @@
   flex-direction: column;
 }
 
-/* =====================================
-   BOTÕES DO MODAL
-   ===================================== */
+/* BOTÕES DO MODAL */
 .modal-btn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -224,9 +209,7 @@
   width: 100%;
 }
 
-/* =====================================
-   ELEMENTOS DE FORMULÁRIO
-   ===================================== */
+/* ELEMENTOS DE FORMULÁRIO */
 .modal-form-group {
   margin-bottom: 1.25rem;
 }
@@ -280,9 +263,7 @@
   font-family: inherit;
 }
 
-/* =====================================
-   MENSAGENS E ALERTAS
-   ===================================== */
+/* MENSAGENS E ALERTAS */
 .modal-alerta {
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
@@ -319,9 +300,7 @@
   font-weight: 700;
 }
 
-/* =====================================
-   CONTADOR DE CARACTERES
-   ===================================== */
+/* CONTADOR DE CARACTERES */
 .modal-contador-caracteres {
   text-align: right;
   font-size: 0.85rem;
@@ -334,9 +313,7 @@
   font-weight: 600;
 }
 
-/* =====================================
-   LISTAS
-   ===================================== */
+/* LISTAS */
 .modal-lista {
   display: flex;
   flex-direction: column;
@@ -361,9 +338,7 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* =====================================
-   MENSAGEM DE VAZIO
-   ===================================== */
+/* MENSAGEM DE VAZIO */
 .modal-vazio {
   text-align: center;
   padding: 2rem 1rem;
@@ -372,25 +347,19 @@
   font-size: 0.95rem;
 }
 
-/* =====================================
-   LINHA DE SEPARAÇÃO
-   ===================================== */
+/* LINHA DE SEPARAÇÃO */
 .modal-separador {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   margin: 1.5rem 0;
 }
 
-/* =====================================
-   BLOQUEIO DE SCROLL DA PÁGINA
-   ===================================== */
+/* BLOQUEIO DE SCROLL DA PÁGINA */
 body.modal-aberto {
   overflow: hidden;
 }
 
-/* =====================================
-   RESPONSIVIDADE
-   ===================================== */
+/* RESPONSIVIDADE */
 @media (max-width: 768px) {
   .modal-container {
     width: 95%;
@@ -440,9 +409,7 @@ body.modal-aberto {
   }
 }
 
-/* =====================================
-   ANIMAÇÕES
-   ===================================== */
+/* ANIMAÇÕES */
 @keyframes modalFadeIn {
   from {
     opacity: 0;
@@ -471,9 +438,7 @@ body.modal-aberto {
   animation: modalSlideIn 0.3s ease;
 }
 
-/* =====================================
-   MODAL COMPARTILHAR - ESPECÍFICO
-   ===================================== */
+/* MODAL COMPARTILHAR - ESPECÍFICO */
 .opcoes-compartilhamento {
   display: flex;
   gap: 1rem;
@@ -557,9 +522,7 @@ body.modal-aberto {
   font-family: monospace;
 }
 
-/* =====================================
-   MODAL FAVORITOS - ESPECÍFICO
-   ===================================== */
+   /* MODAL FAVORITOS - ESPECÍFICO */
 .lista-favoritos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -587,9 +550,7 @@ body.modal-aberto {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* =====================================
-   MODAL DE MENSAGEM
-   ===================================== */
+  /* Modal de mensagem */
 .modal-mensagem-textarea {
   width: 100%;
   min-height: 8rem;

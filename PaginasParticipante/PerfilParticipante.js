@@ -564,7 +564,7 @@ function inicializarEventosPerfilParticipante() {
         });
     }
     
-    // ========== EVENTOS DO MODAL DE CÓDIGO ORGANIZADOR ==========
+    //  EVENTOS DO MODAL DE CÓDIGO ORGANIZADOR 
     // Botão para abrir modal
     const btnTornarOrganizador = document.getElementById('btn-tornar-organizador');
     if (btnTornarOrganizador) {
@@ -702,7 +702,7 @@ window.addEventListener('DOMContentLoaded', inicializarEventosPerfilParticipante
 // Permite inicialização após AJAX
 window.inicializarEventosPerfilParticipante = inicializarEventosPerfilParticipante;
 
-// ========== FUNCIONALIDADES PARA TORNAR-SE ORGANIZADOR ==========
+//  FUNCIONALIDADES PARA TORNAR-SE ORGANIZADOR 
 
 // Função para mostrar modal de código
 function mostrarModalCodigo() {

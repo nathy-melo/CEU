@@ -723,7 +723,7 @@
             if (teclas.includes(e.keyCode)) e.preventDefault();
         }
 
-        // ====== Modal de Compartilhar ======
+        //  Modal de Compartilhar 
         function abrirModalCompartilhar() {
             if (!codEvento) return;
             const modal = document.getElementById('modal-compartilhar');
@@ -882,7 +882,7 @@
             setTimeout(inicializarModais, 50);
         }
 
-        // ====== Modal de Mensagem ======
+        //  Modal de Mensagem 
         function atualizarContadorMensagem() {
             const textarea = document.getElementById('texto-mensagem-organizador');
             const contador = document.getElementById('contador-mensagem-organizador');
@@ -975,7 +975,7 @@
             }
         }
 
-        // ====== Favoritos ======
+        //  Favoritos 
         function atualizarIconeFavorito(btn, fav) {
             if (!btn) return;
             const img = btn.querySelector('img');
@@ -1273,7 +1273,7 @@
             }
         }
 
-        // ====== Inscrição rápida ======
+        //  Inscrição rápida 
         function atualizarIconeInscricao(btn, inscrito) {
             if (!btn) return;
             const img = btn.querySelector('img');
