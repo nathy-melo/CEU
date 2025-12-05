@@ -1154,7 +1154,6 @@ document.addEventListener('click', async function (e) {
                     }
                 }
             });
-            console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, novoEstado: ${novoEstado}`);
         };
         atualizarTodosBotoes();
         setTimeout(atualizarTodosBotoes, 100);
@@ -1234,7 +1233,6 @@ document.addEventListener('click', async function (e) {
                                 }
                             }
                         });
-                        console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, favoritado: ${j.favoritado}`);
                     };
                     atualizarTodosBotoes();
                     setTimeout(atualizarTodosBotoes, 100);

@@ -1,8 +1,5 @@
-/**
- * FiltroParticipantes.js
- * Sistema de filtro/ordenação para tabela de participantes
- * Integrado com sistema de paginação de tabelas
- */
+// FiltroParticipantes.js
+// Sistema de filtro/ordenação para tabela de participantes
 
 (function () {
     'use strict';
@@ -79,9 +76,7 @@
         wireFilterInputs();
     };
 
-    /**
-     * Função global para aplicar ordenação inicial (chamada de fora)
-     */
+    // Aplica ordenação inicial (chamada de fora)
     window.aplicarOrdenacaoInicial = function () {
         const config = window.filtroParticipantesConfig;
         if (config && config.tabelaId && config.dadosOriginais.length > 0) {

@@ -132,21 +132,15 @@
     }
     
     // Carrega todas as imagens do evento da tabela imagens_evento
-    console.log('Carregando imagens do evento:', dadosEvento.cod_evento);
     fetch('GerenciadorEventos.php?action=imagens&cod_evento=' + dadosEvento.cod_evento)
       .then(res => res.json())
       .then(dataImgs => {
-        console.log('Resposta de imagens:', dataImgs);
         if (dataImgs.sucesso && dataImgs.imagens && dataImgs.imagens.length > 0) {
           // Se há imagens na tabela imagens_evento, usa elas
           listaImagensEvento = dataImgs.imagens.map(img => '../' + img.caminho);
-          console.log('Imagens carregadas da tabela imagens_evento:', listaImagensEvento);
         } else if (listaImagensEvento.length === 0) {
           // Se não há imagens, usa padrão
           listaImagensEvento = ['../ImagensEventos/CEU-ImagemEvento.png'];
-          console.log('Usando imagem padrão');
-        } else {
-          console.log('Usando imagem principal do evento');
         }
         indiceImagemAtual = 0;
         document.getElementById('imagem-carrossel').src = listaImagensEvento[indiceImagemAtual];
