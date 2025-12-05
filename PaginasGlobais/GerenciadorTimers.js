@@ -72,9 +72,6 @@
     
     // Função para listar timers ativos (debug)
     function listarTimersAtivos() {
-        console.log('[Gerenciador Timers] Timers ativos:');
-        console.log('Intervalos:', intervalosAtivos);
-        console.log('Timeouts:', timeoutsAtivos);
         return {
             intervalos: intervalosAtivos.length,
             timeouts: timeoutsAtivos.length,

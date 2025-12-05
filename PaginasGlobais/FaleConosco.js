@@ -54,11 +54,8 @@ function mostrarMensagemFaleConosco() {
 
 // Adiciona o controle de exibição da mensagem ao carregar a página
 function inicializarFaleConosco() {
-    console.log('Inicializando FaleConosco...');
-    
     // Adiciona evento ao formulário para interceptar o submit
     var form = document.querySelector('.cartao-formulario form');
-    console.log('Formulário encontrado:', form);
     
     if (form) {
         // Remove qualquer listener anterior para evitar duplicação
@@ -66,7 +63,6 @@ function inicializarFaleConosco() {
         
         // Adiciona o evento de submit
         form.addEventListener('submit', function(e) {
-            console.log('Submit interceptado!');
             e.preventDefault();
             
             if (!form.checkValidity()) {
@@ -74,12 +70,9 @@ function inicializarFaleConosco() {
                 return;
             }
             
-            console.log('Formulário válido, mostrando mensagem...');
             sessionStorage.setItem('faleConoscoEnviado', '1');
             mostrarMensagemFaleConosco();
         });
-        
-        console.log('Event listener adicionado ao formulário');
     } else {
         console.error('Formulário não encontrado!');
     }

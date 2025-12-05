@@ -1057,18 +1057,14 @@
 
       // Adiciona imagens se houver novas
       const inputImagem = document.getElementById('input-imagem');
-      console.log('Input de imagem:', inputImagem, 'Arquivos selecionados:', inputImagem.files.length);
       if (inputImagem.files.length > 0) {
-        console.log('Enviando', inputImagem.files.length, 'imagem(ns) ao servidor');
         for (let i = 0; i < inputImagem.files.length; i++) {
           formData.append('imagens_evento[]', inputImagem.files[i]);
-          console.log('Imagem', i, ':', inputImagem.files[i].name);
         }
       }
       
       // Adiciona lista de imagens para remover
       if (window.imagensParaRemover && window.imagensParaRemover.length > 0) {
-        console.log('Imagens para remover:', window.imagensParaRemover);
         formData.append('imagens_remover', JSON.stringify(window.imagensParaRemover));
       }
 
@@ -1079,13 +1075,11 @@
       })
         .then(response => response.json())
         .then(data => {
-          console.log('Resposta do servidor ao salvar:', data);
           if (data.sucesso) {
             alert(data.mensagem || 'Evento atualizado com sucesso!');
 
             // Se houve atualização de imagens, atualiza o carrossel com todas as imagens
             if (data.imagens && data.imagens.length > 0) {
-              console.log('Imagens retornadas pelo servidor:', data.imagens);
               listaImagensEvento = data.imagens;
               indiceImagemAtual = 0;
               const imagemCarrossel = document.getElementById('imagem-carrossel');
@@ -1093,8 +1087,6 @@
                 imagemCarrossel.src = listaImagensEvento[indiceImagemAtual];
               }
               atualizarVisibilidadeSetas();
-            } else {
-              console.log('Nenhuma imagem retornada pelo servidor');
             }
             
             // Limpa a lista de imagens para remover
@@ -1398,7 +1390,6 @@
 
     // NÃO limpa o input para que os arquivos fiquem disponíveis para upload
     // event.target.value = ''; <- REMOVIDO
-    console.log('Imagens adicionadas ao preview. Total de arquivos no input:', event.target.files.length);
   }
 
   function mostrarCarrossel() {

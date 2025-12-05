@@ -142,8 +142,6 @@
             .then(dadosResposta => {
                 // Log apenas se sessão não estiver ativa (importante)
                 if (!dadosResposta.ativa) {
-                    console.log('Resposta do servidor:', dadosResposta);
-                    console.log('Sessão inativa detectada pelo servidor');
                     pararVerificacaoSessao();
                     // SEMPRE mostra o modal, nunca redireciona automaticamente
                     mostrarModalSessaoExpirada();
@@ -295,7 +293,6 @@
 
     // Função de debug para forçar expiração de sessão (teste)
     window.debugForcarExpiracao = function () {
-        console.log('DEBUG: Forçando expiração de sessão para teste');
         timestampUltimaAtividade = Date.now() - (tempoLimiteSessaoInatividade + 1000);
     };
 
