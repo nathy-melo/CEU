@@ -21,7 +21,6 @@
             delay: delay,
             timestamp: Date.now()
         });
-        // Log desabilitado para reduzir ruído no console
         return id;
     };
     
@@ -35,7 +34,6 @@
             delay: delay,
             timestamp: Date.now()
         });
-        // Log desabilitado para reduzir ruído no console
         return id;
     };
     
@@ -85,9 +83,7 @@
     }
     
     // Função para limpar listeners de eventos
-    function limparEventListeners() {
-        // Log desabilitado para reduzir ruído no console
-        
+    function limparEventListeners() {        
         // Remove todos os listeners de elementos específicos que podem causar problemas
         const elementosProblematicos = [
             'form', 'button', 'input', 'select', 'textarea'
@@ -188,5 +184,4 @@
         }
     });
     
-    // Log inicial desabilitado para reduzir ruído no console
 })();

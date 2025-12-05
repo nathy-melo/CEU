@@ -22,7 +22,6 @@
 
         // Se havia modal de aviso ativo, remove
         if (modalAvisoSessaoAtivo) {
-            // console.log('Removendo modal de aviso devido à atividade'); // Debug desabilitado
             removerModalAvisoSessao();
         }
     }
@@ -38,7 +37,6 @@
 
     // Função para adicionar listeners de atividade
     function adicionarListenersAtividadeUsuario() {
-        // console.log('Adicionando listeners de atividade'); // Debug desabilitado
         eventosAtividadeUsuario.forEach(evento => {
             document.addEventListener(evento, atualizarTimestampUltimaAtividade, {
                 passive: true,
@@ -53,7 +51,6 @@
 
     // Função para remover listeners de atividade
     function removerListenersAtividadeUsuario() {
-        // console.log('Removendo listeners de atividade'); // Debug desabilitado
         eventosAtividadeUsuario.forEach(evento => {
             document.removeEventListener(evento, atualizarTimestampUltimaAtividade, {
                 passive: true,

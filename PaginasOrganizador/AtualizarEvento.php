@@ -263,12 +263,8 @@ $novasImagens = [];
 $caminhoNovaImagemPrincipal = null;
 $deveAtualizarImagem = false;
 
-// Debug: Log de $_FILES
-error_log("DEBUG AtualizarEvento.php - FILES recebidos: " . print_r($_FILES, true));
-
 if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name'][0])) {
     $totalImagens = count($_FILES['imagens_evento']['name']);
-    error_log("DEBUG - Total de imagens para upload: " . $totalImagens);
     $tamanhoMaximo = 10 * 1024 * 1024; // 10MB em bytes
     $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     
@@ -304,7 +300,6 @@ if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name']
         
         if (move_uploaded_file($tmpName, $destino)) {
             $caminhoCompleto = 'ImagensEventos/' . $nomeUnico;
-            error_log("DEBUG - Imagem salva com sucesso: " . $destino);
             $novasImagens[] = [
                 'caminho' => $caminhoCompleto,
                 'ordem' => $i,
@@ -318,7 +313,6 @@ if (isset($_FILES['imagens_evento']) && !empty($_FILES['imagens_evento']['name']
             
             $deveAtualizarImagem = true;
         } else {
-            error_log("DEBUG - ERRO ao mover arquivo: " . $tmpName . " para " . $destino);
             echo json_encode(['erro' => "Erro ao fazer upload da imagem '{$nomeArquivo}'"]);
             mysqli_close($conexao);
             exit;
@@ -550,21 +544,14 @@ if (mysqli_stmt_execute($declaracaoAtualizacao)) {
     
     // Insere as novas imagens na tabela imagens_evento (sempre que houver novas imagens)
     if (!empty($novasImagens)) {
-        error_log("DEBUG - Inserindo " . count($novasImagens) . " imagens no BD");
         $sqlImagem = "INSERT INTO imagens_evento (cod_evento, caminho_imagem, ordem, principal) VALUES (?, ?, ?, ?)";
         $stmtImagem = mysqli_prepare($conexao, $sqlImagem);
         
         foreach ($novasImagens as $img) {
-            error_log("DEBUG - Inserindo imagem: " . $img['caminho'] . " ordem: " . $img['ordem']);
             mysqli_stmt_bind_param($stmtImagem, "isii", $codigoEvento, $img['caminho'], $img['ordem'], $img['principal']);
-            $resultado = mysqli_stmt_execute($stmtImagem);
-            if (!$resultado) {
-                error_log("DEBUG - ERRO ao inserir imagem no BD: " . mysqli_error($conexao));
-            }
+            mysqli_stmt_execute($stmtImagem);
         }
         mysqli_stmt_close($stmtImagem);
-    } else {
-        error_log("DEBUG - Nenhuma nova imagem para inserir no BD");
     }
     
     $resposta = ['sucesso' => true, 'mensagem' => 'Evento atualizado com sucesso!'];

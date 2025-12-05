@@ -264,8 +264,6 @@
         gerenciarSwipe();
         gerenciarResize();
         aplicarSafeAreaDinamica();
-        
-        // Log desabilitado para reduzir ruído no console
     }
     
     // Rodar quando DOM estiver pronto

@@ -489,7 +489,6 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (window.adicionarEventoScriptExecutado) {
                         delete window.adicionarEventoScriptExecutado;
                     }
-                    console.log('[DEBUG] Página AdicionarEvento carregada e pronta');
                 }
             },
             'painelnotificacoes': {

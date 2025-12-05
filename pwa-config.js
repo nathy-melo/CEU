@@ -48,12 +48,10 @@
 
       navigator.serviceWorker.getRegistration().then(function(existing){
         if (existing) {
-          // Log desabilitado para reduzir ruído no console
           setupRegistrationListeners(existing);
         } else {
           navigator.serviceWorker.register('/CEU/sw.js')
             .then(function(registration){
-              // Log desabilitado para reduzir ruído no console
               setupRegistrationListeners(registration);
             })
             .catch(function(error){
@@ -81,7 +79,6 @@
 
   // Detectar quando app foi instalado
   window.addEventListener('appinstalled', (evt) => {
-    // Log desabilitado para reduzir ruído no console
     // Limpa o prompt guardado
     deferredPrompt = null;
     window.deferredPrompt = null;

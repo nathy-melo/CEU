@@ -1766,7 +1766,7 @@ mysqli_close($conexao);
         (function() {
             // Limpa flag anterior se existir
             if (window.adicionarEventoScriptExecutado) {
-                console.log('[DEBUG] Reinicializando script AdicionarEvento');
+                return;
             }
             window.adicionarEventoScriptExecutado = true;
 
@@ -2311,14 +2311,11 @@ mysqli_close($conexao);
             // CORREÇÃO PRINCIPAL: Adiciona listener do formulário de forma segura
             const formEvento = document.getElementById('form-evento');
             if (formEvento) {
-                console.log('[DEBUG] Formulário encontrado, anexando listener de submit');
-                
                 // Remove listener anterior se existir
                 formEvento.onsubmit = null;
                 
                 formEvento.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    console.log('[DEBUG] Submit interceptado, processando formulário...');
 
                     const camposFaltantes = validarCamposObrigatorios();
 
@@ -2341,35 +2338,25 @@ mysqli_close($conexao);
                     const btnCriar = document.getElementById('btn-criar');
                     btnCriar.disabled = true;
                     btnCriar.textContent = 'Criando...';
-                    
-                    console.log('[DEBUG] Enviando dados para AdicionarEvento.php...');
 
                     fetch('AdicionarEvento.php', {
                             method: 'POST',
                             body: formData
                         })
                         .then(response => {
-                            console.log('[DEBUG] Resposta recebida. Status:', response.status);
-                            console.log('[DEBUG] Content-Type:', response.headers.get('content-type'));
-                            
                             if (!response.ok) {
                                 throw new Error('Erro HTTP: ' + response.status);
                             }
                             const contentType = response.headers.get('content-type');
                             if (!contentType || !contentType.includes('application/json')) {
                                 return response.text().then(text => {
-                                    console.error('[DEBUG] Resposta NÃO é JSON. Primeiros 500 caracteres:');
-                                    console.error(text.substring(0, 500));
-                                    console.error('[DEBUG] Verifique se há erros PHP sendo exibidos antes do JSON');
-                                    throw new Error('Resposta do servidor não é JSON válido. Verifique o console para detalhes.');
+                                    throw new Error('Resposta do servidor não é JSON válido.');
                                 });
                             }
                             return response.json();
                         })
                         .then(data => {
-                            console.log('[DEBUG] Resposta JSON do servidor:', data);
                             if (data.sucesso === true) {
-                                console.log('[DEBUG] Evento criado com sucesso!');
                                 alert(data.mensagem || 'Evento criado com sucesso!');
                                 if (typeof carregarPagina === 'function') {
                                     carregarPagina('meusEventos');
@@ -2377,27 +2364,18 @@ mysqli_close($conexao);
                                     window.location.href = 'ContainerOrganizador.php?pagina=meusEventos';
                                 }
                             } else {
-                                console.error('[DEBUG] Erro retornado pelo servidor:', data.erro);
                                 alert('Erro ao criar evento: ' + (data.erro || 'Erro desconhecido'));
                                 btnCriar.disabled = false;
                                 btnCriar.textContent = 'Criar evento';
                             }
                         })
                         .catch(error => {
-                            console.error('[DEBUG] ERRO CAPTURADO');
-                            console.error('[DEBUG] Mensagem:', error.message);
-                            console.error('[DEBUG] Stack:', error.stack);
-                            alert('Erro ao criar evento: ' + error.message + '\n\nVerifique o console (F12) para mais detalhes.');
+                            alert('Erro ao criar evento: ' + error.message);
                             btnCriar.disabled = false;
                             btnCriar.textContent = 'Criar evento';
                         });
                 });
-            } else {
-                console.error('[DEBUG] ERRO: Formulário #form-evento não encontrado no DOM!');
             }
-
-            validarFormulario();
-
             // Carrega modelos de certificado disponíveis
             carregarModelosDisponiveis();
         })();
