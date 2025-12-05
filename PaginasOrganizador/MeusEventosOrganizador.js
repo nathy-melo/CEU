@@ -619,7 +619,7 @@ if (document.readyState === 'loading') {
     }, 50);
 }
 
-// ====== Sistema de Favoritos, Mensagens e Compartilhar ======
+//  Sistema de Favoritos, Mensagens e Compartilhar 
 // Variáveis globais - verificar se já existem para evitar re-declaração
 if (typeof window.codEvento === 'undefined') {
     window.codEvento = null;
@@ -640,7 +640,7 @@ var codEventoMensagem = window.codEventoMensagem;
 var favoritosSet = window.favoritosSet;
 var favoritosDados = window.favoritosDados;
 
-// ====== Modal de Compartilhar ======
+//  Modal de Compartilhar 
 function abrirModalCompartilhar() {
     if (!codEvento) return;
     const modal = document.getElementById('modal-compartilhar');
@@ -764,7 +764,7 @@ function prevenirScrollTeclado(e) {
     if (teclas.includes(e.keyCode)) e.preventDefault();
 }
 
-// ====== Modal de Mensagem ======
+//  Modal de Mensagem 
 function atualizarContadorMensagem() {
     const textarea = document.getElementById('texto-mensagem-organizador');
     const contador = document.getElementById('contador-mensagem-organizador');
@@ -844,7 +844,7 @@ async function enviarMensagemOrganizador() {
     }
 }
 
-// ====== Favoritos ======
+//  Favoritos 
 function atualizarIconeFavorito(btn, fav) {
     if (!btn) return;
     const img = btn.querySelector('img');
@@ -1154,7 +1154,6 @@ document.addEventListener('click', async function (e) {
                     }
                 }
             });
-            console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, novoEstado: ${novoEstado}`);
         };
         atualizarTodosBotoes();
         setTimeout(atualizarTodosBotoes, 100);
@@ -1234,7 +1233,6 @@ document.addEventListener('click', async function (e) {
                                 }
                             }
                         });
-                        console.log(`Atualizados ${atualizados} botões de favorito para código ${cod}, favoritado: ${j.favoritado}`);
                     };
                     atualizarTodosBotoes();
                     setTimeout(atualizarTodosBotoes, 100);

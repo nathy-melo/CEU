@@ -2,12 +2,12 @@
 function formatar(txt) {
     if (!txt) return '';
     const map = {
-        'Á':'A','À':'A','Â':'A','Ã':'A','Ä':'A','á':'a','à':'a','â':'a','ã':'a','ä':'a',
-        'É':'E','È':'E','Ê':'E','Ë':'E','é':'e','è':'e','ê':'e','ë':'e',
-        'Í':'I','Ì':'I','Î':'I','Ï':'I','í':'i','ì':'i','î':'i','ï':'i',
-        'Ó':'O','Ò':'O','Ô':'O','Õ':'O','Ö':'O','ó':'o','ò':'o','ô':'o','õ':'o','ö':'o',
-        'Ú':'U','Ù':'U','Û':'U','Ü':'U','ú':'u','ù':'u','û':'u','ü':'u',
-        'Ç':'C','ç':'c'
+        'Á': 'A', 'À': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'á': 'a', 'à': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a',
+        'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E', 'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+        'Í': 'I', 'Ì': 'I', 'Î': 'I', 'Ï': 'I', 'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
+        'Ó': 'O', 'Ò': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O', 'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+        'Ú': 'U', 'Ù': 'U', 'Û': 'U', 'Ü': 'U', 'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u',
+        'Ç': 'C', 'ç': 'c'
     };
     let resultado = txt;
     for (const [k, v] of Object.entries(map)) {
@@ -28,8 +28,7 @@ function carregarEventosDoServidor() {
         // Não executar se não estiver na página de "meusEventos"
         return;
     }
-    
-    console.log('carregarEventosDoServidor() chamado');
+
     const container = document.getElementById('eventos-container');
     if (!container) {
         console.error('Container de eventos não encontrado');
@@ -39,7 +38,6 @@ function carregarEventosDoServidor() {
     fetch('BuscarEventosInscritos.php')
         .then(response => response.json())
         .then(data => {
-            console.log('Resposta do servidor:', data);
             if (!data.sucesso) {
                 console.error('Erro ao carregar eventos:', data.mensagem);
                 container.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:20px;color:var(--branco);">Erro ao carregar eventos</p>';
@@ -47,19 +45,17 @@ function carregarEventosDoServidor() {
             }
 
             if (data.eventos.length === 0) {
-                console.log('Nenhum evento inscrito encontrado');
                 container.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:20px;color:var(--branco);">Você ainda não está inscrito em nenhum evento</p>';
                 return;
             }
 
-            console.log(`Carregando ${data.eventos.length} eventos`);
             container.innerHTML = '';
 
             data.eventos.forEach(evento => {
                 const dataInicio = new Date(evento.inicio.replace(' ', 'T'));
                 const dataConclusao = new Date(evento.conclusao.replace(' ', 'T'));
                 const agora = new Date();
-                
+
                 let status = '';
                 if (agora < dataInicio) {
                     status = 'Aguardando';
@@ -71,11 +67,11 @@ function carregarEventosDoServidor() {
 
                 const dataFormatada = dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
                 const dataISO = dataInicio.toISOString().split('T')[0];
-                
+
                 const tipo = formatar(evento.categoria);
                 const local = formatar(evento.lugar);
                 const modalidadeAttr = formatar(evento.modalidade || '');
-                
+
                 let duracaoFaixa = '';
                 const h = parseFloat(evento.duracao);
                 if (!isNaN(h)) {
@@ -84,12 +80,12 @@ function carregarEventosDoServidor() {
                     else if (h < 4) duracaoFaixa = '2h_4h';
                     else duracaoFaixa = 'mais_5h';
                 }
-                
+
                 // Certificado: considerar tipo_certificado
                 const tipoCertificado = evento.tipo_certificado || '';
                 const temCertificado = parseInt(evento.certificado) === 1;
                 let certTexto, cert;
-                
+
                 if (temCertificado) {
                     if (tipoCertificado === 'Ensino' || tipoCertificado === 'Pesquisa' || tipoCertificado === 'Extensao') {
                         certTexto = tipoCertificado;
@@ -199,7 +195,7 @@ function carregarEventosDoServidor() {
             if (typeof window.inicializarPaginacaoEventos === 'function') {
                 window.inicializarPaginacaoEventos('eventos-container', true); // true = ocultar filtro de finalizados
             }
-            
+
             // Reinicializa os filtros após carregar
             if (typeof window.inicializarFiltroEventos === 'function') {
                 window.inicializarFiltroEventos();
@@ -216,10 +212,10 @@ function prevenirNavegacaoCards() {
     document.querySelectorAll('.CaixaDoEvento').forEach(link => {
         // Remover listener anterior se existir
         if (link._clickHandlerAdded) return;
-        
-        link.addEventListener('click', function(e) {
+
+        link.addEventListener('click', function (e) {
             // Se o clique foi em qualquer botão de ação ou dentro de AcoesFlutuantes, prevenir navegação
-            if (e.target.closest('.AcoesFlutuantes') || 
+            if (e.target.closest('.AcoesFlutuantes') ||
                 e.target.closest('.BotaoAcaoCard') ||
                 e.target.closest('.BotaoDesinscreverCard') ||
                 e.target.closest('.BotaoFavoritoCard') ||
@@ -230,19 +226,19 @@ function prevenirNavegacaoCards() {
                 return false;
             }
         }, true);
-        
+
         link._clickHandlerAdded = true;
     });
-    
+
     // Adicionar listeners nos próprios botões para garantir que o clique não propague
     document.querySelectorAll('.BotaoAcaoCard').forEach(btn => {
         if (btn._stopPropagationAdded) return;
-        
-        btn.addEventListener('click', function(e) {
+
+        btn.addEventListener('click', function (e) {
             e.stopPropagation();
             e.stopImmediatePropagation();
         }, true);
-        
+
         btn._stopPropagationAdded = true;
     });
 }
@@ -312,7 +308,7 @@ function inicializarFiltroEventos() {
         if ((eventosContainer?.querySelectorAll('.CaixaDoEvento') || []).length > 0) {
             atualizarMensagemSemResultados(algumaVisivel);
         }
-        
+
         // Resetar paginação para primeira página e atualizar contador de eventos
         if (typeof window.resetarPaginacao === 'function') {
             window.resetarPaginacao('eventos-container');
@@ -353,7 +349,7 @@ function inicializarFiltroEventos() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Verificar se está na página correta antes de carregar
     const params = new URLSearchParams(window.location.search);
     const pagina = params.get('pagina');
@@ -364,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Listener para recarregar quando houver mudança nas inscrições
 // IMPORTANTE: Verifica se está na página correta antes de executar
-window.addEventListener('inscricaoAtualizada', function() {
+window.addEventListener('inscricaoAtualizada', function () {
     const params = new URLSearchParams(window.location.search);
     const pagina = params.get('pagina');
     // Só recarrega se estiver na página de "meusEventos"
@@ -374,7 +370,7 @@ window.addEventListener('inscricaoAtualizada', function() {
 });
 
 // Também recarregar quando a página voltar ao foco (navegação de volta)
-window.addEventListener('focus', function() {
+window.addEventListener('focus', function () {
     // Verifica se está na página de meus eventos
     const params = new URLSearchParams(window.location.search);
     const pagina = params.get('pagina');

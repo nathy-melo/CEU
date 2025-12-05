@@ -1,5 +1,5 @@
 <?php
-// Configurações centrais do módulo de Certificação
+// Configurações do módulo de Certificação
 
 return [
     // Caminho para o autoload do Composer (vendor)

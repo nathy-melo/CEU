@@ -1,15 +1,13 @@
 // Service Worker para CEU PWA
-const CACHE_NAME = 'ceu-v1.1.0';
+const CACHE_NAME = 'ceu-v1.0.0';
 const urlsToCache = [
   '/CEU/',
   '/CEU/index.php',
-  // Removido: '/CEU/styleGlobal.css' para evitar CSS obsoleto no precache
   '/CEU/PaginasPublicas/ContainerPublico.php',
   '/CEU/PaginasParticipante/ContainerParticipante.php',
   '/CEU/PaginasOrganizador/ContainerOrganizador.php',
   '/CEU/Imagens/CEU-Logo-1x1.png',
   '/CEU/Imagens/CEU-Logo.png',
-  // Adicione outros recursos críticos aqui
 ];
 
 // Utilidades de cache
@@ -78,7 +76,6 @@ self.addEventListener('activate', (event) => {
           return caches.delete(cacheName);
         }
       }),
-      // Assume controle imediatamente
       self.clients.claim()
     ]))
   );

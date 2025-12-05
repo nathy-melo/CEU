@@ -1,9 +1,9 @@
 <?php
 /**
- * Processador de Templates de Certificado (Opção A)
- * - Entrada: DOCX com placeholders do tipo {NomeParticipante}
+ * Processador de Templates de Certificado
+ * - Entrada: DOCX com placeholders {NomeParticipante}
  * - Pipeline: DOCX -> (preenche via Zip) -> DOCX -> HTML (PHPWord) -> PDF (mPDF)
- * - Requer: phpoffice/phpword e mpdf/mpdf via autoload de bibliotecas/vendor
+ * - Requer: phpoffice/phpword e mpdf/mpdf via Composer (bibliotecas/vendor)
  */
 
 namespace CEU\Certificacao;

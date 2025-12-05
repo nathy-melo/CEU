@@ -196,11 +196,9 @@ $tipoCertificado = ucfirst($certificado['tipo']);
 // Verifica se o arquivo PDF existe (com path normalizado para file_exists)
 $arquivoPdfReal = str_replace('/', DIRECTORY_SEPARATOR, $arquivoPdf);
 $arquivoExiste = file_exists($arquivoPdfReal);
-$debugLog = []; // Array para logs de debug
 
 // Se não existe, tenta regenerar silenciosamente
 if (!$arquivoExiste) {
-    $debugLog[] = "ðŸ” Arquivo não existe: $arquivoPdf";
 
     try {
         // Buscar dados completos para regeneração
@@ -221,13 +219,10 @@ if (!$arquivoExiste) {
         $dados = mysqli_fetch_assoc($resDados);
         mysqli_stmt_close($stmtDados);
 
-        $debugLog[] = "Dados do usuário/evento: " . ($dados ? "ENCONTRADOS" : "NÃO ENCONTRADOS");
-
         if ($dados) {
             // Incluir o autoload de bibliotecas
             $autoloadPath = __DIR__ . '/../Certificacao/bibliotecas/vendor/autoload.php';
             $autoloadExiste = file_exists($autoloadPath);
-            $debugLog[] = "Autoload: " . ($autoloadExiste ? "EXISTE" : "NÃO EXISTE") . " em $autoloadPath";
 
             if ($autoloadExiste) {
                 require_once $autoloadPath;
@@ -235,11 +230,9 @@ if (!$arquivoExiste) {
 
             // Carregar ProcessadorTemplate e tentar gerar
             require_once __DIR__ . '/../Certificacao/ProcessadorTemplate.php';
-            $debugLog[] = "ProcessadorTemplate carregado";
 
             try {
                 $proc = new \CEU\Certificacao\ProcessadorTemplate($autoloadPath);
-                $debugLog[] = "ProcessadorTemplate instanciado";
 
                 // Obter template do modelo
                 $modelo = $certificado['modelo'] ?? 'universal';
@@ -264,8 +257,6 @@ if (!$arquivoExiste) {
                         ? 'ModeloExemploOrganizador'
                         : 'ModeloExemplo';
 
-                    $debugLog[] = "ℹ️ Template '$modelo' não encontrado, tentando padrão: $modeloPadrao";
-
                     foreach ($possiveisExtensoes as $ext) {
                         $caminho = __DIR__ . "/../Certificacao/templates/$modeloPadrao.$ext";
                         if (file_exists($caminho)) {
@@ -274,8 +265,6 @@ if (!$arquivoExiste) {
                         }
                     }
                 }
-
-                $debugLog[] = "Template final: " . ($templatePath ? "EXISTE em $templatePath" : "NÃO ENCONTRADO");
 
                 if ($templatePath) {
                     // Preparar dados para preenchimento
@@ -308,27 +297,18 @@ if (!$arquivoExiste) {
                         $dadosCert['CargoOrganizador'] = '';
                     }
 
-                    $debugLog[] = "ðŸ“ Tipo de certificado: $tipo";
-                    $debugLog[] = "ðŸ“ Dados do certificado preparados: " . json_encode($dadosCert, JSON_UNESCAPED_UNICODE);
-
                     // Diretório de saída
                     $pastaSaida = __DIR__ . '/../Certificacao/certificados';
                     if (!is_dir($pastaSaida)) {
                         mkdir($pastaSaida, 0755, true);
-                        $debugLog[] = "ðŸ“ Pasta criada: $pastaSaida";
-                    } else {
-                        $debugLog[] = "ðŸ“ Pasta já existe: $pastaSaida";
                     }
 
                     // Extrair nome do arquivo original da coluna 'arquivo'
                     $arquivoOriginal = basename($certificado['arquivo']);
                     $caminhoSaida = $pastaSaida . DIRECTORY_SEPARATOR . $arquivoOriginal;
-                    $debugLog[] = "Caminho de saída: $caminhoSaida";
 
                     // Gerar PDF
-                    $debugLog[] = "Iniciando geração do PDF...";
                     $resultado = $proc->gerarPdfDeModelo($templatePath, $dadosCert, $caminhoSaida);
-                    $debugLog[] = "Resultado da geração: " . json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
                     // Verifica sucesso (pode ser 'sucesso' ou 'success')
                     $sucesso = ($resultado['sucesso'] ?? $resultado['success'] ?? false);
@@ -336,30 +316,19 @@ if (!$arquivoExiste) {
                     if ($sucesso) {
                         // Atualizar verificação com caminho normalizado
                         $arquivoExiste = file_exists($arquivoPdfReal);
-                        $debugLog[] = "PDF gerado! Arquivo existe agora? " . ($arquivoExiste ? "SIM" : "NAO");
 
                         // Se foi gerado com sucesso, marcar para recarregar a página
                         if ($arquivoExiste) {
-                            $debugLog[] = "Recarregando página para exibir o certificado...";
                             echo "<script>window.location.reload();</script>";
                             exit;
                         }
-                    } else {
-                        $debugLog[] = "âŒ Falha ao gerar PDF: " . ($resultado['erro'] ?? $resultado['error'] ?? 'sem detalhes');
                     }
                 } else {
-                    $debugLog[] = "âŒ Template não encontrado, abortando geração";
                 }
             } catch (Exception $e) {
-                $debugLog[] = "âŒ ERRO ProcessadorTemplate: " . $e->getMessage();
-                $debugLog[] = "ðŸ“ Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
             }
-        } else {
-            $debugLog[] = "âŒ Não foi possível buscar dados do evento/usuário";
         }
     } catch (Exception $e) {
-        $debugLog[] = "âŒ ERRO GERAL: " . $e->getMessage();
-        $debugLog[] = "ðŸ“ Arquivo: " . $e->getFile() . " Linha: " . $e->getLine();
     }
 }
 ?>
@@ -612,15 +581,6 @@ if (!$arquivoExiste) {
     </div>
 
     <script>
-        // Logs de debug da regeneração do certificado
-        <?php if (!empty($debugLog)): ?>
-            console.group('DEBUG: Regeneração do Certificado');
-            <?php foreach ($debugLog as $log): ?>
-                console.log(<?php echo json_encode($log, JSON_UNESCAPED_UNICODE); ?>);
-            <?php endforeach; ?>
-            console.groupEnd();
-        <?php endif; ?>
-
         function imprimirCertificado() {
             const janela = window.open('<?php echo $arquivoPdf; ?>', '_blank');
             if (janela) {

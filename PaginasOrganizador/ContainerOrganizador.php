@@ -152,14 +152,10 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <div id="modais-globais"></div>
 
     <script>
-        // =========================
         // Variáveis globais
-        // =========================
         let menuContentObserver = null; // Observer para sincronizar menu/conteúdo
 
-        // =========================
         // Funções utilitárias (helpers)
-        // =========================
         function carregarScripts(lista, callback) {
             const alvo = document.getElementById('conteudo-dinamico') || document.body;
             let index = 0;
@@ -274,9 +270,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
             }
         }
 
-        // =========================
         // Definição das rotas
-        // =========================
         const rotas = {
             'inicio': {
                 html: 'InicioOrganizador.php',
@@ -495,7 +489,6 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                     if (window.adicionarEventoScriptExecutado) {
                         delete window.adicionarEventoScriptExecutado;
                     }
-                    console.log('[DEBUG] Página AdicionarEvento carregada e pronta');
                 }
             },
             'painelnotificacoes': {
@@ -512,9 +505,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
         };
         globalThis.rotas = rotas;
 
-        // =========================
         // Funções de navegação e carregamento
-        // =========================
         function executarRota(pagina) {
             const rota = rotas[pagina];
             if (!rota) return;
@@ -610,9 +601,7 @@ $tema_site = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 });
         }
 
-        // =========================
         // Eventos de inicialização
-        // =========================
 
         // Desabilita restauração automática de scroll do navegador
         if ('scrollRestoration' in history) {

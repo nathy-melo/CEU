@@ -535,7 +535,7 @@
             });
     }
 
-    // ===== AÇÕES RÁPIDAS =====
+    //  AÇÕES RÁPIDAS 
 
     // Funções dos modais - declaradas globalmente primeiro
     function abrirModalAdicionarColaborador() {
@@ -666,7 +666,7 @@
         carregarOrganizacao();
     }, 100);
 
-    // ===== FUNÇÕES DE VERIFICAÇÃO E SALVAMENTO =====
+    //  FUNÇÕES DE VERIFICAÇÃO E SALVAMENTO 
 
     async function verificarCPFColaborador() {
         const cpfInput = document.getElementById('add-cpf-colab');
@@ -781,7 +781,7 @@
         }
     }
 
-    // ===== FUNÇÕES DE EDIÇÃO E EXCLUSÃO =====
+    // FUNÇÕES DE EDIÇÃO E EXCLUSÃO 
 
     function abrirModalEditarMembro(cpf) {
         const membro = todosOrganizacao.find(m => m.cpf === cpf);
@@ -885,7 +885,7 @@
         window.excluirMembroOrg = excluirMembro;
     }
 
-    // ===== FUNÇÕES DE AÇÕES EM MASSA =====
+    //  FUNÇÕES DE AÇÕES EM MASSA 
 
     async function confirmarPresencasEmMassaOrg() {
         if (todosOrganizacao.length === 0) {
@@ -1048,7 +1048,7 @@
         carregarOrganizacao();
     }
 
-    // ===== FUNÇÕES DE EVENTOS E PESQUISA =====
+    //  FUNÇÕES DE EVENTOS E PESQUISA 
 
     function inicializarEventosOrganizacao() {
         // Eventos de checkbox (funciona para tabela E cards mobile)

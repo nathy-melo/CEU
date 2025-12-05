@@ -1,12 +1,8 @@
--- Script para Popular o Banco de Dados CEU com dados fictícios
--- Execute este script após criar o banco de dados principal
--- Senha padrão para todos: senha123 (hash: $2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.)
+-- Dados fictícios para testes
+-- Senha padrão: senha123 (hash: $2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.)
 
 USE CEU_bd;
 
--- ====================================
--- CÓDIGOS DE ORGANIZADOR (10 códigos válidos)
--- ====================================
 INSERT INTO codigos_organizador (codigo, ativo, usado, criado_por, observacoes) VALUES 
 ('4CT5L8DW', 1, 0, 'SISTEMA', 'Código disponível para organização'),
 ('BF8T5H7L', 1, 0, 'SISTEMA', 'Código disponível para organização'),
@@ -19,14 +15,7 @@ INSERT INTO codigos_organizador (codigo, ativo, usado, criado_por, observacoes) 
 ('JA2PM4H4', 1, 0, 'SISTEMA', 'Código disponível para organização'),
 ('HG69KZMJ', 1, 0, 'SISTEMA', 'Código disponível para organização');
 
--- ====================================
--- USUÁRIOS PARTICIPANTES (40 participantes comuns)
--- ====================================
--- Senha: senha123
--- Hash: $2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.
-
 INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES
--- Participantes 1-10
 ('12345678911', 'Ana Clara Silva', 'ana.silva@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024001', NULL, 0, 0),
 ('23456789012', 'Bruno Henrique Costa', 'bruno.costa@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024002', NULL, 0, 1),
 ('34567890123', 'Carla Fernanda Souza', 'carla.souza@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024003', NULL, 0, 0),
@@ -37,8 +26,6 @@ INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite)
 ('89012345678', 'Henrique Vieira Nascimento', 'henrique.nascimento@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024008', NULL, 0, 0),
 ('90123456789', 'Isabela Cristina Oliveira', 'isabela.oliveira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024009', NULL, 0, 1),
 ('01234567890', 'João Pedro Barbosa', 'joao.barbosa@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024010', NULL, 0, 0),
-
--- Participantes 11-20
 ('11234567890', 'Kelly Vitória Mendes', 'kelly.mendes@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024011', NULL, 0, 1),
 ('21234567890', 'Lucas Gabriel Cardoso', 'lucas.cardoso@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024012', NULL, 0, 0),
 ('31234567890', 'Mariana Beatriz Dias', 'mariana.dias@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024013', NULL, 0, 1),
@@ -49,8 +36,6 @@ INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite)
 ('81234567890', 'Samuel José Correia', 'samuel.correia@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024018', NULL, 0, 0),
 ('91234567890', 'Thais Amanda Freitas', 'thais.freitas@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024019', NULL, 0, 0),
 ('10234567890', 'Vitor Hugo Pinto', 'vitor.pinto@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024020', NULL, 0, 1),
-
--- Participantes 21-30
 ('12345098765', 'Bruna Camila Reis', 'bruna.reis@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024021', NULL, 0, 0),
 ('23456098765', 'Caio Matheus Azevedo', 'caio.azevedo@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024022', NULL, 0, 1),
 ('34567098765', 'Diana Laura Monteiro', 'diana.monteiro@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024023', NULL, 0, 0),
@@ -61,8 +46,6 @@ INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite)
 ('89012098765', 'Igor Alexandre Batista', 'igor.batista@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024028', NULL, 0, 0),
 ('90123098765', 'Juliana Carolina Barros', 'juliana.barros@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024029', NULL, 0, 1),
 ('01234098765', 'Kaique Leonardo Silva', 'kaique.silva@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024030', NULL, 0, 0),
-
--- Participantes 31-40
 ('11223344556', 'Larissa Fernanda Cruz', 'larissa.cruz@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024031', NULL, 0, 1),
 ('22334455667', 'Marcos Vinicius Cunha', 'marcos.cunha@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024032', NULL, 0, 0),
 ('33445566778', 'Natália Eduarda Farias', 'natalia.farias@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024033', NULL, 0, 1),
@@ -74,9 +57,6 @@ INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite)
 ('99001122334', 'Vanessa Louise Macedo', 'vanessa.macedo@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024039', NULL, 0, 0),
 ('00112233445', 'Wesley Bruno Ferreira', 'wesley.ferreira@email.com', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', '2024040', NULL, 0, 1);
 
--- ====================================
--- USUÁRIOS ORGANIZADORES (10 organizadores com códigos)
--- ====================================
 INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite) VALUES
 ('10987654321', 'Amanda Cristina', 'amanda@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, '4CT5L8DW', 1, 0),
 ('20987654321', 'Bernardo Silva', 'bernardo@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'BF8T5H7L', 1, 1),
@@ -88,7 +68,7 @@ INSERT INTO usuario (CPF, Nome, Email, Senha, RA, Codigo, Organizador, TemaSite)
 ('80987654321', 'Hugo Martins', 'hugo@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'B7KQZDU7', 1, 0),
 ('90987654321', 'Ingrid Souza', 'ingrid@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'JA2PM4H4', 1, 1),
 ('09876543210', 'Jonas Lima', 'jonas@ceu.edu.br', '$2y$10$RCjaM7e2Hq/a/p56ggSTEeFvYlQC4GEUgayQ476pn0SY1y1fN70R.', NULL, 'HG69KZMJ', 1, 0);
--- Atualizar códigos como usados
+
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '10987654321' WHERE codigo = '4CT5L8DW';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '20987654321' WHERE codigo = 'BF8T5H7L';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '30987654321' WHERE codigo = '9TDMW2Z4';
@@ -99,11 +79,7 @@ UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_po
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '80987654321' WHERE codigo = 'B7KQZDU7';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '90987654321' WHERE codigo = 'JA2PM4H4';
 UPDATE codigos_organizador SET usado = 1, data_uso = CURRENT_TIMESTAMP, usado_por = '09876543210' WHERE codigo = 'HG69KZMJ';
--- ====================================
--- INSCRIÇÕES NOS EVENTOS (pelo menos 20 pessoas por evento)
--- ====================================
 
--- Evento 1: Workshop de JavaScript (25 participantes)
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('12345678911', 1, 'ativa', 1),
 ('23456789012', 1, 'ativa', 1),
@@ -131,7 +107,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('45678098765', 1, 'ativa', 1),
 ('56789098765', 1, 'ativa', 0);
 
--- Evento 2: Palestra sobre IA (22 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('67890098765', 2, 'ativa', 1),
 ('78901098765', 2, 'ativa', 1),
@@ -156,7 +132,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('67890123456', 2, 'ativa', 1),
 ('78901234567', 2, 'ativa', 1);
 
--- Evento 3: Curso de Python (30 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('89012345678', 3, 'ativa', 1),
 ('90123456789', 3, 'ativa', 1),
@@ -189,7 +165,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('66778899001', 3, 'ativa', 1),
 ('77889900112', 3, 'ativa', 1);
 
--- Evento 4: Semana da Tecnologia (28 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('88990011223', 4, 'ativa', 1),
 ('99001122334', 4, 'ativa', 1),
@@ -220,7 +196,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('45678098765', 4, 'ativa', 1),
 ('56789098765', 4, 'ativa', 1);
 
--- Evento 5: Minicurso de Git (20 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('67890098765', 5, 'ativa', 1),
 ('78901098765', 5, 'ativa', 1),
@@ -243,7 +219,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('45678901234', 5, 'ativa', 1),
 ('56789012345', 5, 'ativa', 1);
 
--- Evento 6: Workshop de Design UX (24 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('67890123456', 6, 'ativa', 1),
 ('78901234567', 6, 'ativa', 1),
@@ -270,7 +246,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('89012098765', 6, 'ativa', 1),
 ('90123098765', 6, 'ativa', 1);
 
--- Evento 7: Hackathon CEU 2025 (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 7, 'ativa', 1),
 ('11223344556', 7, 'ativa', 1),
@@ -299,7 +275,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 7, 'ativa', 1),
 ('51234567890', 7, 'ativa', 1);
 
--- Evento 8: Seminário de Inovação (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 8, 'ativa', 1),
 ('11223344556', 8, 'ativa', 1),
@@ -328,7 +304,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 8, 'ativa', 1),
 ('51234567890', 8, 'ativa', 1);
 
--- Evento 9: Palestra de Empreendedorismo (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 9, 'ativa', 1),
 ('11223344556', 9, 'ativa', 1),
@@ -357,7 +333,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 9, 'ativa', 1),
 ('51234567890', 9, 'ativa', 1);
 
--- Evento 10: Workshop de Marketing Digital (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 10, 'ativa', 1),
 ('11223344556', 10, 'ativa', 1),
@@ -386,7 +362,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 10, 'ativa', 1),
 ('51234567890', 10, 'ativa', 1);
 
--- Evento 11: Curso de React (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 11, 'ativa', 1),
 ('11223344556', 11, 'ativa', 1),
@@ -415,7 +391,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 11, 'ativa', 1),
 ('51234567890', 11, 'ativa', 1);
 
--- Evento 12: Palestra Sustentabilidade na Tech (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 12, 'ativa', 1),
 ('11223344556', 12, 'ativa', 1),
@@ -444,7 +420,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 12, 'ativa', 1),
 ('51234567890', 12, 'ativa', 1);
 
--- Evento 13: Desenvolvimento Mobile (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 13, 'ativa', 1),
 ('11223344556', 13, 'ativa', 1),
@@ -473,7 +449,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 13, 'ativa', 1),
 ('51234567890', 13, 'ativa', 1);
 
--- Evento 14: Workshop de Blockchain (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 14, 'ativa', 1),
 ('11223344556', 14, 'ativa', 1),
@@ -502,7 +478,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 14, 'ativa', 1),
 ('51234567890', 14, 'ativa', 1);
 
--- Evento 15: Semana da Inovação (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 15, 'ativa', 1),
 ('11223344556', 15, 'ativa', 1),
@@ -531,7 +507,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 15, 'ativa', 1),
 ('51234567890', 15, 'ativa', 1);
 
--- Evento 16: Cybersecurity Basics (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 16, 'ativa', 1),
 ('11223344556', 16, 'ativa', 1),
@@ -560,7 +536,7 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 16, 'ativa', 1),
 ('51234567890', 16, 'ativa', 1);
 
--- Evento 17: Conferência de Cloud Computing (26 participantes)
+
 INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('01234098765', 17, 'ativa', 1),
 ('11223344556', 17, 'ativa', 1),
@@ -589,18 +565,11 @@ INSERT INTO inscricao (CPF, cod_evento, status, presenca_confirmada) VALUES
 ('41234567890', 17, 'ativa', 1),
 ('51234567890', 17, 'ativa', 1);
 
--- ====================================
--- COLABORADORES DOS EVENTOS
--- ====================================
--- Adicionar alguns organizadores como colaboradores em eventos de outros organizadores
 INSERT INTO colaboradores_evento (cod_evento, CPF, papel, presenca_confirmada) VALUES
--- Evento 1: Workshop de JavaScript
 (1, '20987654321', 'colaborador', 1),
 (1, '30987654321', 'colaborador', 1),
 (1, '23456789012', 'colaborador', 0),
 (1, '34567890123', 'colaborador', 1),
-
--- Evento 2: Palestra sobre IA
 (2, '40987654321', 'colaborador', 1),
 (2, '50987654321', 'colaborador', 1),
 (2, '45678901234', 'colaborador', 1),
@@ -609,9 +578,7 @@ INSERT INTO colaboradores_evento (cod_evento, CPF, papel, presenca_confirmada) V
 (3, '10987654321', 'colaborador', 1),
 (3, '60987654321', 'colaborador', 1),
 (3, '56789012345', 'colaborador', 0),
-(3, '67890123456', 'colaborador', 1),
-
--- Evento 4: Semana da Tecnologia
+(3, '56789098765', 'colaborador', 1),
 (4, '70987654321', 'colaborador', 1),
 (4, '80987654321', 'colaborador', 1),
 (4, '78901234567', 'colaborador', 1),
@@ -620,12 +587,8 @@ INSERT INTO colaboradores_evento (cod_evento, CPF, papel, presenca_confirmada) V
 -- Evento 7: Hackathon CEU 2025
 (7, '90987654321', 'colaborador', 1),
 (7, '09876543210', 'colaborador', 1),
-(7, '90123456789', 'colaborador', 1),
-(7, '01234567890', 'colaborador', 0);
+(7, '90123456789', 'colaborador', 1);
 
--- ====================================
--- FAVORITOS (Alguns usuários favoritam eventos)
--- ====================================
 INSERT INTO favoritos_evento (CPF, cod_evento) VALUES
 ('12345678911', 2),
 ('12345678911', 3),
@@ -648,9 +611,9 @@ INSERT INTO favoritos_evento (CPF, cod_evento) VALUES
 ('31234567890', 8),
 ('41234567890', 9);
 
--- ====================================
+
 -- ESTATÍSTICAS FINAIS
--- ====================================
+
 SELECT 'RESUMO DA POPULAÇÃO DO BANCO DE DADOS' AS '';
 SELECT COUNT(*) AS 'Total de Usuários' FROM usuario;
 SELECT COUNT(*) AS 'Total de Organizadores' FROM usuario WHERE Organizador = 1;

@@ -1,6 +1,6 @@
 // Configuração PWA para CEU
 (function(){
-  // ===== Manifest switching util =====
+  // Manifest switching util
   function setManifestHref(href){
     try {
       let link = document.querySelector('link[rel="manifest"]');
@@ -12,7 +12,6 @@
       const prev = link.getAttribute('href');
       if (prev !== href) {
         link.setAttribute('href', href);
-        // Log desabilitado para reduzir ruído no console
       }
     } catch (e) { console.warn('Não foi possível ajustar o manifest:', e); }
   }
@@ -49,12 +48,10 @@
 
       navigator.serviceWorker.getRegistration().then(function(existing){
         if (existing) {
-          // Log desabilitado para reduzir ruído no console
           setupRegistrationListeners(existing);
         } else {
           navigator.serviceWorker.register('/CEU/sw.js')
             .then(function(registration){
-              // Log desabilitado para reduzir ruído no console
               setupRegistrationListeners(registration);
             })
             .catch(function(error){
@@ -82,7 +79,6 @@
 
   // Detectar quando app foi instalado
   window.addEventListener('appinstalled', (evt) => {
-    // Log desabilitado para reduzir ruído no console
     // Limpa o prompt guardado
     deferredPrompt = null;
     window.deferredPrompt = null;
@@ -129,7 +125,7 @@
     }
   };
 
-  // ===== Roteamento: habilitar manifest instalável SOMENTE em Configurações (mobile) =====
+  // Roteamento: habilitar manifest instalável SOMENTE em Configurações (mobile)
   function isConfigPage(){
     try {
       const params = new URLSearchParams(location.search);

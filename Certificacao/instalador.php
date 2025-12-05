@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Instalador Automático de Dependências
  * - Baixa composer.phar localmente (sem depender de processos externos)
@@ -38,19 +39,23 @@ if (!isset($_POST['action'])) {
 $action = $_POST['action'];
 // Alvo agora é a pasta de bibliotecas dentro de Certificacao
 $libsRoot = __DIR__ . '/bibliotecas';
-if (!is_dir($libsRoot)) { @mkdir($libsRoot, 0775, true); }
+if (!is_dir($libsRoot)) {
+    @mkdir($libsRoot, 0775, true);
+}
 // Registrar logs dentro da pasta de bibliotecas
 $logPath = $libsRoot . '/instalador.log';
 
-function logMsg($msg) {
+function logMsg($msg)
+{
     global $logPath;
     $ts = date('Y-m-d H:i:s');
     @file_put_contents($logPath, "[$ts] $msg\n", FILE_APPEND);
 }
 
-// Utilitários ---------------------------------------------------------------
+// Utilitários
 
-function funcDisponivel($name) {
+function funcDisponivel($name)
+{
     if (!function_exists($name)) return false;
     $disabled = ini_get('disable_functions');
     if (!$disabled) return true;
@@ -58,7 +63,8 @@ function funcDisponivel($name) {
     return !in_array($name, $list, true);
 }
 
-function executarComando($comando, $dir) {
+function executarComando($comando, $dir)
+{
     $output = [];
     $returnCode = 0;
     $oldDir = getcwd();
@@ -72,7 +78,8 @@ function executarComando($comando, $dir) {
     ];
 }
 
-function caminhoPhpExe() {
+function caminhoPhpExe()
+{
     $candidatos = [];
     if (defined('PHP_BINARY') && PHP_BINARY) {
         $candidatos[] = PHP_BINARY;
@@ -96,9 +103,10 @@ function caminhoPhpExe() {
     return 'php';
 }
 
-// Composer -----------------------------------------------------------------
+// Composer - funções de detecção e instalação
 
-function verificarComposer() {
+function verificarComposer()
+{
     $output = [];
     $returnCode = 1;
     if (funcDisponivel('exec')) {
@@ -107,7 +115,8 @@ function verificarComposer() {
     return $returnCode === 0;
 }
 
-function baixarComposerPhar($dir) {
+function baixarComposerPhar($dir)
+{
     $url = 'https://getcomposer.org/download/latest-stable/composer.phar';
     logMsg('Baixando composer.phar de ' . $url);
     $target = rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'composer.phar';
@@ -140,7 +149,8 @@ function baixarComposerPhar($dir) {
     return ['success' => true, 'message' => 'composer.phar baixado'];
 }
 
-function instalarComposerLocal($dir) {
+function instalarComposerLocal($dir)
+{
     // Mantido como fallback: tenta rodar o instalador oficial
     try {
         $oldDir = getcwd();
@@ -150,7 +160,15 @@ function instalarComposerLocal($dir) {
         $installerUrl = 'https://getcomposer.org/installer';
         $installerPath = 'composer-setup.php';
         $installer = function_exists('curl_init')
-            ? (function() use ($installerUrl) { $ch=curl_init($installerUrl); curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); curl_setopt($ch, CURLOPT_TIMEOUT, 60); $data=curl_exec($ch); curl_close($ch); return $data; })()
+            ? (function () use ($installerUrl) {
+                $ch = curl_init($installerUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+                $data = curl_exec($ch);
+                curl_close($ch);
+                return $data;
+            })()
             : @file_get_contents($installerUrl);
         if ($installer === false) {
             @chdir($oldDir);
@@ -177,7 +195,8 @@ function instalarComposerLocal($dir) {
     }
 }
 
-function detectarPhpIniCli() {
+function detectarPhpIniCli()
+{
     $phpExe = caminhoPhpExe();
     if (!funcDisponivel('exec')) return null;
     @exec('"' . $phpExe . '" --ini 2>&1', $out, $code);
@@ -196,7 +215,8 @@ function detectarPhpIniCli() {
     return file_exists($fallback) ? $fallback : null;
 }
 
-function habilitarExtensaoNoIni($iniPath, $ext) {
+function habilitarExtensaoNoIni($iniPath, $ext)
+{
     if (!$iniPath || !file_exists($iniPath) || !is_writable($iniPath)) {
         return ['success' => false, 'message' => 'php.ini não encontrado ou sem permissão de escrita'];
     }
@@ -214,43 +234,47 @@ function habilitarExtensaoNoIni($iniPath, $ext) {
     foreach ($patterns as $pattern) {
         if (preg_match($pattern, $content)) {
             $content = preg_replace($pattern, 'extension=' . $ext, $content);
-            $replaced = true; break;
+            $replaced = true;
+            break;
         }
     }
-    if (!$replaced) { $content .= "\nextension=" . $ext . "\n"; }
+    if (!$replaced) {
+        $content .= "\nextension=" . $ext . "\n";
+    }
     if (@file_put_contents($iniPath, $content) === false) {
         return ['success' => false, 'message' => 'Falha ao salvar php.ini após ajuste'];
     }
     return ['success' => true, 'message' => 'Extensão ' . $ext . ' habilitada no php.ini', 'backup' => $backup];
 }
 
-function verificarEHabilitarExtensoes() {
+function verificarEHabilitarExtensoes()
+{
     $extensoes_necessarias = ['zip', 'gd', 'mbstring'];
     $resultado = [];
-    
+
     foreach ($extensoes_necessarias as $ext) {
         if (extension_loaded($ext)) {
             $resultado[$ext] = ['carregada' => true, 'acao' => 'nada'];
         } else {
             $resultado[$ext] = ['carregada' => false, 'acao' => 'tentar_habilitar'];
-            
+
             // Detecta o php.ini
             $iniPath = detectarPhpIniCli();
             if (!$iniPath) {
                 $resultado[$ext]['detalhes'] = 'php.ini não detectado, falha ao habilitar';
                 continue;
             }
-            
+
             // Tenta habilitar
             $extensoes_alternativas = [
                 'zip' => ['zip', 'php_zip'],
                 'gd' => ['gd', 'php_gd2', 'php_gd'],
                 'mbstring' => ['mbstring', 'php_mbstring'],
             ];
-            
+
             $variantes = $extensoes_alternativas[$ext] ?? [$ext];
             $habilitada = false;
-            
+
             foreach ($variantes as $var) {
                 $res = habilitarExtensaoNoIni($iniPath, $var);
                 if ($res['success']) {
@@ -259,20 +283,21 @@ function verificarEHabilitarExtensoes() {
                     break;
                 }
             }
-            
+
             if (!$habilitada) {
                 $resultado[$ext]['detalhes'] = 'Não foi possível habilitar no php.ini';
             }
         }
     }
-    
+
     logMsg('Verificação de extensões: ' . json_encode($resultado));
     return $resultado;
 }
 
-// ---------------------------- NOVAS FUNÇÕES (Git/Logs/Testes) ---------------------------------
+// Funções auxiliares: Git, Logs e Testes
 
-function caminhoGitExe() {
+function caminhoGitExe()
+{
     $candidatos = ['git', 'C:\\Program Files\\Git\\bin\\git.exe', 'C:\\Program Files\\Git\\cmd\\git.exe'];
     foreach ($candidatos as $g) {
         if ($g === 'git') {
@@ -287,19 +312,21 @@ function caminhoGitExe() {
     return null;
 }
 
-function rmrf($path) {
+function rmrf($path)
+{
     if (!file_exists($path)) return true;
     if (is_file($path) || is_link($path)) return @unlink($path);
     $ok = true;
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($it as $file) {
-        $ok = $ok && ( $file->isDir() ? @rmdir($file->getRealPath()) : @unlink($file->getRealPath()) );
+        $ok = $ok && ($file->isDir() ? @rmdir($file->getRealPath()) : @unlink($file->getRealPath()));
     }
     return $ok && @rmdir($path);
 }
 
-function limpezaInstaladorDir($dir, $removerPesados = false) {
-    $res = [ 'success' => true, 'steps' => [] ];
+function limpezaInstaladorDir($dir, $removerPesados = false)
+{
+    $res = ['success' => true, 'steps' => []];
     // Limpeza leve (por padrão): NUNCA remover vendor automaticamente após instalar
     // Apenas quando $removerPesados = true (opção explícita) é que removemos artefatos pesados.
 
@@ -335,7 +362,8 @@ function limpezaInstaladorDir($dir, $removerPesados = false) {
     return $res;
 }
 
-function tailFile($path, $lines = 200) {
+function tailFile($path, $lines = 200)
+{
     if (!file_exists($path)) return '';
     $data = @file($path);
     if ($data === false) return '';
@@ -343,7 +371,7 @@ function tailFile($path, $lines = 200) {
     return implode('', $slice);
 }
 
-// Ações --------------------------------------------------------------------
+// Processamento das ações
 
 switch ($action) {
     case 'verificar_composer':
@@ -415,7 +443,7 @@ switch ($action) {
                 echo json_encode(['success' => false, 'message' => 'Arquivo composer.json não encontrado em bibliotecas']);
                 break;
             }
-            
+
             // Verifica e habilita extensões necessárias ANTES de instalar
             $verifyExt = verificarEHabilitarExtensoes();
             logMsg('[instalar_dependencias] Verificação de extensões executada');
@@ -423,24 +451,38 @@ switch ($action) {
             $composerJson = @json_decode(@file_get_contents($libsRoot . '/composer.json'), true);
             $composerLock = @json_decode(@file_get_contents($libsRoot . '/composer.lock'), true);
             $requires = array_keys(($composerJson['require'] ?? []));
-            $requires = array_values(array_filter($requires, function($p){ return strtolower($p) !== 'php'; }));
+            $requires = array_values(array_filter($requires, function ($p) {
+                return strtolower($p) !== 'php';
+            }));
             $locked = [];
             if (is_array($composerLock)) {
-                foreach (['packages','packages-dev'] as $k) {
+                foreach (['packages', 'packages-dev'] as $k) {
                     if (!empty($composerLock[$k]) && is_array($composerLock[$k])) {
-                        foreach ($composerLock[$k] as $pkg) { if (!empty($pkg['name'])) { $locked[] = $pkg['name']; } }
+                        foreach ($composerLock[$k] as $pkg) {
+                            if (!empty($pkg['name'])) {
+                                $locked[] = $pkg['name'];
+                            }
+                        }
                     }
                 }
             }
             $missingPkgs = [];
-            foreach ($requires as $pkg) { if (!in_array($pkg, $locked, true)) { $missingPkgs[] = $pkg; } }
+            foreach ($requires as $pkg) {
+                if (!in_array($pkg, $locked, true)) {
+                    $missingPkgs[] = $pkg;
+                }
+            }
 
             // Opções do usuário
             $forceReset = isset($_POST['force_reset']) && ($_POST['force_reset'] === '1' || $_POST['force_reset'] === 'true');
             if ($forceReset) {
                 // Remove vendor e composer.lock para reinstalar limpo
-                if (is_dir($libsRoot . '/vendor')) { rmrf($libsRoot . '/vendor'); }
-                if (file_exists($libsRoot . '/composer.lock')) { @unlink($libsRoot . '/composer.lock'); }
+                if (is_dir($libsRoot . '/vendor')) {
+                    rmrf($libsRoot . '/vendor');
+                }
+                if (file_exists($libsRoot . '/composer.lock')) {
+                    @unlink($libsRoot . '/composer.lock');
+                }
                 logMsg('[instalar_dependencias] force_reset: removeu vendor/ e composer.lock');
             } elseif (!empty($missingPkgs) && file_exists($libsRoot . '/composer.lock')) {
                 // Força regenerar lock quando há divergência
@@ -468,8 +510,10 @@ switch ($action) {
                 $app->setAutoExit(false);
                 // Se havia mismatch ou force_reset, roda update (regenera lock); caso contrário, install
                 $cmd = (!empty($missingPkgs) || $forceReset) ? 'update' : 'install';
-                $args = [ 'command' => $cmd, '--no-interaction' => true, '--prefer-dist' => true ];
-                if ($ignoreAll) { $args['--ignore-platform-reqs'] = true; }
+                $args = ['command' => $cmd, '--no-interaction' => true, '--prefer-dist' => true];
+                if ($ignoreAll) {
+                    $args['--ignore-platform-reqs'] = true;
+                }
                 $input = new $inputClass($args);
                 $buffer = new $outputClass();
                 $exitCode = $app->run($input, $buffer);
@@ -477,7 +521,8 @@ switch ($action) {
                 logMsg('[composer interno] exit=' . $exitCode);
                 logMsg($bufferOutput);
             } catch (Throwable $t) {
-                $exitCode = 1; $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage();
+                $exitCode = 1;
+                $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage();
                 logMsg('[composer interno] exceção: ' . $t->getMessage());
             }
             chdir($cwd);
@@ -487,7 +532,8 @@ switch ($action) {
             $vendorExists = file_exists($autoload);
 
             // Fallback: tentar rodar composer via CLI se vendor não existir
-            $fallback = null; $fallbackExit = null;
+            $fallback = null;
+            $fallbackExit = null;
             if (!$vendorExists && funcDisponivel('exec')) {
                 $phpExe = caminhoPhpExe();
                 $cmd = '"' . $phpExe . '" composer.phar install --no-interaction --prefer-dist' . ($ignoreAll ? ' --ignore-platform-reqs' : '');
@@ -510,7 +556,9 @@ switch ($action) {
 
             $succ = ($exitCode === 0 || $fallbackExit === 0) && $vendorExists;
             $msg = $succ ? 'Dependências instaladas com sucesso.' : 'Falha ao instalar dependências.';
-            if ($faltandoZip) { $msg .= ' Observação: extensão PHP zip ausente; ative-a no php.ini.'; }
+            if ($faltandoZip) {
+                $msg .= ' Observação: extensão PHP zip ausente; ative-a no php.ini.';
+            }
 
             echo json_encode([
                 'success' => $succ,
@@ -523,7 +571,7 @@ switch ($action) {
                 'autoload' => $autoload,
                 'classes_ok' => $classesOk,
                 'ignored_platform_reqs' => $ignoreAll,
-                'extensoes_carregadas' => [ 'gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring'), 'zip' => extension_loaded('zip') ],
+                'extensoes_carregadas' => ['gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring'), 'zip' => extension_loaded('zip')],
                 'cleanup' => $cleanup,
                 'libs_root' => $libsRoot
             ]);
@@ -575,7 +623,11 @@ switch ($action) {
             if ($removerArtefatos) {
                 $artefatos = [$logPath];
                 foreach ($artefatos as $a) {
-                    if (file_exists($a)) { if (@unlink($a)) { $removidos[] = $a; } }
+                    if (file_exists($a)) {
+                        if (@unlink($a)) {
+                            $removidos[] = $a;
+                        }
+                    }
                 }
             }
             echo json_encode(['success' => $res['success'], 'message' => 'Limpeza executada', 'detalhes' => $res, 'removidos' => $removidos, 'libs_root' => $libsRoot]);
@@ -587,7 +639,10 @@ switch ($action) {
     case 'criar_log':
         try {
             $mensagem = isset($_POST['mensagem']) ? (string)$_POST['mensagem'] : '';
-            if ($mensagem === '') { echo json_encode(['success' => false, 'message' => 'mensagem obrigatória']); break; }
+            if ($mensagem === '') {
+                echo json_encode(['success' => false, 'message' => 'mensagem obrigatória']);
+                break;
+            }
             logMsg('[MANUAL] ' . $mensagem);
             echo json_encode(['success' => true, 'message' => 'Log gravado']);
         } catch (Exception $e) {
@@ -620,10 +675,18 @@ switch ($action) {
             $composerLocal = file_exists($libsRoot . '/composer.phar');
             $r1 = ['success' => true, 'composer_global' => $composerGlobal, 'composer_local' => $composerLocal, 'composer_disponivel' => $composerGlobal || $composerLocal];
             $r2 = $composerLocal ? ['success' => true, 'message' => 'composer.phar já presente'] : baixarComposerPhar($libsRoot);
-            if (!$r2['success']) { $r2 = instalarComposerLocal($libsRoot); }
+            if (!$r2['success']) {
+                $r2 = instalarComposerLocal($libsRoot);
+            }
             // instalar_dependencias resumido
-            $cwd = getcwd(); chdir($libsRoot);
-            $bufferOutput = ''; $exitCode = 1; $faltandoGd = !extension_loaded('gd'); $faltandoMb = !extension_loaded('mbstring'); $faltandoZip = !extension_loaded('zip'); $ignoreAll = ($faltandoGd || $faltandoMb);
+            $cwd = getcwd();
+            chdir($libsRoot);
+            $bufferOutput = '';
+            $exitCode = 1;
+            $faltandoGd = !extension_loaded('gd');
+            $faltandoMb = !extension_loaded('mbstring');
+            $faltandoZip = !extension_loaded('zip');
+            $ignoreAll = ($faltandoGd || $faltandoMb);
             try {
                 require_once 'phar://composer.phar/src/bootstrap.php';
                 $appClass = '\\Composer\\Console\\Application';
@@ -635,11 +698,17 @@ switch ($action) {
                 $app = new $appClass();
                 $app->setAutoExit(false);
                 $args = ['command' => 'install', '--no-interaction' => true, '--prefer-dist' => true];
-                if ($ignoreAll) { $args['--ignore-platform-reqs'] = true; }
+                if ($ignoreAll) {
+                    $args['--ignore-platform-reqs'] = true;
+                }
                 $input = new $inputClass($args);
                 $buffer = new $outputClass();
-                $exitCode = $app->run($input, $buffer); $bufferOutput = $buffer->fetch();
-            } catch (Throwable $t) { $exitCode = 1; $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage(); }
+                $exitCode = $app->run($input, $buffer);
+                $bufferOutput = $buffer->fetch();
+            } catch (Throwable $t) {
+                $exitCode = 1;
+                $bufferOutput = 'Falha ao executar Composer programaticamente: ' . $t->getMessage();
+            }
             chdir($cwd);
             $autoload = $libsRoot . '/vendor/autoload.php';
             $vendorExists = file_exists($autoload);
@@ -648,7 +717,9 @@ switch ($action) {
                 $cmd = '"' . $phpExe . '" composer.phar install --no-interaction --prefer-dist' . ($ignoreAll ? ' --ignore-platform-reqs' : '');
                 $fallback = executarComando($cmd, $libsRoot);
                 $vendorExists = file_exists($autoload);
-            } else { $fallback = null; }
+            } else {
+                $fallback = null;
+            }
             $cleanup = limpezaInstaladorDir($libsRoot, false);
             $r3 = [
                 'success' => (($exitCode === 0) && $vendorExists),
@@ -657,7 +728,7 @@ switch ($action) {
                 'fallback' => $fallback,
                 'ignored_platform_reqs' => $ignoreAll,
                 'cleanup' => $cleanup,
-                'extensoes' => [ 'gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring'), 'zip' => extension_loaded('zip') ]
+                'extensoes' => ['gd' => extension_loaded('gd'), 'mbstring' => extension_loaded('mbstring'), 'zip' => extension_loaded('zip')]
             ];
             echo json_encode(['success' => true, 'etapas' => ['verificar_composer' => $r1, 'instalar_composer' => $r2, 'instalar_dependencias' => $r3], 'libs_root' => $libsRoot]);
         } catch (Exception $e) {
@@ -665,7 +736,7 @@ switch ($action) {
         }
         break;
 
-    // ===================== FONTES (Inter) =====================
+    // FONTES (Inter)
     case 'verificar_fonte_inter':
         try {
             $dirFontes = __DIR__ . '/fonts';
@@ -689,7 +760,9 @@ switch ($action) {
     case 'instalar_fonte_inter':
         try {
             $dirFontes = __DIR__ . '/fonts';
-            if (!is_dir($dirFontes)) { @mkdir($dirFontes, 0775, true); }
+            if (!is_dir($dirFontes)) {
+                @mkdir($dirFontes, 0775, true);
+            }
             $urls = [
                 'Inter-Regular.ttf'     => 'https://github.com/rsms/inter/releases/latest/download/Inter-Regular.ttf',
                 'Inter-Bold.ttf'        => 'https://github.com/rsms/inter/releases/latest/download/Inter-Bold.ttf',
@@ -700,7 +773,8 @@ switch ($action) {
             foreach ($urls as $nome => $url) {
                 $dest = $dirFontes . '/' . $nome;
                 // Download com curl se possível
-                $data = false; $http = 0;
+                $data = false;
+                $http = 0;
                 if (function_exists('curl_init')) {
                     $ch = curl_init($url);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -709,7 +783,9 @@ switch ($action) {
                     $data = curl_exec($ch);
                     $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
                     curl_close($ch);
-                    if ($http !== 200 || $data === false) { $data = false; }
+                    if ($http !== 200 || $data === false) {
+                        $data = false;
+                    }
                 }
                 if ($data === false) {
                     $data = @file_get_contents($url);

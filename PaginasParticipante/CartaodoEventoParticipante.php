@@ -882,7 +882,7 @@
     // Carrega as imagens quando a página é carregada
     carregarImagensEvento();
 
-    // ====== Variáveis globais ======
+    //  Variáveis globais 
     if (typeof window.favoritosSet === 'undefined') {
       window.favoritosSet = new Set();
     }
@@ -939,7 +939,7 @@
       }
     }
 
-    // ====== Funções de Favorito ======
+    //  Funções de Favorito 
     function atualizarIconeFavorito(btn, fav) {
       if (!btn) return;
       const img = btn.querySelector('img');
@@ -990,7 +990,7 @@
       }
     }
 
-    // ====== Funções de Mensagem ao Organizador ======
+    //  Funções de Mensagem ao Organizador 
     function atualizarContadorMensagem() {
       const textarea = document.getElementById('texto-mensagem-organizador');
       const contador = document.getElementById('contador-mensagem-organizador');
@@ -1075,7 +1075,7 @@
       }
     }
 
-    // ====== Modal de Compartilhar ======
+    //  Modal de Compartilhar 
     function abrirModalCompartilhar() {
       if (!codEventoCompartilhar) return;
       const modal = document.getElementById('modal-compartilhar');
@@ -1163,7 +1163,7 @@
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
     }
 
-    // ====== Event Listeners para os botões ======
+    //  Event Listeners para os botões 
     document.addEventListener('DOMContentLoaded', function() {
       // Botão de favoritar
       const btnFavorito = document.querySelector('.BotaoFavoritoCartao');

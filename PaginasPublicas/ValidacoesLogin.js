@@ -1,6 +1,6 @@
 // Validações específicas da página de login
 
-// ============= MODO TESTE =============
+// MODO TESTE 
 // Defina como true para desativar algumas validações durante testes
 const MODO_TESTE_LOGIN = false; // Mude para false para ativar validações
 

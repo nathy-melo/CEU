@@ -1,8 +1,5 @@
-/**
- * FiltroOrganizadores.js
- * Sistema de filtro/ordenação para tabela de organizadores e colaboradores
- * Integrado com sistema de paginação de tabelas
- */
+// FiltroOrganizadores.js
+// Sistema de filtro/ordenação para tabela de organizadores
 
 (function () {
     'use strict';

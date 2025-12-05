@@ -120,7 +120,6 @@ function carregarEventosDoServidor() {
         return;
     }
     
-    console.log('carregarEventosDoServidor() chamado');
     const container = document.getElementById('eventos-container');
     if (!container) {
         console.error('Container de eventos não encontrado');
@@ -130,7 +129,6 @@ function carregarEventosDoServidor() {
     fetch('../PaginasParticipante/BuscarEventosInscritos.php')
         .then(response => response.json())
         .then(data => {
-            console.log('Resposta do servidor:', data);
             if (!data.sucesso) {
                 console.error('Erro ao carregar eventos:', data.mensagem);
                 container.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:20px;color:var(--branco);">Erro ao carregar eventos</p>';
@@ -138,12 +136,10 @@ function carregarEventosDoServidor() {
             }
 
             if (data.eventos.length === 0) {
-                console.log('Nenhum evento inscrito encontrado');
                 container.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:20px;color:var(--branco);">Você ainda não está inscrito em nenhum evento</p>';
                 return;
             }
 
-            console.log(`Carregando ${data.eventos.length} eventos`);
             container.innerHTML = '';
 
             data.eventos.forEach(evento => {

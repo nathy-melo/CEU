@@ -1,20 +1,12 @@
 <?php
 
-/**
- * Sistema de Gerenciamento Administrativo - CEU
- * API para operações CRUD completas
- */
-
 header('Content-Type: application/json');
 session_start();
 
-// Incluir conexão com banco de dados
 require_once '../BancoDados/conexao.php';
 
-// Verificação básica de autenticação - aceitar tanto sessão quanto localStorage
 $tempAuth = $_SESSION['admin_temp_auth'] ?? '';
 if (empty($tempAuth)) {
-    // Permitir criação de sessão temporária via POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
         if (isset($input['admin_temp_auth'])) {
@@ -24,17 +16,14 @@ if (empty($tempAuth)) {
         }
     }
 
-    // Se não tem autenticação, usar credenciais básicas para testes
     $_SESSION['admin_temp_auth'] = 'authenticated';
 }
 
-// Se é uma requisição POST para criar sessão sem action, retornar sucesso
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_GET['action'])) {
     echo json_encode(['success' => true, 'message' => 'Autenticação confirmada']);
     exit;
 }
 
-// Função para logs de segurança
 function logAdminAction($action, $details = '')
 {
     error_log("[" . date('Y-m-d H:i:s') . "] Admin Action: $action | Details: $details");
@@ -116,11 +105,6 @@ try {
     echo json_encode(['success' => false, 'message' => 'Erro interno: ' . $e->getMessage()]);
     logAdminAction('ERROR', $e->getMessage());
 }
-
-// ============================================
-// FUNÇÕES DO DASHBOARD
-// ============================================
-
 function getDashboardStats($conexao)
 {
     $estatisticas = [];
@@ -160,10 +144,6 @@ function getDashboardStats($conexao)
     logAdminAction('DASHBOARD_VIEW', 'Estatísticas carregadas');
     echo json_encode(['success' => true, 'data' => $estatisticas]);
 }
-
-// ============================================
-// FUNÇÕES DE EVENTOS
-// ============================================
 
 function getEventos($conexao)
 {
@@ -256,10 +236,6 @@ function deleteEvento($conexao)
     }
 }
 
-// ============================================
-// FUNÇÕES DE USUÁRIOS
-// ============================================
-
 function getUsuarios($conexao)
 {
     // Parâmetros de busca
@@ -293,11 +269,9 @@ function getUsuarios($conexao)
 
     $usuarios = [];
     while ($linha = mysqli_fetch_assoc($resultado)) {
-        // Não retornar senhas por segurança
         $usuarios[] = $linha;
     }
 
-    // Contar total para paginação (se busca ativa)
     $totalRegistros = count($usuarios);
     if (!empty($termoBusca)) {
         $sqlContagem = "SELECT COUNT(*) as total FROM usuario WHERE Nome LIKE ? OR CPF LIKE ? OR Email LIKE ? OR RA LIKE ?";
@@ -480,10 +454,6 @@ function deleteUsuario($conexao)
     }
 }
 
-// ============================================
-// FUNÇÕES DE CÓDIGOS
-// ============================================
-
 function getCodigos($conexao)
 {
     // Parâmetros de busca
@@ -637,10 +607,6 @@ function deleteCodigo($conexao)
     }
 }
 
-// ============================================
-// FUNÇÕES DE CERTIFICADOS
-// ============================================
-
 function getCertificados($conexao)
 {
     $sql = "SELECT * FROM certificado ORDER BY cod_verificacao";
@@ -655,13 +621,8 @@ function getCertificados($conexao)
     echo json_encode(['success' => true, 'data' => $certificados]);
 }
 
-// ============================================
-// FUNÇÕES DE SOLICITAÇÕES DE SENHA
-// ============================================
-
 function getSolicitacoesSenha($conexao)
 {
-    // Parâmetros de busca
     $status = $_GET['status'] ?? 'all';
     $limite = intval($_GET['limit'] ?? 1000);
     $offset = intval($_GET['offset'] ?? 0);
@@ -670,7 +631,6 @@ function getSolicitacoesSenha($conexao)
     $parametros = [];
     $tipos = '';
 
-    // Adicionar filtro de status se fornecido
     if ($status !== 'all') {
         $sql .= " WHERE status = ?";
         $parametros[] = $status;
@@ -694,7 +654,6 @@ function getSolicitacoesSenha($conexao)
         $solicitacoes[] = $linha;
     }
 
-    // Contar totais por status
     $sqlTotais = "SELECT status, COUNT(*) as total FROM solicitacoes_redefinicao_senha GROUP BY status";
     $resultadoTotais = mysqli_query($conexao, $sqlTotais);
     $totaisPorStatus = [];
@@ -730,7 +689,6 @@ function resolverSolicitacaoSenha($conexao)
         return;
     }
 
-    // Se CPF não foi enviado pelo frontend, tentar obter pelo ID da solicitação (via email)
     if (empty($cpf)) {
         $sqlSolic = "SELECT email, CPF FROM solicitacoes_redefinicao_senha WHERE id = ?";
         $stmtSolic = mysqli_prepare($conexao, $sqlSolic);
@@ -744,7 +702,6 @@ function resolverSolicitacaoSenha($conexao)
             if (!empty($rowSolic['CPF'])) {
                 $cpf = $rowSolic['CPF'];
             } else if (!empty($rowSolic['email'])) {
-                // Buscar CPF pelo email do usuário
                 $sqlUserByEmail = "SELECT CPF FROM usuario WHERE Email = ?";
                 $stmtUserByEmail = mysqli_prepare($conexao, $sqlUserByEmail);
                 mysqli_stmt_bind_param($stmtUserByEmail, "s", $rowSolic['email']);
@@ -764,14 +721,11 @@ function resolverSolicitacaoSenha($conexao)
         return;
     }
 
-    // Hash da nova senha
     $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
 
-    // Iniciar transação
     mysqli_begin_transaction($conexao);
 
     try {
-        // Atualizar senha do usuário
         $sqlUsuario = "UPDATE usuario SET Senha = ? WHERE CPF = ?";
         $stmtUsuario = mysqli_prepare($conexao, $sqlUsuario);
         mysqli_stmt_bind_param($stmtUsuario, "ss", $senhaHash, $cpf);
@@ -783,7 +737,6 @@ function resolverSolicitacaoSenha($conexao)
             throw new Exception('Nenhum usuário encontrado com o CPF informado.');
         }
 
-        // Marcar solicitação como resolvida
         $sqlSolicitacao = "UPDATE solicitacoes_redefinicao_senha 
                           SET status = 'resolvida', 
                               data_resolucao = NOW(), 
@@ -797,13 +750,11 @@ function resolverSolicitacaoSenha($conexao)
             throw new Exception('Erro ao atualizar status da solicitação');
         }
 
-        // Confirmar transação
         mysqli_commit($conexao);
 
         logAdminAction('SENHA_RESOLVIDA', "ID: $id | CPF: $cpf");
         echo json_encode(['success' => true, 'message' => 'Senha redefinida com sucesso']);
     } catch (Exception $e) {
-        // Reverter transação em caso de erro
         mysqli_rollback($conexao);
         echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
     }
@@ -818,7 +769,6 @@ function deleteSolicitacaoSenha($conexao)
         return;
     }
 
-    // Pode-se optar por marcar como cancelada ao invés de deletar
     $sql = "UPDATE solicitacoes_redefinicao_senha SET status = 'cancelada' WHERE id = ?";
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id);
@@ -833,15 +783,9 @@ function deleteSolicitacaoSenha($conexao)
 
 mysqli_close($conexao);
 
-// ============================================
-// INFO DE PWA/REDE (SEM DEPENDER DO BD)
-// ============================================
-
 function getPwaServerInfo()
 {
-    // Dados de ambiente/servidor
     $serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
-    // SERVER_ADDR pode vir vazio/127.0.0.1 em ambientes locais; tentar alternativas
     if (!$serverAddr || $serverAddr === '127.0.0.1' || $serverAddr === '::1') {
         $hostname = gethostname();
         if ($hostname) {
@@ -856,11 +800,9 @@ function getPwaServerInfo()
     $httpHost = $_SERVER['HTTP_HOST'] ?? '';
     $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
 
-    // Calcular base path do app (ex.: /CEU)
-    $rootDirName = basename(dirname(__DIR__)); // nome da pasta pai de Admin => CEU
+    $rootDirName = basename(dirname(__DIR__));
     $basePath = '/' . $rootDirName;
 
-    // Arquivos PWA no root do CEU
     $swPath = realpath(__DIR__ . '/../sw.js');
     $manifestPath = realpath(__DIR__ . '/../manifest.json');
     $manifestInstallPath = realpath(__DIR__ . '/../manifest-install.json');

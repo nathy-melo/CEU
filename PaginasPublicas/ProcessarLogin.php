@@ -2,7 +2,7 @@
 // Configuração do tempo de sessão para 6 minutos (5min de inatividade + 1min de extensão)
 ini_set('session.gc_maxlifetime', 360);
 
-// ============= MODO DE TESTE =============
+//  MODO DE TESTE 
 // Defina como true para desativar algumas validações durante testes
 define('MODO_TESTE_LOGIN', true); // Mude para false para ativar validações
 

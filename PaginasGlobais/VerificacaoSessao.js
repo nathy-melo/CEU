@@ -22,7 +22,6 @@
 
         // Se havia modal de aviso ativo, remove
         if (modalAvisoSessaoAtivo) {
-            // console.log('Removendo modal de aviso devido à atividade'); // Debug desabilitado
             removerModalAvisoSessao();
         }
     }
@@ -38,7 +37,6 @@
 
     // Função para adicionar listeners de atividade
     function adicionarListenersAtividadeUsuario() {
-        // console.log('Adicionando listeners de atividade'); // Debug desabilitado
         eventosAtividadeUsuario.forEach(evento => {
             document.addEventListener(evento, atualizarTimestampUltimaAtividade, {
                 passive: true,
@@ -53,7 +51,6 @@
 
     // Função para remover listeners de atividade
     function removerListenersAtividadeUsuario() {
-        // console.log('Removendo listeners de atividade'); // Debug desabilitado
         eventosAtividadeUsuario.forEach(evento => {
             document.removeEventListener(evento, atualizarTimestampUltimaAtividade, {
                 passive: true,
@@ -102,12 +99,12 @@
             btnLogin.addEventListener('click', function () {
                 window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada';
             });
-            
+
             // Efeito hover
-            btnLogin.addEventListener('mouseenter', function() {
+            btnLogin.addEventListener('mouseenter', function () {
                 this.style.opacity = '0.9';
             });
-            btnLogin.addEventListener('mouseleave', function() {
+            btnLogin.addEventListener('mouseleave', function () {
                 this.style.opacity = '1';
             });
         }
@@ -145,8 +142,6 @@
             .then(dadosResposta => {
                 // Log apenas se sessão não estiver ativa (importante)
                 if (!dadosResposta.ativa) {
-                    console.log('Resposta do servidor:', dadosResposta);
-                    console.log('Sessão inativa detectada pelo servidor');
                     pararVerificacaoSessao();
                     // SEMPRE mostra o modal, nunca redireciona automaticamente
                     mostrarModalSessaoExpirada();
@@ -298,7 +293,6 @@
 
     // Função de debug para forçar expiração de sessão (teste)
     window.debugForcarExpiracao = function () {
-        console.log('DEBUG: Forçando expiração de sessão para teste');
         timestampUltimaAtividade = Date.now() - (tempoLimiteSessaoInatividade + 1000);
     };
 

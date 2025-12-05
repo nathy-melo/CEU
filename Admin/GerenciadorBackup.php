@@ -1,5 +1,4 @@
 <?php
-// Sistema básico de backup do banco de dados
 
 class GerenciadorBackup
 {
@@ -17,18 +16,14 @@ class GerenciadorBackup
         }
     }
 
-    // Faz backup do banco de dados
-
     public function fazerBackup()
     {
         try {
             $nomeArquivo = 'backup_' . date('Y-m-d_H-i-s') . '.sql';
             $caminhoBackup = $this->pastaBackup . $nomeArquivo;
 
-            // Gerar SQL
             $sql = $this->exportarBD();
 
-            // Salvar arquivo
             if (!file_put_contents($caminhoBackup, $sql)) {
                 throw new Exception('Erro ao salvar backup');
             }
@@ -44,9 +39,6 @@ class GerenciadorBackup
         }
     }
 
-    /**
-     * Exporta o banco em SQL
-     */
     private function exportarBD()
     {
         $sql = "-- Backup CEU_bd - " . date('Y-m-d H:i:s') . "\n\n";
@@ -54,7 +46,6 @@ class GerenciadorBackup
         $sql .= "CREATE DATABASE CEU_bd;\n";
         $sql .= "USE CEU_bd;\n\n";
 
-        // Obter todas as tabelas
         $resultado = $this->conexao->query("SHOW TABLES FROM CEU_bd");
 
         if (!$resultado) {
@@ -64,12 +55,10 @@ class GerenciadorBackup
         while ($linha = $resultado->fetch_row()) {
             $tabela = $linha[0];
 
-            // Estrutura da tabela
             $resultCreate = $this->conexao->query("SHOW CREATE TABLE CEU_bd.`$tabela`");
             $linhaCreate = $resultCreate->fetch_row();
             $sql .= $linhaCreate[1] . ";\n\n";
 
-            // Dados da tabela
             $resultDados = $this->conexao->query("SELECT * FROM CEU_bd.`$tabela`");
 
             if ($resultDados && $resultDados->num_rows > 0) {
@@ -95,9 +84,6 @@ class GerenciadorBackup
         return $sql;
     }
 
-    /**
-     * Lista todos os backups
-     */
     public function listarBackups()
     {
         try {
@@ -114,7 +100,6 @@ class GerenciadorBackup
                 ];
             }
 
-            // Ordenar por data (mais recente primeiro)
             usort($backups, function ($a, $b) {
                 return $b['timestamp'] - $a['timestamp'];
             });
@@ -129,9 +114,6 @@ class GerenciadorBackup
         }
     }
 
-    /**
-     * Restaura um backup
-     */
     public function restaurarBackup($nomeArquivo)
     {
         try {
@@ -161,9 +143,6 @@ class GerenciadorBackup
         }
     }
 
-    /**
-     * Deleta um backup
-     */
     public function deletarBackup($nomeArquivo)
     {
         try {
@@ -186,9 +165,6 @@ class GerenciadorBackup
         }
     }
 
-    /**
-     * Obtém informações do banco
-     */
     public function obterInfo()
     {
         try {
@@ -210,9 +186,6 @@ class GerenciadorBackup
         }
     }
 
-    /**
-     * Formata tamanho de arquivo
-     */
     private function formatarTamanho($bytes)
     {
         $unidades = ['B', 'KB', 'MB'];
@@ -228,7 +201,6 @@ class GerenciadorBackup
     }
 }
 
-// Tratamento de requisições
 if (php_sapi_name() !== 'cli' && isset($_GET['acao'])) {
     header('Content-Type: application/json; charset=utf-8');
 

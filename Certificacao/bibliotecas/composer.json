@@ -1,11 +1,24 @@
 {
   "name": "ceu/certificacao-bibliotecas",
-  "description": "Dependências da área de certificação do CEU",
+  "description": "Dependências do Sistema de Certificação CEU - Gerencia bibliotecas PHP necessárias para geração de certificados em múltiplos formatos",
   "type": "project",
   "require": {
     "php": ">=7.4",
     "phpoffice/phppresentation": "^1.0",
     "phpoffice/phpword": "^1.2",
     "mpdf/mpdf": "^8.2"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "preferred-install": "dist"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@php -r \"echo '✅ Bibliotecas de certificação instaladas com sucesso!\\n';\""
+    ],
+    "post-update-cmd": [
+      "@php -r \"echo '✅ Bibliotecas de certificação atualizadas!\\n';\""
+    ]
   }
 }

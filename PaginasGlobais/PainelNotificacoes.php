@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../styleGlobal.css" />
     <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
     <style>
-        /* ==== Seção Principal ==== */
+        /* Seção Principal */
         .secao-painel {
             flex: 1 0 auto;
             display: flex;
@@ -20,7 +20,7 @@
             padding: 1.75rem 0.9rem;
         }
 
-        /* ==== Cartão Principal ==== */
+        /* Cartão Principal */
         .cartao-painel {
             background-color: var(--caixas);
             color: var(--branco);
@@ -35,7 +35,7 @@
             margin: 3rem 0;
         }
 
-        /* ==== Cabeçalho do Painel ==== */
+        /* Cabeçalho do Painel */
         .painel-cabecalho {
             width: 100%;
             display: flex;
@@ -68,7 +68,7 @@
             white-space: nowrap;
         }
 
-        /* ==== Filtros ==== */
+        /* Filtros */
         .painel-filtros {
             width: 100%;
             display: flex;
@@ -106,7 +106,7 @@
             box-shadow: 0 2px 8px rgba(101, 152, 210, 0.4);
         }
 
-        /* ==== Lista de Notificações ==== */
+        /* Lista de Notificações */
         .painel-conteudo {
             width: 100%;
             max-width: 57.3rem;
@@ -119,7 +119,7 @@
             gap: 0.8rem;
         }
 
-        /* ==== Item de Notificação ==== */
+        /* Item de Notificação */
         .notificacao-item {
             background-color: rgba(255, 255, 255, 0.05);
             border-left: 4px solid var(--botao);
@@ -226,7 +226,7 @@
             color: #FFF;
         }
 
-        /* ==== Estilos para Mensagem de Participante ==== */
+        /* Estilos para Mensagem de Participante */
         .notif-mensagem-participante {
             display: flex;
             flex-direction: column;
@@ -306,7 +306,7 @@
             box-shadow: 0 2px 8px rgba(101, 152, 210, 0.4) !important;
         }
 
-        /* ==== Estilos para Thread de Mensagens (estilo Gmail) ==== */
+        /* Thread de Mensagens */
         .notif-cabecalho-thread {
             background: rgba(101, 152, 210, 0.1);
             padding: 0.8rem;
@@ -446,7 +446,7 @@
             margin: 0.75rem 0;
         }
 
-        /* ==== Modal de Resposta ==== */
+        /* Modal de Resposta */
         .modal-resposta-mensagem {
             display: none;
             position: fixed;
@@ -563,7 +563,7 @@
             background: var(--vermelho);
         }
 
-        /* ==== Mensagem Vazia ==== */
+        /* Mensagem Vazia */
         .painel-vazio {
             text-align: center;
             padding: 3rem 1rem;
@@ -585,7 +585,7 @@
             filter: brightness(0) invert(1);
         }
 
-        /* ==== Botão Voltar ==== */
+        /* Botão Voltar */
         .botao-voltar {
             display: inline-block;
             background-color: var(--botao);
@@ -601,7 +601,7 @@
             cursor: pointer;
         }
 
-        /* ==== Scrollbar Personalizada ==== */
+        /* Scrollbar Personalizada */
         .painel-conteudo::-webkit-scrollbar {
             width: 0.5rem;
         }
@@ -620,7 +620,7 @@
             background: var(--azul-claro);
         }
 
-        /* ==== Responsividade ==== */
+        /* Responsividade */
         @media (max-width: 768px) {
             .cartao-painel {
                 padding: 1.2rem 0.7rem;

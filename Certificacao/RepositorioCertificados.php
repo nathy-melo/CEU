@@ -3,8 +3,7 @@ declare(strict_types=1);
 namespace CEU\Certificacao;
 
 /**
- * Repositório responsável por garantir o esquema e manipular registros de certificados.
- * Adicionados PHPDocs e ajustes de montagem de SQL para evitar falsos positivos do Intelephense (P1008).
+ * Repositório de certificados: garante esquema do banco e manipula registros
  */
 class RepositorioCertificados
 {

@@ -909,7 +909,7 @@
       }
     });
 
-    // ====== Inscrição rápida ======
+    //  Inscrição rápida 
     function atualizarIconeInscricao(btn, inscrito) {
       if (!btn) return;
       const img = btn.querySelector('img');
@@ -1163,7 +1163,7 @@
       }
     }
 
-    // ====== Modal de mensagem ao organizador ======
+    // Modal de mensagem ao organizador 
     // Variáveis globais - verificar se já existem para evitar re-declaração
     if (typeof window.codEventoMensagem === 'undefined') {
       window.codEventoMensagem = null;
@@ -1261,7 +1261,7 @@
       }
     }
 
-    // ====== Favoritos ======
+    //  Favoritos 
     // favoritosSet e favoritosDados já foram declarados acima
 
     function atualizarIconeFavorito(btn, fav) {

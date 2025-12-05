@@ -3,7 +3,7 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-// Modo API: ativa proteção para sempre responder JSON mesmo em fatais
+// Ativa proteção para sempre responder JSON mesmo em fatais
 $__API_MODE__ = (isset($_GET['verificar']) || isset($_GET['atualizar']));
 $__EXECUTADOS_TOTAL__ = 0; // usado para reportar em caso de erro fatal
 if ($__API_MODE__) {
@@ -34,8 +34,7 @@ if ($__API_MODE__) {
     });
 }
 
-/**
- * Verificação Simples do Banco de Dados
+/* Verificação Simples do Banco de Dados
  * Compara o banco atual com o arquivo BancodeDadosCEU.sql
  */
 
@@ -80,7 +79,7 @@ function parseSqlSchema($caminhoArquivo) {
     $sql = preg_replace('/\/(\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/)/s', '', $sql);
     $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
 
-    // Normaliza quebras de linha
+    // Quebras de linha
     $sql = str_replace(["\r\n", "\r"], "\n", $sql);
 
     $schema = [ 'database' => null, 'tables' => [] ]; // tables: nome => ['create' => string, 'columns' => [col => def]]
@@ -96,7 +95,7 @@ function parseSqlSchema($caminhoArquivo) {
         foreach ($matches as $mt) {
             $tabela = $mt[1];
             $conteudo = $mt[2];
-            $opcoes = $mt[3]; // ENGINE, DEFAULT CHARSET, etc.
+            $opcoes = $mt[3];
             $schema['tables'][$tabela] = $schema['tables'][$tabela] ?? ['create' => '', 'columns' => [], 'options' => ''];
             
             // Guarda o bloco CREATE completo
@@ -104,7 +103,7 @@ function parseSqlSchema($caminhoArquivo) {
             $schema['tables'][$tabela]['create'] = $blocoCompleto;
             $schema['tables'][$tabela]['options'] = trim($opcoes);
             
-            // Percorre linhas internas do create de forma mais precisa
+            // Percorre linhas internas do create
             $linhas = preg_split('/,\s*\n/', $conteudo);
             foreach ($linhas as $linha) {
                 $linha = trim($linha);
@@ -145,8 +144,6 @@ function parseSqlSchema($caminhoArquivo) {
         }
     }
 
-    // Mantém mapa col => definição para ALTER dinâmico
-
     return $schema;
 }
 
@@ -158,7 +155,6 @@ function verificarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
         return [ $schema['erro'] ];
     }
 
-    // Se o SQL define um banco, usa-o como referência
     if (!empty($schema['database'])) {
         $nomeBanco = $schema['database'];
     }
@@ -173,7 +169,6 @@ function verificarDiferencas($conexaoServidor, $nomeBanco, $caminhoArquivo) {
         $resTab = mysqli_query($conexaoServidor, "SHOW TABLES LIKE '" . mysqli_real_escape_string($conexaoServidor, $tabela) . "'");
         if (!$resTab || mysqli_num_rows($resTab) == 0) {
             $diferencas[] = "Tabela '$tabela' não existe";
-            // Não tenta checar colunas se a tabela nem existe
             continue;
         }
         

@@ -7,7 +7,7 @@
     <title>Painel Administrativo - CEU</title>
 
     <meta name="description"
-        content="Sistema de Gerenciamento Administrativo - CEU (Catálogo de Eventos Universitários)">
+        content="Sistema de Gerenciamento Administrativo - CEU (Controle de Eventos Unificado)">
     <meta name="theme-color" content="#4F6C8C">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -697,7 +697,6 @@
     <script>
         let currentData = {};
 
-        // Verificar autenticação ao carregar
         document.addEventListener('DOMContentLoaded', function () {
             verificarAuth();
         });
@@ -711,14 +710,12 @@
                 return;
             }
 
-            // Decodificar e verificar
             try {
                 const decoded = atob(tempAuth);
                 const [usuario, senha] = decoded.split(':');
 
                 if (usuario === 'infofriends' && senha === '12345678') {
                     console.log('Credenciais válidas, mostrando painel...');
-                    // Criar sessão no servidor para o PHP
                     fetch('GerenciadorAdmin.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -738,7 +735,6 @@
             }
         }
 
-        // Função auxiliar para fazer requisições à API
         async function apiCall(endpoint, method = 'GET', data = null) {
             const options = {
                 method: method,
@@ -755,7 +751,6 @@
                 options.body = JSON.stringify(data);
             }
 
-            // Adicionar timestamp para evitar cache
             const timestamp = new Date().getTime();
             const baseUrl = `GerenciadorAdmin.php?action=${endpoint}`;
             const url = `${baseUrl}&_t=${timestamp}`;
@@ -821,9 +816,7 @@
             }
         }
 
-        // =======================================
-        // DASHBOARD
-        // =======================================
+        // Dashboard
 
         async function carregarDashboard() {
             try {
@@ -862,9 +855,7 @@
             }
         }
 
-        // =======================================
-        // EVENTOS
-        // =======================================
+        // Eventos
 
         async function carregarEventos() {
             try {
@@ -950,9 +941,7 @@
             }
         }
 
-        // =======================================
-        // USUÁRIOS
-        // =======================================
+        // Usuários
 
         async function carregarUsuarios() {
             try {
@@ -976,9 +965,7 @@
             }
         }
 
-        // =======================================
-        // CÓDIGOS
-        // =======================================
+        // Códigos
 
         async function carregarCodigos() {
             try {
@@ -1002,9 +989,7 @@
             }
         }
 
-        // =======================================
-        // CERTIFICADOS
-        // =======================================
+        // Certificados
 
         async function carregarCertificados() {
             try {
@@ -1073,9 +1058,7 @@
             }
         }
 
-        // =======================================
-        // AÇÕES DOS BOTÕES
-        // =======================================
+        // Ações dos botões
 
         async function gerarNovoCodigo() {
             // Pergunta se quer gerar automaticamente ou inserir manualmente
@@ -1191,9 +1174,7 @@
             }
         }
 
-        // =======================================
-        // MODAL DE EVENTOS
-        // =======================================
+        // Modal de eventos
 
         function showModalEvento(eventoId = null) {
             document.getElementById('modalEvento').style.display = 'block';
@@ -1239,9 +1220,7 @@
             showModalEvento(id);
         }
 
-        // =======================================
-        // MODAL DE USUÁRIOS
-        // =======================================
+        // Modal de usuários
 
         function showModalUsuario() {
             document.getElementById('modalUsuario').style.display = 'block';
@@ -1397,9 +1376,7 @@
             alert(`Validando certificado: ${codigo}`);
         }
 
-        // =======================================
-        // SOLICITAÇÕES DE SENHA
-        // =======================================
+        // Solicitações de senha
 
         async function carregarSolicitacoesSenha() {
             try {
@@ -1643,9 +1620,7 @@
             }
         }
 
-        // =======================================
-        // FUNCIONALIDADES DE BUSCA
-        // =======================================
+        // Funcionalidades de busca
 
         // Variáveis para controle de timeout de busca
         let timeoutBuscaUsuarios = null;
@@ -1898,9 +1873,7 @@
             }
         }
 
-        // =======================================
-        // BACKUPS
-        // =======================================
+        // Backups
 
         async function carregarInfoBackups() {
             try {
@@ -2078,9 +2051,7 @@
             }
         }
 
-        // =======================================
-        // PWA / REDE - DIAGNÓSTICO E AÇÕES
-        // =======================================
+        // PWA / Rede - Diagnóstico e ações
         async function carregarPwaRede() {
             // Reset UI
             document.getElementById('pwaLocalUrl').textContent = '-';

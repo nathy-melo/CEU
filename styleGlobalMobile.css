@@ -10,7 +10,7 @@
 /* MOBILE - Abordagem minimalista e não-intrusiva */
 @media screen and (max-width: 767px) {
   
-  /* ========== OVERLAY PARA MENU E FILTRO ========== */
+  /*  OVERLAY PARA MENU E FILTRO  */
   /* Overlay escuro quando menu está aberto */
   body.menu-open::before {
     content: '';
@@ -59,7 +59,7 @@
     height: 100dvh;
   }
   
-  /* ========== AJUSTES NO MENU (MÍNIMOS) ========== */
+  /*  AJUSTES NO MENU (MÍNIMOS)  */
   /* NO MOBILE: conteúdo NÃO desloca quando menu abre */
   #main-content.shifted {
     margin-left: 0 !important;
@@ -103,7 +103,7 @@
     box-shadow: none !important; /* Remover sombra no mobile */
   }
   
-  /* ========== BARRA DE PESQUISA ========== */
+  /*  BARRA DE PESQUISA  */
   .barra-pesquisa-container {
     flex-direction: row; /* Lado a lado no mobile */
     gap: 8px;
@@ -129,7 +129,7 @@
     padding: 0 clamp(12px, 2.5vw, 16px);
   }
   
-  /* ========== TÍTULOS E SEÇÕES ========== */
+  /*  TÍTULOS E SEÇÕES  */
   .section-title-wrapper {
     padding: clamp(12px, 2vw, 16px) 0;
   }
@@ -138,7 +138,7 @@
     font-size: clamp(1.1rem, 4vw, 1.4rem); /* Reduzido */
   }
   
-  /* ========== CONTAINER DE EVENTOS ========== */
+  /*  CONTAINER DE EVENTOS  */
   .container {
     grid-template-columns: 1fr;
     padding: 0 15px 20px;
@@ -152,7 +152,7 @@
     transition: none; /* Sem animação */
   }
   
-  /* ========== NOTIFICAÇÕES ========== */
+  /*  NOTIFICAÇÕES  */
   .notificacoes-dropdown {
     left: 50%;
     transform: translateX(-50%);
@@ -184,9 +184,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - FORMULÁRIOS
-  ======================================= */
+/* RESPONSIVIDADE - FORMULÁRIOS */
 
 @media screen and (max-width: 767px) {
   /* Seção de contato - remover largura mínima */
@@ -297,9 +295,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - CARTÃO DO EVENTO
-  ======================================= */
+/* RESPONSIVIDADE - CARTÃO DO EVENTO */
 
 @media screen and (max-width: 767px) {
   /* Cartão do evento - quebrar grid complexo */
@@ -476,12 +472,10 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - LOGIN E CADASTRO
-  ======================================= */
+/* RESPONSIVIDADE - LOGIN E CADASTRO */
 
 @media screen and (max-width: 767px) {
-  /* ========== LOGIN ========== */
+  /*  LOGIN  */
   .container-pagina-login {
     padding: 0 35px;
     box-sizing: border-box;
@@ -553,7 +547,7 @@
     margin-bottom: 0.8rem !important;
   }
   
-  /* ========== CADASTRO ========== */
+  /*  CADASTRO  */
   #main-content {
     padding: 0 35px;
     box-sizing: border-box;
@@ -826,9 +820,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - MODAL PERSONALIZADO
-  ======================================= */
+/* RESPONSIVIDADE - MODAL PERSONALIZADO */
 
 @media screen and (max-width: 767px) {
   .conteudo-modal-personalizado {
@@ -882,9 +874,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - REDEFINIR SENHA
-  ======================================= */
+/* RESPONSIVIDADE - REDEFINIR SENHA */
 
 @media screen and (max-width: 767px) {
   /* Redefinir senha - página pública (email) */
@@ -1018,9 +1008,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - SOLICITAR CÓDIGO
-  ======================================= */
+/* RESPONSIVIDADE - SOLICITAR CÓDIGO */
 
 @media screen and (max-width: 767px) {
   #solicitar-codigo {
@@ -1160,9 +1148,7 @@
   }
 }
 
-/* ==========================================
-  PÁGINA DE CONFIGURAÇÕES - RESPONSIVE
-  ========================================== */
+/* PÁGINA DE CONFIGURAÇÕES - RESPONSIVEL */
 
 @media screen and (max-width: 767px) {
   .conteiner-configuracoes {
@@ -1213,9 +1199,7 @@
   }
 }
 
-/* ==========================================
-  TEMA DO SITE - RESPONSIVE
-  ========================================== */
+/* TEMA DO SITE - RESPONSIVEL */
 
 @media screen and (max-width: 767px) {
   .cartao-tema {
@@ -1309,9 +1293,7 @@
   }
 }
 
-/* ==========================================
-  EMAIL DE RECUPERAÇÃO - RESPONSIVE
-  ========================================== */
+/* EMAIL DE RECUPERAÇÃO - RESPONSIVE */
 
 @media screen and (max-width: 767px) {
   .container-formulario-recuperacao {
@@ -1375,9 +1357,7 @@
   }
 }
 
-/* ==========================================
-  DÚVIDAS FREQUENTES - RESPONSIVE
-  ========================================== */
+/* DÚVIDAS FREQUENTES - RESPONSIVE */
 
 @media screen and (max-width: 767px) {
   .secao-duvidas {
@@ -1448,9 +1428,7 @@
   }
 }
 
-/* ==========================================
-  TERMOS DE CONDIÇÕES - RESPONSIVE
-  ========================================== */
+/* TERMOS DE CONDIÇÕES - RESPONSIVE */
 
 @media screen and (max-width: 767px) {
   .secao-termos {
@@ -1532,9 +1510,7 @@
   }
 }
 
-/* ==========================================
-  SOBRE NÓS - RESPONSIVE
-  ========================================== */
+/* SOBRE NÓS - RESPONSIVE */
 
 @media screen and (max-width: 767px) {
   /* Reutiliza estilos do cartao-duvidas e conteudo-duvidas já definidos acima */
@@ -1551,9 +1527,7 @@
   }
 }
 
-/* ==========================================
-   PÁGINA DE PERFIL - RESPONSIVE
-   ========================================== */
+/* PÁGINA DE PERFIL - RESPONSIVE */
 
 /* Correção global para botão organizador - sobrescreve CSS inline */
 .botao-tornar-organizador {
@@ -1836,10 +1810,8 @@
   }
 }
 
-/* ==========================================
-   DESKTOP SAFEGUARD (>=1025px)
-   Garante layout de PC em telas muito grandes
-   ========================================== */
+/* DESKTOP SAFEGUARD (>=1025px)
+   Garante layout de PC em telas muito grandes */
 @media screen and (min-width: 1025px) {
   /* Evita centralização vertical/global que pode distorcer páginas grandes */
   body {
@@ -1856,9 +1828,7 @@
   }
 }
 
-/* ==========================================
-  DROPDOWN DE NOTIFICAÇÕES - RESPONSIVE
-  ========================================== */
+/* DROPDOWN DE NOTIFICAÇÕES - RESPONSIVE */
 
 @media screen and (max-width: 767px) {
   .notificacoes-dropdown {
@@ -1962,9 +1932,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - GERENCIAR EVENTO (MOBILE)
-  ======================================= */
+/* RESPONSIVIDADE - GERENCIAR EVENTO (MOBILE) */
 
 @media screen and (max-width: 767px) {
   /* Container principal do gerenciar - SEM PADDING */
@@ -2547,9 +2515,7 @@
   }
 }
 
-/* =======================================
-  RESPONSIVIDADE - BOTÕES DAS TABELAS/CARDS
-  ======================================= */
+/* RESPONSIVIDADE - BOTÕES DAS TABELAS/CARDS */
 
 @media screen and (max-width: 767px) {
   /* Botões da tabela quando vira card */

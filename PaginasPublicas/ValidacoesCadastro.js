@@ -1,13 +1,12 @@
 // Validações específicas das páginas de cadastro de participante e organizador
 
-// ========== CONFIGURAÇÕES PARA TESTES ==========
+// Configurações para testes
 // Mude estas variáveis para true/false para ativar/desativar validações
 var VALIDAR_CPF = true;           // true = valida CPF, false = não valida
 var VALIDAR_EMAIL = true;         // true = valida email, false = não valida  
 var VALIDAR_SENHA = true;         // true = valida senha, false = não valida
 var SENHA_MINIMA = 8;             // mínimo de caracteres (0 = desativar)
 var NOME_MINIMO = 5;              // mínimo de caracteres (0 = desativar)
-// ================================================
 
 function validarCadastroParticipante() {
     var campoNome = document.getElementById('nome-completo');
@@ -350,7 +349,7 @@ if (document.readyState === 'loading') {
     inicializarValidacoesCadastro();
 }
 
-// ================= Envio AJAX Reutilizável =================
+//  Envio AJAX Reutilizável 
 function enviarCadastroAjax(idFormulario, urlDestino) {
     var formulario = document.getElementById(idFormulario);
     if (!formulario) return;
@@ -388,16 +387,12 @@ function enviarCadastroAjax(idFormulario, urlDestino) {
                     }
                     
                     function cancelarTimer() {
-                        console.log('cancelarTimer chamada. Timer ativo:', timerAtivo, 'Window timer:', !!window.temporizadorCadastro);
                         if (timerAtivo && window.temporizadorCadastro) {
-                            console.log('✅ Timer de redirecionamento cancelado pela interação do usuário');
                             clearInterval(window.temporizadorCadastro);
                             window.temporizadorCadastro = null;
                             timerAtivo = false;
                             atualizarMensagemSucesso();
                             removerListenersInteracao();
-                        } else {
-                            console.log('❌ Timer não cancelado - já inativo ou não existe');
                         }
                     }
                     
@@ -413,12 +408,9 @@ function enviarCadastroAjax(idFormulario, urlDestino) {
                             'mousedown', 'mouseup'
                         ];
                         
-                        console.log('Adicionando listeners para cancelar timer:', eventosInteracao);
-                        
                         eventosInteracao.forEach(evento => {
                             // Criar uma função wrapper para cada evento para poder remover depois
                             const listenerWrapper = function(e) {
-                                console.log('Evento detectado para cancelar timer:', evento, e.type);
                                 cancelarTimer();
                             };
                             
@@ -433,7 +425,6 @@ function enviarCadastroAjax(idFormulario, urlDestino) {
                     }
                     
                     function removerListenersInteracao() {
-                        console.log('Removendo listeners de cancelamento:', listenersCancelamento.length);
                         listenersCancelamento.forEach(item => {
                             document.removeEventListener(item.evento, item.funcao);
                         });
@@ -449,13 +440,6 @@ function enviarCadastroAjax(idFormulario, urlDestino) {
                     
                     // Adicionar listeners para cancelar timer
                     adicionarListenersInteracao();
-                    
-                    // Teste rápido - adicionar um listener de clique especial para debug
-                    document.addEventListener('click', function(e) {
-                        console.log('CLIQUE DETECTADO:', e.target, 'Timer ativo:', timerAtivo);
-                    }, { once: false });
-                    
-                    console.log('Timer de cadastro iniciado. Timer ativo:', timerAtivo);
                     
                     window.temporizadorCadastro = setInterval(function(){
                         if (!timerAtivo) {

@@ -17,9 +17,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 require_once __DIR__ . '/../BancoDados/conexao.php';
 
-// ===========================
 // VERIFICAÇÕES BÁSICAS
-// ===========================
 
 if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
     echo json_encode(['erro' => 'Usuário não autenticado']);
@@ -31,9 +29,7 @@ if (!isset($_SESSION['organizador']) || $_SESSION['organizador'] != 1) {
     exit;
 }
 
-// ===========================
 // FUNÇÕES AUXILIARES
-// ===========================
 
 function formatarEvento($dadosEvento)
 {
@@ -100,17 +96,13 @@ function garantirEsquemaColaboradores($conexao)
     mysqli_query($conexao, $sql);
 }
 
-// ===========================
 // PROCESSAMENTO
-// ===========================
 
 try {
     $action = $_GET['action'] ?? '';
     $cpfUsuario = $_SESSION['cpf'];
 
-    // ===========================
     // LISTAR EVENTOS DO ORGANIZADOR
-    // ===========================
     if ($action === 'listar_organizador') {
         $sql = "SELECT 
                     evento.cod_evento,
@@ -150,9 +142,7 @@ try {
         exit;
     }
 
-    // ===========================
     // LISTAR EVENTOS DE COLABORAÇÃO
-    // ===========================
     if ($action === 'listar_colaboracao') {
         garantirEsquemaColaboradores($conexao);
 
@@ -216,9 +206,7 @@ try {
         exit;
     }
 
-    // ===========================
     // BUSCAR DETALHES DE UM EVENTO
-    // ===========================
     if ($action === 'detalhe') {
         $codEvento = isset($_GET['cod_evento']) ? intval($_GET['cod_evento']) : 0;
 
@@ -369,9 +357,7 @@ try {
         exit;
     }
 
-    // ===========================
     // BUSCAR IMAGENS DO EVENTO
-    // ===========================
     if ($action === 'imagens') {
         $codEvento = isset($_GET['cod_evento']) ? (int)$_GET['cod_evento'] : 0;
 

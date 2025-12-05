@@ -18,9 +18,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// ===========================
 // FUNÇÕES AUXILIARES
-// ===========================
 
 function garantirEsquemaColaboradores(mysqli $conexao)
 {
@@ -100,9 +98,7 @@ function verificarPermissaoVisualizacao($conexao, $codEvento, $cpfUsuario)
     return $temPermissao;
 }
 
-// ===========================
 // VERIFICAÇÕES BÁSICAS
-// ===========================
 
 if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
     echo json_encode(['sucesso' => false, 'erro' => 'nao_autenticado']);
@@ -112,9 +108,7 @@ if (!isset($_SESSION['cpf']) || empty($_SESSION['cpf'])) {
 try {
     garantirEsquemaColaboradores($conexao);
     
-    // ===========================
     // GET: LISTAR COLABORADORES
-    // ===========================
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $cpfUsuario = $_SESSION['cpf'];
         $codEvento = isset($_GET['cod_evento']) ? (int) $_GET['cod_evento'] : 0;
@@ -216,16 +210,12 @@ try {
         exit;
     }
 
-    // ===========================
     // POST: AÇÕES
-    // ===========================
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cpfUsuario = $_SESSION['cpf'];
         $action = $_POST['action'] ?? '';
 
-        // ===========================
         // ADICIONAR COLABORADOR
-        // ===========================
         if ($action === 'adicionar') {
             $codEvento = isset($_POST['cod_evento']) ? (int) $_POST['cod_evento'] : 0;
             $identificador = trim($_POST['identificador'] ?? ''); // CPF ou Email
@@ -286,9 +276,7 @@ try {
             exit;
         }
 
-        // ===========================
         // SAIR DA COLABORAÇÃO
-        // ===========================
         if ($action === 'sair') {
             $codEvento = isset($_POST['cod_evento']) ? (int) $_POST['cod_evento'] : 0;
             
@@ -324,9 +312,7 @@ try {
             exit;
         }
 
-        // ===========================
         // REMOVER COLABORADOR (apenas organizador)
-        // ===========================
         if ($action === 'remover') {
             $codEvento = isset($_POST['cod_evento']) ? (int) $_POST['cod_evento'] : 0;
             $cpfRemover = preg_replace('/\D+/', '', $_POST['cpf'] ?? '');
@@ -365,9 +351,7 @@ try {
             exit;
         }
 
-        // ===========================
         // APROVAR/RECUSAR SOLICITAÇÃO
-        // ===========================
         if ($action === 'aprovar' || $action === 'recusar') {
             $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
             

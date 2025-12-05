@@ -2017,7 +2017,7 @@ if ($stmtPermissao && $cpfUsuario) {
     window.codEventoAtual = <?php echo $id_evento; ?>;
     var codEvento = <?php echo $id_evento; ?>;
 
-    // ====== Variáveis globais ======
+    //  Variáveis globais 
     if (typeof window.favoritosSet === 'undefined') {
       window.favoritosSet = new Set();
     }
@@ -2032,7 +2032,7 @@ if ($stmtPermissao && $cpfUsuario) {
     var codEventoMensagem = window.codEventoMensagem;
     var codEventoCompartilhar = codEvento;
 
-    // ====== Funções de bloqueio/desbloqueio de scroll ======
+    //  Funções de bloqueio/desbloqueio de scroll 
     function bloquearScroll() {
       document.body.classList.add('modal-aberto');
       document.addEventListener('wheel', prevenirScroll, {
@@ -2067,7 +2067,7 @@ if ($stmtPermissao && $cpfUsuario) {
       if (teclas.includes(e.keyCode)) e.preventDefault();
     }
 
-    // ====== Funções de Favorito ======
+    //  Funções de Favorito 
     function atualizarIconeFavorito(btn, fav) {
       if (!btn) return;
       const img = btn.querySelector('img');
@@ -2118,7 +2118,7 @@ if ($stmtPermissao && $cpfUsuario) {
       }
     }
 
-    // ====== Funções de Mensagem ao Organizador ======
+    //  Funções de Mensagem ao Organizador 
     function atualizarContadorMensagem() {
       const textarea = document.getElementById('texto-mensagem-organizador');
       const contador = document.getElementById('contador-mensagem-organizador');
@@ -2203,7 +2203,7 @@ if ($stmtPermissao && $cpfUsuario) {
       }
     }
 
-    // ====== Modal de Compartilhar ======
+    //  Modal de Compartilhar 
     function abrirModalCompartilhar() {
       if (!codEventoCompartilhar) return;
       const modal = document.getElementById('modal-compartilhar');
@@ -2291,7 +2291,7 @@ if ($stmtPermissao && $cpfUsuario) {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(linkEvento)}`, '_blank');
     }
 
-    // ====== Event Listeners para os botões ======
+    //  Event Listeners para os botões 
     document.addEventListener('DOMContentLoaded', function() {
       // Botão de favoritar
       const btnFavorito = document.querySelector('.BotaoFavoritoCartao');
