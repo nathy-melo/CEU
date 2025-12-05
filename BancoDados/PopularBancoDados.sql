@@ -587,8 +587,7 @@ INSERT INTO colaboradores_evento (cod_evento, CPF, papel, presenca_confirmada) V
 -- Evento 7: Hackathon CEU 2025
 (7, '90987654321', 'colaborador', 1),
 (7, '09876543210', 'colaborador', 1),
-(7, '90123456789', 'colaborador', 1),
-(7, '90987654321', 'colaborador', 0);
+(7, '90123456789', 'colaborador', 1);
 
 INSERT INTO favoritos_evento (CPF, cod_evento) VALUES
 ('12345678911', 2),

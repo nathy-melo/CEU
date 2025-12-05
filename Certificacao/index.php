@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Verificador de Dependências - Sistema de Certificados CEU
- * Verifica se Composer e bibliotecas necessárias estão instaladas
+ * Instalador do Sistema de Certificados - CEU
+ * Verifica e instala automaticamente as dependências necessárias
  */
 
-// Caminhos importantes agora dentro de Certificacao/bibliotecas
+// Caminhos das bibliotecas Composer dentro de Certificacao/bibliotecas
 $vendorPath = __DIR__ . '/bibliotecas/vendor/autoload.php';
 $composerJsonPath = __DIR__ . '/bibliotecas/composer.json';
 $composerExists = file_exists($composerJsonPath);
@@ -35,13 +35,13 @@ if ($vendorExists) {
   $dependenciasOk = $todasClassesExistem;
 
   if (!$dependenciasOk) {
-    $mensagemErro = 'Bibliotecas PHP necessárias não encontradas. Execute: <code>composer install</code>';
+    $mensagemErro = 'Bibliotecas PHP necessárias não encontradas.';
   }
 } else {
   if ($composerExists) {
-    $mensagemErro = 'Pasta vendor não encontrada. Execute: <code>composer install</code>';
+    $mensagemErro = 'Pasta vendor não encontrada.';
   } else {
-    $mensagemErro = 'Composer não configurado. Siga as instruções abaixo para instalar.';
+    $mensagemErro = 'Composer não configurado.';
   }
 }
 ?>
@@ -51,140 +51,127 @@ if ($vendorExists) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Certificado - CEU</title>
+  <title><?php echo $dependenciasOk ? 'Sistema de Certificados - CEU' : 'Instalador - Sistema de Certificados CEU'; ?></title>
+  <link rel="stylesheet" href="../styleGlobal.css">
+  <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)">
 
   <?php if (!$dependenciasOk): ?>
     <script>
       window.addEventListener('DOMContentLoaded', function() {
-        alert('⚠️ Configuração necessária!\n\nClique no botão "Instalar Automaticamente" na página para configurar o sistema.');
+        alert('⚙️ Configuração Necessária\n\nO sistema de certificados precisa instalar algumas dependências. Clique no botão "Instalar Dependências" para continuar.');
       });
     </script>
   <?php endif; ?>
 
-  <style id="sections-styles">
-    /* Estilos básicos e da UI */
-    :root {
-      --bg-color: #d1eaff;
-      --card-bg-color: #4f6c8c;
-      --text-color: #ffffff;
-      --button-bg-color: #6598d2;
+  <style>
+    /* Estilos específicos do instalador */
+    .secao-instalador {
+      flex: 1 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 1.75rem 0.9rem;
+      min-height: 100vh;
     }
 
-    body {
-      margin: 0;
+    .cartao-instalador {
+      background-color: var(--caixas);
+      color: var(--branco);
+      border-radius: 0.9rem;
+      box-shadow: 0 0.2rem 0.9rem 0 var(--sombra-padrao);
+      padding: 2.5rem 2rem;
+      max-width: 50rem;
+      width: 100%;
+      margin: 2rem auto;
+    }
+
+    .titulo-instalador {
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      box-sizing: border-box;
-    }
-
-    body.sem-dependencias {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+      font-weight: 700;
+      font-size: 2rem;
+      line-height: 1.2;
       text-align: center;
+      margin: 0 0 1.5rem 0;
+      color: var(--branco);
     }
 
-    body.sem-dependencias .certificate-container {
+    .conteudo-instalador {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--branco);
+    }
+
+    .status-instalacao {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
       display: none;
     }
 
-    .mensagem-config {
-      background-color: var(--card-bg-color);
-      color: var(--text-color);
-      padding: 40px;
-      border-radius: 20px;
-      max-width: 760px;
-      margin: 20px;
+    .status-instalacao.visivel {
+      display: block;
     }
 
-    .mensagem-config h2 {
-      margin-top: 0;
-      font-size: 2rem;
+    .status-instalacao.sucesso {
+      background-color: rgba(44, 149, 51, 0.2);
+      border: 1px solid var(--verde);
     }
 
-    .mensagem-config p {
-      line-height: 1.6;
-      margin: 15px 0;
+    .status-instalacao.erro {
+      background-color: rgba(255, 0, 0, 0.2);
+      border: 1px solid var(--vermelho);
     }
 
-    .mensagem-config code {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-family: 'Consolas', monospace;
-      font-size: 0.9rem;
+    .status-instalacao.carregando {
+      background-color: rgba(101, 152, 210, 0.2);
+      border: 1px solid var(--botao);
     }
 
-    .btn-install {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+    .btn-instalador {
+      background-color: var(--botao);
+      color: var(--branco);
       border: none;
-      padding: 18px 45px;
-      border-radius: 12px;
-      font-weight: 700;
+      border-radius: 0.5rem;
+      padding: 1rem 2.5rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
       font-size: 1.05rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      margin-top: 25px;
+      box-shadow: 0 0.2rem 0.5rem var(--sombra-padrao);
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-      text-transform: uppercase;
-      letter-spacing: .5px;
+      gap: 0.5rem;
+      margin: 1rem auto;
     }
 
-    .btn-install:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.7);
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    .btn-instalador:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0.4rem 0.8rem var(--sombra-padrao);
+      background-color: #7aabdb;
     }
 
-    .btn-install:disabled {
-      opacity: .7;
+    .btn-instalador:disabled {
+      opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-
-    .install-status {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: .95rem;
-      display: none;
-    }
-
-    .install-status.loading {
-      background: rgba(255, 255, 255, 0.2);
-      display: block;
-    }
-
-    .install-status.success {
-      background: rgba(146, 254, 157, 0.3);
-      display: block;
-    }
-
-    .install-status.error {
-      background: rgba(255, 100, 100, 0.3);
-      display: block;
     }
 
     .spinner {
       display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, .3);
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin .8s linear infinite;
+      border-top-color: var(--branco);
+      animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin {
@@ -193,273 +180,214 @@ if ($vendorExists) {
       }
     }
 
-    /* Painel de suporte/diagnóstico */
-    .support-panel {
-      margin-top: 24px;
-      padding: 16px;
-      border: 1px solid #444;
-      border-radius: 10px;
+    .painel-ferramentas {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 0.5rem;
       text-align: left;
     }
 
-    .support-panel h3 {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-
-    .row {
-      margin: 8px 0;
-    }
-
-    .row button {
-      margin: 4px 6px 4px 0;
-      padding: 8px 14px;
-      font-size: 14px;
-    }
-
-    .row input[type="text"],
-    .row input[type="number"] {
-      padding: 6px;
-      font-size: 14px;
-    }
-
-    .row label {
-      margin-right: 8px;
-    }
-
-    pre#resultado {
-      background: #111;
-      color: #ddd;
-      padding: 12px;
-      border: 1px solid #333;
-      max-height: 320px;
-      overflow: auto;
-    }
-
-    /* CSS do certificado */
-    .certificate-container {
-      position: relative;
-      width: 100%;
-      max-width: 1920px;
-      margin: 0 auto;
-      padding: clamp(20px, 3vw, 60px) 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .decorative-bg {
-      position: absolute;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .decorative-bg img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .top-left {
-      top: clamp(-30px, -2.6vw, -50px);
-      left: clamp(-30px, -2.6vw, -50px);
-      width: clamp(200px, 36vw, 694px);
-    }
-
-    .bottom-right {
-      right: clamp(-30px, -2.6vw, -50px);
-      bottom: clamp(-30px, -2.6vw, -50px);
-      width: clamp(200px, 36vw, 694px);
-      transform: rotate(180deg);
-    }
-
-    .certificate-card {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: var(--card-bg-color);
-      border-radius: clamp(25px, 2.6vw, 50px);
-      width: clamp(85%, 90%, 1464px);
-      max-width: 1464px;
-      margin: 0 auto;
-      padding: clamp(30px, 3.125vw, 60px) clamp(40px, 4.167vw, 80px);
-      box-sizing: border-box;
+    .painel-ferramentas h3 {
+      margin: 0 0 1rem 0;
+      font-size: 1.2rem;
       text-align: center;
     }
 
-    .title-wrapper {
-      margin-bottom: clamp(40px, 6.25vw, 120px);
+    .linha-ferramentas {
+      margin: 0.8rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
     }
 
-    .certificate-title {
-      font-size: clamp(2rem, 3.67vw, 70.55px);
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: clamp(3px, .37vw, 7.06px);
-      text-shadow: 0 4px 20px rgba(0, 0, 0, .6);
-      margin: 0;
+    .linha-ferramentas button {
+      background-color: rgba(101, 152, 210, 0.3);
+      color: var(--branco);
+      border: 1px solid var(--botao);
+      border-radius: 0.3rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
     }
 
-    .certificate-body {
-      font-size: clamp(.875rem, 1.67vw, 32px);
-      font-weight: 500;
-      line-height: 1.32;
-      letter-spacing: -.64px;
-      text-align: left;
-      max-width: 1285px;
-      margin: 0 0 clamp(40px, 6.25vw, 120px) 0;
+    .linha-ferramentas button:hover {
+      background-color: rgba(101, 152, 210, 0.5);
     }
 
-    .certificate-date {
-      font-size: clamp(.875rem, 1.67vw, 32px);
-      font-weight: 500;
-      line-height: 1.32;
-      letter-spacing: -.64px;
-      margin: 0 0 clamp(12px, 1.25vw, 24px) 0;
+    .linha-ferramentas input[type="text"],
+    .linha-ferramentas input[type="number"] {
+      padding: 0.5rem;
+      border-radius: 0.3rem;
+      border: 1px solid var(--botao);
+      background-color: rgba(0, 0, 0, 0.2);
+      color: var(--branco);
+      font-size: 0.85rem;
     }
 
-    .certificate-verification {
-      font-size: clamp(.75rem, .83vw, 16px);
-      font-weight: 500;
-      line-height: 1.32;
-      letter-spacing: -.32px;
-      max-width: 930px;
-      margin: 0 0 clamp(12px, 1.25vw, 24px) 0;
+    .linha-ferramentas label {
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
     }
 
-    .logo {
-      width: clamp(120px, 16.93vw, 325px);
-      height: auto;
-      object-fit: contain;
-      margin-bottom: clamp(12px, 1.25vw, 24px);
-      max-width: 80%;
+    #resultado {
+      background-color: rgba(0, 0, 0, 0.4);
+      color: #ddd;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0.3rem;
+      max-height: 20rem;
+      overflow: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
-    .button-wrapper {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, .6);
-      border-radius: 6px;
-      transition: transform .2s ease;
+    .mensagem-sucesso {
+      background-color: var(--caixas);
+      color: var(--branco);
+      border-radius: 0.9rem;
+      box-shadow: 0 0.2rem 0.9rem 0 var(--sombra-padrao);
+      padding: 2.5rem 2rem;
+      max-width: 40rem;
+      width: 100%;
+      text-align: center;
+      margin: 2rem auto;
     }
 
-    .button-wrapper:hover {
-      transform: translateY(-2px);
+    .mensagem-sucesso h2 {
+      font-size: 2.5rem;
+      margin: 0 0 1rem 0;
     }
 
-    .btn-back {
-      display: inline-block;
-      background-color: var(--button-bg-color);
-      color: var(--text-color);
-      text-decoration: none;
-      font-size: clamp(.875rem, 1.25vw, 24px);
-      font-weight: 500;
-      padding: clamp(12px, .94vw, 18px) clamp(50px, 5.78vw, 111px);
-      border-radius: 6px;
+    .mensagem-sucesso p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin: 0.5rem 0;
     }
 
-    @media (max-width: 1200px) {
-      .certificate-card {
-        padding: 40px 50px;
+    .icone-sucesso {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 767px) {
+      .cartao-instalador {
+        padding: 1.5rem 1rem;
       }
 
-      .title-wrapper {
-        margin-bottom: 80px;
+      .titulo-instalador {
+        font-size: 1.5rem;
       }
 
-      .certificate-body {
-        margin-bottom: 80px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .certificate-container {
-        padding: 1rem;
+      .conteudo-instalador {
+        font-size: 0.95rem;
       }
 
-      .certificate-card {
-        padding: 30px 20px;
-        border-radius: 30px;
+      .btn-instalador {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.95rem;
       }
 
-      .title-wrapper {
-        margin-bottom: 50px;
+      .linha-ferramentas {
+        flex-direction: column;
+        align-items: stretch;
       }
 
-      .certificate-title {
-        letter-spacing: 4px;
-      }
-
-      .certificate-body {
-        text-align: center;
-        margin-bottom: 50px;
-      }
-
-      .top-left,
-      .bottom-right {
-        display: none;
-      }
-
-      .btn-back {
-        padding: 15px 60px;
+      .linha-ferramentas button,
+      .linha-ferramentas input {
+        width: 100%;
       }
     }
   </style>
-  <script src="global.js" defer></script>
 </head>
 
-<body<?php echo !$dependenciasOk ? ' class="sem-dependencias"' : ''; ?>>
-
+<body>
   <?php if (!$dependenciasOk): ?>
-    <div class="mensagem-config">
-      <h2>⚙️ Configuração Necessária</h2>
-      <p>As bibliotecas PHP ainda não foram instaladas.</p>
-      <button class="btn-install" id="btnInstall" onclick="instalarDependencias()"><span id="btnText"><span class="spinner" style="display:none"></span> ⚡ Instalar Automaticamente</span></button>
-      <div class="install-status" id="installStatus"></div>
-      <div class="support-panel">
-        <h3>Ferramentas de Suporte</h3>
-        <div class="row">
-          <button onclick="acao('verificar_composer')">verificar_composer</button>
-          <button onclick="acao('instalar_composer')">instalar_composer</button>
-          <button onclick="acao('instalar_dependencias')">instalar_dependencias</button>
-          <button onclick="acao('verificar_instalacao')">verificar_instalacao</button>
-          <button onclick="acao('verificar_fonte_inter')">verificar_fonte_inter</button>
-          <button onclick="acao('instalar_fonte_inter')">instalar_fonte_inter</button>
+    <!-- Instalador -->
+    <section class="secao-instalador">
+      <div class="cartao-instalador">
+        <h1 class="titulo-instalador">⚙️ Instalador do Sistema de Certificados</h1>
+        <p class="conteudo-instalador">
+          Bem-vindo ao instalador automático! As bibliotecas PHP necessárias ainda não foram configuradas.
+          Clique no botão abaixo para instalar automaticamente.
+        </p>
+
+        <div style="text-align: center;">
+          <button class="btn-instalador" id="btnInstall" onclick="instalarDependencias()">
+            <span id="btnText">🚀 Instalar Dependências</span>
+          </button>
         </div>
-        <div class="row">
-          <button onclick="acao('status_git')">status_git</button>
-          <label><input type="checkbox" id="removerArtefatos"> remover instalador.log</label>
-          <button onclick="limparInstalador()">limpar_instalador</button>
-        </div>
-        <div class="row">
-          <input type="text" id="msgLog" placeholder="Mensagem do log" style="width: 320px;">
-          <button onclick="criarLog()">criar_log</button>
-        </div>
-        <div class="row">
-          <label for="linhas">Linhas:</label>
-          <input type="number" id="linhas" value="200" min="1" max="2000">
-          <button onclick="lerLog()">ler_log</button>
-          <button onclick="acao('limpar_log')">limpar_log</button>
-          <button onclick="acao('auto_test')">auto_test</button>
-        </div>
-        <pre id="resultado"></pre>
+
+        <div class="status-instalacao" id="installStatus"></div>
+
+        <!-- Painel de Ferramentas de Diagnóstico -->
+        <details class="painel-ferramentas">
+          <summary style="cursor: pointer; font-weight: 600; margin-bottom: 1rem; text-align: center;">
+            🔧 Ferramentas de Diagnóstico (Clique para expandir)
+          </summary>
+
+          <div class="linha-ferramentas">
+            <button onclick="acao('verificar_composer')">Verificar Composer</button>
+            <button onclick="acao('instalar_composer')">Instalar Composer</button>
+            <button onclick="acao('instalar_dependencias')">Instalar Dependências</button>
+            <button onclick="acao('verificar_instalacao')">Verificar Instalação</button>
+          </div>
+
+          <div class="linha-ferramentas">
+            <button onclick="acao('verificar_fonte_inter')">Verificar Fonte Inter</button>
+            <button onclick="acao('instalar_fonte_inter')">Instalar Fonte Inter</button>
+            <button onclick="acao('status_git')">Status Git</button>
+          </div>
+
+          <div class="linha-ferramentas">
+            <label>
+              <input type="checkbox" id="removerArtefatos">
+              Remover instalador.log
+            </label>
+            <button onclick="limparInstalador()">Limpar Instalador</button>
+          </div>
+
+          <div class="linha-ferramentas">
+            <input type="text" id="msgLog" placeholder="Mensagem do log" style="flex: 1; min-width: 200px;">
+            <button onclick="criarLog()">Criar Log</button>
+          </div>
+
+          <div class="linha-ferramentas">
+            <label>
+              Linhas:
+              <input type="number" id="linhas" value="200" min="1" max="2000" style="width: 80px;">
+            </label>
+            <button onclick="lerLog()">Ler Log</button>
+            <button onclick="acao('limpar_log')">Limpar Log</button>
+            <button onclick="acao('auto_test')">Auto Test</button>
+          </div>
+
+          <pre id="resultado"></pre>
+        </details>
       </div>
-      <p style="margin-top: 18px; font-size: 0.85rem; opacity: 0.8;">
-        O sistema instalará o Composer e as bibliotecas automaticamente.<br>
-        Ou instale manualmente: <code>composer install</code> em <code>C:\xampp\htdocs\CEU\Certificacao\bibliotecas</code>
-      </p>
-    </div>
+    </section>
 
     <script>
       async function instalarDependencias() {
         const btn = document.getElementById('btnInstall');
         const btnText = document.getElementById('btnText');
         const status = document.getElementById('installStatus');
+
         btn.disabled = true;
-        status.className = 'install-status loading';
+        status.className = 'status-instalacao visivel carregando';
+        status.textContent = '🔍 Verificando ambiente...';
         btnText.innerHTML = '<span class="spinner"></span> Verificando...';
+
         try {
+          // Verifica se o Composer está disponível
           const verificarResp = await fetch('instalador.php', {
             method: 'POST',
             headers: {
@@ -468,9 +396,11 @@ if ($vendorExists) {
             body: 'action=verificar_composer'
           });
           const verificarData = await verificarResp.json();
+
           if (!verificarData.composer_disponivel) {
-            status.textContent = '📥 Composer não encontrado. Baixando Composer local (bibliotecas)...';
-            btnText.innerHTML = '<span class="spinner"></span> Baixando Composer local...';
+            status.textContent = '📥 Composer não encontrado. Instalando Composer local...';
+            btnText.innerHTML = '<span class="spinner"></span> Instalando Composer...';
+
             const instalarComposerResp = await fetch('instalador.php', {
               method: 'POST',
               headers: {
@@ -479,26 +409,26 @@ if ($vendorExists) {
               body: 'action=instalar_composer'
             });
             const instalarComposerData = await instalarComposerResp.json();
+
             if (!instalarComposerData.success) {
-              status.className = 'install-status error';
-              status.innerHTML = '❌ Erro ao instalar Composer: ' + instalarComposerData.message;
+              status.className = 'status-instalacao visivel erro';
+              status.innerHTML = '❌ Erro ao instalar Composer:<br>' + instalarComposerData.message;
               btnText.textContent = '🔄 Tentar Novamente';
               btn.disabled = false;
               return;
             }
-            status.textContent = '✅ Composer local instalado em bibliotecas! Continuando...';
+
+            status.textContent = '✅ Composer instalado com sucesso!';
+            await new Promise(r => setTimeout(r, 800));
           } else {
-            if (verificarData.composer_global) {
-              status.textContent = '✅ Composer global encontrado!';
-            } else if (verificarData.composer_local) {
-              status.textContent = '✅ Composer local encontrado em bibliotecas!';
-            } else {
-              status.textContent = '✅ Composer disponível!';
-            }
+            status.textContent = '✅ Composer encontrado!';
+            await new Promise(r => setTimeout(r, 400));
           }
-          await new Promise(r => setTimeout(r, 400));
-          status.textContent = '📦 Instalando bibliotecas PHP em bibliotecas/vendor...';
-          btnText.innerHTML = '<span class="spinner"></span> Instalando dependências...';
+
+          // Instala as dependências
+          status.textContent = '📦 Instalando bibliotecas PHP (PhpPresentation, mPDF)...';
+          btnText.innerHTML = '<span class="spinner"></span> Instalando bibliotecas...';
+
           const instalarResp = await fetch('instalador.php', {
             method: 'POST',
             headers: {
@@ -507,14 +437,19 @@ if ($vendorExists) {
             body: 'action=instalar_dependencias'
           });
           const instalarData = await instalarResp.json();
+
           if (!instalarData.success) {
-            status.className = 'install-status error';
-            status.innerHTML = `❌ Erro ao instalar dependências:<br>${instalarData.message}`;
+            status.className = 'status-instalacao visivel erro';
+            status.innerHTML = '❌ Erro ao instalar dependências:<br>' + instalarData.message;
             btnText.textContent = '🔄 Tentar Novamente';
             btn.disabled = false;
             return;
           }
-          status.textContent = '✅ Verificando instalação...';
+
+          status.textContent = '🔎 Verificando instalação...';
+          await new Promise(r => setTimeout(r, 400));
+
+          // Verifica se tudo foi instalado corretamente
           const verificarInstResp = await fetch('instalador.php', {
             method: 'POST',
             headers: {
@@ -523,21 +458,22 @@ if ($vendorExists) {
             body: 'action=verificar_instalacao'
           });
           const verificarInstData = await verificarInstResp.json();
+
           if (verificarInstData.success) {
-            status.className = 'install-status success';
-            status.innerHTML = '🎉 Tudo instalado com sucesso! Recarregando em 2s...';
+            status.className = 'status-instalacao visivel sucesso';
+            status.innerHTML = '🎉 <strong>Instalação concluída com sucesso!</strong><br>Todas as dependências foram instaladas corretamente.<br>Recarregando a página...';
             btnText.textContent = '✅ Concluído!';
             setTimeout(() => window.location.reload(), 2000);
           } else {
-            status.className = 'install-status error';
-            status.textContent = '⚠️ Instalação concluída, mas algumas classes não foram encontradas. Tente recarregar.';
+            status.className = 'status-instalacao visivel erro';
+            status.textContent = '⚠️ Instalação concluída, mas algumas verificações falharam. Tente recarregar a página.';
             btnText.textContent = '🔄 Recarregar Página';
             btn.disabled = false;
             btn.onclick = () => window.location.reload();
           }
         } catch (error) {
-          status.className = 'install-status error';
-          status.textContent = '❌ Erro ao comunicar com o servidor: ' + error.message;
+          status.className = 'status-instalacao visivel erro';
+          status.textContent = '❌ Erro de comunicação: ' + error.message;
           btnText.textContent = '🔄 Tentar Novamente';
           btn.disabled = false;
         }
@@ -546,8 +482,9 @@ if ($vendorExists) {
       async function acao(acao, body = '') {
         const resultado = document.getElementById('resultado');
         if (resultado) {
-          resultado.textContent = 'Ação: ' + acao + '...\n';
+          resultado.textContent = 'Executando: ' + acao + '...\n';
         }
+
         try {
           const params = 'action=' + encodeURIComponent(acao) + (body ? '&' + body : '');
           const resp = await fetch('instalador.php', {
@@ -558,14 +495,20 @@ if ($vendorExists) {
             body: params
           });
           const text = await resp.text();
+
           if (resultado) {
             resultado.textContent += 'HTTP ' + resp.status + '\n' + text + '\n';
             try {
-              resultado.textContent += '\nJSON:\n' + JSON.stringify(JSON.parse(text), null, 2);
-            } catch (e) {}
+              const json = JSON.parse(text);
+              resultado.textContent += '\nJSON formatado:\n' + JSON.stringify(json, null, 2);
+            } catch (e) {
+              // Não é JSON, ignora
+            }
           }
         } catch (e) {
-          if (resultado) resultado.textContent += 'Erro: ' + e.message;
+          if (resultado) {
+            resultado.textContent += 'Erro: ' + e.message;
+          }
         }
       }
 
@@ -577,7 +520,7 @@ if ($vendorExists) {
       function criarLog() {
         const msg = document.getElementById('msgLog').value.trim();
         if (!msg) {
-          alert('Informe uma mensagem');
+          alert('Informe uma mensagem para o log');
           return;
         }
         acao('criar_log', 'mensagem=' + encodeURIComponent(msg));
@@ -588,39 +531,29 @@ if ($vendorExists) {
         acao('ler_log', 'linhas=' + encodeURIComponent(String(linhas)));
       }
     </script>
+
+  <?php else: ?>
+    <!-- Sistema instalado com sucesso -->
+    <section class="secao-instalador">
+      <div class="mensagem-sucesso">
+        <div class="icone-sucesso">✅</div>
+        <h2>Sistema Pronto!</h2>
+        <p>
+          O sistema de certificados está instalado e configurado corretamente.
+        </p>
+        <p style="margin-top: 1.5rem; font-size: 0.95rem; opacity: 0.9;">
+          Todas as dependências necessárias foram instaladas:<br>
+          <strong>PhpPresentation</strong> e <strong>mPDF</strong>
+        </p>
+        <div style="margin-top: 2rem;">
+          <a href="../index.php" class="btn-instalador" style="text-decoration: none;">
+            🏠 Voltar para o Site
+          </a>
+        </div>
+      </div>
+    </section>
   <?php endif; ?>
 
-  <section id="certificate">
-    <main class="certificate-container">
-      <div class="decorative-bg top-left">
-        <img src="images/733_4080.svg" alt="decor-top-left">
-      </div>
-      <div class="decorative-bg bottom-right">
-        <img src="images/733_4084.svg" alt="decor-bottom-right">
-      </div>
-
-      <div class="certificate-card">
-        <div class="title-wrapper">
-          <h1 class="certificate-title">Certificado</h1>
-        </div>
-        <p class="certificate-body">
-          Certificamos que <strong>{Nome do Participante}</strong>, participou do(a) <strong>{Nome do Evento}</strong>,
-          evento organizado por {Nome do Organizador}, realizado no {Local do Evento} no dia {Data}, com carga horária
-          de {X horas}.
-        </p>
-        <p class="certificate-date">Sabará, {Data}.</p>
-        <p class="certificate-verification">
-          Este certificado é concedido como comprovação da participação no referido evento, tendo sido registrado na
-          plataforma CEU. <br>Sua autenticidade pode ser verificada por meio do código {Código Autenticador} em [domínio
-          do site].
-        </p>
-        <img class="logo" src="images/ac6b1d75b31a5bceb4921444f5111cc5bf3f3370.png" alt="CEU Logo">
-        <div class="button-wrapper">
-          <a href="#" class="btn-back">Voltar</a>
-        </div>
-      </div>
-    </main>
-  </section>
-  </body>
+</body>
 
 </html>

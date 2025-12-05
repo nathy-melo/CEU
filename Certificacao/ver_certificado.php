@@ -1,11 +1,10 @@
 <?php
-// Endpoint para abrir/baixar certificado pelo código salvo no banco
+// Exibe/baixa certificado pelo código de verificação
 use CEU\Certificacao\RepositorioCertificados;
 use CEU\Certificacao\ProcessadorTemplate;
 
 $base = __DIR__;
 
-// Conectar ao banco
 $caminhoConexao = realpath($base . '/../BancoDados/conexao.php');
 if (!$caminhoConexao || !file_exists($caminhoConexao)) {
     http_response_code(500);
@@ -25,7 +24,7 @@ require_once $base . '/ProcessadorTemplate.php';
 $repo = new RepositorioCertificados($conexao);
 $repo->garantirEsquema();
 
-// Aceita código via GET ou POST; não aceita CPF/evento por segurança
+// Aceita código via GET ou POST
 $codigo = '';
 if (isset($_POST['codigo'])) {
     $codigo = strtoupper(trim((string)$_POST['codigo']));
@@ -57,7 +56,7 @@ if (!$arquivoRel || strpos($arquivoRel, 'certificados/') !== 0) {
 
 $caminhoArquivo = realpath($base . '/' . $arquivoRel);
 
-// Se arquivo não existe, tenta regenerar do banco de dados
+// Regenera certificado se arquivo não existir
 if (!$caminhoArquivo || !file_exists($caminhoArquivo)) {
     // Verifica se temos dados no banco para regenerar
     if (empty($registro['dados_array']) && empty($registro['dados'])) {
@@ -67,7 +66,6 @@ if (!$caminhoArquivo || !file_exists($caminhoArquivo)) {
     }
 
     try {
-        // Extrai dados JSON
         $dados = $registro['dados_array'] ?? json_decode($registro['dados'], true) ?? [];
         if (empty($dados)) {
             throw new Exception('Dados do certificado vazios.');

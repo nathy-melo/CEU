@@ -121,7 +121,7 @@ $pdfUrl = 'certificados/' . rawurlencode($file);
             <button id="fitBtn">Ajustar</button>
             <button id="zoomIn">+</button>
             <button id="zoomOut">−</button>
-    </div>
+        </div>
     </div>
     <script>
         (function() {

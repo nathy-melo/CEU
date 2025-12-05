@@ -1,5 +1,5 @@
 <?php
-// Handler para requisições AJAX de verificação de certificado
+// API AJAX para verificar certificado
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
     header('Content-Type: application/json; charset=utf-8');
     
