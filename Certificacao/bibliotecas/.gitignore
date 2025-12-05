@@ -1,0 +1,15 @@
+# Dependências do Composer
+# A pasta vendor/ contém todas as bibliotecas instaladas pelo Composer
+# e NÃO deve ser comitada no Git. Apenas composer.json e composer.lock
+# devem ser versionados.
+
+vendor/
+
+# Composer local (se instalado localmente)
+composer.phar
+
+# Cache do Composer
+.composer-cache/
+
+# Logs de instalação
+instalador.log
