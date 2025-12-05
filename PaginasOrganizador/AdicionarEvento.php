@@ -1775,7 +1775,7 @@ mysqli_close($conexao);
             let colaboradores = [];
             let tipoTemplateAtual = null; // 'participante' ou 'organizador'
 
-            // ==== FUNÇÕES DE TEMPLATE DE CERTIFICADO ====
+            // FUNÇÕES DE TEMPLATE DE CERTIFICADO
 
             // Carrega modelos disponíveis ao iniciar a página
             function carregarModelosDisponiveis() {
@@ -1917,7 +1917,7 @@ mysqli_close($conexao);
                     });
             };
 
-            // ==== FIM FUNÇÕES DE TEMPLATE ====
+            // FIM FUNÇÕES DE TEMPLATE
 
             function validarFormulario() {
                 const nome = document.getElementById('nome').value.trim();
@@ -2049,7 +2049,7 @@ mysqli_close($conexao);
                 return camposFaltantes;
             }
 
-            // ==== FUNÇÕES DE COLABORADORES ====
+            //FUNÇÕES DE COLABORADORES
             window.abrirModalColaboradores = function() {
                 document.getElementById('modal-colaboradores').style.display = 'flex';
                 limparCamposColaborador();

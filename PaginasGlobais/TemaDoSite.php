@@ -1,5 +1,7 @@
 ﻿<?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0; // 0=claro, 1=escuro
 ?>
 <!DOCTYPE html>
@@ -13,28 +15,132 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     <link rel="stylesheet" href="../styleGlobalMobile.css" media="(max-width: 767px)" />
 </head>
 <style>
-    .cartao-tema { background-color: var(--caixas); border-radius: 1rem; padding: 1.35rem 3.05rem 1.15rem; max-width: 34.65rem; width: 100%; display: flex; flex-direction: column; align-items: center; box-shadow: 0rem 0.18rem 0.9rem 0rem var(--sombra-forte); }
-    .cartao-titulo { color: var(--branco); font-weight: 700; font-size: 1.75rem; line-height: 1.32; letter-spacing: -0.035rem; text-align: center; text-shadow: 0rem 0.18rem 0.9rem var(--sombra-forte); margin: 0 0 1.65rem 0; }
-    .opcoes-tema { display: flex; justify-content: center; gap: 5.2rem; margin-bottom: 1.75rem; width: 100%; }
+    .cartao-tema {
+        background-color: var(--caixas);
+        border-radius: 1rem;
+        padding: 1.35rem 3.05rem 1.15rem;
+        max-width: 34.65rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0rem 0.18rem 0.9rem 0rem var(--sombra-forte);
+    }
+
+    .cartao-titulo {
+        color: var(--branco);
+        font-weight: 700;
+        font-size: 1.75rem;
+        line-height: 1.32;
+        letter-spacing: -0.035rem;
+        text-align: center;
+        text-shadow: 0rem 0.18rem 0.9rem var(--sombra-forte);
+        margin: 0 0 1.65rem 0;
+    }
+
+    .opcoes-tema {
+        display: flex;
+        justify-content: center;
+        gap: 5.2rem;
+        margin-bottom: 1.75rem;
+        width: 100%;
+    }
 
     /* Botões de tema */
-    .opcao-tema { position: relative; display: flex; align-items: center; justify-content: flex-start; width: 11.4rem; height: 4.05rem; border-radius: 0.9rem; padding-left: 1.75rem; cursor: pointer; transition: transform 0.2s ease-in-out, background-color 0.2s ease, border-color 0.2s ease; background-color: var(--branco); border: 2px solid var(--branco); box-shadow: 0 0.25rem 0.6rem var(--sombra-leve); }
-    .opcao-tema:hover { transform: scale(1.05); }
-    .opcao-tema.selecionado { background-color: var(--azul-claro); outline: 3px solid var(--botao); box-shadow: 0 0 0 3px rgba(0,0,0,0.1) inset, 0 0.25rem 0.6rem var(--sombra-leve); border-color: var(--azul-claro); }
+    .opcao-tema {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 11.4rem;
+        height: 4.05rem;
+        border-radius: 0.9rem;
+        padding-left: 1.75rem;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out, background-color 0.2s ease, border-color 0.2s ease;
+        background-color: var(--branco);
+        border: 2px solid var(--branco);
+        box-shadow: 0 0.25rem 0.6rem var(--sombra-leve);
+    }
+
+    .opcao-tema:hover {
+        transform: scale(1.05);
+    }
+
+    .opcao-tema.selecionado {
+        background-color: var(--azul-claro);
+        outline: 3px solid var(--botao);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) inset, 0 0.25rem 0.6rem var(--sombra-leve);
+        border-color: var(--azul-claro);
+    }
 
     /* Não sobrescrever o background via classes de tipo */
     .opcao-tema-dia {}
+
     .opcao-tema-noite {}
 
-    .texto-opcao { font-size: 1.58rem; font-weight: 700; color: var(--preto); }
-    .grupo-icone { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    .grupo-icone img { position: absolute; }
-    .icone-sol { width: 3.05rem; height: 2.8rem; left: 7.6rem; top: 0.18rem; }
-    .icone-nuvem { width: 1.85rem; height: 1.45rem; left: 6.7rem; top: 2.25rem; }
-    .icone-lua { width: 3.25rem; height: 3.15rem; left: 6.95rem; top: 0.53rem; }
-    .icone-estrela { width: 1.23rem; height: 1.23rem; left: 8.97rem; top: 0.35rem; }
-    .botao-voltar { background-color: var(--botao); color: var(--branco); font-size: 1.05rem; font-weight: 700; border: none; border-radius: 0.45rem; width: 9.1rem; height: 2.85rem; cursor: pointer; transition: background-color 0.2s ease; }
-    .botao-voltar:hover { background-color: #5a90c9; }
+    .texto-opcao {
+        font-size: 1.58rem;
+        font-weight: 700;
+        color: var(--preto);
+    }
+
+    .grupo-icone {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .grupo-icone img {
+        position: absolute;
+    }
+
+    .icone-sol {
+        width: 3.05rem;
+        height: 2.8rem;
+        left: 7.6rem;
+        top: 0.18rem;
+    }
+
+    .icone-nuvem {
+        width: 1.85rem;
+        height: 1.45rem;
+        left: 6.7rem;
+        top: 2.25rem;
+    }
+
+    .icone-lua {
+        width: 3.25rem;
+        height: 3.15rem;
+        left: 6.95rem;
+        top: 0.53rem;
+    }
+
+    .icone-estrela {
+        width: 1.23rem;
+        height: 1.23rem;
+        left: 8.97rem;
+        top: 0.35rem;
+    }
+
+    .botao-voltar {
+        background-color: var(--botao);
+        color: var(--branco);
+        font-size: 1.05rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.45rem;
+        width: 9.1rem;
+        height: 2.85rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .botao-voltar:hover {
+        background-color: #5a90c9;
+    }
 </style>
 
 <body>
@@ -62,10 +168,11 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
     </div>
 
     <script>
-        (function () {
+        (function() {
             var temaAtual = <?php echo json_encode($currentTheme); ?>;
+
             function destacar() {
-                document.querySelectorAll('.opcao-tema').forEach(function (el) {
+                document.querySelectorAll('.opcao-tema').forEach(function(el) {
                     el.classList.toggle('selecionado', el.getAttribute('data-theme') == String(temaAtual));
                 });
             }
@@ -79,23 +186,31 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                 }
             }
 
-            // Resolve URL do endpoint com base absoluta do documento atual
             var salvarTemaURL = new URL('../PaginasGlobais/SalvarTema.php', window.location.href).toString();
 
-            document.querySelectorAll('.opcao-tema').forEach(function (btn) {
-                btn.addEventListener('click', function () {
+            document.querySelectorAll('.opcao-tema').forEach(function(btn) {
+                btn.addEventListener('click', function() {
                     var valor = this.getAttribute('data-theme');
                     fetch(salvarTemaURL, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ tema: valor }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            tema: valor
+                        }),
                         credentials: 'include'
-                    }).then(function (response) {
+                    }).then(function(response) {
                         var status = response.status;
-                        return response.json().catch(function(){ return {}; }).then(function (data) {
-                            return { status: status, data: data };
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(data) {
+                            return {
+                                status: status,
+                                data: data
+                            };
                         });
-                    }).then(function (result) {
+                    }).then(function(result) {
                         if (result.data && result.data.sucesso) {
                             temaAtual = Number(result.data.tema);
                             aplicarTemaLocal(temaAtual);
@@ -105,7 +220,7 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
                         } else {
                             alert('Não foi possível salvar o tema agora.');
                         }
-                    }).catch(function () {
+                    }).catch(function() {
                         alert('Não foi possível salvar o tema agora.');
                     });
                 });
@@ -117,4 +232,3 @@ $currentTheme = isset($_SESSION['tema_site']) ? (int)$_SESSION['tema_site'] : 0;
 </body>
 
 </html>
-

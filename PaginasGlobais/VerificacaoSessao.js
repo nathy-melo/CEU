@@ -102,12 +102,12 @@
             btnLogin.addEventListener('click', function () {
                 window.location.href = '../PaginasPublicas/ContainerPublico.php?pagina=login&erro=sessao_expirada';
             });
-            
+
             // Efeito hover
-            btnLogin.addEventListener('mouseenter', function() {
+            btnLogin.addEventListener('mouseenter', function () {
                 this.style.opacity = '0.9';
             });
-            btnLogin.addEventListener('mouseleave', function() {
+            btnLogin.addEventListener('mouseleave', function () {
                 this.style.opacity = '1';
             });
         }
