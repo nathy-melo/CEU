@@ -717,8 +717,6 @@ mysql -u root CEU_bd < backup.sql
 
 ## 📝 Checklist Final de Instalação
 
-Marque cada item conforme completar:
-
 ### Pré-requisitos
 - [ ] XAMPP instalado
 - [ ] Apache rodando
