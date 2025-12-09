@@ -71,12 +71,160 @@ session_start();
                     } else {
                         // Tudo OK - não faz nada, página continua normalmente
                         console.log('✅ Banco de dados está atualizado!');
+
+                        // Verifica se é a primeira vez que o usuário acessa o site
+                        verificarPrimeiroAcesso();
                     }
                 })
                 .catch(error => {
                     console.error('Erro ao verificar BD:', error);
                     alert('❌ ERRO AO VERIFICAR BANCO DE DADOS\n\nNão foi possível conectar ao servidor.\n\nVerifique se:\n• XAMPP está rodando\n• MySQL está iniciado\n• Servidor Apache está rodando\n\nDetalhes: ' + error.message);
                 });
+
+            // Verifica se é a primeira vez que o usuário acessa o site
+            function verificarPrimeiroAcesso() {
+                const primeiroAcesso = localStorage.getItem('ceu_primeiro_acesso');
+
+                if (!primeiroAcesso) {
+                    // É a primeira vez, mostra aviso
+                    setTimeout(() => {
+                        mostrarAvisoPrimeiroAcesso();
+                    }, 1000); // Delay de 1 segundo para não conflitar com outros avisos
+                }
+            }
+
+            function mostrarAvisoPrimeiroAcesso() {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    animation: fadeIn 0.3s ease;
+                `;
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    max-width: 600px;
+                    width: 90%;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                    animation: slideIn 0.3s ease;
+                `;
+
+                modal.innerHTML = `
+                    <h2 style="color: #6598D2; margin-bottom: 20px; font-size: 24px; text-align: center;">
+                        👋 Bem-vindo ao CEU!
+                    </h2>
+                    <div style="margin-bottom: 20px; line-height: 1.6; color: #333;">
+                        <p style="margin-bottom: 15px;">
+                            Parece que esta é a <strong>primeira vez</strong> que você acessa o sistema.
+                        </p>
+                        <p style="margin-bottom: 15px;">
+                            Para garantir uma instalação correta e entender todas as funcionalidades, 
+                            recomendamos fortemente a leitura da documentação:
+                        </p>
+                        <ul style="margin: 15px 0 15px 20px; color: #555;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>README.md</strong> - Visão geral do projeto
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Tutorial_Instalacao.md</strong> - Guia passo a passo completo
+                        </ul>
+                        <p style="margin-top: 15px; padding: 12px; background: #e3f2fd; border-left: 4px solid #6598D2; border-radius: 4px;">
+                            💡 <strong>Dica:</strong> Você encontra esses arquivos na pasta raiz do projeto!
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 25px;">
+                        <button id="btnEntendi" style="
+                            background: #6598D2;
+                            color: white;
+                            border: none;
+                            padding: 12px 30px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            font-weight: 600;
+                            transition: background 0.3s ease;
+                        ">
+                            Entendi!
+                        </button>
+                        <button id="btnNaoMostrar" style="
+                            background: #888;
+                            color: white;
+                            border: none;
+                            padding: 12px 30px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            transition: background 0.3s ease;
+                        ">
+                            Não mostrar novamente
+                        </button>
+                    </div>
+                `;
+
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideIn {
+                        from { transform: translateY(-50px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                    #btnEntendi:hover {
+                        background: #4F6C8C !important;
+                    }
+                    #btnNaoMostrar:hover {
+                        background: #666 !important;
+                    }
+                `;
+
+                document.head.appendChild(style);
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+
+                // Eventos dos botões
+                document.getElementById('btnEntendi').addEventListener('click', () => {
+                    overlay.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => overlay.remove(), 300);
+                });
+
+                document.getElementById('btnNaoMostrar').addEventListener('click', () => {
+                    localStorage.setItem('ceu_primeiro_acesso', 'false');
+                    overlay.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => overlay.remove(), 300);
+                });
+
+                // Fechar ao clicar fora
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => overlay.remove(), 300);
+                    }
+                });
+
+                // Adicionar animação de fadeOut
+                const fadeOutStyle = document.createElement('style');
+                fadeOutStyle.textContent = `
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(fadeOutStyle);
+            }
+
 
             function atualizarBanco() {
                 console.log('Atualizando banco de dados...');
