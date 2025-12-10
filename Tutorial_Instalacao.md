@@ -6,14 +6,15 @@
 3. [Instalação do Projeto](#instalação-do-projeto)
 4. [Configuração do Banco de Dados](#configuração-do-banco-de-dados)
 5. [Instalação de Dependências do Sistema de Certificação](#instalação-de-dependências-do-sistema-de-certificação)
-6. [Instalação do LibreOffice (Opcional mas Recomendado)](#instalação-do-libreoffice)
-7. [Configuração do PHP](#configuração-do-php)
-8. [Configuração do Painel Administrativo](#configuração-do-painel-administrativo)
-9. [Configuração de Pastas e Permissões](#configuração-de-pastas-e-permissões)
-10. [Primeiro Acesso e Verificação](#primeiro-acesso-e-verificação)
-11. [Configuração do PWA](#configuração-do-pwa)
-12. [Solução de Problemas Comuns](#solução-de-problemas-comuns)
-13. [Modo de Desenvolvimento](#modo-de-desenvolvimento)
+6. [Instalação da Fonte Inter (Necessária para Certificados)](#instalação-da-fonte-inter-necessária-para-certificados)
+7. [Instalação do LibreOffice (Opcional mas Recomendado)](#instalação-do-libreoffice-opcional-mas-altamente-recomendado)
+8. [Configuração do PHP](#configuração-do-php)
+9. [Configuração do Painel Administrativo](#configuração-do-painel-administrativo)
+10. [Configuração de Pastas e Permissões](#configuração-de-pastas-e-permissões)
+11. [Primeiro Acesso e Verificação](#primeiro-acesso-e-verificação)
+12. [Configuração do PWA](#configuração-do-pwa)
+13. [Solução de Problemas Comuns](#solução-de-problemas-comuns)
+14. [Modo de Desenvolvimento](#modo-de-desenvolvimento)
 
 ---
 
@@ -237,7 +238,108 @@ O sistema instala automaticamente:
 
 ---
 
-## 6️⃣ Instalação do LibreOffice (Opcional mas ALTAMENTE RECOMENDADO)
+## 6️⃣ Instalação da Fonte Inter (Necessária para Certificados)
+
+O sistema de certificados padrão utiliza a fonte **Inter**, que precisa estar instalada no sistema para que os certificados sejam gerados com a formatação correta.
+
+### Por que instalar?
+
+- ✅ **Certificados padrão** dependem desta fonte
+- ✅ **Renderização correta** dos textos nos PDFs
+- ⚠️ **Sem ela**: O sistema tentará usar fontes substitutas, mas o resultado visual será diferente do esperado
+
+### Instalação da Fonte Inter
+
+#### Windows
+
+**Opção 1: Download Direto**
+1. Acesse o Google Fonts: https://fonts.google.com/specimen/Inter
+2. Clique em "Download family" (botão no canto superior direito)
+3. Extraia o arquivo ZIP baixado
+4. Abra a pasta `static/` ou a raiz do ZIP
+5. Selecione todos os arquivos `.ttf` (Inter-Regular.ttf, Inter-Bold.ttf, etc.)
+6. Clique com botão direito → "Instalar" ou "Instalar para todos os usuários"
+7. Aguarde a instalação concluir
+
+**Opção 2: Instalação Rápida**
+1. Baixe diretamente: https://github.com/rsms/inter/releases/latest
+2. Procure por `Inter-*.zip` nos assets
+3. Extraia e instale os arquivos `.ttf` como acima
+
+**Verificar Instalação:**
+- Abra o Painel de Controle → Fontes
+- Procure por "Inter" na lista
+- Você deve ver: Inter Regular, Inter Bold, Inter SemiBold, etc.
+
+#### Linux (Ubuntu/Debian)
+
+```bash
+# Instalar via repositório (se disponível)
+sudo apt update
+sudo apt install fonts-inter
+
+# OU instalar manualmente:
+# 1. Baixar fonte
+wget https://github.com/rsms/inter/releases/download/v3.19/Inter-3.19.zip
+
+# 2. Extrair
+unzip Inter-3.19.zip -d inter-font
+
+# 3. Copiar para pasta de fontes do sistema
+sudo mkdir -p /usr/share/fonts/truetype/inter
+sudo cp inter-font/*.ttf /usr/share/fonts/truetype/inter/
+
+# 4. Atualizar cache de fontes
+sudo fc-cache -f -v
+
+# 5. Verificar instalação
+fc-list | grep Inter
+```
+
+#### macOS
+
+**Opção 1: Google Fonts**
+1. Acesse: https://fonts.google.com/specimen/Inter
+2. Clique em "Download family"
+3. Extraia o ZIP
+4. Abra cada arquivo `.ttf`
+5. Clique em "Instalar Fonte" no Font Book
+
+**Opção 2: Homebrew**
+```bash
+brew tap homebrew/cask-fonts
+brew install --cask font-inter
+```
+
+**Verificar Instalação:**
+- Abra o Font Book (Livro de Fontes)
+- Procure por "Inter" na lista
+
+### Reiniciar Serviços (Importante!)
+
+Após instalar a fonte, **reinicie o Apache** para que o PHP reconheça a nova fonte:
+
+**Windows (XAMPP):**
+- XAMPP Control Panel → Stop Apache → Start Apache
+
+**Linux:**
+```bash
+sudo systemctl restart apache2
+```
+
+**Se usar LibreOffice para conversão, reinicie-o também** ou reinicie o computador.
+
+### Testar a Fonte
+
+Para verificar se a fonte está sendo reconhecida:
+
+1. Acesse uma das contas de teste de organizador
+2. Gere um certificado
+3. Verifique se o texto está com a fonte correta (sem partes fora do lugar por exemplo)
+
+---
+
+## 7️⃣ Instalação do LibreOffice (Opcional mas ALTAMENTE RECOMENDADO)
 
 O LibreOffice é **opcional** para geração de certificados em PDF. O sistema funciona sem ele, mas a qualidade pode variar em muito!
 
@@ -300,7 +402,7 @@ Ou edite `Certificacao/config.php`:
 
 ---
 
-## 7️⃣ Configuração do PHP
+## 8️⃣ Configuração do PHP
 
 ### Editar php.ini
 
@@ -336,7 +438,7 @@ Após editar o `php.ini`:
 sudo systemctl restart apache2
 ```
 
-## 8️⃣ Configuração do Painel Administrativo
+## 9️⃣ Configuração do Painel Administrativo
 
 O sistema possui um painel administrativo para gerenciar códigos de organizador e realizar backups.
 
@@ -359,7 +461,7 @@ define('ADMIN_PASS_HASH', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5
 
 ---
 
-## 9️⃣ Configuração de Pastas e Permissões
+## 🔟 Configuração de Pastas e Permissões
 
 ### Pastas que Precisam de Permissão de Escrita
 
@@ -377,7 +479,7 @@ CEU/
 
 ---
 
-## 🔟 Primeiro Acesso e Verificação
+## 1️⃣1️⃣ Primeiro Acesso e Verificação
 
 ### 1. Acessar o Sistema
 
@@ -435,25 +537,26 @@ Se você importou o arquivo de dados iniciais, já existem usuários de teste.
 ### Lista de Verificação Completa
 
 Execute esta checklist:
-
 ```
 ☐ XAMPP instalado e rodando (Apache + MySQL)
 ☐ Projeto em C:\xampp\htdocs\CEU
 ☐ Banco de dados CEU_bd criado e populado
-☐ Extensões PHP habilitadas (mysqli, zip, mbstring)
+☐ Extensões PHP habilitadas (mysqli, zip, mbstring, gd, fileinfo)
 ☐ Dependências do Composer instaladas
+☐ Fonte Inter instalada no sistema
+☐ Apache reiniciado após instalação da fonte
 ☐ LibreOffice instalado (opcional)
 ☐ Permissões de pastas configuradas
 ☐ Acesso ao site funcionando (http://localhost/CEU)
 ☐ Login/cadastro funcionando
 ☐ Criação de evento funcionando
-☐ Geração de certificado funcionando
+☐ Geração de certificado funcionando (com fonte correta)
 ☐ Painel Admin acessível
 ```
 
 ---
 
-## 1️⃣1️⃣ Configuração do PWA
+## 1️⃣2️⃣ Configuração do PWA
 
 O CEU é um Progressive Web App (PWA), permitindo instalação como aplicativo. Porém, somente se o sistema identificar a quantidade de pixels vertical maior que a horizontal, considerando o dispositivo como mobile.
 
@@ -466,7 +569,7 @@ O CEU é um Progressive Web App (PWA), permitindo instalação como aplicativo. 
 
 ---
 
-## 1️⃣2️⃣ Solução de Problemas Comuns
+## 1️⃣3️⃣ Solução de Problemas Comuns
 
 ### Problema: "Erro na conexão com o banco de dados"
 
@@ -501,6 +604,7 @@ O CEU é um Progressive Web App (PWA), permitindo instalação como aplicativo. 
 - Dependências do Composer não instaladas
 - Pasta sem permissão de escrita
 - Template não encontrado
+- Fonte Inter não instalada
 
 **Solução:**
 ```
@@ -508,6 +612,22 @@ O CEU é um Progressive Web App (PWA), permitindo instalação como aplicativo. 
 2. Se não existe, instalar dependências
 3. Verificar permissões da pasta Certificacao/certificados
 4. Verificar se template existe em Certificacao/templates
+5. Instalar fonte Inter no sistema (ver seção 6)
+6. Reiniciar Apache após instalar a fonte
+```
+
+### Problema: "Certificado gerado com fonte errada"
+
+**Causa:**
+- Fonte Inter não está instalada no sistema
+
+**Solução:**
+```
+1. Baixar fonte Inter: https://fonts.google.com/specimen/Inter
+2. Instalar todos os arquivos .ttf
+3. Reiniciar Apache
+4. Se usar LibreOffice, reiniciar o computador
+5. Gerar certificado novamente
 ```
 
 ### Problema: "Upload de imagem falha"
@@ -592,7 +712,7 @@ log_errors = On
 
 ---
 
-## 1️⃣3️⃣ Modo de Desenvolvimento
+## 1️⃣4️⃣ Modo de Desenvolvimento
 
 Para facilitar testes durante desenvolvimento, o sistema possui configurações especiais.
 
@@ -725,11 +845,20 @@ mysql -u root CEU_bd < backup.sql
 
 ### Projeto
 - [ ] Arquivos em `C:\xampp\htdocs\CEU`
-- [ ] Estrutura de pastas verificada
 
 ### Banco de Dados
 - [ ] Banco `CEU_bd` criado
 - [ ] Arquivo `BancodeDadosCEU.sql` importado
+- [ ] Arquivo `PopularBancoDados.sql` importado (opcional)
+- [ ] Conexão testada
+
+### Certificação
+- [ ] Composer instalado
+- [ ] Dependências instaladas (`vendor/` existe)
+- [ ] Fonte Inter instalada no sistema
+- [ ] Apache reiniciado após instalar fonte
+- [ ] LibreOffice instalado (recomendado)
+- [ ] Template de teste existe.sql` importado
 - [ ] Arquivo `PopularBancoDados.sql` importado (opcional)
 - [ ] Conexão testada
 
