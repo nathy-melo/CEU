@@ -36,12 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
                 'success' => true,
                 'certificado' => [
                     'codigo' => $certificado['cod_verificacao'] ?? '',
-                    'participante' => $dadosArray['Participante'] ?? $dadosArray['nome_participante'] ?? 'N/A',
+                    'participante' => $dadosArray['NomeParticipante'] ?? $dadosArray['Participante'] ?? $dadosArray['nome_participante'] ?? 'N/A',
                     'evento' => $dadosArray['NomeEvento'] ?? $dadosArray['nome_evento'] ?? 'N/A',
-                    'organizador' => $dadosArray['Organizador'] ?? $dadosArray['nome_organizador'] ?? 'N/A',
-                    'data' => $dadosArray['Data'] ?? $dadosArray['data_emissao'] ?? 'N/A',
+                    'organizador' => $dadosArray['NomeOrganizador'] ?? $dadosArray['Organizador'] ?? $dadosArray['nome_organizador'] ?? 'N/A',
+                    'data' => $dadosArray['DataEvento'] ?? $dadosArray['Data'] ?? $dadosArray['data_emissao'] ?? 'N/A',
                     'carga_horaria' => $dadosArray['CargaHoraria'] ?? $dadosArray['carga_horaria'] ?? 'N/A',
-                    'local' => $dadosArray['Local'] ?? $dadosArray['local_evento'] ?? 'N/A',
+                    'local' => $dadosArray['LocalEvento'] ?? $dadosArray['Local'] ?? $dadosArray['local_evento'] ?? 'N/A',
+                    'tipo_participacao' => $dadosArray['TipoParticipacao'] ?? 'Participante',
                     'arquivo' => $certificado['arquivo'] ?? ''
                 ]
             ]);
@@ -538,14 +539,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
             resultadoIcone.textContent = '✓';
             resultadoTitulo.textContent = 'Certificado Válido';
 
-            certificadoInfo.innerHTML = `
+            let infoHTML = `
                 <p><strong>Participante:</strong> ${certificado.participante || 'N/A'}</p>
                 <p><strong>Evento:</strong> ${certificado.evento || 'N/A'}</p>
                 <p><strong>Organizador:</strong> ${certificado.organizador || 'N/A'}</p>
                 <p><strong>Data:</strong> ${certificado.data || 'N/A'}</p>
-                <p><strong>Carga Horária:</strong> ${certificado.carga_horaria || 'N/A'} horas</p>
+                <p><strong>Carga Horária:</strong> ${certificado.carga_horaria || 'N/A'}</p>
                 <p><strong>Local:</strong> ${certificado.local || 'N/A'}</p>
+                <p><strong>Tipo de Participação:</strong> ${certificado.tipo_participacao || 'N/A'}</p>
             `;
+
+            certificadoInfo.innerHTML = infoHTML;
 
             resultadoConteudo.innerHTML = `
                 <p>Este certificado foi encontrado em nossa base de dados e é válido.</p>
