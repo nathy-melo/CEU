@@ -630,6 +630,23 @@ O CEU é um Progressive Web App (PWA), permitindo instalação como aplicativo. 
 5. Gerar certificado novamente
 ```
 
+### Problema: "Algumas verificações não funcionam após ações" (Conhecido)
+
+**Comportamento:**
+- Ao criar uma conta, algumas validações podem não funcionar imediatamente
+- Campos podem não atualizar o estado visual corretamente
+- Necessário atualizar a página (F5) para tudo funcionar normalmente
+
+**Causa:**
+- Problema conhecido de sincronização de estado do JavaScript
+
+**Solução Temporária:**
+```
+1. Após criar conta ou realizar ações importantes
+2. Pressione F5 para recarregar a página
+3. As verificações funcionarão normalmente
+```
+
 ### Problema: "Upload de imagem falha"
 
 **Causas possíveis:**
