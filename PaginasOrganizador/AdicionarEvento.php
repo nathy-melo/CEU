@@ -2226,7 +2226,10 @@ mysqli_close($conexao);
 
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        imagens.push(e.target.result);
+                        imagens.push({
+                            file: file,
+                            preview: e.target.result
+                        });
                         if (imagens.length === 1) {
                             indiceAtual = 0;
                             mostrarCarrossel();
@@ -2235,14 +2238,12 @@ mysqli_close($conexao);
                     };
                     reader.readAsDataURL(file);
                 });
-
-                event.target.value = '';
             };
 
             function mostrarCarrossel() {
                 document.getElementById('placeholder-imagem').style.display = 'none';
                 document.getElementById('carrossel-imagens').style.display = 'flex';
-                document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+                document.getElementById('imagem-carrossel').src = imagens[indiceAtual].preview;
             }
 
             function esconderCarrossel() {
@@ -2260,7 +2261,7 @@ mysqli_close($conexao);
                         if (indiceAtual >= imagens.length) {
                             indiceAtual = imagens.length - 1;
                         }
-                        document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+                        document.getElementById('imagem-carrossel').src = imagens[indiceAtual].preview;
                         atualizarVisibilidadeSetas();
                     }
                 }
@@ -2282,14 +2283,14 @@ mysqli_close($conexao);
             window.mudarImagem = function(direcao) {
                 if (imagens.length > 0) {
                     indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
-                    document.getElementById('imagem-carrossel').src = imagens[indiceAtual];
+                    document.getElementById('imagem-carrossel').src = imagens[indiceAtual].preview;
                 }
             };
 
             window.mudarImagemModal = function(direcao) {
                 if (imagens.length > 0) {
                     indiceAtual = (indiceAtual + direcao + imagens.length) % imagens.length;
-                    document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+                    document.getElementById('imagem-ampliada').src = imagens[indiceAtual].preview;
                 }
             };
 
@@ -2298,7 +2299,7 @@ mysqli_close($conexao);
                 imgCarrossel.onclick = function(e) {
                     e.stopPropagation();
                     if (imagens.length > 0) {
-                        document.getElementById('imagem-ampliada').src = imagens[indiceAtual];
+                        document.getElementById('imagem-ampliada').src = imagens[indiceAtual].preview;
                         document.getElementById('modal-imagem').style.display = 'flex';
                     }
                 };
@@ -2308,10 +2309,8 @@ mysqli_close($conexao);
                 document.getElementById('modal-imagem').style.display = 'none';
             };
 
-            // CORREÇÃO PRINCIPAL: Adiciona listener do formulário de forma segura
             const formEvento = document.getElementById('form-evento');
             if (formEvento) {
-                // Remove listener anterior se existir
                 formEvento.onsubmit = null;
                 
                 formEvento.addEventListener('submit', function(e) {
@@ -2330,6 +2329,15 @@ mysqli_close($conexao);
                     }
 
                     const formData = new FormData(this);
+
+                    formData.delete('imagens_evento');
+                    formData.delete('imagens_evento[]');
+
+                    if (imagens.length > 0) {
+                        imagens.forEach((img, index) => {
+                            formData.append('imagens_evento[]', img.file, img.file.name);
+                        });
+                    }
 
                     if (colaboradores.length > 0) {
                         formData.append('colaboradores', JSON.stringify(colaboradores));
